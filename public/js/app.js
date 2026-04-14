@@ -6553,6 +6553,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   data: function data() {
     return {
+      pasoActual: 1,
+      listaPacientes: [],
+      busquedaTexto: '',
+      timerBusqueda: null,
       precios: [],
       nosrecomienda: true,
       precioNuevo: true,
@@ -6648,10 +6652,75 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     };
   },
   mounted: function mounted() {
+    var _this = this;
     this.$parent.$on('limpiarDescuentos', this.limpiarInputs(false));
     this.pedirMonedas();
+    this.fetchPacientes();
+    var modal = document.getElementById('modalNuevaCita');
+    if (modal) {
+      modal.addEventListener('hidden.bs.modal', function () {
+        _this.pasoActual = 1;
+        _this.busquedaTexto = '';
+        _this.fetchPacientes();
+      });
+    }
   },
   methods: {
+    fetchPacientes: function fetchPacientes() {
+      var _this2 = this;
+      this.axios.get('/api/getLast10Patients').then(function (res) {
+        return _this2.listaPacientes = res.data;
+      })["catch"](function (err) {
+        return console.error(err);
+      });
+    },
+    buscarPacientes: function buscarPacientes() {
+      var _this3 = this;
+      clearTimeout(this.timerBusqueda);
+      this.timerBusqueda = setTimeout(function () {
+        if (_this3.busquedaTexto.length >= 2) {
+          _this3.axios.get('/api/searchPatientByNameDni/' + _this3.busquedaTexto).then(function (res) {
+            return _this3.listaPacientes = res.data;
+          })["catch"](function (err) {
+            return console.error(err);
+          });
+        } else if (_this3.busquedaTexto.length === 0) {
+          _this3.fetchPacientes();
+        }
+      }, 400);
+    },
+    seleccionarPaciente: function seleccionarPaciente(paciente) {
+      this.cita.dni = paciente.dni;
+      this.reniec();
+      this.pasoActual = 2;
+    },
+    guardarNuevoPaciente: function guardarNuevoPaciente() {
+      if (this.cita.type_dni == 1 && (this.cita.dni == '' || this.cita.dni.length < 8)) {
+        alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Todo paciente debe tener un DNI válido', 10);
+        return;
+      }
+      if (this.cita.name == '' && this.cita.nombres == '') {
+        alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar apellidos y nombres', 10);
+        return;
+      }
+      if (this.cita.phone == '') {
+        alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar un celular', 10);
+        return;
+      }
+      if (this.cita.contacto == '' || this.cita.contacto_celular == '' || this.cita.parentezco == '') {
+        alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar el contacto de emergencia', 10);
+        return;
+      }
+      this.patientNew = true;
+      this.pasoActual = 2;
+      var myModalEl = document.getElementById('modalNuevoPaciente');
+      var modal = bootstrap.Modal.getInstance(myModalEl);
+      if (modal) {
+        modal.hide();
+      } else {
+        document.querySelector('#modalNuevoPaciente .btn-close').click();
+      }
+    },
     horaLatam1: function horaLatam1(horita) {
       return moment__WEBPACK_IMPORTED_MODULE_2___default()(horita, 'HH:mm:ss').format('hh:mm');
     },
@@ -6659,11 +6728,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       return moment__WEBPACK_IMPORTED_MODULE_2___default()(horita, 'HH:mm:ss').format('hh:mm a');
     },
     precioDinamico: function precioDinamico() {
-      var _this = this;
+      var _this4 = this;
       this.cita.price = 0;
       if (this.cita.type == '') this.cita.price = 0;else {
         var precioPadre = this.precios.find(function (p) {
-          return p.id == _this.cita.type;
+          return p.id == _this4.cita.type;
         });
         var precio = 0;
         var descuentoPorcentual;
@@ -6684,13 +6753,13 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     pedirMonedas: function pedirMonedas() {
-      var _this2 = this;
+      var _this5 = this;
       this.axios('/api/listarMonedas').then(function (resp) {
-        return _this2.monedas = resp.data;
+        return _this5.monedas = resp.data;
       });
     },
     insertar: function insertar(e) {
-      var _this3 = this;
+      var _this6 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         var config, formData;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
@@ -6702,7 +6771,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   'content-type': 'multipart/form-data'
                 }
               };
-              if (!(_this3.cita.type_dni == 1 && (_this3.cita.dni == '' || _this3.cita.dni.length < 8))) {
+              if (!(_this6.cita.type_dni == 1 && (_this6.cita.dni == '' || _this6.cita.dni.length < 8))) {
                 _context.next = 6;
                 break;
               }
@@ -6710,7 +6779,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context.next = 90;
               break;
             case 6:
-              if (!(_this3.cita.type_dni != 1 && (_this3.cita.dni == '' || _this3.cita.dni.length < 8))) {
+              if (!(_this6.cita.type_dni != 1 && (_this6.cita.dni == '' || _this6.cita.dni.length < 8))) {
                 _context.next = 10;
                 break;
               }
@@ -6718,7 +6787,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context.next = 90;
               break;
             case 10:
-              if (!(_this3.cita.name == '' && _this3.cita.nombres == '')) {
+              if (!(_this6.cita.name == '' && _this6.cita.nombres == '')) {
                 _context.next = 14;
                 break;
               }
@@ -6726,7 +6795,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context.next = 90;
               break;
             case 14:
-              if (!(_this3.cita.phone == '')) {
+              if (!(_this6.cita.phone == '')) {
                 _context.next = 18;
                 break;
               }
@@ -6734,7 +6803,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context.next = 90;
               break;
             case 18:
-              if (_this3.cita.type) {
+              if (_this6.cita.type) {
                 _context.next = 22;
                 break;
               }
@@ -6742,7 +6811,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context.next = 90;
               break;
             case 22:
-              if (!(_this3.tieneDescuento && _this3.razonPorcentaje == '')) {
+              if (!(_this6.tieneDescuento && _this6.razonPorcentaje == '')) {
                 _context.next = 26;
                 break;
               }
@@ -6750,7 +6819,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context.next = 90;
               break;
             case 26:
-              if (!(_this3.tieneRebaja && _this3.razonRebaja == '')) {
+              if (!(_this6.tieneRebaja && _this6.razonRebaja == '')) {
                 _context.next = 30;
                 break;
               }
@@ -6758,7 +6827,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context.next = 90;
               break;
             case 30:
-              if (!(_this3.descuentoAdelanto && _this3.razonAdelanto == '')) {
+              if (!(_this6.descuentoAdelanto && _this6.razonAdelanto == '')) {
                 _context.next = 34;
                 break;
               }
@@ -6766,7 +6835,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context.next = 90;
               break;
             case 34:
-              if (!(_this3.cita.contacto == '' || _this3.cita.contacto_celular == '' || _this3.cita.parentezco == '')) {
+              if (!(_this6.cita.contacto == '' || _this6.cita.contacto_celular == '' || _this6.cita.parentezco == '')) {
                 _context.next = 38;
                 break;
               }
@@ -6774,7 +6843,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context.next = 90;
               break;
             case 38:
-              if (!(_this3.cita.recomendation == '')) {
+              if (!(_this6.cita.recomendation == '')) {
                 _context.next = 42;
                 break;
               }
@@ -6783,66 +6852,66 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               break;
             case 42:
               formData = new FormData();
-              formData.append('dni', _this3.cita.dni);
-              formData.append('phone', _this3.cita.phone);
-              formData.append('name', _this3.cita.name.toUpperCase() || 'Sin apellidos');
-              formData.append('nombres', _this3.cita.nombres.toUpperCase() || '');
-              formData.append('email', _this3.cita.email);
-              formData.append('address', _this3.cita.address);
-              formData.append('department', _this3.cita.department);
-              formData.append('province', _this3.cita.province);
-              formData.append('district', _this3.cita.district);
-              formData.append('birth_date', _this3.cita.birth_date);
-              formData.append('gender', parseInt(_this3.cita.gender));
-              formData.append('occupation', _this3.cita.occupation);
-              formData.append('marital_status', _this3.cita.marital_status);
-              formData.append('instruction_degree', _this3.cita.instruction_degree);
-              formData.append('professional_id', _this3.cita.professional_id);
-              formData.append('schedule_id', _this3.horaElegida.id);
-              formData.append('check_time', _this3.horaElegida.check_time);
-              formData.append('date', _this3.fechaElegida);
-              formData.append('clasification', _this3.cita.clasification);
-              formData.append('price', _this3.cita.price);
-              formData.append('type', _this3.cita.type); //nueva lista de servicios
+              formData.append('dni', _this6.cita.dni);
+              formData.append('phone', _this6.cita.phone);
+              formData.append('name', _this6.cita.name.toUpperCase() || 'Sin apellidos');
+              formData.append('nombres', _this6.cita.nombres.toUpperCase() || '');
+              formData.append('email', _this6.cita.email);
+              formData.append('address', _this6.cita.address);
+              formData.append('department', _this6.cita.department);
+              formData.append('province', _this6.cita.province);
+              formData.append('district', _this6.cita.district);
+              formData.append('birth_date', _this6.cita.birth_date);
+              formData.append('gender', parseInt(_this6.cita.gender));
+              formData.append('occupation', _this6.cita.occupation);
+              formData.append('marital_status', _this6.cita.marital_status);
+              formData.append('instruction_degree', _this6.cita.instruction_degree);
+              formData.append('professional_id', _this6.cita.professional_id);
+              formData.append('schedule_id', _this6.horaElegida.id);
+              formData.append('check_time', _this6.horaElegida.check_time);
+              formData.append('date', _this6.fechaElegida);
+              formData.append('clasification', _this6.cita.clasification);
+              formData.append('price', _this6.cita.price);
+              formData.append('type', _this6.cita.type); //nueva lista de servicios
               //formData.append('patient_condition', this.cita.patient_condition); //El sistema evalúa la condición: nuevo o continuo, no es necesario pasar
-              formData.append('recomendation', _this3.cita.recomendation);
-              formData.append('recomendacion_comentario', _this3.cita.recomendacion_comentario);
-              formData.append('mode', _this3.esPresencial ? 1 : 2);
-              formData.append('link', _this3.cita.link);
-              formData.append('type_dni', _this3.cita.type_dni);
-              formData.append('contacto', _this3.cita.contacto);
-              formData.append('contacto_celular', _this3.cita.contacto_celular);
-              formData.append('parentezco', _this3.cita.parentezco);
-              formData.append('contacto2', _this3.cita.contacto2);
-              formData.append('contacto_celular2', _this3.cita.contacto_celular2);
-              formData.append('parentezco2', _this3.cita.parentezco2);
-              formData.append('continuo', _this3.precioNuevo ? '1' : 2); //this.cita.type_amount
-              formData.append('user_id', _this3.idUsuario);
+              formData.append('recomendation', _this6.cita.recomendation);
+              formData.append('recomendacion_comentario', _this6.cita.recomendacion_comentario);
+              formData.append('mode', _this6.esPresencial ? 1 : 2);
+              formData.append('link', _this6.cita.link);
+              formData.append('type_dni', _this6.cita.type_dni);
+              formData.append('contacto', _this6.cita.contacto);
+              formData.append('contacto_celular', _this6.cita.contacto_celular);
+              formData.append('parentezco', _this6.cita.parentezco);
+              formData.append('contacto2', _this6.cita.contacto2);
+              formData.append('contacto_celular2', _this6.cita.contacto_celular2);
+              formData.append('parentezco2', _this6.cita.parentezco2);
+              formData.append('continuo', _this6.precioNuevo ? '1' : 2); //this.cita.type_amount
+              formData.append('user_id', _this6.idUsuario);
               formData.append('formato_nuevo', 1);
               formData.append('etiqueta', $('#sltServicio option:selected').text());
-              formData.append('rebaja', _this3.descuentoRebaja);
-              formData.append('motivoRebaja', _this3.razonRebaja);
-              formData.append('descuento', _this3.descuentoPorcentaje);
-              formData.append('motivoDescuento', _this3.razonPorcentaje);
-              formData.append('new_status', _this3.cita.new_status);
-              formData.append('adelanto', _this3.descuentoAdelanto);
-              formData.append('razonAdelanto', _this3.razonAdelanto);
-              formData.append('monedaAdelanto', _this3.monedaAdelanto);
-              formData.append('idSede', _this3.idSede);
+              formData.append('rebaja', _this6.descuentoRebaja);
+              formData.append('motivoRebaja', _this6.razonRebaja);
+              formData.append('descuento', _this6.descuentoPorcentaje);
+              formData.append('motivoDescuento', _this6.razonPorcentaje);
+              formData.append('new_status', _this6.cita.new_status);
+              formData.append('adelanto', _this6.descuentoAdelanto);
+              formData.append('razonAdelanto', _this6.razonAdelanto);
+              formData.append('monedaAdelanto', _this6.monedaAdelanto);
+              formData.append('idSede', _this6.idSede);
               _context.next = 90;
-              return _this3.axios.post('/api/appointment', formData, config).then(function (response) {
+              return _this6.axios.post('/api/appointment', formData, config).then(function (response) {
                 //Trabaja en api -> modelo (appointment)>store()
                 console.log(response.data);
-                _this3.closeModal();
-                _this3.cita.membresia = '';
-                _this3.$emit('actualizarListadoCitas', true);
+                _this6.closeModal();
+                _this6.cita.membresia = '';
+                _this6.$emit('actualizarListadoCitas', true);
                 //console.log(response.data.cita.id)
-                _this3.$swal({
+                _this6.$swal({
                   icon: 'success',
                   title: 'Cita registrada con éxito'
                 });
                 //this.$parent.listar()
-                _this3.clearModal();
+                _this6.clearModal();
               })["catch"](function (error) {
                 console.log(error);
               });
@@ -6863,6 +6932,9 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     clearModal: function clearModal() {
+      this.pasoActual = 1;
+      this.busquedaTexto = '';
+      this.fetchPacientes();
       this.cita.phone = '';
       this.cita.dni = '';
       this.cita.name = '';
@@ -6915,7 +6987,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.monedaAdelanto = 1;
     },
     reniec: function reniec() {
-      var _this4 = this;
+      var _this7 = this;
       if (this.switchReciec === 0) return;
       this.switchReciec = 0;
       this.limpiarInputs(false);
@@ -6926,28 +6998,28 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         timer: 2500,
         timerProgressBar: true,
         didOpen: function didOpen() {
-          timerProgressBar: true, _this4.$swal.showLoading();
+          timerProgressBar: true, _this7.$swal.showLoading();
         }
       });
       this.axios.get("/api/buscarPacienteDB/" + this.cita.dni).then(function (res) {
         if (res.data.patient == null) {
           //Buscar en reniec, nuevo
-          if (_this4.cita.type_dni == 1) {
+          if (_this7.cita.type_dni == 1) {
             //window.axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
-            _this4.axios.get("/api/buscarDni/" + _this4.cita.dni).then(function (response) {
+            _this7.axios.get("/api/buscarDni/" + _this7.cita.dni).then(function (response) {
               console.log(response.data);
-              _this4.cita.name = "".concat(response.data.apellido_paterno, " ").concat(response.data.apellido_materno, " ").trim();
-              _this4.cita.nombres = "".concat(response.data.nombres.trim());
-              _this4.cita.vivo = 1;
+              _this7.cita.name = "".concat(response.data.apellido_paterno, " ").concat(response.data.apellido_materno, " ").trim();
+              _this7.cita.nombres = "".concat(response.data.nombres.trim());
+              _this7.cita.vivo = 1;
               if (response.data.apellido_paterno) {
-                _this4.patientNew = false;
-                _this4.$swal.fire({
+                _this7.patientNew = false;
+                _this7.$swal.fire({
                   icon: 'success',
                   title: 'Okey',
                   text: 'Paciente nuevo'
                 });
               } else {
-                _this4.$swal.fire({
+                _this7.$swal.fire({
                   icon: 'error',
                   title: 'Oops...',
                   text: 'DNI no encontrado!',
@@ -6961,7 +7033,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         } else {
           var _res$data$relacion$0$, _res$data$relacion$0$2, _res$data$relacion$0$3, _res$data$relacion$1$, _res$data$relacion$, _res$data$relacion$1$2, _res$data$relacion$2, _res$data$relacion$1$3, _res$data$relacion$3;
           //encontró en la DB
-          _this4.$swal.fire({
+          _this7.$swal.fire({
             title: 'Buscando paciente',
             timer: 10
           });
@@ -6972,49 +7044,49 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             for (var i = 0; i < cantDeudas; i++) {
               sumaDeudas += res.data.deudas[i].monto;
             }
-            _this4.alertaDeudas = true;
-            _this4.mensajeDeudas = "El paciente tiene <strong>".concat(cantDeudas == 1 ? '1 deuda' : cantDeudas + ' deudas', "</strong> de <strong>").concat(moment__WEBPACK_IMPORTED_MODULE_2___default()(res.data.deudas[0].fecha).fromNow(), "</strong> por un total de <strong>S/ ").concat(parseFloat(sumaDeudas).toFixed(2), "</strong>");
-          } else _this4.alertaDeudas = false;
+            _this7.alertaDeudas = true;
+            _this7.mensajeDeudas = "El paciente tiene <strong>".concat(cantDeudas == 1 ? '1 deuda' : cantDeudas + ' deudas', "</strong> de <strong>").concat(moment__WEBPACK_IMPORTED_MODULE_2___default()(res.data.deudas[0].fecha).fromNow(), "</strong> por un total de <strong>S/ ").concat(parseFloat(sumaDeudas).toFixed(2), "</strong>");
+          } else _this7.alertaDeudas = false;
           if (res.data.patient.faults != 0) {
-            _this4.$swal.fire({
+            _this7.$swal.fire({
               title: 'Atención, este paciente tiene ' + res.data.patient.faults + ' faltas'
             });
           }
-          _this4.cita.name = res.data.patient.name;
-          _this4.cita.nombres = res.data.patient.nombres;
-          _this4.cita.phone = res.data.patient.phone;
-          _this4.cita.email = res.data.patient.email;
-          _this4.cita.birth_date = res.data.patient.birth_date;
-          _this4.cita.marital_status = res.data.patient.marital_status;
-          _this4.cita.instruction_degree = res.data.patient.instruction_degree;
-          _this4.cita.gender = typeof parseInt(res.data.patient.gender) === 'number' && res.data.patient.gender !== null ? res.data.patient.gender : 2;
-          _this4.cita.occupation = res.data.patient.occupation;
-          _this4.cita.address = res.data.patient.address.address;
-          _this4.cita.department = res.data.patient.address.department;
-          _this4.cita.province = res.data.patient.address.province;
-          _this4.cita.district = res.data.patient.address.district;
-          _this4.cita.vivo = res.data.patient.vivo;
-          _this4.cita.contacto = (_res$data$relacion$0$ = res.data.relacion[0].name) !== null && _res$data$relacion$0$ !== void 0 ? _res$data$relacion$0$ : '';
-          _this4.cita.contacto_celular = (_res$data$relacion$0$2 = res.data.relacion[0].phone) !== null && _res$data$relacion$0$2 !== void 0 ? _res$data$relacion$0$2 : '';
-          _this4.cita.parentezco = (_res$data$relacion$0$3 = res.data.relacion[0].kinship) !== null && _res$data$relacion$0$3 !== void 0 ? _res$data$relacion$0$3 : '';
-          _this4.cita.contacto2 = (_res$data$relacion$1$ = (_res$data$relacion$ = res.data.relacion[1]) === null || _res$data$relacion$ === void 0 ? void 0 : _res$data$relacion$.name) !== null && _res$data$relacion$1$ !== void 0 ? _res$data$relacion$1$ : '';
-          _this4.cita.contacto_celular2 = (_res$data$relacion$1$2 = (_res$data$relacion$2 = res.data.relacion[1]) === null || _res$data$relacion$2 === void 0 ? void 0 : _res$data$relacion$2.phone) !== null && _res$data$relacion$1$2 !== void 0 ? _res$data$relacion$1$2 : '';
-          _this4.cita.parentezco2 = (_res$data$relacion$1$3 = (_res$data$relacion$3 = res.data.relacion[1]) === null || _res$data$relacion$3 === void 0 ? void 0 : _res$data$relacion$3.kinship) !== null && _res$data$relacion$1$3 !== void 0 ? _res$data$relacion$1$3 : '';
-          _this4.cita.etiqueta = res.data.patient.etiqueta;
-          _this4.cita.deudas = res.data.patient.deudas;
-          _this4.cita.prev_status = res.data.patient.new_status;
-          _this4.cita.club = res.data.patient.club;
-          _this4.cita.membresia = res.data.membresia;
-          _this4.cita.recomendation = res.data.patient.recomendation;
-          _this4.cita.recomendacion_comentario = res.data.patient.recomendacion_comentario;
-          _this4.patientNew = true;
-          _this4.moverProvincias(false);
-          _this4.moverDistritos();
+          _this7.cita.name = res.data.patient.name;
+          _this7.cita.nombres = res.data.patient.nombres;
+          _this7.cita.phone = res.data.patient.phone;
+          _this7.cita.email = res.data.patient.email;
+          _this7.cita.birth_date = res.data.patient.birth_date;
+          _this7.cita.marital_status = res.data.patient.marital_status;
+          _this7.cita.instruction_degree = res.data.patient.instruction_degree;
+          _this7.cita.gender = typeof parseInt(res.data.patient.gender) === 'number' && res.data.patient.gender !== null ? res.data.patient.gender : 2;
+          _this7.cita.occupation = res.data.patient.occupation;
+          _this7.cita.address = res.data.patient.address.address;
+          _this7.cita.department = res.data.patient.address.department;
+          _this7.cita.province = res.data.patient.address.province;
+          _this7.cita.district = res.data.patient.address.district;
+          _this7.cita.vivo = res.data.patient.vivo;
+          _this7.cita.contacto = (_res$data$relacion$0$ = res.data.relacion[0].name) !== null && _res$data$relacion$0$ !== void 0 ? _res$data$relacion$0$ : '';
+          _this7.cita.contacto_celular = (_res$data$relacion$0$2 = res.data.relacion[0].phone) !== null && _res$data$relacion$0$2 !== void 0 ? _res$data$relacion$0$2 : '';
+          _this7.cita.parentezco = (_res$data$relacion$0$3 = res.data.relacion[0].kinship) !== null && _res$data$relacion$0$3 !== void 0 ? _res$data$relacion$0$3 : '';
+          _this7.cita.contacto2 = (_res$data$relacion$1$ = (_res$data$relacion$ = res.data.relacion[1]) === null || _res$data$relacion$ === void 0 ? void 0 : _res$data$relacion$.name) !== null && _res$data$relacion$1$ !== void 0 ? _res$data$relacion$1$ : '';
+          _this7.cita.contacto_celular2 = (_res$data$relacion$1$2 = (_res$data$relacion$2 = res.data.relacion[1]) === null || _res$data$relacion$2 === void 0 ? void 0 : _res$data$relacion$2.phone) !== null && _res$data$relacion$1$2 !== void 0 ? _res$data$relacion$1$2 : '';
+          _this7.cita.parentezco2 = (_res$data$relacion$1$3 = (_res$data$relacion$3 = res.data.relacion[1]) === null || _res$data$relacion$3 === void 0 ? void 0 : _res$data$relacion$3.kinship) !== null && _res$data$relacion$1$3 !== void 0 ? _res$data$relacion$1$3 : '';
+          _this7.cita.etiqueta = res.data.patient.etiqueta;
+          _this7.cita.deudas = res.data.patient.deudas;
+          _this7.cita.prev_status = res.data.patient.new_status;
+          _this7.cita.club = res.data.patient.club;
+          _this7.cita.membresia = res.data.membresia;
+          _this7.cita.recomendation = res.data.patient.recomendation;
+          _this7.cita.recomendacion_comentario = res.data.patient.recomendacion_comentario;
+          _this7.patientNew = true;
+          _this7.moverProvincias(false);
+          _this7.moverDistritos();
         }
       })["catch"](function (err) {
         console.error(err);
       })["finally"](function (result) {
-        _this4.switchReciec = 1;
+        _this7.switchReciec = 1;
         document.querySelector(".btnReniec").classList.replace('btn-danger', 'btn-info');
       });
     },
@@ -7116,14 +7188,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     listarPrecios: function listarPrecios() {
-      var _this5 = this;
+      var _this8 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
               _context2.next = 2;
-              return _this5.axios.get('/api/listarPreciosTodos').then(function (response) {
-                return _this5.precios = response.data;
+              return _this8.axios.get('/api/listarPreciosTodos').then(function (response) {
+                return _this8.precios = response.data;
               });
             case 2:
             case "end":
@@ -7133,27 +7205,27 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }))();
     },
     listarDepartamentos: function listarDepartamentos() {
-      var _this6 = this;
+      var _this9 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
               _context3.next = 2;
-              return _this6.axios.get('/api/departamentos').then(function (response) {
-                _this6.ubigeo.departamentos = response.data['departamentos'];
-                _this6.ubigeo.provincias = response.data['provincias'];
-                _this6.ubigeo.distritos = response.data['distritos'];
-                _this6.provincias = _this6.ubigeo.provincias.filter(function (provincia) {
+              return _this9.axios.get('/api/departamentos').then(function (response) {
+                _this9.ubigeo.departamentos = response.data['departamentos'];
+                _this9.ubigeo.provincias = response.data['provincias'];
+                _this9.ubigeo.distritos = response.data['distritos'];
+                _this9.provincias = _this9.ubigeo.provincias.filter(function (provincia) {
                   return provincia.idDepa == 12;
                 });
-                _this6.distritos = _this6.ubigeo.distritos.filter(function (distrito) {
+                _this9.distritos = _this9.ubigeo.distritos.filter(function (distrito) {
                   return distrito.idProv == 103;
                 });
-                _this6.cita.department = 12;
-                _this6.cita.province = 103;
-                _this6.cita.district = 1006;
-                _this6.moverProvincias(false);
-                _this6.moverDistritos();
+                _this9.cita.department = 12;
+                _this9.cita.province = 103;
+                _this9.cita.district = 1006;
+                _this9.moverProvincias(false);
+                _this9.moverDistritos();
               });
             case 2:
             case "end":
@@ -10957,7 +11029,7 @@ var render = function render() {
   var _vm$cita$membresia, _vm$cita$membresia$pr, _vm$cita$membresia2, _vm$cita$membresia$pr2, _vm$cita$membresia3;
   var _vm = this,
     _c = _vm._self._c;
-  return _c("div", {
+  return _c("div", [_c("div", {
     staticClass: "modal fade",
     attrs: {
       id: "modalNuevaCita",
@@ -10977,718 +11049,90 @@ var render = function render() {
       submit: _vm.insertar,
       keydown: _vm.prevenirEvent
     }
+  }, [_c("div", {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.pasoActual === 1,
+      expression: "pasoActual === 1"
+    }]
   }, [_vm._m(1), _vm._v(" "), _c("div", {
-    staticClass: "card"
+    staticClass: "card mb-3"
   }, [_c("div", {
     staticClass: "card-body"
   }, [_c("div", {
-    staticClass: "form-group row"
-  }, [_c("div", {
-    staticClass: "col"
-  }, [_vm._m(2), _vm._v(" "), _c("select", {
+    staticClass: "input-group mb-3"
+  }, [_vm._m(2), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.cita.type_dni,
-      expression: "cita.type_dni"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "type_dni"
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.cita, "type_dni", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }
-    }
-  }, [_c("option", {
-    attrs: {
-      value: "1"
-    }
-  }, [_vm._v("D.N.I.")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "2"
-    }
-  }, [_vm._v("Carnet de extranjería")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "3"
-    }
-  }, [_vm._v("Pasaporte")])])]), _vm._v(" "), _c("div", {
-    staticClass: "col"
-  }, [_vm._m(3), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.phone,
-      expression: "cita.phone"
+      value: _vm.busquedaTexto,
+      expression: "busquedaTexto"
     }],
     staticClass: "form-control",
     attrs: {
       type: "text",
-      id: "phone",
-      placeholder: "",
-      autocomplete: "off"
+      placeholder: "Buscar por DNI o Nombres..."
     },
     domProps: {
-      value: _vm.cita.phone
+      value: _vm.busquedaTexto
     },
     on: {
-      keypress: function keypress($event) {
-        return _vm.limitarCel($event);
+      keyup: _vm.buscarPacientes,
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.busquedaTexto = $event.target.value;
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "list-group",
+    staticStyle: {
+      "max-height": "300px",
+      "overflow-y": "auto"
+    }
+  }, [_vm._l(_vm.listaPacientes, function (paciente) {
+    return _c("button", {
+      key: paciente.id,
+      staticClass: "list-group-item list-group-item-action d-flex justify-content-between align-items-center",
+      attrs: {
+        type: "button"
       },
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "phone", $event.target.value);
+      on: {
+        click: function click($event) {
+          return _vm.seleccionarPaciente(paciente);
+        }
       }
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
+    }, [_c("div", [_c("strong", [_vm._v(_vm._s(paciente.name) + " " + _vm._s(paciente.nombres))]), _vm._v(" "), _c("br"), _vm._v(" "), _c("small", {
+      staticClass: "text-muted"
+    }, [_vm._v("DNI: " + _vm._s(paciente.dni))])]), _vm._v(" "), _c("span", {
+      staticClass: "btn btn-sm btn-outline-primary"
+    }, [_vm._v("Seleccionar")])]);
+  }), _vm._v(" "), _vm.listaPacientes.length === 0 ? _c("div", {
+    staticClass: "text-center text-muted my-3"
+  }, [_vm._v("\r\n\t\t\t\t\t\t\t\t\t\tNo se encontraron pacientes.\r\n\t\t\t\t\t\t\t\t\t")]) : _vm._e()], 2), _vm._v(" "), _vm._m(3)])])]), _vm._v(" "), _c("div", {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.pasoActual === 2,
+      expression: "pasoActual === 2"
+    }]
   }, [_c("div", {
-    staticClass: "col-4"
-  }, [_vm.cita.type_dni == 1 ? _c("label", {
+    staticClass: "d-flex justify-content-between align-items-center mb-2"
+  }, [_vm._m(4), _vm._v(" "), _c("div", [_c("span", {
+    staticClass: "badge bg-secondary me-2 fs-6"
+  }, [_vm._v("Paciente: " + _vm._s(_vm.cita.name) + " " + _vm._s(_vm.cita.nombres) + " (" + _vm._s(_vm.cita.dni) + ")")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm btn-outline-secondary",
     attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("D.N.I. "), _c("span", {
-    staticClass: "text-danger"
-  }, [_vm._v("*")])]) : _c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Doc. Extranjero "), _c("span", {
-    staticClass: "text-danger"
-  }, [_vm._v("*")])]), _vm._v(" "), _c("div", {
-    staticClass: "form-inline"
-  }, [_vm.cita.type_dni == 1 ? _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.dni,
-      expression: "cita.dni"
-    }],
-    staticClass: "form-control w-75 mr-1",
-    attrs: {
-      type: "text",
-      name: "dni",
-      id: "dni",
-      placeholder: "DNI del paciente",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.dni
+      type: "button"
     },
     on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "dni", $event.target.value);
+      click: function click($event) {
+        _vm.pasoActual = 1;
       }
-    }
-  }) : _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.dni,
-      expression: "cita.dni"
-    }],
-    staticClass: "form-control w-75 mr-1",
-    attrs: {
-      type: "text",
-      name: "dni",
-      id: "dni",
-      placeholder: "Código de extranjería",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.dni
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "dni", $event.target.value);
-      }
-    }
-  }), _vm._v(" "), _c("a", {
-    staticClass: "btnReniec btn btn-outline-primary",
-    on: {
-      click: _vm.reniec
     }
   }, [_c("i", {
-    staticClass: "fas fa-search"
-  })])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-4"
-  }, [_vm._m(4), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.name,
-      expression: "cita.name"
-    }],
-    staticClass: "form-control text-uppercase",
-    attrs: {
-      type: "text",
-      id: "name",
-      placeholder: "",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.name
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "name", $event.target.value);
-      }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-4"
-  }, [_vm._m(5), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.nombres,
-      expression: "cita.nombres"
-    }],
-    staticClass: "form-control text-uppercase",
-    attrs: {
-      type: "text",
-      id: "name",
-      placeholder: "",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.nombres
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "nombres", $event.target.value);
-      }
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
-  }, [_c("div", {
-    staticClass: "col-sm-4"
-  }, [_vm._m(6), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.birth_date,
-      expression: "cita.birth_date"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "date",
-      name: "birth_date",
-      id: "birth_date"
-    },
-    domProps: {
-      value: _vm.cita.birth_date
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "birth_date", $event.target.value);
-      }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_vm._m(7), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.marital_status,
-      expression: "cita.marital_status"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      name: "marital_status",
-      id: "marital_status"
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.cita, "marital_status", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }
-    }
-  }, [_c("option", {
-    attrs: {
-      value: "2"
-    }
-  }, [_vm._v("Casado")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "5"
-    }
-  }, [_vm._v("Conviviente")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "4"
-    }
-  }, [_vm._v("Divorciado")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "1"
-    }
-  }, [_vm._v("Soltero")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "3"
-    }
-  }, [_vm._v("Viudo")])])])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
-  }, [_c("div", {
-    staticClass: "col-sm-4"
-  }, [_vm._m(8), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.instruction_degree,
-      expression: "cita.instruction_degree"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      name: "instruction_degree",
-      id: "instruction_degree"
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.cita, "instruction_degree", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }
-    }
-  }, [_c("option", {
-    attrs: {
-      value: "1"
-    }
-  }, [_vm._v("Inicial")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "2"
-    }
-  }, [_vm._v("Primaria")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "3"
-    }
-  }, [_vm._v("Secundaria")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "4"
-    }
-  }, [_vm._v("Superior")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "5"
-    }
-  }, [_vm._v("Técnico")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "6"
-    }
-  }, [_vm._v("Sin instrucción")])])]), _vm._v(" "), _c("div", {
-    staticClass: "col"
-  }, [_vm._m(9), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.address,
-      expression: "cita.address"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "address",
-      id: "address",
-      placeholder: "",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.address
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "address", $event.target.value);
-      }
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
-  }, [_c("div", {
-    staticClass: "col-sm-4"
-  }, [_vm._m(10), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.department,
-      expression: "cita.department"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "department"
-    },
-    on: {
-      change: [function ($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.cita, "department", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }, function ($event) {
-        return _vm.moverProvincias(true);
-      }]
-    }
-  }, _vm._l(_vm.ubigeo.departamentos, function (departamento) {
-    return _c("option", {
-      domProps: {
-        value: departamento.idDepa
-      }
-    }, [_vm._v(_vm._s(departamento.departamento))]);
-  }), 0)]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_vm._m(11), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.province,
-      expression: "cita.province"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "provincia"
-    },
-    on: {
-      change: [function ($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.cita, "province", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }, function ($event) {
-        return _vm.moverDistritos();
-      }]
-    }
-  }, _vm._l(_vm.provincias, function (provincia) {
-    return _c("option", {
-      domProps: {
-        value: provincia.idProv
-      }
-    }, [_vm._v(_vm._s(provincia.provincia))]);
-  }), 0)]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_vm._m(12), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.district,
-      expression: "cita.district"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "distrito"
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.cita, "district", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }
-    }
-  }, _vm._l(_vm.distritos, function (distrito) {
-    return _c("option", {
-      domProps: {
-        value: distrito.idDist
-      }
-    }, [_vm._v(_vm._s(distrito.distrito))]);
-  }), 0)])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
-  }, [_c("div", {
-    staticClass: "col-sm-4"
-  }, [_vm._m(13), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.occupation,
-      expression: "cita.occupation"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "occupation",
-      id: "occupation",
-      placeholder: "Ocupación del paciente",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.occupation
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "occupation", $event.target.value);
-      }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_vm._m(14), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.gender,
-      expression: "cita.gender"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "sexo"
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.cita, "gender", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }
-    }
-  }, [_c("option", {
-    attrs: {
-      value: "2"
-    }
-  }, [_vm._v("Sin definir")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "0"
-    }
-  }, [_vm._v("Femenino")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "1"
-    }
-  }, [_vm._v("Masculino")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "3"
-    }
-  }, [_vm._v("LGTB+")])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Correo electrónico")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.email,
-      expression: "cita.email"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "address",
-      id: "address",
-      placeholder: "Correo electrónico",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.email
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "email", $event.target.value);
-      }
-    }
-  })])])])]), _vm._v(" "), _vm._m(15), _vm._v(" "), _c("div", {
-    staticClass: "card"
-  }, [_c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "form-group row"
-  }, [_c("div", {
-    staticClass: "col-sm-4"
-  }, [_vm._m(16), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.contacto,
-      expression: "cita.contacto"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "contacto",
-      id: "contacto",
-      placeholder: "Contacto principal",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.contacto
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "contacto", $event.target.value);
-      }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_vm._m(17), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.contacto_celular,
-      expression: "cita.contacto_celular"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "contacto_celular",
-      id: "contacto_celular",
-      placeholder: "Celular",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.contacto_celular
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "contacto_celular", $event.target.value);
-      }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_vm._m(18), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.parentezco,
-      expression: "cita.parentezco"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "parentezco",
-      id: "parentezco",
-      placeholder: "Parentesco",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.parentezco
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "parentezco", $event.target.value);
-      }
-    }
-  })])]), _vm._v(" "), _c("hr"), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
-  }, [_c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Nombre del segundo contacto")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.contacto2,
-      expression: "cita.contacto2"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "contacto",
-      id: "contacto",
-      placeholder: "Contacto secundario",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.contacto2
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "contacto2", $event.target.value);
-      }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Celular emergencia")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.contacto_celular2,
-      expression: "cita.contacto_celular2"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "contacto_celular",
-      id: "contacto_celular",
-      placeholder: "Celular",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.contacto_celular2
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "contacto_celular2", $event.target.value);
-      }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Parentesco")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.parentezco2,
-      expression: "cita.parentezco2"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "parentezco",
-      id: "parentezco",
-      placeholder: "Parentesco",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.parentezco2
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "parentezco2", $event.target.value);
-      }
-    }
-  })])])])]), _vm._v(" "), _vm._m(19), _vm._v(" "), _c("div", {
+    staticClass: "fas fa-arrow-left"
+  }), _vm._v(" Cambiar")])])]), _vm._v(" "), _c("div", {
     staticClass: "card"
   }, [_c("div", {
     staticClass: "card-body"
@@ -12043,7 +11487,7 @@ var render = function render() {
         }
       }
     }
-  }), _vm._v(" "), _vm._m(20)])]), _vm._v(" "), _vm.nosrecomienda ? _c("div", {
+  }), _vm._v(" "), _vm._m(5)])]), _vm._v(" "), _vm.nosrecomienda ? _c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-sm-4 my-1"
@@ -12393,9 +11837,755 @@ var render = function render() {
     staticClass: "display-6"
   }, [_c("small", {
     staticClass: "fw-light text-secondary"
-  }, [_vm._v("Precio a cobrar")]), _vm._v(" S/ " + _vm._s(parseFloat(_vm.cita.price).toFixed(2)))])])])]), _vm._v(" "), _vm.cita.vivo == 1 ? _c("div", {
+  }, [_vm._v("Precio a cobrar")]), _vm._v(" S/ " + _vm._s(parseFloat(_vm.cita.price).toFixed(2)))])])])]), _vm._v(" "), _vm.cita.vivo == 1 && _vm.pasoActual === 2 ? _c("div", {
     staticClass: "modal-footer border-0 justify-content-center"
-  }, [_vm._m(21), _vm._v(" "), _vm._m(22)]) : _c("div", [_vm._m(23)])])])])])]);
+  }, [_vm._m(6), _vm._v(" "), _vm._m(7)]) : _vm.cita.vivo != 1 && _vm.pasoActual === 2 ? _c("div", [_vm._m(8)]) : _vm._e()])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "modal fade",
+    staticStyle: {
+      "z-index": "1060"
+    },
+    attrs: {
+      id: "modalNuevoPaciente",
+      tabindex: "-1",
+      "aria-labelledby": "modalNuevoPacienteLabel",
+      "aria-hidden": "true"
+    }
+  }, [_c("div", {
+    staticClass: "modal-dialog modal-dialog-scrollable modal-xl"
+  }, [_c("div", {
+    staticClass: "modal-content"
+  }, [_vm._m(9), _vm._v(" "), _c("div", {
+    staticClass: "modal-body"
+  }, [_vm._m(10), _vm._v(" "), _c("div", {
+    staticClass: "card mb-3"
+  }, [_c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "form-group row"
+  }, [_c("div", {
+    staticClass: "col"
+  }, [_vm._m(11), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.type_dni,
+      expression: "cita.type_dni"
+    }],
+    staticClass: "form-select",
+    attrs: {
+      id: "type_dni"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.cita, "type_dni", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "1"
+    }
+  }, [_vm._v("D.N.I.")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "2"
+    }
+  }, [_vm._v("Carnet de extranjería")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "3"
+    }
+  }, [_vm._v("Pasaporte")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col"
+  }, [_vm._m(12), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.phone,
+      expression: "cita.phone"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      id: "phone",
+      placeholder: "",
+      autocomplete: "off"
+    },
+    domProps: {
+      value: _vm.cita.phone
+    },
+    on: {
+      keypress: function keypress($event) {
+        return _vm.limitarCel($event);
+      },
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "phone", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "form-group row"
+  }, [_c("div", {
+    staticClass: "col-4"
+  }, [_vm.cita.type_dni == 1 ? _c("label", {
+    attrs: {
+      "for": "name"
+    }
+  }, [_vm._v("D.N.I. "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]) : _c("label", {
+    attrs: {
+      "for": "name"
+    }
+  }, [_vm._v("Doc. Extranjero "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]), _vm._v(" "), _c("div", {
+    staticClass: "form-inline"
+  }, [_vm.cita.type_dni == 1 ? _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.dni,
+      expression: "cita.dni"
+    }],
+    staticClass: "form-control w-75 mr-1",
+    attrs: {
+      type: "text",
+      name: "dni",
+      id: "dni",
+      placeholder: "DNI del paciente",
+      autocomplete: "off"
+    },
+    domProps: {
+      value: _vm.cita.dni
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "dni", $event.target.value);
+      }
+    }
+  }) : _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.dni,
+      expression: "cita.dni"
+    }],
+    staticClass: "form-control w-75 mr-1",
+    attrs: {
+      type: "text",
+      name: "dni",
+      id: "dni",
+      placeholder: "Código de extranjería",
+      autocomplete: "off"
+    },
+    domProps: {
+      value: _vm.cita.dni
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "dni", $event.target.value);
+      }
+    }
+  }), _vm._v(" "), _c("a", {
+    staticClass: "btnReniec btn btn-outline-primary",
+    on: {
+      click: _vm.reniec
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-search"
+  })])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-4"
+  }, [_vm._m(13), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.name,
+      expression: "cita.name"
+    }],
+    staticClass: "form-control text-uppercase",
+    attrs: {
+      type: "text",
+      id: "name",
+      placeholder: "",
+      autocomplete: "off"
+    },
+    domProps: {
+      value: _vm.cita.name
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "name", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-4"
+  }, [_vm._m(14), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.nombres,
+      expression: "cita.nombres"
+    }],
+    staticClass: "form-control text-uppercase",
+    attrs: {
+      type: "text",
+      id: "name",
+      placeholder: "",
+      autocomplete: "off"
+    },
+    domProps: {
+      value: _vm.cita.nombres
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "nombres", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "form-group row"
+  }, [_c("div", {
+    staticClass: "col-sm-4"
+  }, [_vm._m(15), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.birth_date,
+      expression: "cita.birth_date"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "date",
+      name: "birth_date",
+      id: "birth_date"
+    },
+    domProps: {
+      value: _vm.cita.birth_date
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "birth_date", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
+  }, [_vm._m(16), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.marital_status,
+      expression: "cita.marital_status"
+    }],
+    staticClass: "form-select",
+    attrs: {
+      name: "marital_status",
+      id: "marital_status"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.cita, "marital_status", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "2"
+    }
+  }, [_vm._v("Casado")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "5"
+    }
+  }, [_vm._v("Conviviente")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "4"
+    }
+  }, [_vm._v("Divorciado")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "1"
+    }
+  }, [_vm._v("Soltero")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "3"
+    }
+  }, [_vm._v("Viudo")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "form-group row"
+  }, [_c("div", {
+    staticClass: "col-sm-4"
+  }, [_vm._m(17), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.instruction_degree,
+      expression: "cita.instruction_degree"
+    }],
+    staticClass: "form-select",
+    attrs: {
+      name: "instruction_degree",
+      id: "instruction_degree"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.cita, "instruction_degree", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "1"
+    }
+  }, [_vm._v("Inicial")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "2"
+    }
+  }, [_vm._v("Primaria")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "3"
+    }
+  }, [_vm._v("Secundaria")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "4"
+    }
+  }, [_vm._v("Superior")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "5"
+    }
+  }, [_vm._v("Técnico")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "6"
+    }
+  }, [_vm._v("Sin instrucción")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col"
+  }, [_vm._m(18), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.address,
+      expression: "cita.address"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "address",
+      id: "address",
+      placeholder: "",
+      autocomplete: "off"
+    },
+    domProps: {
+      value: _vm.cita.address
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "address", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "form-group row"
+  }, [_c("div", {
+    staticClass: "col-sm-4"
+  }, [_vm._m(19), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.department,
+      expression: "cita.department"
+    }],
+    staticClass: "form-select",
+    attrs: {
+      id: "department"
+    },
+    on: {
+      change: [function ($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.cita, "department", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }, function ($event) {
+        return _vm.moverProvincias(true);
+      }]
+    }
+  }, _vm._l(_vm.ubigeo.departamentos, function (departamento) {
+    return _c("option", {
+      domProps: {
+        value: departamento.idDepa
+      }
+    }, [_vm._v(_vm._s(departamento.departamento))]);
+  }), 0)]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
+  }, [_vm._m(20), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.province,
+      expression: "cita.province"
+    }],
+    staticClass: "form-select",
+    attrs: {
+      id: "provincia"
+    },
+    on: {
+      change: [function ($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.cita, "province", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }, function ($event) {
+        return _vm.moverDistritos();
+      }]
+    }
+  }, _vm._l(_vm.provincias, function (provincia) {
+    return _c("option", {
+      domProps: {
+        value: provincia.idProv
+      }
+    }, [_vm._v(_vm._s(provincia.provincia))]);
+  }), 0)]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
+  }, [_vm._m(21), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.district,
+      expression: "cita.district"
+    }],
+    staticClass: "form-select",
+    attrs: {
+      id: "distrito"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.cita, "district", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, _vm._l(_vm.distritos, function (distrito) {
+    return _c("option", {
+      domProps: {
+        value: distrito.idDist
+      }
+    }, [_vm._v(_vm._s(distrito.distrito))]);
+  }), 0)])]), _vm._v(" "), _c("div", {
+    staticClass: "form-group row"
+  }, [_c("div", {
+    staticClass: "col-sm-4"
+  }, [_vm._m(22), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.occupation,
+      expression: "cita.occupation"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "occupation",
+      id: "occupation",
+      placeholder: "Ocupación del paciente",
+      autocomplete: "off"
+    },
+    domProps: {
+      value: _vm.cita.occupation
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "occupation", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
+  }, [_vm._m(23), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.gender,
+      expression: "cita.gender"
+    }],
+    staticClass: "form-select",
+    attrs: {
+      id: "sexo"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.cita, "gender", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "2"
+    }
+  }, [_vm._v("Sin definir")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "0"
+    }
+  }, [_vm._v("Femenino")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "1"
+    }
+  }, [_vm._v("Masculino")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "3"
+    }
+  }, [_vm._v("LGTB+")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
+  }, [_c("label", {
+    attrs: {
+      "for": "name"
+    }
+  }, [_vm._v("Correo electrónico")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.email,
+      expression: "cita.email"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "address",
+      id: "address",
+      placeholder: "Correo electrónico",
+      autocomplete: "off"
+    },
+    domProps: {
+      value: _vm.cita.email
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "email", $event.target.value);
+      }
+    }
+  })])])])]), _vm._v(" "), _vm._m(24), _vm._v(" "), _c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "form-group row"
+  }, [_c("div", {
+    staticClass: "col-sm-4"
+  }, [_vm._m(25), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.contacto,
+      expression: "cita.contacto"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "contacto",
+      id: "contacto",
+      placeholder: "Contacto principal",
+      autocomplete: "off"
+    },
+    domProps: {
+      value: _vm.cita.contacto
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "contacto", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
+  }, [_vm._m(26), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.contacto_celular,
+      expression: "cita.contacto_celular"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "contacto_celular",
+      id: "contacto_celular",
+      placeholder: "Celular",
+      autocomplete: "off"
+    },
+    domProps: {
+      value: _vm.cita.contacto_celular
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "contacto_celular", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
+  }, [_vm._m(27), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.parentezco,
+      expression: "cita.parentezco"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "parentezco",
+      id: "parentezco",
+      placeholder: "Parentesco",
+      autocomplete: "off"
+    },
+    domProps: {
+      value: _vm.cita.parentezco
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "parentezco", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("hr"), _vm._v(" "), _c("div", {
+    staticClass: "form-group row"
+  }, [_c("div", {
+    staticClass: "col-sm-4"
+  }, [_c("label", {
+    attrs: {
+      "for": "name"
+    }
+  }, [_vm._v("Nombre del segundo contacto")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.contacto2,
+      expression: "cita.contacto2"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "contacto",
+      id: "contacto",
+      placeholder: "Contacto secundario",
+      autocomplete: "off"
+    },
+    domProps: {
+      value: _vm.cita.contacto2
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "contacto2", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
+  }, [_c("label", {
+    attrs: {
+      "for": "name"
+    }
+  }, [_vm._v("Celular emergencia")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.contacto_celular2,
+      expression: "cita.contacto_celular2"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "contacto_celular",
+      id: "contacto_celular",
+      placeholder: "Celular",
+      autocomplete: "off"
+    },
+    domProps: {
+      value: _vm.cita.contacto_celular2
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "contacto_celular2", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
+  }, [_c("label", {
+    attrs: {
+      "for": "name"
+    }
+  }, [_vm._v("Parentesco")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.parentezco2,
+      expression: "cita.parentezco2"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      name: "parentezco",
+      id: "parentezco",
+      placeholder: "Parentesco",
+      autocomplete: "off"
+    },
+    domProps: {
+      value: _vm.cita.parentezco2
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "parentezco2", $event.target.value);
+      }
+    }
+  })])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer"
+  }, [_c("button", {
+    staticClass: "btn btn-secondary",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Cancelar")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: _vm.guardarNuevoPaciente
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-check"
+  }), _vm._v(" Confirmar Datos")])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -12418,6 +12608,105 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fas fa-times"
   })])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("p", {
+    staticClass: "mb-2 lead text-success"
+  }, [_c("strong", [_c("i", {
+    staticClass: "fas fa-search"
+  }), _vm._v(" Seleccionar Paciente")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text"
+  }, [_c("i", {
+    staticClass: "fas fa-search"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mt-3 text-center"
+  }, [_c("button", {
+    staticClass: "btn btn-success",
+    attrs: {
+      type: "button",
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#modalNuevoPaciente"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-plus"
+  }), _vm._v(" Nuevo paciente\r\n\t\t\t\t\t\t\t\t\t")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("p", {
+    staticClass: "mb-0 lead text-success"
+  }, [_c("strong", [_c("i", {
+    staticClass: "fas fa-ticket-alt"
+  }), _vm._v(" Datos de la Nueva Cita")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-check-label",
+    attrs: {
+      "for": "flexSwitchCheckDefault"
+    }
+  }, [_vm._v("Referencia "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn btn-lg btn-outline-secondary",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  }), _vm._v(" Cerrar")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn btn-lg btn-outline-primary",
+    attrs: {
+      type: "submit"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-save"
+  }), _vm._v(" Registrar cita")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("p", {
+    staticClass: "text-dark text-end"
+  }, [_vm._v("Restringido porque el paciente esta reportado como fallecido ( "), _c("i", {
+    staticClass: "fas fa-cross"
+  }), _vm._v(" )")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modal-header"
+  }, [_c("h5", {
+    staticClass: "modal-title",
+    attrs: {
+      id: "modalNuevoPacienteLabel"
+    }
+  }, [_vm._v("Nuevo Paciente")]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal",
+      "aria-label": "Close"
+    }
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -12594,56 +12883,6 @@ var staticRenderFns = [function () {
   }, [_vm._v("Parentesco "), _c("span", {
     staticClass: "text-danger"
   }, [_vm._v("*")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("p", {
-    staticClass: "my-2 lead text-success"
-  }, [_c("strong", [_c("i", {
-    staticClass: "fas fa-ticket-alt"
-  }), _vm._v(" Datos de la Nueva Cita")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("label", {
-    staticClass: "form-check-label",
-    attrs: {
-      "for": "flexSwitchCheckDefault"
-    }
-  }, [_vm._v("Referencia "), _c("span", {
-    staticClass: "text-danger"
-  }, [_vm._v("*")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("button", {
-    staticClass: "btn btn-lg btn-outline-secondary",
-    attrs: {
-      type: "button",
-      "data-bs-dismiss": "modal"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-times"
-  }), _vm._v(" Cerrar")]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("button", {
-    staticClass: "btn btn-lg btn-outline-primary",
-    attrs: {
-      type: "submit"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-save"
-  }), _vm._v(" Registrar cita")]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("p", {
-    staticClass: "text-dark text-end"
-  }, [_vm._v("Restringido porque el paciente esta reportado como fallecido ( "), _c("i", {
-    staticClass: "fas fa-cross"
-  }), _vm._v(" )")]);
 }];
 render._withStripped = true;
 

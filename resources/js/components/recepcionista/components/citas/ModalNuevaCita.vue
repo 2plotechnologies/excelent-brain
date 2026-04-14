@@ -1,4 +1,5 @@
 <template>
+<div>
 <div class="modal fade " id="modalNuevaCita" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-xl">
 		<div class="modal-content">
@@ -9,162 +10,45 @@
 			</div>
 			<div class="modal-body">
 				<form class="user" @submit="insertar" @keydown="prevenirEvent">
-				 
-					<p class="mb-2 lead text-success"><strong><i class="far fa-address-card"></i> Datos Personales</strong></p>
-					<div class="card">
-						<div class="card-body">
-							<div class="form-group row">
-								<div class="col">
-									<label for="name">Tipo de documento <span class="text-danger">*</span></label>
-									<select class="form-select" id="type_dni" v-model="cita.type_dni">
-										<option value="1">D.N.I.</option>
-										<option value="2">Carnet de extranjería</option>
-										<option value="3">Pasaporte</option>
-									</select>
+					<div v-show="pasoActual === 1">
+						<p class="mb-2 lead text-success"><strong><i class="fas fa-search"></i> Seleccionar Paciente</strong></p>
+						<div class="card mb-3">
+							<div class="card-body">
+								<div class="input-group mb-3">
+									<span class="input-group-text"><i class="fas fa-search"></i></span>
+									<input type="text" class="form-control" placeholder="Buscar por DNI o Nombres..." v-model="busquedaTexto" @keyup="buscarPacientes">
 								</div>
-								<div class="col">
-									<label for="name">Celular personal <span class="text-danger">*</span></label>
-									<input type="text" class="form-control" id="phone" v-model="cita.phone" placeholder="" @keypress="limitarCel($event)" autocomplete="off">
-								</div>
-							</div>
-		
-							<div class="form-group row">
-								<div class="col-4">
-									<label v-if="cita.type_dni==1" for="name">D.N.I. <span class="text-danger">*</span></label>
-									<label v-else for="name">Doc. Extranjero <span class="text-danger">*</span></label>
-									<div class="form-inline">
-										<input v-if="cita.type_dni==1" type="text" class="form-control w-75 mr-1" name="dni" id="dni" v-model="cita.dni" placeholder="DNI del paciente" autocomplete="off">
-										<input v-else type="text" class="form-control w-75 mr-1" name="dni" id="dni" v-model="cita.dni" placeholder="Código de extranjería" autocomplete="off">
-										<a @click="reniec" class="btnReniec btn btn-outline-primary"><i class="fas fa-search"></i></a>
+								<div class="list-group" style="max-height: 300px; overflow-y: auto;">
+									<button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" v-for="paciente in listaPacientes" :key="paciente.id" @click="seleccionarPaciente(paciente)">
+										<div>
+											<strong>{{ paciente.name }} {{ paciente.nombres }}</strong>
+											<br>
+											<small class="text-muted">DNI: {{ paciente.dni }}</small>
+										</div>
+										<span class="btn btn-sm btn-outline-primary">Seleccionar</span>
+									</button>
+									<div v-if="listaPacientes.length === 0" class="text-center text-muted my-3">
+										No se encontraron pacientes.
 									</div>
 								</div>
-								<div class="col-4">
-									<label for="name">Apellidos <span class="text-danger">*</span></label>
-									<input  type="text" class="form-control text-uppercase" id="name" v-model="cita.name" placeholder="" autocomplete="off">
-								</div>
-								<div class="col-4">
-									<label for="name">Nombres <span class="text-danger">*</span></label>
-									<input  type="text" class="form-control text-uppercase" id="name" v-model="cita.nombres" placeholder="" autocomplete="off">
-								</div>
-							</div>
-		
-							<div class="form-group row">
-								<div class="col-sm-4">
-										<label for="name">Fecha de nacimiento <span class="text-danger">*</span></label>
-										<input type="date" class="form-control" name="birth_date" id="birth_date" v-model="cita.birth_date">
-								</div>
-								<div class="col-sm-4">
-										<label for="marital_status">Estado Civil <span class="text-danger">*</span></label>
-										<select class="form-select" name="marital_status" id="marital_status" v-model="cita.marital_status">
-											<option value="2">Casado</option>
-											<option value="5">Conviviente</option>
-											<option value="4">Divorciado</option>
-											<option value="1">Soltero</option>
-											<option value="3">Viudo</option>
-										</select>
-								</div>
-		
-							</div>
-		
-		
-							<div class="form-group row" >
-								<div class="col-sm-4">
-										<label for="">Grado de instrucción <span class="text-danger">*</span></label>
-										<select class="form-select" name="instruction_degree" id="instruction_degree" v-model="cita.instruction_degree">
-											<option value="1">Inicial</option>
-											<option value="2">Primaria</option>
-											<option value="3">Secundaria</option>
-											<option value="4">Superior</option>
-											<option value="5">Técnico</option>
-											<option value="6">Sin instrucción</option>
-										</select>
-								</div>
-								<div class="col">
-									<label for="name">Dirección de vivienda <span class="text-danger">*</span></label>
-									<input type="text" class="form-control" name="address" id="address" v-model="cita.address" placeholder="" autocomplete="off">
-								</div>
-							</div>
-		
-		
-							<div class="form-group row">
-								<div class="col-sm-4">
-										<label for="name">Departamento <span class="text-danger">*</span></label>
-										<select v-model="cita.department" class="form-select" id="department" @change="moverProvincias(true)">
-											<option v-for="departamento in ubigeo.departamentos" :value="departamento.idDepa">{{ departamento.departamento }}</option>
-										</select>
-								</div>
-								<div class="col-sm-4">
-										<label for="name">Provincia <span class="text-danger">*</span></label>
-										<select v-model="cita.province" class="form-select" id="provincia" @change="moverDistritos()">
-											<option v-for="provincia in provincias" :value="provincia.idProv">{{ provincia.provincia }}</option>
-										</select>
-								</div>
-								<div class="col-sm-4">
-										<label for="name">Distrito <span class="text-danger">*</span></label>
-										<select v-model="cita.district" class="form-select" id="distrito">
-											<option v-for="distrito in distritos" :value="distrito.idDist">{{ distrito.distrito }}</option>
-										</select>
-								</div>
-							</div>
-		
-							<div class="form-group row">
-								<div class="col-sm-4">
-										<label for="name">Ocupación <span class="text-danger">*</span></label>
-										<input type="text" class="form-control" name="occupation" id="occupation" v-model="cita.occupation"  placeholder="Ocupación del paciente" autocomplete="off">
-								</div>
-		
-								<div class="col-sm-4">
-									<label for="name">Género <span class="text-danger">*</span></label>
-									<select class="form-select" id="sexo" v-model="cita.gender">
-										<option value="2">Sin definir</option>
-										<option value="0">Femenino</option>
-										<option value="1">Masculino</option>
-										<option value="3">LGTB+</option>
-									</select>
-								</div>
-								<div class="col-sm-4">
-									<label for="name">Correo electrónico</label>
-									<input type="text" class="form-control" name="address" id="address" v-model="cita.email" placeholder="Correo electrónico" autocomplete="off">
+								<div class="mt-3 text-center">
+									<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalNuevoPaciente">
+										<i class="fas fa-plus"></i> Nuevo paciente
+									</button>
 								</div>
 							</div>
 						</div>
 					</div>
-					
-					<p class="my-2 lead text-success"><strong><i class="fas fa-people-arrows"></i> Datos de Contacto de Emergencia</strong></p>
-					<div class="card">
-						<div class="card-body">
-							<div class="form-group row" >
-								<div class="col-sm-4">
-									<label for="name">Nombre del primer contacto <span class="text-danger">*</span></label>
-									<input type="text" class="form-control" name="contacto" id="contacto" v-model="cita.contacto"  placeholder="Contacto principal" autocomplete="off">
-								</div>
-								<div class="col-sm-4">
-									<label for="name">Celular emergencia <span class="text-danger">*</span></label>
-									<input type="text" class="form-control" name="contacto_celular" id="contacto_celular" v-model="cita.contacto_celular"  placeholder="Celular" autocomplete="off">
-								</div>
-								<div class="col-sm-4">
-									<label for="name">Parentesco <span class="text-danger">*</span></label>
-									<input type="text" class="form-control" name="parentezco" id="parentezco" v-model="cita.parentezco"  placeholder="Parentesco" autocomplete="off">
-								</div>
-							</div>
-							<hr>
-							<div class="form-group row" >
-								<div class="col-sm-4">
-									<label for="name">Nombre del segundo contacto</label>
-									<input type="text" class="form-control" name="contacto" id="contacto" v-model="cita.contacto2"  placeholder="Contacto secundario" autocomplete="off">
-								</div>
-								<div class="col-sm-4">
-									<label for="name">Celular emergencia</label>
-									<input type="text" class="form-control" name="contacto_celular" id="contacto_celular" v-model="cita.contacto_celular2"  placeholder="Celular" autocomplete="off">
-								</div>
-								<div class="col-sm-4">
-									<label for="name">Parentesco</label>
-									<input type="text" class="form-control" name="parentezco" id="parentezco" v-model="cita.parentezco2"  placeholder="Parentesco" autocomplete="off">
-								</div>
+
+					<div v-show="pasoActual === 2">
+						<div class="d-flex justify-content-between align-items-center mb-2">
+							<p class="mb-0 lead text-success"><strong><i class="fas fa-ticket-alt"></i> Datos de la Nueva Cita</strong></p>
+							<div>
+								<span class="badge bg-secondary me-2 fs-6">Paciente: {{ cita.name }} {{ cita.nombres }} ({{ cita.dni }})</span>
+								<button type="button" class="btn btn-sm btn-outline-secondary" @click="pasoActual = 1"><i class="fas fa-arrow-left"></i> Cambiar</button>
 							</div>
 						</div>
-					</div>
-					<p class="my-2 lead text-success"><strong><i class="fas fa-ticket-alt"></i> Datos de la Nueva Cita</strong></p>
+
 					<div class="card">
 						<div class="card-body">
 							<div class="row row-cols-2">
@@ -326,17 +210,191 @@
 					</div>
 				</div>
 
-					<div class="modal-footer border-0 justify-content-center" v-if="cita.vivo==1" >
+					<div class="modal-footer border-0 justify-content-center" v-if="cita.vivo==1 && pasoActual === 2" >
 						<button type="button" class="btn btn-lg btn-outline-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cerrar</button>
 						<button type="submit" class="btn btn-lg btn-outline-primary"><i class="fas fa-save"></i> Registrar cita</button>
 					</div>
-					<div v-else>
+					<div v-else-if="cita.vivo!=1 && pasoActual === 2">
 						<p class="text-dark text-end">Restringido porque el paciente esta reportado como fallecido ( <i class="fas fa-cross"></i> )</p>
 					</div>
+					</div> <!-- end of pasoActual === 2 -->
 				</form>
 			</div>
 		</div>
 	</div>
+</div>
+
+<!-- Modal Nuevo Paciente -->
+<div class="modal fade" id="modalNuevoPaciente" tabindex="-1" aria-labelledby="modalNuevoPacienteLabel" aria-hidden="true" style="z-index: 1060;">
+	<div class="modal-dialog modal-dialog-scrollable modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="modalNuevoPacienteLabel">Nuevo Paciente</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<p class="mb-2 lead text-success"><strong><i class="far fa-address-card"></i> Datos Personales</strong></p>
+				<div class="card mb-3">
+					<div class="card-body">
+						<div class="form-group row">
+							<div class="col">
+								<label for="name">Tipo de documento <span class="text-danger">*</span></label>
+								<select class="form-select" id="type_dni" v-model="cita.type_dni">
+									<option value="1">D.N.I.</option>
+									<option value="2">Carnet de extranjería</option>
+									<option value="3">Pasaporte</option>
+								</select>
+							</div>
+							<div class="col">
+								<label for="name">Celular personal <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" id="phone" v-model="cita.phone" placeholder="" @keypress="limitarCel($event)" autocomplete="off">
+							</div>
+						</div>
+	
+						<div class="form-group row">
+							<div class="col-4">
+								<label v-if="cita.type_dni==1" for="name">D.N.I. <span class="text-danger">*</span></label>
+								<label v-else for="name">Doc. Extranjero <span class="text-danger">*</span></label>
+								<div class="form-inline">
+									<input v-if="cita.type_dni==1" type="text" class="form-control w-75 mr-1" name="dni" id="dni" v-model="cita.dni" placeholder="DNI del paciente" autocomplete="off">
+									<input v-else type="text" class="form-control w-75 mr-1" name="dni" id="dni" v-model="cita.dni" placeholder="Código de extranjería" autocomplete="off">
+									<a @click="reniec" class="btnReniec btn btn-outline-primary"><i class="fas fa-search"></i></a>
+								</div>
+							</div>
+							<div class="col-4">
+								<label for="name">Apellidos <span class="text-danger">*</span></label>
+								<input  type="text" class="form-control text-uppercase" id="name" v-model="cita.name" placeholder="" autocomplete="off">
+							</div>
+							<div class="col-4">
+								<label for="name">Nombres <span class="text-danger">*</span></label>
+								<input  type="text" class="form-control text-uppercase" id="name" v-model="cita.nombres" placeholder="" autocomplete="off">
+							</div>
+						</div>
+	
+						<div class="form-group row">
+							<div class="col-sm-4">
+									<label for="name">Fecha de nacimiento <span class="text-danger">*</span></label>
+									<input type="date" class="form-control" name="birth_date" id="birth_date" v-model="cita.birth_date">
+							</div>
+							<div class="col-sm-4">
+									<label for="marital_status">Estado Civil <span class="text-danger">*</span></label>
+									<select class="form-select" name="marital_status" id="marital_status" v-model="cita.marital_status">
+										<option value="2">Casado</option>
+										<option value="5">Conviviente</option>
+										<option value="4">Divorciado</option>
+										<option value="1">Soltero</option>
+										<option value="3">Viudo</option>
+									</select>
+							</div>
+	
+						</div>
+	
+	
+						<div class="form-group row" >
+							<div class="col-sm-4">
+									<label for="">Grado de instrucción <span class="text-danger">*</span></label>
+									<select class="form-select" name="instruction_degree" id="instruction_degree" v-model="cita.instruction_degree">
+										<option value="1">Inicial</option>
+										<option value="2">Primaria</option>
+										<option value="3">Secundaria</option>
+										<option value="4">Superior</option>
+										<option value="5">Técnico</option>
+										<option value="6">Sin instrucción</option>
+									</select>
+							</div>
+							<div class="col">
+								<label for="name">Dirección de vivienda <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" name="address" id="address" v-model="cita.address" placeholder="" autocomplete="off">
+							</div>
+						</div>
+	
+	
+						<div class="form-group row">
+							<div class="col-sm-4">
+									<label for="name">Departamento <span class="text-danger">*</span></label>
+									<select v-model="cita.department" class="form-select" id="department" @change="moverProvincias(true)">
+										<option v-for="departamento in ubigeo.departamentos" :value="departamento.idDepa">{{ departamento.departamento }}</option>
+									</select>
+							</div>
+							<div class="col-sm-4">
+									<label for="name">Provincia <span class="text-danger">*</span></label>
+									<select v-model="cita.province" class="form-select" id="provincia" @change="moverDistritos()">
+										<option v-for="provincia in provincias" :value="provincia.idProv">{{ provincia.provincia }}</option>
+									</select>
+							</div>
+							<div class="col-sm-4">
+									<label for="name">Distrito <span class="text-danger">*</span></label>
+									<select v-model="cita.district" class="form-select" id="distrito">
+										<option v-for="distrito in distritos" :value="distrito.idDist">{{ distrito.distrito }}</option>
+									</select>
+							</div>
+						</div>
+	
+						<div class="form-group row">
+							<div class="col-sm-4">
+									<label for="name">Ocupación <span class="text-danger">*</span></label>
+									<input type="text" class="form-control" name="occupation" id="occupation" v-model="cita.occupation"  placeholder="Ocupación del paciente" autocomplete="off">
+							</div>
+	
+							<div class="col-sm-4">
+								<label for="name">Género <span class="text-danger">*</span></label>
+								<select class="form-select" id="sexo" v-model="cita.gender">
+									<option value="2">Sin definir</option>
+									<option value="0">Femenino</option>
+									<option value="1">Masculino</option>
+									<option value="3">LGTB+</option>
+								</select>
+							</div>
+							<div class="col-sm-4">
+								<label for="name">Correo electrónico</label>
+								<input type="text" class="form-control" name="address" id="address" v-model="cita.email" placeholder="Correo electrónico" autocomplete="off">
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<p class="my-2 lead text-success"><strong><i class="fas fa-people-arrows"></i> Datos de Contacto de Emergencia</strong></p>
+				<div class="card">
+					<div class="card-body">
+						<div class="form-group row" >
+							<div class="col-sm-4">
+								<label for="name">Nombre del primer contacto <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" name="contacto" id="contacto" v-model="cita.contacto"  placeholder="Contacto principal" autocomplete="off">
+							</div>
+							<div class="col-sm-4">
+								<label for="name">Celular emergencia <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" name="contacto_celular" id="contacto_celular" v-model="cita.contacto_celular"  placeholder="Celular" autocomplete="off">
+							</div>
+							<div class="col-sm-4">
+								<label for="name">Parentesco <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" name="parentezco" id="parentezco" v-model="cita.parentezco"  placeholder="Parentesco" autocomplete="off">
+							</div>
+						</div>
+						<hr>
+						<div class="form-group row" >
+							<div class="col-sm-4">
+								<label for="name">Nombre del segundo contacto</label>
+								<input type="text" class="form-control" name="contacto" id="contacto" v-model="cita.contacto2"  placeholder="Contacto secundario" autocomplete="off">
+							</div>
+							<div class="col-sm-4">
+								<label for="name">Celular emergencia</label>
+								<input type="text" class="form-control" name="contacto_celular" id="contacto_celular" v-model="cita.contacto_celular2"  placeholder="Celular" autocomplete="off">
+							</div>
+							<div class="col-sm-4">
+								<label for="name">Parentesco</label>
+								<input type="text" class="form-control" name="parentezco" id="parentezco" v-model="cita.parentezco2"  placeholder="Parentesco" autocomplete="off">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+				<button type="button" class="btn btn-primary" @click="guardarNuevoPaciente"><i class="fas fa-check"></i> Confirmar Datos</button>
+			</div>
+		</div>
+</div>
+</div>
 </div>
 </template>
 
@@ -350,6 +408,7 @@ export default {
 	props:{ profesionalElegido: null, horaElegida: null , idUsuario:null, fechaElegida:null, idSede:null },
 	data(){
 		return{
+			pasoActual: 1, listaPacientes: [], busquedaTexto: '', timerBusqueda: null,
 			precios: [], nosrecomienda:true, precioNuevo:true, esPresencial: true, masBasicos:true, masEmergencia:false, tieneDescuento:false, descuentoRebaja:0, tieneRebaja:false, razonPorcentaje:'', razonRebaja:'',
 			switchReciec: 1, tieneAdelanto:false, descuentoAdelanto:0, razonAdelanto:'',
 			status:[{id:4, stat:'Ambulatorio'},{id:3, stat:'Clínica de día'},{id:2, stat:'Kurame'},{id:1, stat:'Ninguno'},], //sacado de la DB:tbl status
@@ -399,10 +458,69 @@ export default {
 	},
 	mounted(){
 		this.$parent.$on('limpiarDescuentos', this.limpiarInputs(false) );
-		this.pedirMonedas()
+		this.pedirMonedas();
+		this.fetchPacientes();
+		
+		const modal = document.getElementById('modalNuevaCita')
+		if (modal) {
+			modal.addEventListener('hidden.bs.modal', () => {
+				this.pasoActual = 1;
+				this.busquedaTexto = '';
+				this.fetchPacientes();
+			})
+		}
 	},
 	 
 	methods: {
+		fetchPacientes() {
+			this.axios.get('/api/getLast10Patients')
+				.then(res => this.listaPacientes = res.data)
+				.catch(err => console.error(err));
+		},
+		buscarPacientes() {
+			clearTimeout(this.timerBusqueda);
+			this.timerBusqueda = setTimeout(() => {
+				if (this.busquedaTexto.length >= 2) {
+					this.axios.get('/api/searchPatientByNameDni/' + this.busquedaTexto)
+						.then(res => this.listaPacientes = res.data)
+						.catch(err => console.error(err));
+				} else if (this.busquedaTexto.length === 0) {
+					this.fetchPacientes();
+				}
+			}, 400);
+		},
+		seleccionarPaciente(paciente) {
+			this.cita.dni = paciente.dni;
+			this.reniec();
+			this.pasoActual = 2;
+		},
+		guardarNuevoPaciente() {
+			if( this.cita.type_dni==1 && (this.cita.dni =='' || this.cita.dni.length<8) ) {
+				alertify.error('Todo paciente debe tener un DNI válido', 10);
+				return;
+			}
+			if(this.cita.name == '' && this.cita.nombres =='') {
+				alertify.error('Debe rellenar apellidos y nombres', 10);
+				return;
+			}
+			if(this.cita.phone == '') {
+				alertify.error('Debe rellenar un celular', 10);
+				return;
+			}
+			if( this.cita.contacto == '' || this.cita.contacto_celular == '' || this.cita.parentezco=='') {
+				alertify.error('Debe rellenar el contacto de emergencia', 10);
+				return;
+			}
+			this.patientNew = true;
+			this.pasoActual = 2;
+			var myModalEl = document.getElementById('modalNuevoPaciente');
+			var modal = bootstrap.Modal.getInstance(myModalEl);
+			if(modal) {
+				modal.hide();
+			} else {
+				document.querySelector('#modalNuevoPaciente .btn-close').click();
+			}
+		},
 		horaLatam1(horita){ return moment(horita, 'HH:mm:ss').format('hh:mm') },
 		horaLatam2(horita){ return moment(horita, 'HH:mm:ss').format('hh:mm a') },
 		precioDinamico(){
@@ -537,6 +655,9 @@ export default {
 		},
 
 		clearModal(){
+			this.pasoActual = 1;
+			this.busquedaTexto = '';
+			this.fetchPacientes();
 			this.cita.phone= '';
 			this.cita.dni= '';
 			this.cita.name= ''; this.cita.nombres= '';
