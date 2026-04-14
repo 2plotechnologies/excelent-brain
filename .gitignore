@@ -4,8 +4,6 @@
 /storage/*.key
 /storage/fonts/*
 /storage/fonts/*.php
-/public/js/*
-/public/css/*
 /public/fonts
 /vendor
 .env
@@ -25,3 +23,6 @@ storage/fonts/*
 .env.laptop
 .env.local
 .github/copilot-instructions.md
+cert.pem
+composer-show-laravel-framework.txt
+composer.lock.bak
