@@ -7197,7 +7197,6 @@ module.exports = Parser
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
-/* provided dependency */ var process = __webpack_require__(/*! process/browser.js */ "./node_modules/process/browser.js");
 
 
 let AtRule = __webpack_require__(/*! ./at-rule */ "./node_modules/postcss/lib/at-rule.js")
@@ -7238,7 +7237,7 @@ postcss.plugin = function plugin(name, initializer) {
           ': postcss.plugin was deprecated. Migration guide:\n' +
           'https://evilmartians.com/chronicles/postcss-8-plugin-migration'
       )
-      if (process.env.LANG && process.env.LANG.startsWith('cn')) {
+      if (({"FACTURACION_TOKEN":undefined}).LANG && ({"FACTURACION_TOKEN":undefined}).LANG.startsWith('cn')) {
         /* c8 ignore next 7 */
         // eslint-disable-next-line no-console
         console.warn(

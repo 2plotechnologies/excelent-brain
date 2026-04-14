@@ -8,7 +8,7 @@
 					<button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#calendario-tab" type="button" role="tab" aria-controls="calendario-tab" aria-selected="false"><i class="fa-regular fa-calendar-days"></i> Vista calendario</button>
 				</li>
 				<li class="nav-item" role="presentation">
-					<button class="nav-link active" id="book-tab" data-bs-toggle="tab" data-bs-target="#cuaderno-tab" type="button" role="tab" aria-controls="cuaderno-tab" aria-selected="true"><i class="fa-solid fa-book"></i> Vista cuaderno</button>
+					<button class="nav-link active font-weight-bold" id="book-tab" data-bs-toggle="tab" data-bs-target="#cuaderno-tab" type="button" role="tab" aria-controls="cuaderno-tab" aria-selected="true"><i class="fa-regular fa-calendar-days text-success"></i> Calendario Programado</button>
 				</li>
 				<li class="nav-item" role="presentation">
 					<button class="nav-link " id="home-tab" data-bs-toggle="tab" data-bs-target="#inicio-tab" type="button" role="tab" aria-controls="inicio-tab" aria-selected="false"><i class="fas fa-search"></i> Búsqueda del paciente</button>

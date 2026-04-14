@@ -136,7 +136,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     print: function print() {
       this.exam.medical_exams = this.selected;
-      window.open('/api/pdf_exam/' + [JSON.stringify(this.exam).split('/').join('-')]);
+      window.open('/api/pdf_exam/' + [JSON.stringify(this.exam).split('/').join('-')] + '?token=' + localStorage.getItem('token'));
     },
     deleteSelected: function deleteSelected(key) {
       this.selected.splice(key, 1);
