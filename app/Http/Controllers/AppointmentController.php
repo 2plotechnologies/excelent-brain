@@ -22,7 +22,7 @@ use App\Models\Precio;
 use App\Models\Reschedule;
 use App\Models\Schedule;
 use App\Models\Triaje;
-use Barryvdh\DomPDF\Facade as PDF;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Faker\Provider\ar_SA\Payment as Ar_SAPayment;
 use Illuminate\Support\Facades\App;
 use PhpParser\Node\Stmt\TryCatch;

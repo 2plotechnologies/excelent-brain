@@ -227,10 +227,12 @@
                   <p class="py-0 d-block">
                     {{ $historia->initial_psychiatric_history->plan }}
                   </p>
-                  {{-- <p class="title-h6 >Fecha: <span class="">15/12/12</span></p> --}}
+                  {{-- <p class="title-h6 >Fecha: <span class=">15/12/12</span></p> --}}
                 </div>
 								@if($historia->initial_psychiatric_history->professional && $historia->initial_psychiatric_history->professional->signing && $historia->initial_psychiatric_history->professional->signing !== '-' && $historia->initial_psychiatric_history->professional->signing !== '')
-								<div style="text-align: right;"><img class="firmaProfesional" src="{{str_replace('/', DIRECTORY_SEPARATOR, base_path('storage/app/public/'.$historia->initial_psychiatric_history->professional->signing))}}" alt=""></div>
+								<div style="text-align: right;">
+									<img class="firmaProfesional" src="{{ str_starts_with($historia->initial_psychiatric_history->professional->signing, 'data:image') ? $historia->initial_psychiatric_history->professional->signing : str_replace('/', DIRECTORY_SEPARATOR, base_path('storage/app/public/'.$historia->initial_psychiatric_history->professional->signing)) }}" alt="">
+								</div>
 								@endif
               </div> 
             </div>
@@ -305,7 +307,9 @@
                   {{-- <p class="title-h6 >Fecha: <span class="">15/12/12</span></p> --}}
                 </div>
 								@if($historia->initial_psychological_history->professional && $historia->initial_psychological_history->professional->signing && $historia->initial_psychological_history->professional->signing !== '-' && $historia->initial_psychological_history->professional->signing !== '')
-								<div style="text-align: right;"><img class="firmaProfesional" src="{{str_replace('/', DIRECTORY_SEPARATOR, base_path('storage/app/public/'.$historia->initial_psychological_history->professional->signing))}}" alt=""></div>
+								<div style="text-align: right;">
+									<img class="firmaProfesional" src="{{ str_starts_with($historia->initial_psychological_history->professional->signing, 'data:image') ? $historia->initial_psychological_history->professional->signing : str_replace('/', DIRECTORY_SEPARATOR, base_path('storage/app/public/'.$historia->initial_psychological_history->professional->signing)) }}" alt="">
+								</div>
 								@endif
 
               </div> 
@@ -333,7 +337,9 @@
 										@endforeach
                     <p class="py-0"><span class="title-h6">Tratamiento:</span> <span class="text-justify">{{ $evolution->treatment }}</span></p>
 										@if($evolution->professional && $evolution->professional->signing && $evolution->professional->signing !== '-' && $evolution->professional->signing !== '')
-										<div style="text-align: right;"><img class="firmaProfesional" src="{{str_replace('/', DIRECTORY_SEPARATOR, base_path('storage/app/public/'.$evolution->professional->signing))}}" alt=""></div>
+										<div style="text-align: right;">
+											<img class="firmaProfesional" src="{{ str_starts_with($evolution->professional->signing, 'data:image') ? $evolution->professional->signing : str_replace('/', DIRECTORY_SEPARATOR, base_path('storage/app/public/'.$evolution->professional->signing)) }}" alt="">
+										</div>
 										@endif
                   </div>
                 @endforeach

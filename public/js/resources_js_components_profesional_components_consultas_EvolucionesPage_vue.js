@@ -459,7 +459,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               return _this2.axios.get("/api/patientEvolution/".concat(_this2.$route.params.idPaciente, "/").concat(_this2.$attrs.idUser)).then(function (res) {
                 _this2.datosConsulta = res.data;
                 _this2.misHobbies = JSON.parse(_this2.datosConsulta.hobbies);
-                //console.log(this.datosConsulta)
+                console.log(_this2.datosConsulta);
                 _this2.datosConsulta.medical_evolutions = _this2.datosConsulta.medical_evolutions.sort(function (a, b) {
                   if (a.date < b.date) {
                     return -1;
@@ -4449,7 +4449,7 @@ var render = function render() {
       staticClass: "card-evolution"
     }, [_c("div", {
       staticClass: "historia-info"
-    }, [_c("p", [_c("b", [_vm._v("Clase:")]), _vm._v(" " + _vm._s(_vm.dondeEsta2(evolution.type)))]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Profesional:")]), _vm._v(" " + _vm._s(evolution.professional ? evolution.professional.name : "Sin asignar") + " ")]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Diagnóstico: ")]), _vm._v(" " + _vm._s(evolution ? _vm.maxStringCharacter(evolution.content, 50) : "...") + " ")])]), _vm._v(" "), _c("div", {
+    }, [_c("p", [_c("b", [_vm._v("Clase:")]), _vm._v(" " + _vm._s(evolution.type_evolution ? evolution.type_evolution.clasificacion : "Sin asignar"))]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Profesional:")]), _vm._v(" " + _vm._s(evolution.professional ? evolution.professional.name : "Sin asignar") + " ")]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Diagnóstico: ")]), _vm._v(" " + _vm._s(evolution ? _vm.maxStringCharacter(evolution.content, 50) : "...") + " ")])]), _vm._v(" "), _c("div", {
       staticClass: "card-evolution__image d-none"
     }, [_c("img", {
       staticClass: "card-evolution-image",
