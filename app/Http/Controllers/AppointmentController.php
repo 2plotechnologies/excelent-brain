@@ -19,6 +19,7 @@ use App\Models\Relative;
 use App\Models\Medical_evolution;
 use App\Models\Payment_method;
 use App\Models\Precio;
+use App\Models\Membresia;
 use App\Models\Reschedule;
 use App\Models\Schedule;
 use App\Models\Triaje;
@@ -991,6 +992,21 @@ class AppointmentController extends Controller
 			}
 			
 			updateFieldStatus($appointment, $valueStatus);
+			
+			// Si la cita pertenece a un paquete/membresia, auto-completar si cumple las sesiones indicadas
+			if ($appointment->idMembresia && $appointment->idMembresia > 0) {
+				$membresia = Membresia::find($appointment->idMembresia);
+				if ($membresia && $membresia->estado == 2) {
+					$precio = Precio::find($membresia->tipo);
+					if ($precio) {
+						$realizadas = Appointment::where('idMembresia', $membresia->id)->where('status', 2)->count();
+						if ($realizadas >= $precio->sesiones) {
+							$membresia->estado = 3; // 3 = Completado
+							$membresia->save();
+						}
+					}
+				}
+			}
 		}else{
 			updateFieldStatus($appointment, $valueStatus);
 		}

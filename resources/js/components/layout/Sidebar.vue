@@ -56,6 +56,12 @@
 									<span>Precios de servicios</span>
 							</router-link>
 						</li>
+						<li class="nav-item nav__list" @click="activeSidebar()">
+							<router-link  to="/administrador/paquetes" class="nav-link">
+								<i class="fas fa-box"></i>
+									<span>Paquetes</span>
+							</router-link>
+						</li>
 						<!-- Nav Item - Dashboard -->
 						<li class="nav-item nav__list" @click="activeSidebar()">
 								<router-link to="/administrador/reportes/total" class="nav-link">

@@ -215,6 +215,201 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=script&lang=js":
+/*!********************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=script&lang=js ***!
+  \********************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
+function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
+function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'DetallePaciente',
+  props: {
+    pacienteId: {
+      type: Number,
+      required: true
+    }
+  },
+  data: function data() {
+    return {
+      paciente: {},
+      loading: true,
+      timelineActivity: []
+    };
+  },
+  computed: {
+    initials: function initials() {
+      if (!this.paciente.name) return '??';
+      var firstName = this.paciente.nombres ? this.paciente.nombres.trim().charAt(0) : '';
+      return (this.paciente.name.trim().charAt(0) + firstName).toUpperCase();
+    },
+    proximaCita: function proximaCita() {
+      if (!this.paciente.appointments) return null;
+      var today = new Date().toISOString().slice(0, 10);
+      return this.paciente.appointments.slice().reverse().find(function (a) {
+        return a.date >= today && (a.status == 1 || a.status == 2);
+      });
+    },
+    ultimaEvolucion: function ultimaEvolucion() {
+      var _this$paciente$medica;
+      if (!((_this$paciente$medica = this.paciente.medical_evolutions) !== null && _this$paciente$medica !== void 0 && _this$paciente$medica.length)) return null;
+      return this.paciente.medical_evolutions[0];
+    },
+    allTests: function allTests() {
+      var combined = [];
+      var addTest = function addTest(arr, name) {
+        if (arr) {
+          arr.forEach(function (i) {
+            return combined.push(_objectSpread(_objectSpread({}, i), {}, {
+              testName: name,
+              dateStamp: new Date(i.created_at || i.fecha).getTime()
+            }));
+          });
+        }
+      };
+      addTest(this.paciente.scrs, 'SCR');
+      addTest(this.paciente.burns, 'Burnout');
+      addTest(this.paciente.gads, 'GAD-7');
+      addTest(this.paciente.zung_anxieties, 'Zung Ansiedad');
+      addTest(this.paciente.zung_depressions, 'Zung Depresión');
+      addTest(this.paciente.millons, 'Millon');
+      return combined.sort(function (a, b) {
+        return b.dateStamp - a.dateStamp;
+      });
+    }
+  },
+  methods: {
+    fetchPatientDetails: function fetchPatientDetails() {
+      var _this = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              _this.loading = true;
+              _context.prev = 1;
+              _context.next = 4;
+              return _this.axios.get("/api/patient/".concat(_this.pacienteId, "/full-details"));
+            case 4:
+              res = _context.sent;
+              _this.paciente = res.data;
+              _this.buildTimeline();
+              _context.next = 12;
+              break;
+            case 9:
+              _context.prev = 9;
+              _context.t0 = _context["catch"](1);
+              console.error(_context.t0);
+            case 12:
+              _context.prev = 12;
+              _this.loading = false;
+              return _context.finish(12);
+            case 15:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, null, [[1, 9, 12, 15]]);
+      }))();
+    },
+    buildTimeline: function buildTimeline() {
+      var _this2 = this;
+      var activities = [];
+      if (this.paciente.appointments) {
+        this.paciente.appointments.forEach(function (a) {
+          activities.push({
+            type: 'Cita',
+            date: a.date + (a.hora ? 'T' + a.hora : ''),
+            desc: "Cita / Estado: ".concat(_this2.getStatusName(a.status)),
+            profesional: a.professional ? a.professional.name : '',
+            timestamp: new Date(a.date).getTime()
+          });
+        });
+      }
+      if (this.paciente.medical_evolutions) {
+        this.paciente.medical_evolutions.forEach(function (e) {
+          activities.push({
+            type: 'Evolucion',
+            date: e.date,
+            desc: e.descripcion || 'Evolución registrada',
+            profesional: e.professional ? e.professional.name : '',
+            timestamp: new Date(e.date).getTime()
+          });
+        });
+      }
+      activities.sort(function (a, b) {
+        return b.timestamp - a.timestamp;
+      });
+      this.timelineActivity = activities;
+    },
+    getAge: function getAge(dateString) {
+      if (!dateString) return '';
+      var today = new Date();
+      var birthDate = new Date(dateString);
+      var age = today.getFullYear() - birthDate.getFullYear();
+      var m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || m === 0 && today.getDate() < birthDate.getDate()) {
+        age--;
+      }
+      return age;
+    },
+    getGender: function getGender(gen) {
+      if (gen == 1) return 'Masculino';
+      if (gen == 2) return 'Femenino';
+      return 'Sin especificar';
+    },
+    formatDate: function formatDate(date) {
+      if (!date) return '';
+      var d = new Date(date);
+      if (isNaN(d.getTime())) return date;
+      var day = d.getDate().toString().padStart(2, '0');
+      var month = (d.getMonth() + 1).toString().padStart(2, '0');
+      var year = d.getFullYear();
+      return "".concat(day, "/").concat(month, "/").concat(year);
+    },
+    formatDateTime: function formatDateTime(date, time) {
+      return this.formatDate(date) + (time ? ' ' + time : '');
+    },
+    getStatusName: function getStatusName(s) {
+      if (s == 1) return 'Pendiente';
+      if (s == 2) return 'Confirmado';
+      if (s == 3) return 'Atendido';
+      if (s == 4) return 'Reprogramado';
+      if (s == 5) return 'Cancelado';
+      return 'Otro';
+    },
+    getStatusBadge: function getStatusBadge(s) {
+      if (s == 1) return 'bg-warning';
+      if (s == 2) return 'bg-primary';
+      if (s == 3) return 'bg-success';
+      if (s == 4) return 'bg-info';
+      if (s == 5) return 'bg-danger';
+      return 'bg-secondary';
+    }
+  },
+  mounted: function mounted() {
+    this.fetchPatientDetails();
+  },
+  watch: {
+    pacienteId: function pacienteId() {
+      this.fetchPatientDetails();
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/HomePacientes.vue?vue&type=script&lang=js":
 /*!******************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/HomePacientes.vue?vue&type=script&lang=js ***!
@@ -225,19 +420,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ModalEditarPaciente_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalEditarPaciente.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue");
-/* harmony import */ var _ModalRecetas_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModalRecetas.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue");
-/* harmony import */ var _ModalFaltas_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalFaltas.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalFaltas.vue");
-/* harmony import */ var _ModalTriaje_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ModalTriaje.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalTriaje.vue");
-/* harmony import */ var _ModalVerTriajesViejos_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ModalVerTriajesViejos.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalVerTriajesViejos.vue");
-/* harmony import */ var _ModalVerReprogramacionesViejos_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ModalVerReprogramacionesViejos.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalVerReprogramacionesViejos.vue");
-/* harmony import */ var _pacientes_ModalNewPatient_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./../pacientes/ModalNewPatient.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue");
-/* harmony import */ var _ModalVerEstados_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./ModalVerEstados.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue");
-/* harmony import */ var _ModalCambiarLike_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./ModalCambiarLike.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalCambiarLike.vue");
-/* harmony import */ var _reportes_ModalVerFaltas_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./reportes/ModalVerFaltas.vue */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerFaltas.vue");
-/* harmony import */ var _reportes_ModalVerHobbies_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./reportes/ModalVerHobbies.vue */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue");
-/* harmony import */ var _OffVerMembresias_vue__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./OffVerMembresias.vue */ "./resources/js/components/recepcionista/components/pacientes/OffVerMembresias.vue");
-/* harmony import */ var _ModalAcuerdos_vue__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./ModalAcuerdos.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalAcuerdos.vue");
+/* harmony import */ var _DetallePaciente_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DetallePaciente.vue */ "./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue");
+/* harmony import */ var _ModalEditarPaciente_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModalEditarPaciente.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue");
+/* harmony import */ var _ModalRecetas_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalRecetas.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue");
+/* harmony import */ var _ModalFaltas_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ModalFaltas.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalFaltas.vue");
+/* harmony import */ var _ModalTriaje_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ModalTriaje.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalTriaje.vue");
+/* harmony import */ var _ModalVerTriajesViejos_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ModalVerTriajesViejos.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalVerTriajesViejos.vue");
+/* harmony import */ var _ModalVerReprogramacionesViejos_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ModalVerReprogramacionesViejos.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalVerReprogramacionesViejos.vue");
+/* harmony import */ var _pacientes_ModalNewPatient_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./../pacientes/ModalNewPatient.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue");
+/* harmony import */ var _ModalVerEstados_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./ModalVerEstados.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue");
+/* harmony import */ var _ModalCambiarLike_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./ModalCambiarLike.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalCambiarLike.vue");
+/* harmony import */ var _reportes_ModalVerFaltas_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./reportes/ModalVerFaltas.vue */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerFaltas.vue");
+/* harmony import */ var _reportes_ModalVerHobbies_vue__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./reportes/ModalVerHobbies.vue */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue");
+/* harmony import */ var _OffVerMembresias_vue__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./OffVerMembresias.vue */ "./resources/js/components/recepcionista/components/pacientes/OffVerMembresias.vue");
+/* harmony import */ var _ModalAcuerdos_vue__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./ModalAcuerdos.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalAcuerdos.vue");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -261,12 +457,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'HomePacientes',
   data: function data() {
     return {
       dataPatients: [],
       queId: null,
+      vistaActual: 'lista',
       data: null,
       dataTriajes: null,
       busqueda: [],
@@ -335,19 +533,20 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     };
   },
   components: {
-    ModalEdicionPaciente: _ModalEditarPaciente_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
-    ModalRecetas: _ModalRecetas_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    ModalFaltas: _ModalFaltas_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
-    ModalTriaje: _ModalTriaje_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
-    ModalVerTriajesViejos: _ModalVerTriajesViejos_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
-    ModalNewPatient: _pacientes_ModalNewPatient_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
-    ModalVerEstados: _ModalVerEstados_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
-    ModalCambiarLike: _ModalCambiarLike_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
-    ModalVerFaltas: _reportes_ModalVerFaltas_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
-    ModalVerHobbies: _reportes_ModalVerHobbies_vue__WEBPACK_IMPORTED_MODULE_10__["default"],
-    ModalVerReprogramacionesViejos: _ModalVerReprogramacionesViejos_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
-    OffVerMembresias: _OffVerMembresias_vue__WEBPACK_IMPORTED_MODULE_11__["default"],
-    ModalAcuerdos: _ModalAcuerdos_vue__WEBPACK_IMPORTED_MODULE_12__["default"]
+    DetallePaciente: _DetallePaciente_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+    ModalEdicionPaciente: _ModalEditarPaciente_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
+    ModalRecetas: _ModalRecetas_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
+    ModalFaltas: _ModalFaltas_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
+    ModalTriaje: _ModalTriaje_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
+    ModalVerTriajesViejos: _ModalVerTriajesViejos_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
+    ModalNewPatient: _pacientes_ModalNewPatient_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
+    ModalVerEstados: _ModalVerEstados_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
+    ModalCambiarLike: _ModalCambiarLike_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
+    ModalVerFaltas: _reportes_ModalVerFaltas_vue__WEBPACK_IMPORTED_MODULE_10__["default"],
+    ModalVerHobbies: _reportes_ModalVerHobbies_vue__WEBPACK_IMPORTED_MODULE_11__["default"],
+    ModalVerReprogramacionesViejos: _ModalVerReprogramacionesViejos_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
+    OffVerMembresias: _OffVerMembresias_vue__WEBPACK_IMPORTED_MODULE_12__["default"],
+    ModalAcuerdos: _ModalAcuerdos_vue__WEBPACK_IMPORTED_MODULE_13__["default"]
   },
   props: {
     profesionales: null
@@ -478,6 +677,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           }
         }, _callee3);
       }))();
+    },
+    abrirDetallePaciente: function abrirDetallePaciente(paciente) {
+      this.prepararPaciente(paciente);
+      this.vistaActual = 'detalle';
     },
     prepararPaciente: function prepararPaciente(paciente) {
       if (!paciente.relative[0]) paciente.relative[0] = {
@@ -1995,6 +2198,826 @@ render._withStripped = true;
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=template&id=36e64d45&scoped=true":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=template&id=36e64d45&scoped=true ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render),
+/* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "patient-detail-container"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center mb-4 mt-2"
+  }, [_c("button", {
+    staticClass: "btn btn-link text-decoration-none px-0",
+    on: {
+      click: function click($event) {
+        return _vm.$emit("volver");
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-arrow-left"
+  }), _vm._v(" Volver a Pacientes\n    ")])]), _vm._v(" "), _c("div", {
+    staticClass: "card shadow-sm mb-4 border-0 rounded-lg",
+    staticStyle: {
+      "background-color": "#fcfcfc"
+    }
+  }, [!_vm.loading ? _c("div", {
+    staticClass: "card-body d-flex justify-content-between align-items-center flex-wrap"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center mb-3 mb-md-0"
+  }, [_c("div", {
+    staticClass: "rounded-circle text-primary bg-light border d-flex justify-content-center align-items-center me-3 shadow-sm font-weight-bold",
+    staticStyle: {
+      width: "60px",
+      height: "60px",
+      "font-size": "20px"
+    }
+  }, [_vm._v("\n          " + _vm._s(_vm.initials) + "\n        ")]), _vm._v(" "), _c("div", [_c("h4", {
+    staticClass: "mb-1 font-weight-bold d-flex align-items-center gap-2"
+  }, [_vm._v("\n            " + _vm._s(_vm.paciente.name) + " " + _vm._s(_vm.paciente.nombres) + "\n            "), _vm.paciente.activo || _vm.paciente.activo_sn ? _c("span", {
+    staticClass: "badge bg-success",
+    staticStyle: {
+      "font-size": "0.6rem",
+      "vertical-align": "middle"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-heart"
+  }), _vm._v(" Activo")]) : _vm._e()]), _vm._v(" "), _c("div", {
+    staticClass: "text-muted small"
+  }, [_vm.paciente.birth_date ? _c("span", {
+    staticClass: "me-3"
+  }, [_vm._v(_vm._s(_vm.getAge(_vm.paciente.birth_date)) + " años - " + _vm._s(_vm.getGender(_vm.paciente.gender)))]) : _vm._e(), _vm._v(" "), _c("span", {
+    staticClass: "me-3"
+  }, [_vm._v("DNI: " + _vm._s(_vm.paciente.dni))]), _vm._v(" "), _vm.paciente.medical_evolutions ? _c("span", [_c("i", {
+    staticClass: "fas fa-history text-muted"
+  }), _vm._v(" " + _vm._s(_vm.paciente.medical_evolutions.length) + " evoluciones en historial")]) : _vm._e()])])]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex gap-2 flex-wrap"
+  }, [_c("a", {
+    staticClass: "btn btn-light shadow-sm rounded border",
+    attrs: {
+      href: "tel:" + _vm.paciente.phone
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-phone"
+  }), _vm._v(" Llamar")]), _vm._v(" "), _c("a", {
+    staticClass: "btn btn-light shadow-sm rounded border",
+    attrs: {
+      href: "https://wa.me/51" + _vm.paciente.phone,
+      target: "_blank"
+    }
+  }, [_c("i", {
+    staticClass: "fab fa-whatsapp"
+  }), _vm._v(" WhatsApp")])])]) : _vm._e()]), _vm._v(" "), _c("ul", {
+    staticClass: "nav nav-tabs mb-4 px-2",
+    staticStyle: {
+      "border-bottom": "0"
+    },
+    attrs: {
+      id: "patientTabs",
+      role: "tablist"
+    }
+  }, [_vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm._m(2), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    attrs: {
+      id: "historial-tab",
+      "data-bs-toggle": "tab",
+      "data-bs-target": "#historial",
+      type: "button",
+      role: "tab"
+    }
+  }, [_vm._v("Historial Clínico "), _vm.paciente.medical_evolutions ? _c("span", [_vm._v("(" + _vm._s(_vm.paciente.medical_evolutions.length) + ")")]) : _vm._e()])]), _vm._v(" "), _vm._m(3), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7)]), _vm._v(" "), _vm.loading ? _c("div", {
+    staticClass: "text-center my-5"
+  }, [_vm._m(8), _vm._v(" "), _c("p", {
+    staticClass: "mt-2 text-muted"
+  }, [_vm._v("Cargando información completa del paciente...")])]) : _c("div", {
+    staticClass: "tab-content px-2",
+    attrs: {
+      id: "patientTabsContent"
+    }
+  }, [_c("div", {
+    staticClass: "tab-pane fade show active",
+    attrs: {
+      id: "resumen",
+      role: "tabpanel"
+    }
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "card shadow-sm border rounded-lg mb-3"
+  }, [_c("div", {
+    staticClass: "card-body"
+  }, [_vm._m(9), _vm._v(" "), _vm.proximaCita ? _c("div", [_c("h5", {
+    staticClass: "mb-1 text-dark"
+  }, [_vm._v(_vm._s(_vm.formatDateTime(_vm.proximaCita.date, _vm.proximaCita.hora)))]), _vm._v(" "), _vm.proximaCita.professional ? _c("p", {
+    staticClass: "small text-muted mb-0"
+  }, [_vm._v(_vm._s(_vm.proximaCita.professional.name))]) : _vm._e()]) : _c("div", [_c("p", {
+    staticClass: "text-muted mb-0 small"
+  }, [_vm._v("No hay citas próximas programadas.")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card shadow-sm border rounded-lg mb-3"
+  }, [_c("div", {
+    staticClass: "card-body"
+  }, [_vm._m(10), _vm._v(" "), _vm.ultimaEvolucion ? _c("div", [_c("p", {
+    staticClass: "small text-muted mb-1"
+  }, [_vm._v(_vm._s(_vm.formatDate(_vm.ultimaEvolucion.date)) + " - Dr. " + _vm._s(_vm.ultimaEvolucion.professional ? _vm.ultimaEvolucion.professional.name : ""))]), _vm._v(" "), _c("p", {
+    staticClass: "small mb-0"
+  }, [_vm._v(_vm._s(_vm.ultimaEvolucion.descripcion || "Sin descripción"))])]) : _c("div", [_c("p", {
+    staticClass: "text-muted mb-0 small"
+  }, [_vm._v("No hay evoluciones registradas.")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-8"
+  }, [_c("div", {
+    staticClass: "card shadow-sm border rounded-lg h-100"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_vm._m(11), _vm._v(" "), _c("div", {
+    staticClass: "timeline ms-3 mt-3 content-timeline"
+  }, [_vm._l(_vm.timelineActivity.slice(0, 5), function (item, index) {
+    return _c("div", {
+      key: index,
+      staticClass: "timeline-item pb-3 mb-3 border-bottom"
+    }, [_c("div", {
+      staticClass: "d-flex justify-content-between"
+    }, [_c("div", [_c("strong", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(item.type == "Cita" ? "Cita Programada" : "Evolución Clínica"))]), _vm._v(" "), _c("p", {
+      staticClass: "small text-muted mb-0 mt-1"
+    }, [_vm._v(_vm._s(item.desc))]), _vm._v(" "), _c("p", {
+      staticClass: "small text-primary mb-0 mt-1"
+    }, [_vm._v(_vm._s(item.profesional))])]), _vm._v(" "), _c("div", {
+      staticClass: "text-end"
+    }, [_c("span", {
+      staticClass: "small text-muted"
+    }, [_vm._v(_vm._s(_vm.formatDate(item.date)))])])])]);
+  }), _vm._v(" "), _vm.timelineActivity.length === 0 ? _c("div", {
+    staticClass: "text-muted small"
+  }, [_vm._v("\n                  No hay actividad reciente.\n                ")]) : _vm._e()], 2)])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    attrs: {
+      id: "datos",
+      role: "tabpanel"
+    }
+  }, [_c("div", {
+    staticClass: "card border mb-4"
+  }, [_c("div", {
+    staticClass: "card-body p-4 position-relative"
+  }, [_c("button", {
+    staticClass: "btn btn-outline-primary position-absolute btn-sm",
+    staticStyle: {
+      top: "20px",
+      right: "20px"
+    },
+    attrs: {
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#modalEdicionPaciente"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.$emit("editarPaciente", _vm.paciente);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-edit"
+  }), _vm._v(" Editar Paciente\n          ")]), _vm._v(" "), _c("h5", {
+    staticClass: "card-title font-weight-bold mb-4"
+  }, [_vm._v("Información General")]), _vm._v(" "), _c("div", {
+    staticClass: "row mb-3"
+  }, [_c("div", {
+    staticClass: "col-md-3 mb-3"
+  }, [_c("span", {
+    staticClass: "text-muted d-block small mb-1"
+  }, [_vm._v("Nombres")]), _c("strong", {
+    staticClass: "text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.name))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-3"
+  }, [_c("span", {
+    staticClass: "text-muted d-block small mb-1"
+  }, [_vm._v("Apellidos")]), _c("strong", {
+    staticClass: "text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.nombres))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-3"
+  }, [_c("span", {
+    staticClass: "text-muted d-block small mb-1"
+  }, [_vm._v("DNI / CE")]), _c("strong", {
+    staticClass: "text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.dni))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-3"
+  }, [_c("span", {
+    staticClass: "text-muted d-block small mb-1"
+  }, [_vm._v("Fecha Nacimiento")]), _c("strong", {
+    staticClass: "text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.birth_date))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-3"
+  }, [_c("span", {
+    staticClass: "text-muted d-block small mb-1"
+  }, [_vm._v("Ocupación")]), _c("strong", {
+    staticClass: "text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.occupation))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-3"
+  }, [_c("span", {
+    staticClass: "text-muted d-block small mb-1"
+  }, [_vm._v("Teléfono")]), _c("strong", {
+    staticClass: "text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.phone))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-3"
+  }, [_c("span", {
+    staticClass: "text-muted d-block small mb-1"
+  }, [_vm._v("Correo")]), _c("strong", {
+    staticClass: "text-dark",
+    staticStyle: {
+      "word-break": "break-all"
+    }
+  }, [_vm._v(_vm._s(_vm.paciente.email || "N/A"))])])]), _vm._v(" "), _c("hr", {
+    staticClass: "my-4"
+  }), _vm._v(" "), _c("h5", {
+    staticClass: "card-title font-weight-bold mb-4"
+  }, [_vm._v("Dirección")]), _vm._v(" "), _vm.paciente.address ? _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-md-4 mb-2"
+  }, [_c("span", {
+    staticClass: "text-muted d-block small mb-1"
+  }, [_vm._v("Dirección")]), _c("strong", {
+    staticClass: "text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.address.address))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4 mb-2"
+  }, [_c("span", {
+    staticClass: "text-muted d-block small mb-1"
+  }, [_vm._v("Distrito")]), _c("strong", {
+    staticClass: "text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.address.district))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4 mb-2"
+  }, [_c("span", {
+    staticClass: "text-muted d-block small mb-1"
+  }, [_vm._v("Provincia/Departamento")]), _c("strong", {
+    staticClass: "text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.address.province) + " - " + _vm._s(_vm.paciente.address.department))])])]) : _vm._e()])]), _vm._v(" "), _c("div", {
+    staticClass: "card border"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("h5", {
+    staticClass: "card-title font-weight-bold mb-3"
+  }, [_vm._v("Familiares / Contactos")]), _vm._v(" "), _vm.paciente.relative && _vm.paciente.relative.length > 0 ? _c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-borderless table-sm"
+  }, [_vm._m(12), _vm._v(" "), _c("tbody", _vm._l(_vm.paciente.relative, function (rel) {
+    return _c("tr", {
+      directives: [{
+        name: "show",
+        rawName: "v-show",
+        value: rel.name,
+        expression: "rel.name"
+      }],
+      key: rel.id
+    }, [_c("td", {
+      staticClass: "p-2"
+    }, [_vm._v(_vm._s(rel.name))]), _vm._v(" "), _c("td", {
+      staticClass: "p-2"
+    }, [_vm._v(_vm._s(rel.kinship))]), _vm._v(" "), _c("td", {
+      staticClass: "p-2"
+    }, [_vm._v(_vm._s(rel.phone))])]);
+  }), 0)])]) : _c("div", [_c("p", {
+    staticClass: "text-muted mb-0 small"
+  }, [_vm._v("No hay familiares registrados.")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    attrs: {
+      id: "citas",
+      role: "tabpanel"
+    }
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-md-12 mb-4"
+  }, [_c("div", {
+    staticClass: "card border"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("h5", {
+    staticClass: "card-title font-weight-bold mb-4"
+  }, [_vm._v("Últimas Citas")]), _vm._v(" "), _c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-hover table-sm"
+  }, [_vm._m(13), _vm._v(" "), _c("tbody", [_vm._l((_vm.paciente.appointments || []).slice(0, 10), function (cita) {
+    return _c("tr", {
+      key: cita.id
+    }, [_c("td", [_vm._v(_vm._s(_vm.formatDate(cita.date)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(cita.professional ? cita.professional.name : "N/A"))]), _vm._v(" "), _c("td", [_c("span", {
+      staticClass: "badge",
+      "class": _vm.getStatusBadge(cita.status)
+    }, [_vm._v(_vm._s(_vm.getStatusName(cita.status)))])])]);
+  }), _vm._v(" "), !_vm.paciente.appointments || _vm.paciente.appointments.length == 0 ? _c("tr", [_c("td", {
+    staticClass: "text-center text-muted",
+    attrs: {
+      colspan: "3"
+    }
+  }, [_vm._v("No tiene citas")])]) : _vm._e()], 2)])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-12"
+  }, [_c("div", {
+    staticClass: "card border"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("h5", {
+    staticClass: "card-title font-weight-bold mb-4"
+  }, [_vm._v("Membresías / Paquetes")]), _vm._v(" "), _c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-hover table-sm"
+  }, [_vm._m(14), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.membresias, function (mem) {
+    return _c("tr", {
+      key: mem.id
+    }, [_c("td", [_vm._v(_vm._s(_vm.formatDate(mem.inicio)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.formatDate(mem.fin)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(mem.precio ? mem.precio.descripcion : "N/A"))]), _vm._v(" "), _c("td", [_c("span", {
+      staticClass: "badge",
+      "class": mem.activo ? "bg-success" : "bg-secondary"
+    }, [_vm._v(_vm._s(mem.activo ? "ACTIVA" : "INACTIVA"))])])]);
+  }), _vm._v(" "), !_vm.paciente.membresias || _vm.paciente.membresias.length == 0 ? _c("tr", [_c("td", {
+    staticClass: "text-center text-muted",
+    attrs: {
+      colspan: "4"
+    }
+  }, [_vm._v("No tiene membresías")])]) : _vm._e()], 2)])])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    attrs: {
+      id: "historial",
+      role: "tabpanel"
+    }
+  }, [_c("div", {
+    staticClass: "card border"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("h5", {
+    staticClass: "card-title font-weight-bold mb-4"
+  }, [_vm._v("Evoluciones Clínicas")]), _vm._v(" "), _c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-hover table-sm align-middle"
+  }, [_vm._m(15), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.medical_evolutions, function (evo) {
+    return _c("tr", {
+      key: evo.id
+    }, [_c("td", {
+      staticStyle: {
+        "white-space": "nowrap"
+      }
+    }, [_vm._v(_vm._s(_vm.formatDate(evo.date)))]), _vm._v(" "), _c("td", {
+      staticStyle: {
+        "white-space": "nowrap"
+      }
+    }, [_vm._v(_vm._s(evo.professional ? evo.professional.name : ""))]), _vm._v(" "), _c("td", {
+      staticClass: "text-muted small"
+    }, [_vm._v(_vm._s(evo.content))])]);
+  }), _vm._v(" "), !_vm.paciente.medical_evolutions || _vm.paciente.medical_evolutions.length == 0 ? _c("tr", [_c("td", {
+    staticClass: "text-center text-muted py-3",
+    attrs: {
+      colspan: "3"
+    }
+  }, [_vm._v("Aún no cuenta con evoluciones")])]) : _vm._e()], 2)])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    attrs: {
+      id: "triaje",
+      role: "tabpanel"
+    }
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-md-6 mb-3"
+  }, [_c("div", {
+    staticClass: "card border h-100"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("h5", {
+    staticClass: "card-title font-weight-bold mb-4"
+  }, [_vm._v("Triajes")]), _vm._v(" "), _vm.paciente.triajes && _vm.paciente.triajes.length > 0 ? _c("ul", {
+    staticClass: "list-group list-group-flush"
+  }, _vm._l(_vm.paciente.triajes.slice(0, 5), function (tr) {
+    return _c("li", {
+      key: tr.id,
+      staticClass: "list-group-item px-0"
+    }, [_c("strong", [_vm._v(_vm._s(_vm.formatDate(tr.fecha || tr.created_at)))]), _vm._v(" "), _c("p", {
+      staticClass: "mb-0 small text-muted mt-1"
+    }, [_c("strong", [_vm._v("Motivo:")]), _vm._v(" " + _vm._s(tr.motivo))]), _vm._v(" "), _c("p", {
+      staticClass: "mb-0 small text-muted"
+    }, [_c("strong", [_vm._v("Síntomas:")]), _vm._v(" " + _vm._s(tr.sintomatologia))])]);
+  }), 0) : _c("p", {
+    staticClass: "text-muted small"
+  }, [_vm._v("Sin registros de triaje.")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 mb-3"
+  }, [_c("div", {
+    staticClass: "card border h-100"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("h5", {
+    staticClass: "card-title font-weight-bold mb-4"
+  }, [_vm._v("Seguridad / Semáforo")]), _vm._v(" "), _vm.paciente.semaforo_estados && _vm.paciente.semaforo_estados.length > 0 ? _c("ul", {
+    staticClass: "list-group list-group-flush"
+  }, _vm._l(_vm.paciente.semaforo_estados.slice(0, 5), function (sem) {
+    return _c("li", {
+      key: sem.id,
+      staticClass: "list-group-item px-0"
+    }, [_c("strong", [_vm._v(_vm._s(_vm.formatDate(sem.registro)))]), _vm._v(" "), _c("p", {
+      staticClass: "mb-0 small mt-1"
+    }, [_vm._v("Código: " + _vm._s(sem.codigo) + " - "), _c("span", {
+      staticClass: "text-muted"
+    }, [_vm._v(_vm._s(sem.observaciones))])])]);
+  }), 0) : _c("p", {
+    staticClass: "text-muted small"
+  }, [_vm._v("Sin registros en el semáforo.")])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    attrs: {
+      id: "recetas",
+      role: "tabpanel"
+    }
+  }, [_c("div", {
+    staticClass: "card border"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("h5", {
+    staticClass: "card-title font-weight-bold mb-4"
+  }, [_vm._v("Recetas y Órdenes")]), _vm._v(" "), _c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-hover table-sm"
+  }, [_vm._m(16), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.prescriptions, function (receta) {
+    return _c("tr", {
+      key: receta.id
+    }, [_c("td", {
+      staticStyle: {
+        width: "15%"
+      }
+    }, [_vm._v(_vm._s(_vm.formatDate(receta.created_at)))]), _vm._v(" "), _c("td", [_c("span", {
+      staticClass: "small"
+    }, [_vm._v("Receta generada (ID: " + _vm._s(receta.id) + ")")]), _vm._v(" "), _c("span", {
+      staticClass: "text-muted mx-2"
+    }, [_vm._v("|")]), _vm._v(" "), _c("a", {
+      staticClass: "text-primary small",
+      attrs: {
+        href: "/api/pdf/".concat(receta.id, "?token=").concat(_vm.$token),
+        target: "_blank"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-print"
+    }), _vm._v(" Imprimir Receta")])])]);
+  }), _vm._v(" "), !_vm.paciente.prescriptions || _vm.paciente.prescriptions.length == 0 ? _c("tr", [_c("td", {
+    staticClass: "text-center text-muted",
+    attrs: {
+      colspan: "2"
+    }
+  }, [_vm._v("No tiene recetas registradas")])]) : _vm._e()], 2)])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    attrs: {
+      id: "pruebas",
+      role: "tabpanel"
+    }
+  }, [_c("div", {
+    staticClass: "card border border-light"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("h5", {
+    staticClass: "card-title font-weight-bold mb-4"
+  }, [_vm._v("Listado de Pruebas")]), _vm._v(" "), _c("ul", {
+    staticClass: "list-group list-group-flush"
+  }, _vm._l(_vm.allTests, function (t) {
+    return _c("li", {
+      key: t.type + t.id,
+      staticClass: "list-group-item d-flex justify-content-between align-items-center px-0 border-bottom"
+    }, [_c("div", [_c("strong", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(t.testName))]), _vm._v(" "), _c("span", {
+      staticClass: "text-muted small d-block mt-1"
+    }, [_vm._v(_vm._s(_vm.formatDate(t.created_at)))])]), _vm._v(" "), t.score || t.total ? _c("span", {
+      staticClass: "badge bg-primary rounded-pill px-3 py-2"
+    }, [_vm._v(_vm._s(t.score || t.total) + " pts")]) : _vm._e()]);
+  }), 0), _vm._v(" "), _vm.allTests.length === 0 ? _c("div", {
+    staticClass: "text-center text-muted mt-3"
+  }, [_vm._v("\n             No hay pruebas aplicadas.\n           ")]) : _vm._e()])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    attrs: {
+      id: "documentos",
+      role: "tabpanel"
+    }
+  }, [_c("div", {
+    staticClass: "card border"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("h5", {
+    staticClass: "card-title font-weight-bold mb-4"
+  }, [_vm._v("Archivos y Documentos")]), _vm._v(" "), _c("table", {
+    staticClass: "table table-sm table-hover align-middle"
+  }, [_vm._m(17), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.archivos_list || [], function (doc) {
+    return _c("tr", {
+      key: doc.id
+    }, [_c("td", {
+      staticClass: "p-2"
+    }, [_c("i", {
+      staticClass: "far fa-file-pdf text-danger me-2"
+    }), _vm._v(" " + _vm._s(doc.nombre))]), _vm._v(" "), _c("td", {
+      staticClass: "p-2 text-muted small"
+    }, [_vm._v(_vm._s(doc.fecha || _vm.formatDate(doc.created_at)))]), _vm._v(" "), _c("td", {
+      staticClass: "p-2 text-center"
+    }, [_c("a", {
+      staticClass: "btn btn-sm btn-light border",
+      attrs: {
+        href: "/storage/archivos/" + doc.archivo,
+        target: "_blank"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-external-link-alt"
+    })])])]);
+  }), _vm._v(" "), !_vm.paciente.archivos_list || _vm.paciente.archivos_list.length == 0 ? _c("tr", [_c("td", {
+    staticClass: "text-center text-muted py-3",
+    attrs: {
+      colspan: "3"
+    }
+  }, [_vm._v("No existen documentos adjuntos")])]) : _vm._e()], 2)])])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    attrs: {
+      id: "finanzas",
+      role: "tabpanel"
+    }
+  }, [_c("div", {
+    staticClass: "card border"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("h5", {
+    staticClass: "card-title font-weight-bold mb-4"
+  }, [_vm._v("Deudas y Cuentas")]), _vm._v(" "), _c("table", {
+    staticClass: "table table-sm table-hover"
+  }, [_vm._m(18), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.deudas_financieras || [], function (deuda) {
+    return _c("tr", {
+      key: deuda.id
+    }, [_c("td", {
+      staticClass: "p-2 text-dark"
+    }, [_vm._v(_vm._s(_vm.formatDate(deuda.fecha)))]), _vm._v(" "), _c("td", {
+      staticClass: "p-2 text-muted"
+    }, [_vm._v(_vm._s(deuda.observacion || "Atención"))]), _vm._v(" "), _c("td", {
+      staticClass: "p-2 text-dark font-weight-bold"
+    }, [_vm._v("S/ " + _vm._s(deuda.monto))]), _vm._v(" "), _c("td", {
+      staticClass: "p-2"
+    }, [_c("span", {
+      staticClass: "badge",
+      "class": deuda.estado ? "bg-danger" : "bg-success"
+    }, [_vm._v(_vm._s(deuda.estado ? "Pendiente" : "Pagado"))])])]);
+  }), _vm._v(" "), !_vm.paciente.deudas_financieras || _vm.paciente.deudas_financieras.length == 0 ? _c("tr", [_c("td", {
+    staticClass: "text-center text-muted py-3",
+    attrs: {
+      colspan: "4"
+    }
+  }, [_vm._v("No presenta deudas")])]) : _vm._e()], 2)])])])])])]);
+};
+var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link active font-weight-bold small text-dark",
+    attrs: {
+      id: "resumen-tab",
+      "data-bs-toggle": "tab",
+      "data-bs-target": "#resumen",
+      type: "button",
+      role: "tab"
+    }
+  }, [_vm._v("Resumen")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    attrs: {
+      id: "datos-tab",
+      "data-bs-toggle": "tab",
+      "data-bs-target": "#datos",
+      type: "button",
+      role: "tab"
+    }
+  }, [_vm._v("Datos Personales")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    attrs: {
+      id: "citas-tab",
+      "data-bs-toggle": "tab",
+      "data-bs-target": "#citas",
+      type: "button",
+      role: "tab"
+    }
+  }, [_vm._v("Citas & Paquetes")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    attrs: {
+      id: "triaje-tab",
+      "data-bs-toggle": "tab",
+      "data-bs-target": "#triaje",
+      type: "button",
+      role: "tab"
+    }
+  }, [_vm._v("Triaje & Seguridad")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    attrs: {
+      id: "recetas-tab",
+      "data-bs-toggle": "tab",
+      "data-bs-target": "#recetas",
+      type: "button",
+      role: "tab"
+    }
+  }, [_vm._v("Recetas & Órdenes")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    attrs: {
+      id: "pruebas-tab",
+      "data-bs-toggle": "tab",
+      "data-bs-target": "#pruebas",
+      type: "button",
+      role: "tab"
+    }
+  }, [_vm._v("Pruebas Psicológicas")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    attrs: {
+      id: "documentos-tab",
+      "data-bs-toggle": "tab",
+      "data-bs-target": "#documentos",
+      type: "button",
+      role: "tab"
+    }
+  }, [_vm._v("Documentos")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    attrs: {
+      id: "finanzas-tab",
+      "data-bs-toggle": "tab",
+      "data-bs-target": "#finanzas",
+      type: "button",
+      role: "tab"
+    }
+  }, [_vm._v("Finanzas")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "spinner-border text-primary",
+    attrs: {
+      role: "status"
+    }
+  }, [_c("span", {
+    staticClass: "visually-hidden"
+  }, [_vm._v("Loading...")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "font-weight-bold mb-3"
+  }, [_c("i", {
+    staticClass: "far fa-calendar text-primary"
+  }), _vm._v(" Próxima Cita")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "font-weight-bold mb-3"
+  }, [_c("i", {
+    staticClass: "fas fa-file-medical text-success"
+  }), _vm._v(" Última Evolución")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mb-4"
+  }, [_c("h6", {
+    staticClass: "font-weight-bold text-dark mb-0"
+  }, [_c("i", {
+    staticClass: "far fa-clock text-primary"
+  }), _vm._v(" Línea de Tiempo Clínica (Últimas Actividades)")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", {
+    staticClass: "bg-light"
+  }, [_c("tr", [_c("th", {
+    staticClass: "p-2 border-bottom"
+  }, [_vm._v("Nombre")]), _vm._v(" "), _c("th", {
+    staticClass: "p-2 border-bottom"
+  }, [_vm._v("Parentesco")]), _vm._v(" "), _c("th", {
+    staticClass: "p-2 border-bottom"
+  }, [_vm._v("Teléfono")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Fecha")]), _vm._v(" "), _c("th", [_vm._v("Profesional")]), _vm._v(" "), _c("th", [_vm._v("Estado")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Inicio")]), _vm._v(" "), _c("th", [_vm._v("Fin")]), _vm._v(" "), _c("th", [_vm._v("Precio")]), _vm._v(" "), _c("th", [_vm._v("Activo")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Fecha")]), _vm._v(" "), _c("th", [_vm._v("Profesional")]), _vm._v(" "), _c("th", [_vm._v("Descripción")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Fecha")]), _vm._v(" "), _c("th", [_vm._v("Detalles")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", {
+    staticClass: "bg-light"
+  }, [_c("tr", [_c("th", {
+    staticClass: "p-2 rounded-start border-bottom-0"
+  }, [_vm._v("Nombre del archivo")]), _vm._v(" "), _c("th", {
+    staticClass: "p-2 border-bottom-0"
+  }, [_vm._v("Fecha de Subida")]), _vm._v(" "), _c("th", {
+    staticClass: "p-2 border-bottom-0 rounded-end text-center"
+  }, [_vm._v("Acción")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", {
+    staticClass: "bg-light"
+  }, [_c("tr", [_c("th", {
+    staticClass: "p-2 border-bottom-0 text-muted"
+  }, [_vm._v("Fecha")]), _vm._v(" "), _c("th", {
+    staticClass: "p-2 border-bottom-0 text-muted"
+  }, [_vm._v("Detalles")]), _vm._v(" "), _c("th", {
+    staticClass: "p-2 border-bottom-0 text-muted"
+  }, [_vm._v("Monto")]), _vm._v(" "), _c("th", {
+    staticClass: "p-2 border-bottom-0 text-muted"
+  }, [_vm._v("Estado")])])]);
+}];
+render._withStripped = true;
+
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/HomePacientes.vue?vue&type=template&id=f3308000":
 /*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/HomePacientes.vue?vue&type=template&id=f3308000 ***!
@@ -2009,7 +3032,7 @@ __webpack_require__.r(__webpack_exports__);
 var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("main", [_c("div", {
+  return _c("main", [_vm.vistaActual === "lista" ? _c("div", [_c("div", {
     staticClass: "d-sm-flex align-items-center justify-content-around mt-4"
   }, [_c("div", {
     staticClass: "d-none d-sm-inline-block form-inline w-100"
@@ -2055,13 +3078,9 @@ var render = function render() {
       staticStyle: {
         cursor: "pointer"
       },
-      attrs: {
-        "data-bs-toggle": "modal",
-        "data-bs-target": "#modalEdicionPaciente"
-      },
       on: {
         click: function click($event) {
-          return _vm.prepararPaciente(paciente);
+          return _vm.abrirDetallePaciente(paciente);
         }
       }
     }, [paciente.vivo == 0 ? _c("span", [_c("i", {
@@ -2335,7 +3354,19 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fa-solid fa-flask-vial"
     })])])]);
-  }), 0)]), _vm._v(" "), _c("ModalEdicionPaciente", {
+  }), 0)])]) : _c("DetallePaciente", {
+    attrs: {
+      pacienteId: _vm.dataPaciente.id
+    },
+    on: {
+      volver: function volver($event) {
+        _vm.vistaActual = "lista";
+      },
+      editarPaciente: function editarPaciente($event) {
+        _vm.dataPaciente = $event;
+      }
+    }
+  }), _vm._v(" "), _c("ModalEdicionPaciente", {
     attrs: {
       dataPatient: _vm.dataPaciente
     }
@@ -6854,6 +7885,29 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.modal-content[data-v-29522a44] { co
 
 /***/ }),
 
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=style&index=0&id=36e64d45&scoped=true&lang=css":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=style&index=0&id=36e64d45&scoped=true&lang=css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.nav-tabs .nav-link[data-v-36e64d45] {\n  color: #6c757d;\n  border: none;\n  font-size: 14px;\n  border-bottom: 2px solid transparent;\n  padding: 0.75rem 1rem;\n}\n.nav-tabs .nav-link.active[data-v-36e64d45] {\n  color: #0d6efd;\n  background-color: transparent;\n  border-color: transparent transparent #0d6efd;\n}\n.nav-tabs .nav-link[data-v-36e64d45]:hover {\n  border-color: transparent transparent #dee2e6;\n}\n.timeline[data-v-36e64d45] {\n  position: relative;\n  border-left: 2px solid #e9ecef;\n  padding-left: 1.5rem;\n}\n.timeline-item[data-v-36e64d45] {\n  position: relative;\n}\n.timeline-item[data-v-36e64d45]::before {\n  content: '';\n  position: absolute;\n  left: -30px;\n  top: 5px;\n  width: 14px;\n  height: 14px;\n  border-radius: 50%;\n  background-color: #0d6efd;\n  border: 2px solid #fff;\n  box-shadow: 0 0 0 1px #0d6efd;\n}\n.content-timeline[data-v-36e64d45] {\n  max-height: 400px;\n  overflow-y: auto;\n  padding-right: 10px;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=0&id=163c320f&lang=css":
 /*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=0&id=163c320f&lang=css ***!
@@ -6949,6 +8003,35 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalProximaCita_vue_vue_type_style_index_0_id_29522a44_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=style&index=0&id=36e64d45&scoped=true&lang=css":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=style&index=0&id=36e64d45&scoped=true&lang=css ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DetallePaciente_vue_vue_type_style_index_0_id_36e64d45_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DetallePaciente.vue?vue&type=style&index=0&id=36e64d45&scoped=true&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=style&index=0&id=36e64d45&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DetallePaciente_vue_vue_type_style_index_0_id_36e64d45_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DetallePaciente_vue_vue_type_style_index_0_id_36e64d45_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -7167,6 +8250,46 @@ var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__
 /* hot reload */
 if (false) { var api; }
 component.options.__file = "resources/js/components/profesional/components/consultas/ModalProximaCita.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue":
+/*!****************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue ***!
+  \****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _DetallePaciente_vue_vue_type_template_id_36e64d45_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DetallePaciente.vue?vue&type=template&id=36e64d45&scoped=true */ "./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=template&id=36e64d45&scoped=true");
+/* harmony import */ var _DetallePaciente_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DetallePaciente.vue?vue&type=script&lang=js */ "./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=script&lang=js");
+/* harmony import */ var _DetallePaciente_vue_vue_type_style_index_0_id_36e64d45_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DetallePaciente.vue?vue&type=style&index=0&id=36e64d45&scoped=true&lang=css */ "./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=style&index=0&id=36e64d45&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+;
+
+
+/* normalize component */
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _DetallePaciente_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _DetallePaciente_vue_vue_type_template_id_36e64d45_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _DetallePaciente_vue_vue_type_template_id_36e64d45_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "36e64d45",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue"
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
 
 /***/ }),
@@ -7800,6 +8923,21 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=script&lang=js":
+/*!****************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=script&lang=js ***!
+  \****************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DetallePaciente_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DetallePaciente.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DetallePaciente_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
 /***/ "./resources/js/components/recepcionista/components/pacientes/HomePacientes.vue?vue&type=script&lang=js":
 /*!**************************************************************************************************************!*\
   !*** ./resources/js/components/recepcionista/components/pacientes/HomePacientes.vue?vue&type=script&lang=js ***!
@@ -8052,6 +9190,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalProximaCita_vue_vue_type_template_id_29522a44_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalProximaCita_vue_vue_type_template_id_29522a44_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalProximaCita.vue?vue&type=template&id=29522a44&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/profesional/components/consultas/ModalProximaCita.vue?vue&type=template&id=29522a44&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=template&id=36e64d45&scoped=true":
+/*!**********************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=template&id=36e64d45&scoped=true ***!
+  \**********************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DetallePaciente_vue_vue_type_template_id_36e64d45_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DetallePaciente_vue_vue_type_template_id_36e64d45_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DetallePaciente_vue_vue_type_template_id_36e64d45_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DetallePaciente.vue?vue&type=template&id=36e64d45&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=template&id=36e64d45&scoped=true");
 
 
 /***/ }),
@@ -8320,6 +9474,18 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalProximaCita_vue_vue_type_style_index_0_id_29522a44_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalProximaCita.vue?vue&type=style&index=0&id=29522a44&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/profesional/components/consultas/ModalProximaCita.vue?vue&type=style&index=0&id=29522a44&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=style&index=0&id=36e64d45&scoped=true&lang=css":
+/*!************************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=style&index=0&id=36e64d45&scoped=true&lang=css ***!
+  \************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DetallePaciente_vue_vue_type_style_index_0_id_36e64d45_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DetallePaciente.vue?vue&type=style&index=0&id=36e64d45&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue?vue&type=style&index=0&id=36e64d45&scoped=true&lang=css");
 
 
 /***/ }),

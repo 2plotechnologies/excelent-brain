@@ -27,6 +27,7 @@ use App\Http\Controllers\Zung_depressionController;
 use App\Http\Controllers\ExtrasController;
 use App\Http\Controllers\LimboController;
 use App\Http\Controllers\SimpleController;
+use App\Http\Controllers\PaqueteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -94,6 +95,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/pedirArchivos', [PatientController::class, 'pedirArchivos']);
         Route::post('/pedirArchivosTriaje', [PatientController::class, 'pedirArchivosTriaje']);
         Route::get('xlsx_recep/{date}', [PatientController::class, 'createXlsx']);
+        Route::get('patient/{id}/full-details', [PatientController::class, 'getFullPatientDetails']);
 
         // Admin-only patient routes
         Route::middleware('role:administrador,recepcionista')->group(function () {
@@ -227,6 +229,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('cambiarEstadoMembresia/{id}/{estado}/{congelar}', [ExtrasController::class, 'cambiarEstadoMembresia']);
         Route::post('insertarSeguimiento', [ExtrasController::class, 'insertarSeguimiento']);
         Route::get('pedirHistorialSeguimientos/{id}', [ExtrasController::class, 'pedirHistorialSeguimientos']);
+        Route::get('listarPaquetes', [PaqueteController::class, 'listarPaquetes']);
+        Route::get('reportePaquete/{id}', [PaqueteController::class, 'pdfReportePaquete']);
     });
 
     // ── PROFESSIONALS & SCHEDULES ─────────────────────────────────────────────

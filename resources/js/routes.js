@@ -15,6 +15,7 @@ const MainSuperUser = () => import('./components/administrador/Main.vue');
 const HomeAdministrador = () => import('./components/administrador/views/HomeAdministrador.vue');
 const ShowProfessional = () => import('./components/administrador/views/ShowProfessional.vue');
 const HomePrecios = () => import('./components/administrador/views/HomePrecios.vue')
+const HomePaquetes = () => import('./components/administrador/views/HomePaquetes.vue')
 const editarPacientesAdmin = () => import('./components/administrador/views/EditarPacientesAdmin.vue')
 const RecepcionistaReportesGerenciales = () => import('./components/administrador/views/reportes/ReportesGerenciales');
 
@@ -38,9 +39,9 @@ const HomeProfesionalCartera = () => import('./components/profesional/components
 const PacientesSos = () => import('./components/profesional/components/consultas/PacientesSos.vue')
 const Scr90 = () => import('./components/profesional/components/examenes/Scr.vue')
 const Burns = () => import('./components/profesional/components/examenes/Burns.vue')
-const DepZung = () =>import('./components/profesional/components/examenes/ZungDep.vue')
-const AnsZung = () =>import('./components/profesional/components/examenes/ZungAns.vue')
-const Millon = () =>import('./components/profesional/components/examenes/Millon.vue')
+const DepZung = () => import('./components/profesional/components/examenes/ZungDep.vue')
+const AnsZung = () => import('./components/profesional/components/examenes/ZungAns.vue')
+const Millon = () => import('./components/profesional/components/examenes/Millon.vue')
 const phq = () => import('./components/profesional/components/examenes/PHQ-9.vue')
 const gad = () => import('./components/profesional/components/examenes/GAD-7.vue')
 const bdi = () => import('./components/profesional/components/examenes/BDI-2.vue')
@@ -94,13 +95,13 @@ export const routes = [
     path: '/',
     name: 'home',
     component: HomePage,
-    meta: {requiresAuth:true},
+    meta: { requiresAuth: true },
   },
   {
     path: '/patient-test',
     name: 'patient-test',
     component: PatientTest,
-    meta: {requiresAuth:false}
+    meta: { requiresAuth: false }
   },
   /* {
     path: '/voice',
@@ -111,26 +112,26 @@ export const routes = [
     path: '/login',
     name: 'login',
     component: Login,
-    meta: {guest:true}
+    meta: { guest: true }
   },
   {
     path: '/receta',
     name: 'receta',
     component: PrintReceta,
-    meta: {requiresAuth:true}
+    meta: { requiresAuth: true }
   },
   {
     path: '/interno',
     name: 'homeInterno',
     component: HomePage,
-    meta: {requiresAuth:true},
+    meta: { requiresAuth: true },
     children: [
       {
         path: 'home',
         name: 'HomeInterno',
         component: HomeInterno
       },
-			{
+      {
         path: 'pacientes',
         name: 'HomePacientes',
         component: HomePacientes
@@ -231,7 +232,7 @@ export const routes = [
     path: '/profesional',
     name: 'mainProfesional',
     component: HomePage,
-    meta: {requiresAuth:true},
+    meta: { requiresAuth: true },
     children: [
       {
         path: 'home',
@@ -264,14 +265,14 @@ export const routes = [
         name: 'miCarteraProfesional',
         component: HomeProfesionalCartera
       },
-			{
+      {
         path: 'pacientes-sos',
         name: 'pacientes-sos',
         component: PacientesSos
       },
       {
-        path:'kairosTable',
-        name:'kairosTable',
+        path: 'kairosTable',
+        name: 'kairosTable',
         component: KairosTable
       },
       {
@@ -387,27 +388,32 @@ export const routes = [
         name: 'preciosServicios',
         component: HomePrecios
       },
-			{
-				path:'/administrador/usuarios-simples',
-				name: 'usuariosSimples',
-				component: HomeUsuarios
-			},
-			{
-				path:'/administrador/editar/pacientes',
-				name: 'editarPacientesAdmin',
-				component: editarPacientesAdmin
-			},
-			
-			{
-				path: '/administrador/admistracion-profesionales',
-				name: 'profesionalRecepcionista',
-				component: HomeRecepcionistaProfesional
-			},
-			{
-				path: '/administrador/reportes-gerenciales',
-				name: 'reportesGerenciales',
-				component: RecepcionistaReportesGerenciales
-			},
+      {
+        path: '/administrador/paquetes',
+        name: 'paquetes',
+        component: HomePaquetes
+      },
+      {
+        path: '/administrador/usuarios-simples',
+        name: 'usuariosSimples',
+        component: HomeUsuarios
+      },
+      {
+        path: '/administrador/editar/pacientes',
+        name: 'editarPacientesAdmin',
+        component: editarPacientesAdmin
+      },
+
+      {
+        path: '/administrador/admistracion-profesionales',
+        name: 'profesionalRecepcionista',
+        component: HomeRecepcionistaProfesional
+      },
+      {
+        path: '/administrador/reportes-gerenciales',
+        name: 'reportesGerenciales',
+        component: RecepcionistaReportesGerenciales
+      },
       {
         path: '/administrador/reportes',
         name: 'HomeAdministradorRouterReportes',
@@ -440,71 +446,71 @@ export const routes = [
           },
         ]
       },
-			
+
     ]
   },
   {
-     path: '/recepcionista',
-     name: 'main',
-     component: HomePage,
-     meta: {requiresAuth:true},
-     children: [
-        {
-          path: 'home',
-          name: 'homeRecepcionista',
-          component: HomeRecepcionista
-        },
-        {
-          path: 'pacientes',
-          name: 'pacientesRecepcionista',
-          component: HomeRecepcionistaPacientes
-        },
-        {
-          path: 'reportes',
-          name: 'reportesRecepcionista',
-          component: HomeRecepcionistaReportes
-        },
-        {
-          path: 'reportes-avanzados',
-          name: 'reportesRecepcionistaAvanzados',
-          component: RecepcionistaReportesAvanzados
-        },
-        {
-          path:'continuantes',
-          name:'continuantesRecepcionista',
-          component: HomeCont
-        },
-        {
-          path:'adicionales',
-          name: 'adicionalesRecepcionista',
-          component: HomeAdicionales
-        },
-        {
-          path:'cartera',
-          name: 'carteraRecepcionista',
-          component: HomeCartera
-        },
-        {
-          path:'pagos',
-          name: 'pagosRecepcionista',
-          component: HomeRecepcionistaPagos
-        },
-				{
-          path:'recordatorios',
-          name: 'recordatorios',
-          component: HomeRecordatorios
-        },
-				{
-					path: 'pacientes-sos',
-					name: 'pacientes-sos',
-					component: PacientesSos
-				},
-				{
-					path: 'limbo',
-					name: 'limbo',
-					component: HomeLimbo
-				},
-      ]
+    path: '/recepcionista',
+    name: 'main',
+    component: HomePage,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: 'home',
+        name: 'homeRecepcionista',
+        component: HomeRecepcionista
+      },
+      {
+        path: 'pacientes',
+        name: 'pacientesRecepcionista',
+        component: HomeRecepcionistaPacientes
+      },
+      {
+        path: 'reportes',
+        name: 'reportesRecepcionista',
+        component: HomeRecepcionistaReportes
+      },
+      {
+        path: 'reportes-avanzados',
+        name: 'reportesRecepcionistaAvanzados',
+        component: RecepcionistaReportesAvanzados
+      },
+      {
+        path: 'continuantes',
+        name: 'continuantesRecepcionista',
+        component: HomeCont
+      },
+      {
+        path: 'adicionales',
+        name: 'adicionalesRecepcionista',
+        component: HomeAdicionales
+      },
+      {
+        path: 'cartera',
+        name: 'carteraRecepcionista',
+        component: HomeCartera
+      },
+      {
+        path: 'pagos',
+        name: 'pagosRecepcionista',
+        component: HomeRecepcionistaPagos
+      },
+      {
+        path: 'recordatorios',
+        name: 'recordatorios',
+        component: HomeRecordatorios
+      },
+      {
+        path: 'pacientes-sos',
+        name: 'pacientes-sos',
+        component: PacientesSos
+      },
+      {
+        path: 'limbo',
+        name: 'limbo',
+        component: HomeLimbo
+      },
+    ]
   },
   {
     path: '/:pathMedia(.*)',

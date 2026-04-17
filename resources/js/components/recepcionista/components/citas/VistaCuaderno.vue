@@ -72,6 +72,9 @@
 								class="booked-slot shadow-sm p-1" 
 								:style="[slotStyle(horaOcup.schedule ? horaOcup.schedule.check_time : null, horaOcup.schedule ? horaOcup.schedule.departure_date : null, horaOcup), { borderLeft: '4px solid ' + stringToColor(doctor.name) }]"
 								@click="abrirDetallesCita(horaOcup)"
+								@mouseover="mostrarTooltip($event, horaOcup, doctor)"
+								@mouseleave="ocultarTooltip"
+								@mousemove="moverTooltip($event)"
 								data-bs-toggle="modal" data-bs-target="#modalAccionesCita">
 							
 							<div class="booked-content h-100 position-relative overflow-hidden" :class="bgPorSemaforo(horaOcup)">
@@ -90,6 +93,14 @@
 				</div>
 			</div>
 
+		</div>
+
+		<!-- Tooltip Flotante -->
+		<div v-show="tooltipData" class="custom-tooltip shadow-lg p-2 rounded bg-white text-dark border border-secondary" :style="tooltipStyle">
+			<div class="font-weight-bold text-uppercase border-bottom pb-1 mb-1" style="font-size: 0.85rem;">{{ tooltipData ? tooltipData.paciente : '' }}</div>
+			<div class="small"><i class="far fa-clock"></i> {{ tooltipData ? tooltipData.hora : '' }}</div>
+			<div class="small"><i class="fas fa-user-md"></i> {{ tooltipData ? tooltipData.doctor : '' }}</div>
+			<div class="small mt-1 px-1 bg-light rounded text-center border font-weight-bold" style="font-size: 0.75rem;">{{ tooltipData ? tooltipData.estado : '' }}</div>
 		</div>
 
 		<!-- Modales -->
@@ -161,6 +172,8 @@
 			horaInicioGrid: 8,
 			pixelsPorMinuto: 1.5,
 			filtroActual: 'Todos',
+			tooltipData: null,
+			tooltipStyle: { top: '0px', left: '0px', position: 'fixed', zIndex: 1055, pointerEvents: 'none', minWidth: '150px', maxWidth: '250px' },
 		}},
 		props:[ 'nombreUser', 'idSede'],
 		components: { PagoModal, ModalEstadoCita, ModalNuevaCita, ModalPatient, InfoModal, ReprogModal, ModalSearchPatient, ModalIntercambio, modalVerRecetas, modalTiemposEspera, ModalAccionesCita },
@@ -324,6 +337,31 @@
       },
 			syncScroll(e){
 				// Para si quisieramos sincronizar etiquetas Y al moverse, en este layout CSS grid-lines abarca todo
+			},
+			mostrarTooltip(e, cita, doctor) {
+				let horaRango = this.formatHora(cita.schedule ? cita.schedule.check_time : '') + ' - ' + this.formatHora(cita.schedule ? cita.schedule.departure_date : '');
+				
+				let estado = 'Sin Confirmar';
+				if(cita.status == 2) estado = 'Confirmado';
+				if(cita.status == 3) estado = 'Anulado';
+				if(cita.status == 4) estado = 'Reprogramado';
+
+				this.tooltipData = {
+					paciente: cita.patient.name.split(' ')[0] + ' ' + cita.patient.nombres.split(' ')[0],
+					hora: horaRango,
+					doctor: doctor.name,
+					estado: estado
+				};
+				this.moverTooltip(e);
+			},
+			moverTooltip(e) {
+				if(this.tooltipData) {
+					this.tooltipStyle.top = (e.clientY + 15) + 'px';
+					this.tooltipStyle.left = (e.clientX + 15) + 'px';
+				}
+			},
+			ocultarTooltip() {
+				this.tooltipData = null;
 			},
 			crearCitaEnSlot(doctor, horaLibre) {
 				// Buscar el indice en el array para compatibilidad con el v-for de la logica original
