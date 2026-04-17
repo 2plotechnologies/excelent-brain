@@ -8835,6 +8835,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       },
       citaTemp: [],
       // Variables de Calendario Grid
+      cargando: true,
       horasGrid: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
       horaInicioGrid: 8,
       pixelsPorMinuto: 1.5,
@@ -8933,8 +8934,9 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
+              _this3.cargando = true;
               dia = _this3.dayWeek(moment__WEBPACK_IMPORTED_MODULE_0___default()(_this3.fecha).format('d') - 1);
-              _context2.next = 3;
+              _context2.next = 4;
               return _this3.axios.get("/api/horarioCuadernoOcupado/".concat(_this3.fecha, "/").concat(dia)).then(function (res) {
                 moment__WEBPACK_IMPORTED_MODULE_0___default().locale('es');
                 alertifyjs__WEBPACK_IMPORTED_MODULE_12___default().notify('<i class="fa-regular fa-calendar-check"></i> Datos del ' + moment__WEBPACK_IMPORTED_MODULE_0___default()(_this3.fecha).format('DD [de] MMMM'), 'success', 5);
@@ -8967,8 +8969,12 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
                     }
                   });
                 });
+              })["finally"](function () {
+                _this3.cargando = false;
+              })["catch"](function () {
+                _this3.cargando = false;
               });
-            case 3:
+            case 4:
             case "end":
               return _context2.stop();
           }
@@ -15953,9 +15959,15 @@ var render = function render() {
     }, [_vm._v(_vm._s(doctor.name.split(" ")[0]) + " " + _vm._s(doctor.name.split(" ")[1] || ""))]), _vm._v(" "), _c("small", {
       staticClass: "text-muted"
     }, [_vm._v(_vm._s(_vm.citasPorDoctor(doctor.id)) + " citas")])]);
-  }), _vm._v(" "), _vm.doctoresFiltrados.length == 0 ? _c("div", {
-    staticClass: "py-3 px-3 text-muted"
-  }, [_vm._v("No hay profesionales para mostrar")]) : _vm._e()], 2)]), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm.cargando ? _c("div", {
+    staticClass: "py-3 px-3 w-100 text-center text-primary align-self-center my-4"
+  }, [_c("i", {
+    staticClass: "fas fa-circle-notch fa-spin fa-2x mb-2"
+  }), _c("br"), _vm._v(" "), _c("span", {
+    staticClass: "font-weight-bold"
+  }, [_vm._v("Obteniendo agenda...")])]) : _vm.doctoresFiltrados.length == 0 ? _c("div", {
+    staticClass: "py-3 px-3 w-100 text-center text-muted align-self-center my-4 font-weight-bold"
+  }, [_vm._v("No hay profesionales para mostrar el día de hoy.")]) : _vm._e()], 2)]), _vm._v(" "), _c("div", {
     staticClass: "calendar-body d-flex",
     staticStyle: {
       height: "600px",

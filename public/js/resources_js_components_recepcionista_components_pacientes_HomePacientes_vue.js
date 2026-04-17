@@ -371,7 +371,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     },
     formatDate: function formatDate(date) {
       if (!date) return '';
-      // Prevenir bug de zona horaria aislando YYYY-MM-DD
+      // Prevenir bug de zona horaria aislando YYYY-MM-DD.
       if (typeof date === 'string') {
         var parts = date.split(' ')[0].split('T')[0].split('-');
         if (parts.length === 3) {
@@ -992,7 +992,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   updated: function updated() {
     //this.updateValues;
-    //console.log('ver paciente rel ',this.dataPatient.relative)
+    //console.log('ver paciente rel ',this.dataPatient.relative);
   },
   created: function created() {
     this.updateValues;

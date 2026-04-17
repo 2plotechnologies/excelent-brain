@@ -37,7 +37,11 @@
 						<div class="font-weight-bold text-truncate px-1" :title="doctor.name">{{doctor.name.split(' ')[0]}} {{doctor.name.split(' ')[1] || ''}}</div>
 						<small class="text-muted">{{ citasPorDoctor(doctor.id) }} citas</small>
 					</div>
-					<div v-if="doctoresFiltrados.length == 0" class="py-3 px-3 text-muted">No hay profesionales para mostrar</div>
+					<div v-if="cargando" class="py-3 px-3 w-100 text-center text-primary align-self-center my-4">
+						<i class="fas fa-circle-notch fa-spin fa-2x mb-2"></i><br>
+						<span class="font-weight-bold">Obteniendo agenda...</span>
+					</div>
+					<div v-else-if="doctoresFiltrados.length == 0" class="py-3 px-3 w-100 text-center text-muted align-self-center my-4 font-weight-bold">No hay profesionales para mostrar el día de hoy.</div>
 				</div>
 			</div>
 
@@ -168,6 +172,7 @@
 			citaTemp:[],
 			
 			// Variables de Calendario Grid
+			cargando: true,
 			horasGrid: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
 			horaInicioGrid: 8,
 			pixelsPorMinuto: 1.5,
@@ -207,6 +212,7 @@
 				})
 			},
 			async obtenerHorarios(){
+				this.cargando = true;
 				let dia = this.dayWeek(moment(this.fecha).format('d')-1)
 				
 				await this.axios.get(`/api/horarioCuadernoOcupado/${this.fecha}/${dia}`)
@@ -235,6 +241,10 @@
 							}
 						})
 					})
+				}).finally(() => {
+					this.cargando = false;
+				}).catch(() => {
+					this.cargando = false;
 				})
 			},
 

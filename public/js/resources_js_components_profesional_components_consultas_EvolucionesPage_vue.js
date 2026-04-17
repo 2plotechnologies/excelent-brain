@@ -2354,7 +2354,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   updated: function updated() {
     //this.updateValues;
-    //console.log('ver paciente rel ',this.dataPatient.relative)
+    //console.log('ver paciente rel ',this.dataPatient.relative);
   },
   created: function created() {
     this.updateValues;
