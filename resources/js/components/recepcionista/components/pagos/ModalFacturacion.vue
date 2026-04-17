@@ -77,7 +77,10 @@
 							<label class="form-label">Dirección</label>
 							<input type="text" class="form-control" placeholder="" v-model="facturacion.direccion">
 						</div>
-
+						<div class="mb-2">
+							<label class="form-label">Apoderado</label>
+							<input type="text" class="form-control" placeholder="" v-model="facturacion.apoderado">
+						</div>
 						<div class="mb-2">
 							<label class="form-label">Concepto del pago</label>
 							<input type="text" class="form-control" placeholder="" v-model="facturacion.conceptoPago">
@@ -154,6 +157,7 @@ export default{
 			conceptoPago: '',
 			monto:0,
 			tipoPago: 'Contado',
+			apoderado: '',
 			montosFechas: [
 			]
 		}
@@ -326,7 +330,8 @@ export default{
 				fechaCredito : this.facturacion.montosFechas,
 				adelanto: 0,
 				montoCredito: this.facturacion.montosFechas.reduce((acc, item) => acc+item.monto, 0 ),
-				descuentos: 0
+				descuentos: 0,
+				observaciones: this.facturacion.apoderado
 			}
 			
 			jsonProductos.push({
@@ -344,7 +349,7 @@ export default{
 			let cabecera = { tipo: this.facturacion.tipoEmision, serie: comprobantes[this.facturacion.tipoEmision], fecha: this.hoy }
 
 			this.$swal.fire({
-				title: 'Enviando Comprobante Electrónico',				
+				title: 'Enviando Comprobante Electrónico',
 				timerProgressBar: true,
 				didOpen: () => {
 					timerProgressBar: true,
@@ -438,7 +443,7 @@ export default{
 				// Como es 1 solo servicio, solo abregamos 1 opción
 				productos: [
 					{
-						descripcion: datos.detalles[0].descripcionItem,
+						descripcion: datos.detalles[0].descripcionItem.replace(/\|/g, ' '),
 						cantidad: 1, //porque es servicio
 						undCorto: datos.detalles[0].codUnidadMedida,
 						preProducto: datos.detalles[0].mtoPrecioVenta, // Precio unitario
@@ -486,12 +491,15 @@ export default{
 		'pago': function(newVal){
 			if(newVal){
 				if(newVal.voucher) return;
-				this.facturacion.ruc = newVal.patient.dni
+				this.facturacion.ruc = newVal.dniCliente
 				this.buscarReniec()
 				if( parseInt(newVal.idMembresia) >0 )
 					this.facturacion.conceptoPago = 'Pago de membresía'
-				else
-					this.facturacion.conceptoPago = newVal.servicio.replace(/\//g, '-');
+				else{
+					const servicio = {"0":"Certificado","1":"Paquete Membresía","2":"Paquete Kurame","3":"Informe","4":"Otros","5":"Pago de cita","7":"Pago de membresía","8":"Adelanto de cita","15":"Pago de membresía","16":"Revaluación gratuita"}
+					this.facturacion.conceptoPago = servicio[newVal.type]+' '+ newVal.detalle.replace(/\//g, '-');
+
+				}
 				this.facturacion.monto = newVal.price
 			}
 		}

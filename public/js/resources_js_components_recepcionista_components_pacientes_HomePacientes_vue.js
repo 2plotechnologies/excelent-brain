@@ -371,6 +371,13 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     },
     formatDate: function formatDate(date) {
       if (!date) return '';
+      // Prevenir bug de zona horaria aislando YYYY-MM-DD
+      if (typeof date === 'string') {
+        var parts = date.split(' ')[0].split('T')[0].split('-');
+        if (parts.length === 3) {
+          return "".concat(parts[2], "/").concat(parts[1], "/").concat(parts[0]);
+        }
+      }
       var d = new Date(date);
       if (isNaN(d.getTime())) return date;
       var day = d.getDate().toString().padStart(2, '0');

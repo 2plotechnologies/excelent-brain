@@ -303,6 +303,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return _defineProperty(_defineProperty(_defineProperty(_defineProperty({
+      filtroActual: 'Todos',
       payments: [],
       sumaTipos: [],
       sumaSalidas: [],
@@ -499,64 +500,110 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     }
   },
   computed: {
+    filtrosPills: function filtrosPills() {
+      return ['Todos', 'Ingresos', 'Egresos', 'Citas', 'Adelantos', 'Cuotas', 'Ing. Extra', 'Egr. Extra'];
+    },
+    filteredPayments: function filteredPayments() {
+      var result = this.payments.map(function (item, index) {
+        item.originalIndex = index;
+        return item;
+      });
+      if (this.filtroActual === 'Ingresos') return result;
+      if (this.filtroActual === 'Egresos') return result.filter(function (item) {
+        return item.type == 6;
+      });
+      if (this.filtroActual === 'Citas') return result.filter(function (item) {
+        return item.type == 5;
+      });
+      if (this.filtroActual === 'Adelantos') return result.filter(function (item) {
+        return item.type == 8;
+      });
+      if (this.filtroActual === 'Cuotas') return result.filter(function (item) {
+        return [1, 2, 7, 15].includes(item.type);
+      });
+      if (this.filtroActual === 'Ing. Extra') return result.filter(function (item) {
+        return item.type == 4;
+      });
+      if (this.filtroActual === 'Egr. Extra') return [];
+      return result;
+    },
+    filteredSalidas: function filteredSalidas() {
+      var result = this.salidas.map(function (item, index) {
+        item.originalIndex = index;
+        return item;
+      });
+      if (this.filtroActual === 'Egresos') return result;
+      if (this.filtroActual === 'Egr. Extra') return result;
+      if (['Citas', 'Adelantos', 'Cuotas', 'Ing. Extra', 'Ingresos'].includes(this.filtroActual)) return [];
+      return result;
+    },
+    totalIngresosStats: function totalIngresosStats() {
+      if (this.payments.length > 0) {
+        return this.payments.reduce(function (suma, item) {
+          if (item.type == 6) {
+            var _item$price;
+            return suma - parseFloat((_item$price = item.price) !== null && _item$price !== void 0 ? _item$price : 0);
+          } else {
+            var _item$price2;
+            return suma + parseFloat((_item$price2 = item.price) !== null && _item$price2 !== void 0 ? _item$price2 : 0);
+          }
+        }, 0);
+      }
+      return 0;
+    },
+    totalEgresosStats: function totalEgresosStats() {
+      if (this.salidas.length > 0) {
+        var sal = this.salidas.reduce(function (suma, item) {
+          if (item.type == 6) {
+            var _item$price3;
+            return suma - parseFloat((_item$price3 = item.price) !== null && _item$price3 !== void 0 ? _item$price3 : 0);
+          } else {
+            var _item$price4;
+            return suma + parseFloat((_item$price4 = item.price) !== null && _item$price4 !== void 0 ? _item$price4 : 0);
+          }
+        }, 0);
+        return Math.abs(sal);
+      }
+      return 0;
+    },
+    netoDiaStats: function netoDiaStats() {
+      return this.totalIngresosStats - this.totalEgresosStats;
+    },
+    totalCitasCobradas: function totalCitasCobradas() {
+      return this.payments.reduce(function (sum, item) {
+        var _item$price5;
+        if (item.type == 5) return sum + parseFloat((_item$price5 = item.price) !== null && _item$price5 !== void 0 ? _item$price5 : 0);
+        return sum;
+      }, 0);
+    },
+    totalAdelantos: function totalAdelantos() {
+      return this.payments.reduce(function (sum, item) {
+        var _item$price6;
+        if (item.type == 8) return sum + parseFloat((_item$price6 = item.price) !== null && _item$price6 !== void 0 ? _item$price6 : 0);
+        return sum;
+      }, 0);
+    },
     suma: function suma() {
       var _this7 = this;
       this.sumaTipos = [];
-      if (this.payments.length > 0) {
-        return this.payments.reduce(function (suma, item) {
+      if (this.filteredPayments.length > 0) {
+        return this.filteredPayments.reduce(function (suma, item) {
           //console.log(item);
           var queIndex = _this7.sumaTipos.findIndex(function (x) {
             return x.moneda == _this7.queMoneda(item.moneda);
           });
           if (queIndex > -1) {
-            var _item$price, _item$price2;
-            //encuentra
-            if (item.type == 6) _this7.sumaTipos[queIndex].suma -= parseFloat((_item$price = item.price) !== null && _item$price !== void 0 ? _item$price : 0);else _this7.sumaTipos[queIndex].suma += parseFloat((_item$price2 = item.price) !== null && _item$price2 !== void 0 ? _item$price2 : 0);
-          } else {
-            var _item$price3, _item$price4;
-            if (item.type == 6) _this7.sumaTipos.push({
-              suma: -parseFloat((_item$price3 = item.price) !== null && _item$price3 !== void 0 ? _item$price3 : 0),
-              moneda: _this7.queMoneda(item.moneda)
-            });else _this7.sumaTipos.push({
-              suma: parseFloat((_item$price4 = item.price) !== null && _item$price4 !== void 0 ? _item$price4 : 0),
-              moneda: _this7.queMoneda(item.moneda)
-            });
-          }
-          //console.log(item.type==6);
-
-          if (item.type == 6) {
-            var _item$price5;
-            return suma - parseFloat((_item$price5 = item.price) !== null && _item$price5 !== void 0 ? _item$price5 : 0);
-          } else {
-            var _item$price6;
-            return suma + parseFloat((_item$price6 = item.price) !== null && _item$price6 !== void 0 ? _item$price6 : 0);
-          }
-        }, 0);
-      } else {
-        return 0;
-      }
-    },
-    sumaSal: function sumaSal() {
-      var _this8 = this;
-      this.sumaSalidas = [];
-      if (this.salidas.length > 0) {
-        return this.salidas.reduce(function (suma, item) {
-          var queIndex = _this8.sumaSalidas.findIndex(function (x) {
-            return x.moneda == _this8.queMoneda(item.moneda);
-          });
-          //console.log(queIndex);
-          if (queIndex > -1) {
             var _item$price7, _item$price8;
             //encuentra
-            if (item.type == 6) _this8.sumaSalidas[queIndex].suma -= parseFloat((_item$price7 = item.price) !== null && _item$price7 !== void 0 ? _item$price7 : 0);else _this8.sumaSalidas[queIndex].suma += parseFloat((_item$price8 = item.price) !== null && _item$price8 !== void 0 ? _item$price8 : 0);
+            if (item.type == 6) _this7.sumaTipos[queIndex].suma -= parseFloat((_item$price7 = item.price) !== null && _item$price7 !== void 0 ? _item$price7 : 0);else _this7.sumaTipos[queIndex].suma += parseFloat((_item$price8 = item.price) !== null && _item$price8 !== void 0 ? _item$price8 : 0);
           } else {
             var _item$price9, _item$price10;
-            if (item.type == 6) _this8.sumaSalidas.push({
+            if (item.type == 6) _this7.sumaTipos.push({
               suma: -parseFloat((_item$price9 = item.price) !== null && _item$price9 !== void 0 ? _item$price9 : 0),
-              moneda: _this8.queMoneda(item.moneda)
-            });else _this8.sumaSalidas.push({
+              moneda: _this7.queMoneda(item.moneda)
+            });else _this7.sumaTipos.push({
               suma: parseFloat((_item$price10 = item.price) !== null && _item$price10 !== void 0 ? _item$price10 : 0),
-              moneda: _this8.queMoneda(item.moneda)
+              moneda: _this7.queMoneda(item.moneda)
             });
           }
           //console.log(item.type==6);
@@ -567,6 +614,43 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
           } else {
             var _item$price12;
             return suma + parseFloat((_item$price12 = item.price) !== null && _item$price12 !== void 0 ? _item$price12 : 0);
+          }
+        }, 0);
+      } else {
+        return 0;
+      }
+    },
+    sumaSal: function sumaSal() {
+      var _this8 = this;
+      this.sumaSalidas = [];
+      if (this.filteredSalidas.length > 0) {
+        return this.filteredSalidas.reduce(function (suma, item) {
+          var queIndex = _this8.sumaSalidas.findIndex(function (x) {
+            return x.moneda == _this8.queMoneda(item.moneda);
+          });
+          //console.log(queIndex);
+          if (queIndex > -1) {
+            var _item$price13, _item$price14;
+            //encuentra
+            if (item.type == 6) _this8.sumaSalidas[queIndex].suma -= parseFloat((_item$price13 = item.price) !== null && _item$price13 !== void 0 ? _item$price13 : 0);else _this8.sumaSalidas[queIndex].suma += parseFloat((_item$price14 = item.price) !== null && _item$price14 !== void 0 ? _item$price14 : 0);
+          } else {
+            var _item$price15, _item$price16;
+            if (item.type == 6) _this8.sumaSalidas.push({
+              suma: -parseFloat((_item$price15 = item.price) !== null && _item$price15 !== void 0 ? _item$price15 : 0),
+              moneda: _this8.queMoneda(item.moneda)
+            });else _this8.sumaSalidas.push({
+              suma: parseFloat((_item$price16 = item.price) !== null && _item$price16 !== void 0 ? _item$price16 : 0),
+              moneda: _this8.queMoneda(item.moneda)
+            });
+          }
+          //console.log(item.type==6);
+
+          if (item.type == 6) {
+            var _item$price17;
+            return suma - parseFloat((_item$price17 = item.price) !== null && _item$price17 !== void 0 ? _item$price17 : 0);
+          } else {
+            var _item$price18;
+            return suma + parseFloat((_item$price18 = item.price) !== null && _item$price18 !== void 0 ? _item$price18 : 0);
           }
         }, 0);
       } else {
@@ -721,6 +805,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         conceptoPago: '',
         monto: 0,
         tipoPago: 'Contado',
+        apoderado: '',
         montosFechas: []
       }
     };
@@ -943,7 +1028,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         montoCredito: this.facturacion.montosFechas.reduce(function (acc, item) {
           return acc + item.monto;
         }, 0),
-        descuentos: 0
+        descuentos: 0,
+        observaciones: this.facturacion.apoderado
       };
       jsonProductos.push({
         id: 1,
@@ -1068,7 +1154,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 ticketera: 'CAJA',
                 // Como es 1 solo servicio, solo abregamos 1 opción
                 productos: [{
-                  descripcion: datos.detalles[0].descripcionItem,
+                  descripcion: datos.detalles[0].descripcionItem.replace(/\|/g, ' '),
                   cantidad: 1,
                   //porque es servicio
                   undCorto: datos.detalles[0].codUnidadMedida,
@@ -1124,9 +1210,23 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     'pago': function pago(newVal) {
       if (newVal) {
         if (newVal.voucher) return;
-        this.facturacion.ruc = newVal.patient.dni;
+        this.facturacion.ruc = newVal.dniCliente;
         this.buscarReniec();
-        if (parseInt(newVal.idMembresia) > 0) this.facturacion.conceptoPago = 'Pago de membresía';else this.facturacion.conceptoPago = newVal.servicio.replace(/\//g, '-');
+        if (parseInt(newVal.idMembresia) > 0) this.facturacion.conceptoPago = 'Pago de membresía';else {
+          var servicio = {
+            "0": "Certificado",
+            "1": "Paquete Membresía",
+            "2": "Paquete Kurame",
+            "3": "Informe",
+            "4": "Otros",
+            "5": "Pago de cita",
+            "7": "Pago de membresía",
+            "8": "Adelanto de cita",
+            "15": "Pago de membresía",
+            "16": "Revaluación gratuita"
+          };
+          this.facturacion.conceptoPago = servicio[newVal.type] + ' ' + newVal.detalle.replace(/\//g, '-');
+        }
         this.facturacion.monto = newVal.price;
       }
     }
@@ -2308,6 +2408,54 @@ var render = function render() {
       }
     }
   })])]), _vm._v(" "), _c("div", {
+    staticClass: "row mb-3 mt-3 d-print-none"
+  }, [_c("div", {
+    staticClass: "col-md-3 mb-2"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm rounded p-3 h-100"
+  }, [_vm._m(0), _vm._v(" "), _c("h4", {
+    staticClass: "mb-0 text-success fw-bold"
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.totalIngresosStats).toFixed(2)))])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-2"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm rounded p-3 h-100"
+  }, [_vm._m(1), _vm._v(" "), _c("h4", {
+    staticClass: "mb-0 text-danger fw-bold"
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.totalEgresosStats).toFixed(2)))])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-2"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm rounded p-3 h-100"
+  }, [_vm._m(2), _vm._v(" "), _c("h4", {
+    staticClass: "mb-0 text-primary fw-bold"
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.netoDiaStats).toFixed(2)))])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-2"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm rounded p-3 h-100 pb-2"
+  }, [_vm._m(3), _vm._v(" "), _c("h4", {
+    staticClass: "mb-0 text-dark fw-bold"
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.totalCitasCobradas).toFixed(2)))]), _vm._v(" "), _c("div", {
+    staticClass: "text-muted mt-1",
+    staticStyle: {
+      "font-size": "0.8rem"
+    }
+  }, [_vm._v("Adelantos: S/ " + _vm._s(parseFloat(_vm.totalAdelantos).toFixed(2)))])])])]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex mb-3 gap-2 flex-wrap d-print-none"
+  }, _vm._l(_vm.filtrosPills, function (filtro) {
+    return _c("button", {
+      key: filtro,
+      staticClass: "btn rounded-pill border-0 px-3 py-1",
+      "class": _vm.filtroActual === filtro ? "btn-primary" : "bg-light text-muted",
+      staticStyle: {
+        "font-size": "0.85rem",
+        "font-weight": "500"
+      },
+      on: {
+        click: function click($event) {
+          _vm.filtroActual = filtro;
+        }
+      }
+    }, [_vm._v("\n\t\t\t" + _vm._s(filtro) + "\n\t\t")]);
+  }), 0), _vm._v(" "), _c("div", {
     staticClass: "card px-1 pt-2"
   }, [_c("div", {
     staticClass: "m-4 d-print-none"
@@ -2333,7 +2481,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fa-solid fa-arrow-up-right-dots"
-  }), _vm._v(" Ingresar paquete")]), _vm._v(" "), _vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm.consultarFecha() ? _c("button", {
+  }), _vm._v(" Ingresar paquete")]), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm.consultarFecha() ? _c("button", {
     staticClass: "btn btn-outline-secondary",
     on: {
       click: function click($event) {
@@ -2358,11 +2506,11 @@ var render = function render() {
     attrs: {
       id: "table_export"
     }
-  }, [_c("thead", {}, [_vm._m(2), _vm._v(" "), _c("tr", [_vm.tienePrivilegios == "1" ? _c("td", {
+  }, [_c("thead", {}, [_vm._m(6), _vm._v(" "), _c("tr", [_vm.tienePrivilegios == "1" ? _c("td", {
     staticClass: "text-primaryd-print-none"
   }, [_vm._v("@")]) : _vm._e(), _vm._v(" "), _c("td", {
     staticClass: "text-primary"
-  }, [_vm._v("N°")]), _vm._v(" "), _vm._m(3), _vm._v(" "), _c("td", {
+  }, [_vm._v("N°")]), _vm._v(" "), _vm._m(7), _vm._v(" "), _c("td", {
     staticClass: "text-primary"
   }, [_vm._v("Fact. Bol.")]), _vm._v(" "), _c("td", {
     staticClass: "text-primary"
@@ -2389,7 +2537,7 @@ var render = function render() {
     staticStyle: {
       "white-space": "nowrap"
     }
-  }, [_vm._v("@")])])]), _vm._v(" "), _c("tbody", _vm._l(_vm.payments, function (payment, index) {
+  }, [_vm._v("@")])])]), _vm._v(" "), _c("tbody", _vm._l(_vm.filteredPayments, function (payment, index) {
     return _c("tr", [_vm.tienePrivilegios == "1" ? _c("td", {
       staticClass: "d-print-none"
     }, [_c("button", {
@@ -2400,7 +2548,7 @@ var render = function render() {
       },
       on: {
         click: function click($event) {
-          return _vm.mostrarModalBorrar(payment.id, index);
+          return _vm.mostrarModalBorrar(payment.id, payment.originalIndex);
         }
       }
     }, [_c("i", {
@@ -2483,7 +2631,7 @@ var render = function render() {
       },
       on: {
         click: function click($event) {
-          return _vm.editar(index);
+          return _vm.editar(payment.originalIndex);
         }
       }
     }, [_c("i", {
@@ -2537,11 +2685,11 @@ var render = function render() {
     attrs: {
       id: "table_export2"
     }
-  }, [_c("thead", {}, [_vm._m(4), _vm._v(" "), _c("tr", [_vm.esAdmin ? _c("td", {
+  }, [_c("thead", {}, [_vm._m(8), _vm._v(" "), _c("tr", [_vm.esAdmin ? _c("td", {
     staticClass: "text-warning d-print-none"
   }, [_vm._v("@")]) : _vm._e(), _vm._v(" "), _c("td", {
     staticClass: "text-warning"
-  }, [_vm._v("N°")]), _vm._v(" "), _vm._m(5), _vm._v(" "), _c("td", {
+  }, [_vm._v("N°")]), _vm._v(" "), _vm._m(9), _vm._v(" "), _c("td", {
     staticClass: "text-warning"
   }, [_vm._v("Fact. Bol.")]), _vm._v(" "), _c("td", {
     staticClass: "text-warning"
@@ -2561,10 +2709,10 @@ var render = function render() {
     staticClass: "text-warning"
   }, [_vm._v("Hora")]), _vm._v(" "), _c("td", {
     staticClass: "text-warning d-print-none"
-  }, [_vm._v("@")])])]), _vm._v(" "), _c("tbody", _vm._l(_vm.salidas, function (payment, index) {
+  }, [_vm._v("@")])])]), _vm._v(" "), _c("tbody", _vm._l(_vm.filteredSalidas, function (payment, index) {
     return _c("tr", [_vm.esAdmin ? _c("td", {
       staticClass: "d-print-none"
-    }, [_vm._m(6, true)]) : _vm._e(), _vm._v(" "), _c("td", [_c("span", [_vm._v(_vm._s(index + 1))])]), _vm._v(" "), payment.usuario ? _c("td", {
+    }, [_vm._m(10, true)]) : _vm._e(), _vm._v(" "), _c("td", [_c("span", [_vm._v(_vm._s(index + 1))])]), _vm._v(" "), payment.usuario ? _c("td", {
       staticStyle: {
         "white-space": "nowrap"
       },
@@ -2624,7 +2772,7 @@ var render = function render() {
       },
       on: {
         click: function click($event) {
-          return _vm.editar(index);
+          return _vm.editar(payment.originalIndex);
         }
       }
     }, [_c("i", {
@@ -2663,11 +2811,11 @@ var render = function render() {
     attrs: {
       id: "table_eliminados"
     }
-  }, [_c("thead", {}, [_vm._m(7), _vm._v(" "), _c("tr", [_vm.tienePrivilegios == "1" ? _c("td", {
+  }, [_c("thead", {}, [_vm._m(11), _vm._v(" "), _c("tr", [_vm.tienePrivilegios == "1" ? _c("td", {
     staticClass: "text-danger d-print-none"
   }, [_vm._v("@")]) : _vm._e(), _vm._v(" "), _c("td", {
     staticClass: "text-danger"
-  }, [_vm._v("N°")]), _vm._v(" "), _vm._m(8), _vm._v(" "), _c("td", {
+  }, [_vm._v("N°")]), _vm._v(" "), _vm._m(12), _vm._v(" "), _c("td", {
     staticClass: "text-danger"
   }, [_vm._v("Fact. Bol.")]), _vm._v(" "), _c("td", {
     staticClass: "text-danger"
@@ -2771,7 +2919,7 @@ var render = function render() {
     staticClass: "modal-dialog"
   }, [_c("div", {
     staticClass: "modal-content"
-  }, [_vm._m(9), _vm._v(" "), _c("div", {
+  }, [_vm._m(13), _vm._v(" "), _c("div", {
     staticClass: "modal-body"
   }, [_c("p", {
     staticClass: "mb-0"
@@ -2830,7 +2978,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-sm"
   }, [_c("div", {
     staticClass: "modal-content"
-  }, [_vm._m(10), _vm._v(" "), _c("div", {
+  }, [_vm._m(14), _vm._v(" "), _c("div", {
     staticClass: "modal-body"
   }, [_c("div", {
     staticClass: "form-group row"
@@ -3049,6 +3197,38 @@ var render = function render() {
   })], 1);
 };
 var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "text-muted small mb-1"
+  }, [_c("i", {
+    staticClass: "fas fa-arrow-trend-up text-success me-1"
+  }), _vm._v(" Total Ingresos")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "text-muted small mb-1"
+  }, [_c("i", {
+    staticClass: "fas fa-arrow-trend-down text-danger me-1"
+  }), _vm._v(" Total Egresos")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "text-muted small mb-1"
+  }, [_c("i", {
+    staticClass: "fas fa-money-bill-wave text-primary me-1"
+  }), _vm._v(" Neto del Día")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "text-muted small mb-1"
+  }, [_c("i", {
+    staticClass: "far fa-calendar-check text-secondary me-1"
+  }), _vm._v(" Citas Cobradas")]);
+}, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("button", {
@@ -3663,6 +3843,31 @@ var render = function render() {
       }
     }
   })]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "mb-2"
+  }, [_c("label", {
+    staticClass: "form-label"
+  }, [_vm._v("Apoderado")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.facturacion.apoderado,
+      expression: "facturacion.apoderado"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      placeholder: ""
+    },
+    domProps: {
+      value: _vm.facturacion.apoderado
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.facturacion, "apoderado", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
     staticClass: "mb-2"
   }, [_c("label", {
     staticClass: "form-label"

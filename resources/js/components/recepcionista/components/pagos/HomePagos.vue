@@ -10,6 +10,44 @@
 						<input type="date" class="form-control" @change="selectDate" v-model="fecha">
 					</div>
 	</div>
+	<div class="row mb-3 mt-3 d-print-none">
+		<div class="col-md-3 mb-2">
+			<div class="card border-0 shadow-sm rounded p-3 h-100">
+				<div class="text-muted small mb-1"><i class="fas fa-arrow-trend-up text-success me-1"></i> Total Ingresos</div>
+				<h4 class="mb-0 text-success fw-bold">S/ {{ parseFloat(totalIngresosStats).toFixed(2) }}</h4>
+			</div>
+		</div>
+		<div class="col-md-3 mb-2">
+			<div class="card border-0 shadow-sm rounded p-3 h-100">
+				<div class="text-muted small mb-1"><i class="fas fa-arrow-trend-down text-danger me-1"></i> Total Egresos</div>
+				<h4 class="mb-0 text-danger fw-bold">S/ {{ parseFloat(totalEgresosStats).toFixed(2) }}</h4>
+			</div>
+		</div>
+		<div class="col-md-3 mb-2">
+			<div class="card border-0 shadow-sm rounded p-3 h-100">
+				<div class="text-muted small mb-1"><i class="fas fa-money-bill-wave text-primary me-1"></i> Neto del Día</div>
+				<h4 class="mb-0 text-primary fw-bold">S/ {{ parseFloat(netoDiaStats).toFixed(2) }}</h4>
+			</div>
+		</div>
+		<div class="col-md-3 mb-2">
+			<div class="card border-0 shadow-sm rounded p-3 h-100 pb-2">
+				<div class="text-muted small mb-1"><i class="far fa-calendar-check text-secondary me-1"></i> Citas Cobradas</div>
+				<h4 class="mb-0 text-dark fw-bold">S/ {{ parseFloat(totalCitasCobradas).toFixed(2) }}</h4>
+				<div class="text-muted mt-1" style="font-size: 0.8rem;">Adelantos: S/ {{ parseFloat(totalAdelantos).toFixed(2) }}</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="d-flex mb-3 gap-2 flex-wrap d-print-none">
+		<button v-for="filtro in filtrosPills" :key="filtro" 
+				class="btn rounded-pill border-0 px-3 py-1" 
+				style="font-size: 0.85rem; font-weight: 500;"
+				:class="filtroActual === filtro ? 'btn-primary' : 'bg-light text-muted'"
+				@click="filtroActual = filtro">
+			{{ filtro }}
+		</button>
+	</div>
+
 	<div class="card px-1 pt-2 ">
 		<div class="m-4 d-print-none">
 			<button class="btn btn-outline-success" @click="exportar()"><i class="fas fa-file-excel"></i> Exportar a Excel</button>
@@ -47,9 +85,9 @@
 					</tr>
 				</thead>
 				<tbody>
-						<tr v-for="(payment, index) in payments" >
+						<tr v-for="(payment, index) in filteredPayments" >
 							<td class="d-print-none" v-if="tienePrivilegios=='1'">
-								<button class="btn btn-sm btn-outline-danger" @click="mostrarModalBorrar(payment.id, index)" data-bs-toggle="modal" data-bs-target="#modalMotivoBorrar" ><i class="fa-solid fa-xmark"></i></button>
+								<button class="btn btn-sm btn-outline-danger" @click="mostrarModalBorrar(payment.id, payment.originalIndex)" data-bs-toggle="modal" data-bs-target="#modalMotivoBorrar" ><i class="fa-solid fa-xmark"></i></button>
 							</td>
 							<td>
 								<span>{{index+1}}</span>
@@ -96,7 +134,7 @@
 							<td class="d-print-none" style="white-space: nowrap">
 								<button class="btn btn-sm btn-outline-warning" v-if="esAdmin" @click="pagoSeleccionado = payment" title="Dividir pago" data-bs-toggle="modal" data-bs-target="#modalDividirPago" ><i class="fas fa-divide"></i></button>
 								<button class="btn btn-outline-success btn-sm" data-bs-toggle="offcanvas" data-bs-target="#offAdjunto"  @click="verAdjunto(payment.id)" title="Adjuntar archivo"><i class="far fa-file"></i></button>
-								<button class="btn btn-outline-primary btn-sm" title="Editar pago" data-bs-toggle="modal" data-bs-target="#modalEditarPago" @click="editar(index)" v-if="consultarFecha()"><i class="fa-solid fa-pen-to-square"></i></button>
+								<button class="btn btn-outline-primary btn-sm" title="Editar pago" data-bs-toggle="modal" data-bs-target="#modalEditarPago" @click="editar(payment.originalIndex)" v-if="consultarFecha()"><i class="fa-solid fa-pen-to-square"></i></button>
 								<!-- <a v-if="payment.appointment_id!==0" target="_blank" :href="`/api/pdfCupon/${payment.appointment_id}`" class="btn btn-danger btn-sm"><i class="fa-solid fa-file-pdf"></i> PDF</a> -->
 								<a target="_blank" :href="`/api/pdfExtraCupon/${payment.id}`" title="Ver PDF" class="btn btn-danger btn-sm d-none"><i class="fa-solid fa-file-pdf"></i> PDF</a>
 								<button class="btn btn-outline-primary btn-sm" title="Facturación Electrónica" @click="pagoSeleccionado = payment" data-bs-toggle="modal" data-bs-target="#modalFacturacion"><img :src="require('/img/sunat_logo.webp')" style="width: 15px" alt=""></button>
@@ -141,7 +179,7 @@
 				</tr>
 			</thead>
 			<tbody>
-					<tr v-for="(payment, index) in salidas">
+					<tr v-for="(payment, index) in filteredSalidas">
 						<td class="d-print-none" v-if="esAdmin">
 							<button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalMotivoBorrar" ><i class="fa-solid fa-xmark"></i></button>
 						</td>
@@ -171,7 +209,7 @@
 						<td>{{ horaLatam(payment.created_at) }}</td>
 						<td class="d-print-none" style="white-space: nowrap">
 							<button class="btn btn-outline-success btn-sm" data-bs-toggle="offcanvas" data-bs-target="#offAdjunto"  @click="verAdjunto(payment.id)" title="Adjuntar archivo"><i class="far fa-file"></i></button>
-							<button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarPago" @click="editar(index)"><i class="fa-solid fa-pen-to-square"></i></button>
+							<button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarPago" @click="editar(payment.originalIndex)"><i class="fa-solid fa-pen-to-square"></i></button>
 							<a v-if="payment.appointment_id!==0" target="_blank" :href="`/api/pdfCupon/${payment.appointment_id}?token=${token}`" class="btn btn-danger btn-sm"><i class="fa-solid fa-file-pdf"></i> PDF</a>
 							<a target="_blank" :href="`/api/pdfExtraCupon/${payment.id}?token=${token}`" class="btn btn-danger btn-sm"><i class="fa-solid fa-file-pdf"></i> PDF</a>
 						</td>
@@ -352,6 +390,7 @@ import moment from 'moment'
 export default{
 	data(){
 		return{
+			filtroActual: 'Todos',
 			payments:[], sumaTipos:[], sumaSalidas:[], salidas:[], monedas:['Efectivo', 'Depósito bancario',  'POS', 'Aplicativo Yape', 'Banco: BCP', 'Banco: BBVA', 'Banco: Interbank', 'Banco: Nación', 'Banco: Scotiabank', 'Aplicativo Plin', 'Open pay'], idSeleccionado:-1,
 			idUsuario: null, tienePrivilegios: null, razon:'', queId:null, queINdex:null, contenido:'', eliminados:[], caso:{id:-1,index:-1,moneda:1, boleta:'', comprobante:'', observacion:'', tipo:-1}, foto:'', habilitarEliminado:false, fecha:moment().format('YYYY-MM-DD'), monedas:[], idSede:1, pagoSeleccionado:null,
 			buscarVacio:true
@@ -498,10 +537,81 @@ export default{
 		}
 	},
 	computed:{
+		filtrosPills() {
+			return ['Todos', 'Ingresos', 'Egresos', 'Citas', 'Adelantos', 'Cuotas', 'Ing. Extra', 'Egr. Extra'];
+		},
+		filteredPayments() {
+			let result = this.payments.map((item, index) => {
+				item.originalIndex = index;
+				return item;
+			});
+
+			if (this.filtroActual === 'Ingresos') return result; 
+			if (this.filtroActual === 'Egresos') return result.filter(item => item.type == 6);
+			if (this.filtroActual === 'Citas') return result.filter(item => item.type == 5);
+			if (this.filtroActual === 'Adelantos') return result.filter(item => item.type == 8);
+			if (this.filtroActual === 'Cuotas') return result.filter(item => [1, 2, 7, 15].includes(item.type));
+			if (this.filtroActual === 'Ing. Extra') return result.filter(item => item.type == 4);
+			if (this.filtroActual === 'Egr. Extra') return [];
+			
+			return result;
+		},
+		filteredSalidas() {
+			let result = this.salidas.map((item, index) => {
+				item.originalIndex = index;
+				return item;
+			});
+
+			if (this.filtroActual === 'Egresos') return result;
+			if (this.filtroActual === 'Egr. Extra') return result;
+			if (['Citas', 'Adelantos', 'Cuotas', 'Ing. Extra', 'Ingresos'].includes(this.filtroActual)) return [];
+			
+			return result;
+		},
+		totalIngresosStats() {
+			if(this.payments.length > 0){
+				return this.payments.reduce((suma, item)=>{
+					if(item.type == 6){
+						return suma - parseFloat(item.price ?? 0)
+					} else {
+						return suma + parseFloat(item.price ?? 0)
+					}
+				}, 0)
+			}
+			return 0;
+		},
+		totalEgresosStats() {
+			if(this.salidas.length > 0){
+				let sal = this.salidas.reduce((suma, item)=>{
+					if(item.type == 6){
+						return suma - parseFloat(item.price ?? 0)
+					} else {
+						return suma + parseFloat(item.price ?? 0)
+					}
+				}, 0);
+				return Math.abs(sal);
+			}
+			return 0;
+		},
+		netoDiaStats() {
+			return this.totalIngresosStats - this.totalEgresosStats;
+		},
+		totalCitasCobradas() {
+			return this.payments.reduce((sum, item) => {
+				if (item.type == 5) return sum + parseFloat(item.price ?? 0);
+				return sum;
+			}, 0);
+		},
+		totalAdelantos() {
+			return this.payments.reduce((sum, item) => {
+				if (item.type == 8) return sum + parseFloat(item.price ?? 0);
+				return sum;
+			}, 0);
+		},
 		suma: function (){
 			this.sumaTipos=[]
-			if(this.payments.length>0){
-				return this.payments.reduce((suma, item)=>{ //console.log(item);
+			if(this.filteredPayments.length>0){
+				return this.filteredPayments.reduce((suma, item)=>{ //console.log(item);
 					let queIndex= this.sumaTipos.findIndex(x=> x.moneda== this.queMoneda(item.moneda) );
 					if( queIndex>-1 ){ //encuentra
 						if( item.type==6)
@@ -529,8 +639,8 @@ export default{
 		},
 		sumaSal: function (){
 			this.sumaSalidas=[]
-			if(this.salidas.length>0){
-				return this.salidas.reduce((suma, item)=>{
+			if(this.filteredSalidas.length>0){
+				return this.filteredSalidas.reduce((suma, item)=>{
 					let queIndex= this.sumaSalidas.findIndex(x=> x.moneda== this.queMoneda(item.moneda ));
 					//console.log(queIndex);
 					if( queIndex>-1 ){ //encuentra
