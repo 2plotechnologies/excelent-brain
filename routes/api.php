@@ -198,6 +198,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('crearPrecioNuevo', [ExtrasController::class, 'crearPrecioNuevo']);
         Route::get('listarPreciosTodos', [ExtrasController::class, 'listarPreciosTodos']);
         Route::post('reportsJimmy', [SimpleController::class, 'reportsJimmy']);
+        Route::get('seguimiento-crm', [ExtrasController::class, 'seguimientoCrm']);
     });
 
     // ── REPORTS (incluyendo profesional) ──────────────────────────────────────────────────
