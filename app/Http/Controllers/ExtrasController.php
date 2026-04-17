@@ -1509,6 +1509,118 @@ class ExtrasController extends Controller
 		}
 	}
 
+
+	public function seguimientoCrm(){
+		$hoy = Carbon::now()->startOfDay();
+
+		$citas = Appointment::with(['patient:id,name,nombres,vivo,activo', 'professional:id,name,lastname,profession'])
+			->where('status', 2)
+			->whereDate('date', '<=', $hoy->toDateString())
+			->orderBy('date', 'asc')
+			->get();
+
+		$agrupadas = $citas->groupBy('patient_id');
+		$pacientes = [];
+
+		foreach ($agrupadas as $patientId => $citasPaciente) {
+			$paciente = optional($citasPaciente->first())->patient;
+			if (!$paciente || (int) $paciente->vivo === 0 || (int) $paciente->activo === 1) {
+				continue;
+			}
+
+			$primeraAtencion = Carbon::parse($citasPaciente->first()->date)->startOfDay();
+			$ultimaCita = Carbon::parse($citasPaciente->last()->date)->startOfDay();
+			$totalCitas = $citasPaciente->count();
+			$diasDesdePrimera = $primeraAtencion->diffInDays($hoy);
+			$diasSinVenir = $ultimaCita->diffInDays($hoy);
+
+			$servicioFrecuente = $citasPaciente
+				->groupBy(function ($cita) {
+					$profesion = strtolower(trim(optional($cita->professional)->profession ?? ''));
+
+					if (strpos($profesion, 'psiqu') !== false) return 'Psiquiatría';
+					if (strpos($profesion, 'psico') !== false) return 'Psicología';
+
+					return 'Otros';
+				})
+				->sortByDesc(function ($grupo) {
+					return $grupo->count();
+				})
+				->keys()
+				->first() ?? 'Otros';
+
+			$profesionalFrecuente = $citasPaciente
+				->groupBy(function ($cita) {
+					$nombre = trim((optional($cita->professional)->name ?? '') . ' ' . (optional($cita->professional)->lastname ?? ''));
+					return $nombre !== '' ? $nombre : 'Sin profesional';
+				})
+				->sortByDesc(function ($grupo) {
+					return $grupo->count();
+				})
+				->keys()
+				->first() ?? 'Sin profesional';
+
+			$esFidelizado = false;
+			if ($servicioFrecuente === 'Psicología') {
+				$esFidelizado = $diasDesdePrimera >= 30 && $totalCitas >= 4;
+			} elseif ($servicioFrecuente === 'Psiquiatría') {
+				$esFidelizado = $diasDesdePrimera >= 60 && $totalCitas >= 2;
+			} else {
+				$esFidelizado = false;
+			}
+
+			$etiquetaFidelizacion = $esFidelizado ? 'Fidelizado' : 'No Fidelizado';
+
+			$esInactivo = false;
+			if ($servicioFrecuente === 'Psiquiatría') {
+				$esInactivo = $diasSinVenir >= 180;
+			} else {
+				$esInactivo = $diasSinVenir >= 90;
+			}
+
+			$etiquetaRecuperacion = $esInactivo ? 'Inactivo' : 'Recuperación';
+
+			$pacientes[] = [
+				'patient_id' => (int) $patientId,
+				'paciente' => trim(($paciente->name ?? '') . ' ' . ($paciente->nombres ?? '')),
+				'servicio' => $servicioFrecuente,
+				'profesional' => $profesionalFrecuente,
+				'citas' => $totalCitas,
+				'primera_atencion' => $primeraAtencion->toDateString(),
+				'ultima_cita' => $ultimaCita->toDateString(),
+				'dias_sin_venir' => $diasSinVenir,
+				'etiqueta_fidelizacion' => $etiquetaFidelizacion,
+				'etiqueta_recuperacion' => $etiquetaRecuperacion,
+			];
+		}
+
+		$fidelizacion = collect($pacientes)->map(function ($item) {
+			$item['etiqueta'] = $item['etiqueta_fidelizacion'];
+			unset($item['etiqueta_fidelizacion'], $item['etiqueta_recuperacion']);
+			return $item;
+		});
+
+		$recuperacion = collect($pacientes)->map(function ($item) {
+			$item['etiqueta'] = $item['etiqueta_recuperacion'];
+			unset($item['etiqueta_fidelizacion'], $item['etiqueta_recuperacion']);
+			return $item;
+		});
+
+		$union = $fidelizacion->merge($recuperacion)->unique(function ($item) {
+			return $item['patient_id'] . '|' . $item['etiqueta'];
+		})->values();
+
+		return response()->json([
+			'pacientes' => $union,
+			'resumen' => [
+				'fidelizados' => $fidelizacion->where('etiqueta', 'Fidelizado')->count(),
+				'noFidelizados' => $fidelizacion->where('etiqueta', 'No Fidelizado')->count(),
+				'recuperacion' => $recuperacion->where('etiqueta', 'Recuperación')->count(),
+				'inactivos' => $recuperacion->where('etiqueta', 'Inactivo')->count(),
+			],
+		]);
+	}
+
 	function dividirPago($id, Request $request){		
 		//return $request->all();
 		$pagoExtra = Extra_payment::find($id);

@@ -76,6 +76,7 @@ const HomeAdicionales = () => import('./components/recepcionista/components/adic
 const HomeCartera = () => import('./components/recepcionista/components/adicionales/HomeCartera.vue')
 const HomeRecordatorios = () => import('./components/recepcionista/components/recordatorios/HomeRecordatorios.vue')
 const HomeLimbo = () => import('./components/recepcionista/components/citas/HomeLimbo.vue')
+const HomeSeguimiento = () => import('./components/recepcionista/components/pacientes/HomeSeguimiento.vue')
 
 
 
@@ -464,6 +465,11 @@ export const routes = [
         path: 'pacientes',
         name: 'pacientesRecepcionista',
         component: HomeRecepcionistaPacientes
+      },
+      {
+        path: 'pacientes/seguimiento',
+        name: 'seguimientoRecepcionista',
+        component: HomeSeguimiento
       },
       {
         path: 'reportes',
