@@ -545,7 +545,7 @@ export default {
     },
     formatDate(date) {
       if(!date) return '';
-      // Prevenir bug de zona horaria aislando YYYY-MM-DD
+      // Prevenir bug de zona horaria aislando YYYY-MM-DD.
       if (typeof date === 'string') {
         const parts = date.split(' ')[0].split('T')[0].split('-');
         if (parts.length === 3) {

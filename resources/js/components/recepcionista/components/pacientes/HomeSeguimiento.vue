@@ -111,21 +111,31 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in pacientesFiltrados" :key="item.patient_id">
-              <td class="text-capitalize">{{ item.paciente }}</td>
-              <td>{{ item.servicio }}</td>
-              <td class="text-capitalize">{{ item.profesional }}</td>
-              <td>{{ item.citas }}</td>
-              <td>{{ fechaLatam(item.primera_atencion) }}</td>
-              <td>{{ fechaLatam(item.ultima_cita) }}</td>
-              <td>{{ item.dias_sin_venir }}</td>
-              <td>
-                <span class="badge" :class="badgeClass(item.etiqueta)">{{ item.etiqueta }}</span>
+            <tr v-if="cargando">
+              <td colspan="8" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-2 text-muted mb-0">Cargando datos del servidor...</p>
               </td>
             </tr>
-            <tr v-if="pacientesFiltrados.length === 0">
-              <td colspan="8" class="text-center text-muted py-4">No se encontraron pacientes en este segmento</td>
-            </tr>
+            <template v-else>
+              <tr v-for="item in pacientesFiltrados" :key="item.patient_id">
+                <td class="text-capitalize">{{ item.paciente }}</td>
+                <td>{{ item.servicio }}</td>
+                <td class="text-capitalize">{{ item.profesional }}</td>
+                <td>{{ item.citas }}</td>
+                <td>{{ fechaLatam(item.primera_atencion) }}</td>
+                <td>{{ fechaLatam(item.ultima_cita) }}</td>
+                <td>{{ item.dias_sin_venir }}</td>
+                <td>
+                  <span class="badge" :class="badgeClass(item.etiqueta)">{{ item.etiqueta }}</span>
+                </td>
+              </tr>
+              <tr v-if="pacientesFiltrados.length === 0">
+                <td colspan="8" class="text-center text-muted py-4">No se encontraron pacientes en este segmento</td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -140,6 +150,7 @@ export default {
   name: 'HomeSeguimiento',
   data() {
     return {
+      cargando: true,
       pacientes: [],
       resumen: {
         fidelizados: 0,
@@ -186,9 +197,16 @@ export default {
   },
   methods: {
     async cargarSeguimiento() {
-      const { data } = await this.axios.get('/api/seguimiento-crm');
-      this.pacientes = data.pacientes || [];
-      this.resumen = data.resumen || this.resumen;
+      this.cargando = true;
+      try {
+        const { data } = await this.axios.get('/api/seguimiento-crm');
+        this.pacientes = data.pacientes || [];
+        this.resumen = data.resumen || this.resumen;
+      } catch (error) {
+        console.error('Error cargando seguimiento:', error);
+      } finally {
+        this.cargando = false;
+      }
     },
     fechaLatam(fecha) {
       if (!fecha) {

@@ -1513,85 +1513,95 @@ class ExtrasController extends Controller
 	public function seguimientoCrm(){
 		$hoy = Carbon::now()->startOfDay();
 
-		$citas = Appointment::with(['patient:id,name,nombres,vivo,activo', 'professional:id,name,lastname,profession'])
-			->where('status', 2)
-			->whereDate('date', '<=', $hoy->toDateString())
-			->orderBy('date', 'asc')
-			->get();
-
-		$agrupadas = $citas->groupBy('patient_id');
 		$pacientes = [];
+		$citasQuery = Appointment::where('status', 2)
+			->whereDate('date', '<=', $hoy->toDateString());
 
-		foreach ($agrupadas as $patientId => $citasPaciente) {
-			$paciente = optional($citasPaciente->first())->patient;
-			if (!$paciente || (int) $paciente->vivo === 0 || (int) $paciente->activo === 1) {
-				continue;
-			}
+		$patientIds = $citasQuery->distinct()->pluck('patient_id');
 
-			$primeraAtencion = Carbon::parse($citasPaciente->first()->date)->startOfDay();
-			$ultimaCita = Carbon::parse($citasPaciente->last()->date)->startOfDay();
-			$totalCitas = $citasPaciente->count();
-			$diasDesdePrimera = $primeraAtencion->diffInDays($hoy);
-			$diasSinVenir = $ultimaCita->diffInDays($hoy);
+		foreach ($patientIds->chunk(500) as $chunk) {
+			$citas = Appointment::with(['patient:id,name,nombres,vivo,activo', 'professional:id,nombre,name,profession'])
+				->whereIn('patient_id', $chunk)
+				->where('status', 2)
+				->whereDate('date', '<=', $hoy->toDateString())
+				->orderBy('date', 'asc')
+				->get();
 
-			$servicioFrecuente = $citasPaciente
-				->groupBy(function ($cita) {
-					$profesion = strtolower(trim(optional($cita->professional)->profession ?? ''));
+			$agrupadas = $citas->groupBy('patient_id');
 
-					if (strpos($profesion, 'psiqu') !== false) return 'Psiquiatría';
-					if (strpos($profesion, 'psico') !== false) return 'Psicología';
+			foreach ($agrupadas as $patientId => $citasPaciente) {
+				$paciente = optional($citasPaciente->first())->patient;
+				if (!$paciente || (int) $paciente->vivo === 0 || (int) $paciente->activo === 1) {
+					continue;
+				}
 
-					return 'Otros';
-				})
-				->sortByDesc(function ($grupo) {
-					return $grupo->count();
-				})
-				->keys()
-				->first() ?? 'Otros';
+				$primeraAtencion = Carbon::parse($citasPaciente->first()->date)->startOfDay();
+				$ultimaCita = Carbon::parse($citasPaciente->last()->date)->startOfDay();
+				$totalCitas = $citasPaciente->count();
+				$diasDesdePrimera = $primeraAtencion->diffInDays($hoy);
+				$diasSinVenir = $ultimaCita->diffInDays($hoy);
 
-			$profesionalFrecuente = $citasPaciente
-				->groupBy(function ($cita) {
-					$nombre = trim((optional($cita->professional)->name ?? '') . ' ' . (optional($cita->professional)->lastname ?? ''));
-					return $nombre !== '' ? $nombre : 'Sin profesional';
-				})
-				->sortByDesc(function ($grupo) {
-					return $grupo->count();
-				})
-				->keys()
-				->first() ?? 'Sin profesional';
+				$servicioFrecuente = $citasPaciente
+					->groupBy(function ($cita) {
+						$profesion = strtolower(trim(optional($cita->professional)->profession ?? ''));
 
-			$esFidelizado = false;
-			if ($servicioFrecuente === 'Psicología') {
-				$esFidelizado = $diasDesdePrimera >= 30 && $totalCitas >= 4;
-			} elseif ($servicioFrecuente === 'Psiquiatría') {
-				$esFidelizado = $diasDesdePrimera >= 60 && $totalCitas >= 2;
-			} else {
+						if (strpos($profesion, 'psiqu') !== false) return 'Psiquiatría';
+						if (strpos($profesion, 'psico') !== false) return 'Psicología';
+
+						return 'Otros';
+					})
+					->sortByDesc(function ($grupo) {
+						return $grupo->count();
+					})
+					->keys()
+					->first() ?? 'Otros';
+
+				$profesionalFrecuente = $citasPaciente
+					->groupBy(function ($cita) {
+						$nombre = trim((optional($cita->professional)->name ?? '') . ' ' . (optional($cita->professional)->lastname ?? ''));
+						return $nombre !== '' ? $nombre : 'Sin profesional';
+					})
+					->sortByDesc(function ($grupo) {
+						return $grupo->count();
+					})
+					->keys()
+					->first() ?? 'Sin profesional';
+
 				$esFidelizado = false;
+				if ($servicioFrecuente === 'Psicología') {
+					$esFidelizado = $diasDesdePrimera >= 30 && $totalCitas >= 4;
+				} elseif ($servicioFrecuente === 'Psiquiatría') {
+					$esFidelizado = $diasDesdePrimera >= 60 && $totalCitas >= 2;
+				} else {
+					$esFidelizado = false;
+				}
+
+				$etiquetaFidelizacion = $esFidelizado ? 'Fidelizado' : 'No Fidelizado';
+
+				$esInactivo = false;
+				if ($servicioFrecuente === 'Psiquiatría') {
+					$esInactivo = $diasSinVenir >= 180;
+				} else {
+					$esInactivo = $diasSinVenir >= 90;
+				}
+
+				$etiquetaRecuperacion = $esInactivo ? 'Inactivo' : 'Recuperación';
+
+				$pacientes[] = [
+					'patient_id' => (int) $patientId,
+					'paciente' => trim(($paciente->name ?? '') . ' ' . ($paciente->nombres ?? '')),
+					'servicio' => $servicioFrecuente,
+					'profesional' => $profesionalFrecuente,
+					'citas' => $totalCitas,
+					'primera_atencion' => $primeraAtencion->toDateString(),
+					'ultima_cita' => $ultimaCita->toDateString(),
+					'dias_sin_venir' => $diasSinVenir,
+					'etiqueta_fidelizacion' => $etiquetaFidelizacion,
+					'etiqueta_recuperacion' => $etiquetaRecuperacion,
+				];
 			}
-
-			$etiquetaFidelizacion = $esFidelizado ? 'Fidelizado' : 'No Fidelizado';
-
-			$esInactivo = false;
-			if ($servicioFrecuente === 'Psiquiatría') {
-				$esInactivo = $diasSinVenir >= 180;
-			} else {
-				$esInactivo = $diasSinVenir >= 90;
-			}
-
-			$etiquetaRecuperacion = $esInactivo ? 'Inactivo' : 'Recuperación';
-
-			$pacientes[] = [
-				'patient_id' => (int) $patientId,
-				'paciente' => trim(($paciente->name ?? '') . ' ' . ($paciente->nombres ?? '')),
-				'servicio' => $servicioFrecuente,
-				'profesional' => $profesionalFrecuente,
-				'citas' => $totalCitas,
-				'primera_atencion' => $primeraAtencion->toDateString(),
-				'ultima_cita' => $ultimaCita->toDateString(),
-				'dias_sin_venir' => $diasSinVenir,
-				'etiqueta_fidelizacion' => $etiquetaFidelizacion,
-				'etiqueta_recuperacion' => $etiquetaRecuperacion,
-			];
+			unset($citas);
+			unset($agrupadas);
 		}
 
 		$fidelizacion = collect($pacientes)->map(function ($item) {
