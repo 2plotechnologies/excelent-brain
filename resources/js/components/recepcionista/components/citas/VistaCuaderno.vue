@@ -7,6 +7,7 @@
 			<div class="col-auto"><button class="btn btn-outline-primary mx-1 border-0 font-weight-bold" @click="verHorariosHoy()"><i class="fa-regular fa-clock"></i> Hoy</button></div>
 			<div class="col-auto"><button class="btn btn-outline-primary mx-1 border-0 font-weight-bold" @click="verHorariosMañana()">Mañana <i class="fas fa-chevron-right"></i></button></div>
 			<div class="col-auto"><button class="btn btn-outline-secondary mx-2 border-0" @click="refrescarHorarios()"><i class="fas fa-sync"></i> Actualizar</button></div>
+			<div class="col-auto ms-auto"><router-link to="/recepcionista/paquetes" class="btn btn-primary font-weight-bold shadow-sm"><i class="fas fa-box-open"></i> Paquetes</router-link></div>
 		</div>
 
 		<!-- Filtros por profesión (Opcional, si existen en los datos) -->
@@ -399,9 +400,12 @@
 			},
 
 			// ----- METODOS VIEJOS COMPATIBILIDAD -----
-			actualizarAdelanto(adelanto){
-				this.horasMalas[this.indexElegido].payment.price = parseFloat(this.horasMalas[this.indexElegido].payment.price) - parseFloat(adelanto)
-				this.horasMalas[this.indexElegido].payment.adelanto = parseFloat(this.horasMalas[this.indexElegido].payment.adelanto) + parseFloat(adelanto)
+			actualizarAdelanto(adelanto, citaId){
+				const cita = this.horasMalas.find(h => h.id === citaId || h.payment?.id === citaId);
+				if(cita && cita.payment){
+					cita.payment.price = parseFloat(cita.payment.price) - parseFloat(adelanto)
+					cita.payment.adelanto = parseFloat(cita.payment.adelanto || 0) + parseFloat(adelanto)
+				}
 			},
 			validarYEliminar(id){
 				this.$swal({

@@ -1495,9 +1495,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 _this3.$swal({
                   title: 'Se guardó la membresía',
                   showConfirmButton: false,
-                  icon: 'success'
+                  icon: 'success',
+                  timer: 1000
                 });
                 alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-regular fa-calendar-check"></i> Membresía guardada', 'success', 10);
+                _this3.$emit('membresiaGuardada');
               } else alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-regular fa-bomb"></i> Hubo un error guardando', 'danger', 10);
             case 33:
             case "end":
@@ -2468,20 +2470,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-file-excel"
-  }), _vm._v(" Exportar a Excel")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-outline-primary",
-    attrs: {
-      "data-bs-target": "#modalMembresias",
-      "data-bs-toggle": "modal"
-    },
-    on: {
-      click: function click($event) {
-        return _vm.membresias();
-      }
-    }
-  }, [_c("i", {
-    staticClass: "fa-solid fa-arrow-up-right-dots"
-  }), _vm._v(" Ingresar paquete")]), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm.consultarFecha() ? _c("button", {
+  }), _vm._v(" Exportar a Excel")]), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm.consultarFecha() ? _c("button", {
     staticClass: "btn btn-outline-secondary",
     on: {
       click: function click($event) {

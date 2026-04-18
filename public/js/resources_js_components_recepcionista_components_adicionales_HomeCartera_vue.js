@@ -16,6 +16,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_2__);
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
+function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
 function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
 function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
@@ -36,13 +42,16 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       },
       citasResumidas: [],
       citasCompletas: [],
+      citasMostrar: [],
       previewCitas: [],
       titulo: '',
       idGlobal: -1,
       indexGlobal: -1,
       seguimientos: [],
       seguimientosActivos: [],
-      elegido: []
+      elegido: [],
+      cargando: false,
+      progreso: 0
     };
   },
   components: {
@@ -81,108 +90,163 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     buscarCartera: function buscarCartera() {
       var _this2 = this;
-      var condicion;
+      this.cargando = true;
+      this.progreso = 0;
+      this.citasResumidas = [];
+      this.citasCompletas = [];
+      this.citasMostrar = [];
       this.axios.post('/api/buscarCartera', this.filtro).then(function (res) {
-        console.log(res.data);
+        _this2.progreso = 30;
         var hoy = moment__WEBPACK_IMPORTED_MODULE_2___default()().format('YYYY-MM-DD');
         _this2.citasResumidas = res.data.resumidas;
         _this2.citasCompletas = res.data.completas;
-        _this2.citasResumidas.forEach(function (cita, index) {
-          cita.visitas = Object.values(_this2.citasCompletas).filter(function (item) {
-            return item.patient_id === cita.patient_id;
-          }).length;
-          cita.sinconfirmar = Object.values(_this2.citasCompletas).filter(function (item) {
-            return item.patient_id === cita.patient_id && item.status == 1 && moment__WEBPACK_IMPORTED_MODULE_2___default()(item.date).diff(hoy) > 0;
-          }).length;
-          cita.confirmar = Object.values(_this2.citasCompletas).filter(function (item) {
-            return item.patient_id === cita.patient_id && item.status == 2;
-          }).length;
-          cita.anulados = Object.values(_this2.citasCompletas).filter(function (item) {
-            return item.patient_id === cita.patient_id && item.status == 3;
-          }).length;
-          cita.reprogramados = Object.values(_this2.citasCompletas).filter(function (item) {
-            return item.patient_id === cita.patient_id && item.status == 4;
-          }).length;
-          cita.fatas = cita.patient.faults;
-          if (cita.patient.discharge == 1) cita.actual = 'De Alta';else {
-            condicion = Object.values(_this2.citasCompletas).filter(function (item) {
-              return item.patient_id === cita.patient_id && item.patient_condition == 2;
-            }).length;
-            if (condicion > 0) cita.actual = 'Continuante';else cita.actual = 'Nuevo';
-          }
-          if (index == 0) {
-            //cita.
-          }
-          /* this.citasCompletas.filter(x=> {
-          	if( x.patient_id==id && x.status ==1 ) ''
-          }) */
-        });
+        _this2.progreso = 50;
+        var total = _this2.citasResumidas.length;
+        var procesarEnBloques = /*#__PURE__*/function () {
+          var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+            var tamanhoBloque, i, bloque;
+            return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+              while (1) switch (_context2.prev = _context2.next) {
+                case 0:
+                  tamanhoBloque = 50;
+                  i = 0;
+                case 2:
+                  if (!(i < total)) {
+                    _context2.next = 11;
+                    break;
+                  }
+                  bloque = _this2.citasResumidas.slice(i, i + tamanhoBloque);
+                  bloque.forEach(function (cita) {
+                    var _cita$patient, _cita$patient2;
+                    cita.visitas = _this2.citasCompletas.filter(function (item) {
+                      return item.patient_id === cita.patient_id;
+                    }).length;
+                    cita.sinconfirmar = _this2.citasCompletas.filter(function (item) {
+                      return item.patient_id === cita.patient_id && item.status == 1 && moment__WEBPACK_IMPORTED_MODULE_2___default()(item.date).diff(hoy) > 0;
+                    }).length;
+                    cita.confirmar = _this2.citasCompletas.filter(function (item) {
+                      return item.patient_id === cita.patient_id && item.status == 2;
+                    }).length;
+                    cita.anulados = _this2.citasCompletas.filter(function (item) {
+                      return item.patient_id === cita.patient_id && item.status == 3;
+                    }).length;
+                    cita.reprogramados = _this2.citasCompletas.filter(function (item) {
+                      return item.patient_id === cita.patient_id && item.status == 4;
+                    }).length;
+                    cita.fatas = (_cita$patient = cita.patient) === null || _cita$patient === void 0 ? void 0 : _cita$patient.faults;
+                    if (((_cita$patient2 = cita.patient) === null || _cita$patient2 === void 0 ? void 0 : _cita$patient2.discharge) == 1) cita.actual = 'De Alta';else {
+                      var condicion = _this2.citasCompletas.filter(function (item) {
+                        return item.patient_id === cita.patient_id && item.patient_condition == 2;
+                      }).length;
+                      cita.actual = condicion > 0 ? 'Continuante' : 'Nuevo';
+                    }
+                  });
+                  _this2.progreso = 50 + Math.round(i / total * 40);
+                  _context2.next = 8;
+                  return new Promise(function (resolve) {
+                    return setTimeout(resolve, 0);
+                  });
+                case 8:
+                  i += tamanhoBloque;
+                  _context2.next = 2;
+                  break;
+                case 11:
+                  _this2.citasMostrar = _this2.citasResumidas.slice(0, 100);
+                  _this2.progreso = 100;
+                  _this2.$nextTick(function () {
+                    _this2.cargando = false;
+                  });
+                case 14:
+                case "end":
+                  return _context2.stop();
+              }
+            }, _callee2);
+          }));
+          return function procesarEnBloques() {
+            return _ref.apply(this, arguments);
+          };
+        }();
+        procesarEnBloques();
+      })["catch"](function () {
+        _this2.cargando = false;
       });
+    },
+    cargarMas: function cargarMas() {
+      var _this$citasMostrar;
+      var actual = this.citasMostrar.length;
+      var mas = this.citasResumidas.slice(actual, actual + 100);
+      (_this$citasMostrar = this.citasMostrar).push.apply(_this$citasMostrar, _toConsumableArray(mas));
     },
     fechaLatam: function fechaLatam(fecha) {
       return moment__WEBPACK_IMPORTED_MODULE_2___default()(fecha).format('DD/MM/YYYY');
     },
     cargarCitas: function cargarCitas(caso, id) {
       var _this3 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var hoy;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
             case 0:
               hoy = moment__WEBPACK_IMPORTED_MODULE_2___default()().format('YYYY-MM-DD');
-              _context2.t0 = caso;
-              _context2.next = _context2.t0 === 'visitas' ? 4 : _context2.t0 === 'confirmar' ? 7 : _context2.t0 === 'sinconfirmar' ? 10 : _context2.t0 === 'anulados' ? 13 : _context2.t0 === 'reprogramados' ? 16 : 19;
+              _context3.t0 = caso;
+              _context3.next = _context3.t0 === 'visitas' ? 4 : _context3.t0 === 'confirmar' ? 7 : _context3.t0 === 'sinconfirmar' ? 10 : _context3.t0 === 'anulados' ? 13 : _context3.t0 === 'reprogramados' ? 16 : 19;
               break;
             case 4:
               _this3.titulo = 'Total de Citas';
               _this3.previewCitas = _this3.citasCompletas.filter(function (item) {
                 return item.patient_id == id;
               });
-              return _context2.abrupt("break", 19);
+              return _context3.abrupt("break", 19);
             case 7:
               _this3.titulo = 'Citas confirmadas';
               _this3.previewCitas = _this3.citasCompletas.filter(function (item) {
                 return item.patient_id == id && item.status == 2;
               });
-              return _context2.abrupt("break", 19);
+              return _context3.abrupt("break", 19);
             case 10:
               _this3.titulo = 'Citas sin confirmar';
               _this3.previewCitas = _this3.citasCompletas.filter(function (item) {
                 return item.patient_id == id && item.status == 1 && moment__WEBPACK_IMPORTED_MODULE_2___default()(item.date).diff(hoy) > 0;
               });
-              return _context2.abrupt("break", 19);
+              return _context3.abrupt("break", 19);
             case 13:
               _this3.titulo = 'Citas anuladas';
               _this3.previewCitas = _this3.citasCompletas.filter(function (item) {
                 return item.patient_id == id && item.status == 3;
               });
-              return _context2.abrupt("break", 19);
+              return _context3.abrupt("break", 19);
             case 16:
               _this3.titulo = 'Citas reprogramadas';
               _this3.previewCitas = _this3.citasCompletas.filter(function (item) {
                 return item.patient_id == id && item.status == 4;
               });
-              return _context2.abrupt("break", 19);
+              return _context3.abrupt("break", 19);
             case 19:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
           }
-        }, _callee2);
+        }, _callee3);
       }))();
     },
     queSeguimiento: function queSeguimiento(item) {
-      if (item) return this.seguimientos.find(function (x) {
+      if (!item) return '';
+      var seg = this.seguimientos.find(function (x) {
         return x.id == item;
-      }).seguimiento;
+      });
+      return seg ? seg.seguimiento : '';
     },
     queColor: function queColor(item) {
-      var _this$seguimientos$fi;
-      if (item) return (_this$seguimientos$fi = this.seguimientos.find(function (x) {
+      if (!item) return '';
+      var seg = this.seguimientos.find(function (x) {
         return x.id == item;
-      })) === null || _this$seguimientos$fi === void 0 ? void 0 : _this$seguimientos$fi.color;
+      });
+      return seg ? seg.color : '';
     },
     cambiarItem: function cambiarItem(item) {
-      this.citasResumidas[this.indexGlobal].patient.seguimiento = item;
+      var _this$citasResumidas$;
+      if ((_this$citasResumidas$ = this.citasResumidas[this.indexGlobal]) !== null && _this$citasResumidas$ !== void 0 && _this$citasResumidas$.patient) {
+        this.citasResumidas[this.indexGlobal].patient.seguimiento = item;
+      }
     },
     ultimaCita: function ultimaCita(id) {
       moment__WEBPACK_IMPORTED_MODULE_2___default().locale('es');
@@ -190,32 +254,26 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       var citas = this.citasCompletas.filter(function (item) {
         return item.patient_id == id;
       });
-      fechaMasNueva = citas[0].date;
-      //console.log(citas[0].patient.name, citas)
-      return moment__WEBPACK_IMPORTED_MODULE_2___default()(fechaMasNueva).fromNow(true);
+      if (citas.length > 0) {
+        fechaMasNueva = citas[0].date;
+        return moment__WEBPACK_IMPORTED_MODULE_2___default()(fechaMasNueva).fromNow(true);
+      }
+      return '';
     },
     proximaCita: function proximaCita(id) {
       moment__WEBPACK_IMPORTED_MODULE_2___default().locale('es');
       var citas = this.citasCompletas.filter(function (item) {
         return item.patient_id == id;
       });
-      if (citas[0].proximo) {
+      if (citas.length > 0 && citas[0].proximo) {
         return moment__WEBPACK_IMPORTED_MODULE_2___default()(citas[0].proximo.fecha).format('DD/MM/YYYY');
       } else return '';
     },
-    queViejoEs: function queViejoEs(index) {
-      var _this$citasResumidas$;
+    queViejoEs: function queViejoEs(cita) {
+      var _cita$patient$created, _cita$patient3;
       moment__WEBPACK_IMPORTED_MODULE_2___default().locale('es');
       var fechaMasAntigua = new Date();
-      fechaMasAntigua = (_this$citasResumidas$ = this.citasResumidas[index].patient.created_at) !== null && _this$citasResumidas$ !== void 0 ? _this$citasResumidas$ : '2022-01-01';
-
-      /* let citas = this.citasCompletas.filter(item=> item.patient_id == id );
-      citas.forEach(cita=>{
-      	const fechaItem = new Date(cita.date);
-      	if (fechaItem < fechaMasAntigua) {
-      		fechaMasAntigua = fechaItem;
-      	}
-      }) */
+      fechaMasAntigua = (_cita$patient$created = (_cita$patient3 = cita.patient) === null || _cita$patient3 === void 0 ? void 0 : _cita$patient3.created_at) !== null && _cita$patient$created !== void 0 ? _cita$patient$created : '2022-01-01';
       return moment__WEBPACK_IMPORTED_MODULE_2___default()(fechaMasAntigua).fromNow().replace('hace ', '');
     },
     capitalizar: function capitalizar(texto) {
@@ -225,11 +283,13 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     }
   },
   mounted: function mounted() {
-    //this.idUsuario = this.
+    var _this4 = this;
     for (var i = moment__WEBPACK_IMPORTED_MODULE_2___default()().format('YYYY'); i >= 2020; i--) {
       this.años.push(i);
     }
-    this.listarProfesional();
+    this.listarProfesional().then(function () {
+      _this4.buscarCartera();
+    });
   }
 });
 
@@ -498,6 +558,9 @@ var render = function render() {
     staticClass: "col-3 d-flex align-items-end"
   }, [_c("button", {
     staticClass: "btn btn-outline-primary",
+    attrs: {
+      disabled: _vm.cargando
+    },
     on: {
       click: function click($event) {
         return _vm.buscarCartera();
@@ -505,18 +568,47 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fa-solid fa-magnifying-glass"
-  }), _vm._v(" Filtrar cartera")])])])])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" Filtrar cartera\n\t\t\t\t\t")])])])])]), _vm._v(" "), _vm.cargando ? _c("div", {
+    staticClass: "mt-3 mb-3"
+  }, [_c("div", {
+    staticClass: "progress",
+    staticStyle: {
+      height: "20px"
+    }
+  }, [_c("div", {
+    staticClass: "progress-bar progress-bar-striped progress-bar-animated",
+    style: {
+      width: _vm.progreso + "%"
+    },
+    attrs: {
+      role: "progressbar"
+    }
+  }, [_vm._v("\n\t\t\t\t" + _vm._s(_vm.progreso) + "%\n\t\t\t")])])]) : _vm._e(), _vm._v(" "), _vm.citasResumidas.length > 0 ? _c("div", {
     staticClass: "card mt-3"
   }, [_c("div", {
     staticClass: "card-body"
-  }, [_c("table", {
+  }, [_c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mb-2"
+  }, [_c("small", {
+    staticClass: "text-muted"
+  }, [_vm._v("Mostrando " + _vm._s(_vm.citasMostrar.length) + " de " + _vm._s(_vm.citasResumidas.length) + " registros")]), _vm._v(" "), _vm.citasResumidas.length > _vm.citasMostrar.length ? _c("button", {
+    staticClass: "btn btn-sm btn-outline-primary",
+    on: {
+      click: _vm.cargarMas
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-plus"
+  }), _vm._v(" Cargar más (+100)\n\t\t\t\t")]) : _vm._e()]), _vm._v(" "), _c("table", {
     staticClass: "table table-sm table-hover"
-  }, [_vm._m(0), _vm._v(" "), _c("tbody", _vm._l(_vm.citasResumidas, function (cita, index) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", {
+  }, [_vm._m(0), _vm._v(" "), _c("tbody", _vm._l(_vm.citasMostrar, function (cita, index) {
+    var _cita$patient, _cita$patient$name, _cita$patient2, _cita$patient$nombres, _cita$patient3, _cita$patient$dni, _cita$patient4, _cita$patient$phone, _cita$patient5, _cita$patient6, _cita$patient7, _cita$patient8, _cita$patient9;
+    return _c("tr", {
+      key: index
+    }, [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", {
       staticClass: "text-capitalize"
-    }, [cita.patient.vivo == 0 ? _c("span", [_c("i", {
+    }, [((_cita$patient = cita.patient) === null || _cita$patient === void 0 ? void 0 : _cita$patient.vivo) == 0 ? _c("span", [_c("i", {
       staticClass: "fas fa-cross"
-    })]) : _vm._e(), _vm._v(" " + _vm._s(cita.patient.name) + " " + _vm._s(cita.patient.nombres))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(cita.patient.dni))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(cita.patient.phone))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.ultimaCita(cita.patient.id)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.proximaCita(cita.patient.id)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.queViejoEs(index)))]), _vm._v(" "), _c("td", {
+    })]) : _vm._e(), _vm._v(" " + _vm._s((_cita$patient$name = (_cita$patient2 = cita.patient) === null || _cita$patient2 === void 0 ? void 0 : _cita$patient2.name) !== null && _cita$patient$name !== void 0 ? _cita$patient$name : "") + " " + _vm._s((_cita$patient$nombres = (_cita$patient3 = cita.patient) === null || _cita$patient3 === void 0 ? void 0 : _cita$patient3.nombres) !== null && _cita$patient$nombres !== void 0 ? _cita$patient$nombres : ""))]), _vm._v(" "), _c("td", [_vm._v(_vm._s((_cita$patient$dni = (_cita$patient4 = cita.patient) === null || _cita$patient4 === void 0 ? void 0 : _cita$patient4.dni) !== null && _cita$patient$dni !== void 0 ? _cita$patient$dni : ""))]), _vm._v(" "), _c("td", [_vm._v(_vm._s((_cita$patient$phone = (_cita$patient5 = cita.patient) === null || _cita$patient5 === void 0 ? void 0 : _cita$patient5.phone) !== null && _cita$patient$phone !== void 0 ? _cita$patient$phone : ""))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.ultimaCita(cita.patient_id)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.proximaCita(cita.patient_id)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.queViejoEs(cita)))]), _vm._v(" "), _c("td", {
       staticClass: "puntero",
       attrs: {
         "data-bs-toggle": "modal",
@@ -524,7 +616,7 @@ var render = function render() {
       },
       on: {
         click: function click($event) {
-          return _vm.cargarCitas("visitas", cita.patient.id);
+          return _vm.cargarCitas("visitas", cita.patient_id);
         }
       }
     }, [_vm._v(_vm._s(cita.visitas))]), _vm._v(" "), _c("td", {
@@ -535,7 +627,7 @@ var render = function render() {
       },
       on: {
         click: function click($event) {
-          return _vm.cargarCitas("confirmar", cita.patient.id);
+          return _vm.cargarCitas("confirmar", cita.patient_id);
         }
       }
     }, [_vm._v(_vm._s(cita.confirmar))]), _vm._v(" "), _c("td", {
@@ -546,7 +638,7 @@ var render = function render() {
       },
       on: {
         click: function click($event) {
-          return _vm.cargarCitas("sinconfirmar", cita.patient.id);
+          return _vm.cargarCitas("sinconfirmar", cita.patient_id);
         }
       }
     }, [_vm._v(_vm._s(cita.sinconfirmar))]), _vm._v(" "), _c("td", {
@@ -557,7 +649,7 @@ var render = function render() {
       },
       on: {
         click: function click($event) {
-          return _vm.cargarCitas("anulados", cita.patient.id);
+          return _vm.cargarCitas("anulados", cita.patient_id);
         }
       }
     }, [_vm._v(_vm._s(cita.anulados))]), _vm._v(" "), _c("td", {
@@ -568,19 +660,19 @@ var render = function render() {
       },
       on: {
         click: function click($event) {
-          return _vm.cargarCitas("reprogramados", cita.patient.id);
+          return _vm.cargarCitas("reprogramados", cita.patient_id);
         }
       }
     }, [_vm._v(_vm._s(cita.reprogramados))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(cita.actual))]), _vm._v(" "), _c("td", [_c("a", {
       staticClass: "btn btn-outline-success",
       attrs: {
-        href: "../api/pdfEvolution/restricted/" + cita.patient.id + "?token=" + _vm.$token,
+        href: "../api/pdfEvolution/restricted/" + cita.patient_id + "?token=" + _vm.$token,
         target: "_blank",
         title: "Ver Historia"
       }
     }, [_c("i", {
       staticClass: "fa-regular fa-note-sticky"
-    })])]), _vm._v(" "), cita.patient.vivo == 1 ? _c("td", {
+    })])]), _vm._v(" "), ((_cita$patient6 = cita.patient) === null || _cita$patient6 === void 0 ? void 0 : _cita$patient6.vivo) == 1 ? _c("td", {
       staticClass: "puntero",
       attrs: {
         "data-bs-toggle": "modal",
@@ -592,16 +684,16 @@ var render = function render() {
           _vm.indexGlobal = index;
         }
       }
-    }, [cita.patient.seguimiento == 1 ? _c("span", {
+    }, [((_cita$patient7 = cita.patient) === null || _cita$patient7 === void 0 ? void 0 : _cita$patient7.seguimiento) == 1 ? _c("span", {
       attrs: {
         title: "Sin acción"
       }
     }, [_c("i", {
       staticClass: "fa-regular fa-circle"
     })]) : _c("span", {
-      "class": _vm.queColor(cita.patient.seguimiento),
+      "class": _vm.queColor((_cita$patient8 = cita.patient) === null || _cita$patient8 === void 0 ? void 0 : _cita$patient8.seguimiento),
       attrs: {
-        title: _vm.queSeguimiento(cita.patient.seguimiento)
+        title: _vm.queSeguimiento((_cita$patient9 = cita.patient) === null || _cita$patient9 === void 0 ? void 0 : _cita$patient9.seguimiento)
       }
     }, [_c("i", {
       staticClass: "fas fa-circle"
@@ -620,7 +712,16 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "far fa-paper-plane"
     })])]) : _c("td")]);
-  }), 0)])])]), _vm._v(" "), _c("div", {
+  }), 0)]), _vm._v(" "), _vm.citasResumidas.length > _vm.citasMostrar.length ? _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mt-2"
+  }, [_c("span"), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm btn-outline-primary",
+    on: {
+      click: _vm.cargarMas
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-plus"
+  }), _vm._v(" Cargar más (+100)\n\t\t\t\t")])]) : _vm._e()])]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "modal fade",
     attrs: {
       id: "modalCitasPreview",

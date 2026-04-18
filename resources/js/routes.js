@@ -516,6 +516,11 @@ export const routes = [
         name: 'limbo',
         component: HomeLimbo
       },
+      {
+        path: 'paquetes',
+        name: 'paquetesRecepcionista',
+        component: HomePaquetes
+      },
     ]
   },
   {

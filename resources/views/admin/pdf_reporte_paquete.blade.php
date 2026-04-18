@@ -1,428 +1,273 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    
-    <title>Imprimir Reporte de Paquete</title>
-</head>
-<body>
+<meta charset="UTF-8">
+<title>Reporte de Paquete</title>
 
-    <div class="pdf">
-        <div class="pdf-content">
-            <div class="header__content" style="margin-top:10px">
-                <img src="{{ public_path('img/logo-reportee.png') }}" alt="Excelentemente" class="header-logo">
-
-                <div class="header" style="margin-top: 3rem;">
-                    <p class="header__name">CENTRO PSICOLOGICO EXCELENTEMENTE</p>
-                </div>
-
-                <br>
-                <div class="separate"></div>
-                <div class="separate"></div>
-                <br>
-            </div>
-
-            <img src="{{public_path('img/logo-reporte.png')}}" alt="Excelentemente" class="logotipo">
-
-            <div class="pdf__body">
-                <!--
-                DATA QUE RECIBE LA PLANTILLA PDF:
-                $data = [
-                    'membresia' => $membresia,
-                    'citas' => $citas,
-                    'pagos' => $pagos,
-                    'deudas' => $deudas,
-                    'cuotas_vencidas' => $cuotas_vencidas,
-                    'deuda_total' => $deuda_total,
-                    'total_cuotas' => $total_cuotas,
-                    'professional' => $professional,
-                    'status_name' => $status_name,
-                ];
-                            
-                -->
-
-                <div class="pdf__body__content">
-                    <div class="pdf__body__content__header">
-                        <h1 class="pdf__body__content__header__title">Reporte de Paquete</h1>
-                    </div>
-
-                    <div class="pdf__body__content__body">
-                        <div class="pdf__body__content__body__header">
-                            <h2 class="pdf__body__content__body__header__title">Información del Paciente:</h2>
-                        </div>
-                        <div class="pdf__body__content__body__content">
-                            <div class="pdf__body__content__body__content__item">
-                                <span class="pdf__body__content__body__content__item__label">Nombre:</span>
-                                <span class="pdf__body__content__body__content__item__value">{{ $paciente->nombres }} {{ $paciente->name }}</span>
-                            </div>
-                            <div class="pdf__body__content__body__content__item">
-                                <span class="pdf__body__content__body__content__item__label">DNI:</span>
-                                <span class="pdf__body__content__body__content__item__value">{{ $paciente->dni }}</span>
-                            </div>
-                            <div class="pdf__body__content__body__content__item">
-                                <span class="pdf__body__content__body__content__item__label">Teléfono:</span>
-                                <span class="pdf__body__content__body__content__item__value">{{ $paciente->phone }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pdf__body__content__body">
-                        <div class="pdf__body__content__body__header">
-                            <h2 class="pdf__body__content__body__header__title">Información del Paquete:</h2>
-                        </div>
-                        <div class="pdf__body__content__body__header">
-                            <h2 class="pdf__body__content__body__header__title">Citas:</h2>
-                        </div>
-                        @foreach ($citas as $cita)
-                            <div class="pdf__body__content__body__content__item">
-                                <span class="pdf__body__content__body__content__item__label">Fecha:</span>
-                                <span class="pdf__body__content__body__content__item__value">{{ $cita->date }}</span>
-                            </div>
-                            <div class="pdf__body__content__body__content__item">
-                                <span class="pdf__body__content__body__content__item__label">Profesional:</span>
-                                <span class="pdf__body__content__body__content__item__value">{{ $cita->professional->name }}</span>
-                            </div>
-                        @endforeach
-
-                        <div class="pdf__body__content__body__content__item">
-                            <span class="pdf__body__content__body__content__item__label">Total de Citas:</span>
-                            <span class="pdf__body__content__body__content__item__value">{{ $total_citas }}</span>
-                        </div>
-
-                        <div class="pdf__body__content__body__header">
-                            <h2 class="pdf__body__content__body__header__title">Pagos:</h2>
-                        </div>
-
-                        @foreach ($pagos as $pago)
-                            <div class="pdf__body__content__body__content__item">
-                                <span class="pdf__body__content__body__content__item__label">Monto:</span>
-                                <span class="pdf__body__content__body__content__item__value">{{ $pago->price }}</span>
-                            </div>
-                            <div class="pdf__body__content__body__content__item">
-                                <span class="pdf__body__content__body__content__item__label">Fecha:</span>
-                                <span class="pdf__body__content__body__content__item__value">{{ $pago->date }}</span>
-                            </div>
-                        @endforeach
-
-                        <div class="pdf__body__content__body__content__item">
-                            <span class="pdf__body__content__body__content__item__label">Total Pagado:</span>
-                            <span class="pdf__body__content__body__content__item__value">{{ $total_pagado }}</span>
-                        </div>
-                        <div class="pdf__body__content__body__content__item">
-                            <span class="pdf__body__content__body__content__item__label">Total Deuda:</span>
-                            <span class="pdf__body__content__body__content__item__value">{{ $deuda_total }}</span>
-                        </div>
-                        <div class="pdf__body__content__body__content__item">
-                            <span class="pdf__body__content__body__content__item__label">Total Cuotas:</span>
-                            <span class="pdf__body__content__body__content__item__value">{{ $total_cuotas }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-</body>
 <style>
-        *{
-            margin: 0px;
-            padding: 0px;
-        }
+    body {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        color: #333;
+    }
 
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: auto;
-            background: #2F4A99;
-        }
+    .container {
+        width: 100%;
+        padding: 20px;
+        position: relative;
+        z-index: 2;
+    }
 
-        ul li{
-            margin-left: 25px;
-            list-style: disc;
-        }
+    /* MARCA DE AGUA */
+    .watermark {
+        position: fixed;
+        top: 25%;
+        left: 10%;
+        width: 80%;
+        opacity: 0.05;
+        z-index: 0;
+    }
 
-        .header__name {
-            font-size: 30px;
-            color: #0069b3;
-            font-family:'Montserrat-Bold';
-            text-transform: uppercase;
-        }
+    /* HEADER */
+    .header-table {
+        width: 100%;
+        margin-bottom: 15px;
+    }
 
-        .header__sub{
-            color:#484554;
-            font-size: 15px;
-            font-family:'Montserrat-Bold';
-        }
-        .logotipo {
-            width: 90%;
-            position: absolute;
-            top: 15%;
-            left: 6%;
-            z-index: -10;
-            opacity: .05
-        }
+    .logo {
+        width: 150px;
+    }
 
-        .light-signature{
-            font-size:15px;
-            font-family:'Montserrat-Light';
-        }
+    .header-title {
+        text-align: center;
+    }
 
-        #container{
-            margin: 150px auto;
-            width: 600px;
-        }
+    .header-title h1 {
+        margin: 0;
+        color: #2F4A99;
+        font-size: 20px;
+    }
 
-        .header__content {
-            width: 80%;
-            position: relative;
-            margin: 0 auto 0; 
-        }
-        .header-logo {
-            width: 250px;
-            top: 00px;
-            left: -40px;
-            position: absolute
-        }
+    .header-title p {
+        margin: 0;
+        font-size: 12px;
+    }
 
-          .header-logo-big {
-            width: 400px !important;
-            position: relative !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            margin-bottom: -50px !important;
-            display: block !important;
-        }
+    .section {
+        margin-bottom: 15px;
+    }
 
-        .header {
-            text-align: center;
-            z-index: 100;
-        }
+    .section-title {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #2F4A99;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 3px;
+    }
 
-        .separate {
-            width: 100%;
-            height: 5px;
-            margin: 0 auto 5px;
-            background: #0069b3;
-        }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-        .pdf__body {
-            width: 80%;
-            position: relative;
-            z-index: 100;
-            margin: 0 auto 0;
-        }
+    th {
+        background: #2F4A99;
+        color: white;
+        padding: 6px;
+        font-size: 11px;
+    }
 
-        .pdf {
-            width: 100%;
-            background: #F2B201;
-            border-radius: 0 150px 0 150px;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-        }
+    td {
+        padding: 6px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+    }
 
-        .pdf-content {
-            width: 100%;
-            background: #fff;
-            border-radius: 0 180px 0 180px;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-        }
-
-        /* Cuerpo del pdf */
-
-        .paciente__title {
-            color: #484554;
-            text-align: center;
-            font-family:'Montserrat-Bold';
-            font-size: 15px;
-            margin-left: 15px;
-        }
-
-        .paciente__name {
-            background: #fafafa;
-            width: 100%;
-            font-family: 'Montserrat-Light';
-            font-size: 25px;
-            padding: 0 0 10px 0;
-            border: 1px solid;
-            border-radius: 5px;
-        }
-
-        .body-receta {
-            color: #484554;
-            text-align: center;
-            font-family:'Montserrat-Bold';
-            font-size: 25px
-        }
-
-        .body__receta {
-            margin: 10px 0;
-        }
-
-        /* Tabla */
-        table{
-            width: 100%;
-            border-collapse: separate
-        }
-        
-        .body__table {
-            text-align: left;
-            background: #fafafa;
-            border: 1px solid;
-        }
-
-        .border-table-right {
-            border-right: 2px solid
-        }
-
-        .table__head {
-            border-bottom: 1px solid
-        }
-
-        .table__head td {
-            padding: 5px;
-            height: 25px !important;
-            font-family: 'Montserrat-Bold' !important;
-            text-align: center;
-            color: #484554;
-        }
-
-        .table__body {
-            /* padding: 5px; */
-        }
-        .table__body td {
-            padding: 3px 15px;
-            height: 25px !important;
-            border-bottom: 1px solid;
-            text-align: center;
-            color: #495057;
-            font-size: 13px;
-        }
-
-        .body__message {
-            float: right;
-            color: #495057;
-        }
-
-        .columna-1 {
-            text-align: left !important;
-            padding-left: 25px;
-            /* margin-left: 15px !important; */
-        }
-
-        .pdf__footer {
-            width: 100%;
-            position: relative;
-            transform: translateX(-10px);
-            /* top: 59%; */
-            /* left: 0; */
-            margin: 25px auto 0;
-        }
-
-        .footer__contact {
-            float: left;
-            width: 70%;
-            /* padding-right: 15px; */
-        }
-
-
-        .datos__item img{
-            width: 25px;
-        }
-
-        .datos__item{
-        font-size: 13px;
+    /* INFO PACIENTE */
+    .info-table td {
+        width: 33%;
+        background: #fafafa;
+        border: 1px solid #eee;
+        padding: 8px;
         text-align: left;
     }
 
-        .contact__recipe {
-            width: 35%;
-        }
+    .label {
+        font-size: 10px;
+        color: #777;
+    }
 
-        .contact__recipe-item1 {
-            width: 38%;
-            padding: 7px 15px 7px 15px;
-            margin-left: 15px;
-            color: #495057;
-            background: #fafafa;
+    .value {
+        font-size: 12px;
+        font-weight: bold;
+    }
 
-            border-radius: 5px;
-            border: 1px solid;
-            font-size: 13px;
-        }
-        
-        /* Datos de la siguiente consulta */
-        .contact__recipe-item2 {
-            width: 62%;
-            padding: 7px 15px 7px 15px;
-            background: #E6E6E6;
+    /* TOTALES */
+    .totals-table td {
+        width: 33%;
+        background: #2F4A99;
+        color: white;
+        text-align: center;
+        padding: 10px;
+    }
 
-            /* margin-left: 15px; */
-            color: #495057;
-            border-radius: 5px;
-            border: 2px solid
-        }
+    .totals-title {
+        font-size: 10px;
+    }
 
+    .totals-value {
+        font-size: 14px;
+        font-weight: bold;
+    }
 
-        /* datos de contactos */
-        .contact__datos {
-            width: 100%;
-            clear: both;
-            margin-left: 10px;
-            padding-right: 25px;
-        }
+</style>
+</head>
 
-        .contact__datos td{
-            /* padding-right: 15px; */
-        }
+<body>
 
-        .contact__datos thead tr th {
-            text-align: left !important;
-        }
+<!-- MARCA DE AGUA -->
+<img src="{{ public_path('img/logo-reporte.png') }}" class="watermark">
 
-        .icon-redes {
-            margin-top: 8px;
-        }
+<div class="container">
 
-        /* firma  */
-        .footer__firma {
-            width: 25%;
-            top: 0%;
-            right: 0;
-            text-align: center;
-            position: absolute;
-        }
-            .footer__firma img {
-                display: block;
-                width: 350px;
-                top:-0px;
-                position: absolute;
-                right: -75px;
-            }
+    <!-- HEADER -->
+    <table class="header-table">
+        <tr>
+            <td width="30%">
+                <img src="{{ public_path('img/logo-reportee.png') }}" class="logo">
+            </td>
+            <td width="70%" class="header-title">
+                <h1>Reporte de Paquete</h1>
+                <p>CENTRO PSICOLÓGICO EXCELENTEMENTE</p>
+            </td>
+        </tr>
+    </table>
 
-        .font-size-small {
-            font-size: 14px
-        }
+    <!-- PACIENTE -->
+    <div class="section">
+        <div class="section-title">Paciente</div>
 
-        .bg-gray {
-            background: rgba(236, 236, 236, 0.521);
-        }
+        <table class="info-table">
+            <tr>
+                <td>
+                    <div class="label">Nombre</div>
+                    <div class="value">{{ $paciente->nombres }} {{ $paciente->name }}</div>
+                </td>
+                <td>
+                    <div class="label">DNI</div>
+                    <div class="value">{{ $paciente->dni }}</div>
+                </td>
+                <td>
+                    <div class="label">Teléfono</div>
+                    <div class="value">{{ $paciente->phone }}</div>
+                </td>
+            </tr>
+        </table>
+    </div>
 
-        .botica__info{
-            width: 80%;
-            padding: 7px 15px 7px 15px;
-            margin-top: 180px;
-            margin-left: 90px;
-            color: #495057;
-            background: #fafafa;
-            border-radius: 5px;
-            border: 2px solid;
-            text-align: center;
-            font-size: 12px;
-        }
+    <!-- CITAS -->
+    <div class="section">
+        <div class="section-title">Citas</div>
 
-    </style>
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Profesional</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($citas as $cita)
+                    <tr>
+                        <td>{{ $cita->date }}</td>
+                        <td>{{ $cita->professional->name }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="2">No hay citas</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+
+        <p><strong>Total de citas:</strong> {{ $total_citas }}</p>
+    </div>
+
+    <!-- DEUDAS (CRONOGRAMA) -->
+    <div class="section">
+        <div class="section-title">Cronograma de Cuotas Adicionales</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha de Vencimiento</th>
+                    <th>Monto</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($deudas as $deuda)
+                    <tr>
+                        <td>{{ \Carbon\Carbon::parse($deuda->fecha)->format('d/m/Y') }}</td>
+                        <td>S/ {{ $deuda->monto }}</td>
+                        <td>{{ $deuda->estado == 2 ? 'Cancelado' : 'Pendiente' }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3">No hay cuotas programadas (Pago al contado o sin cronograma)</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PAGOS -->
+    <div class="section">
+        <div class="section-title">Historial de Pagos Recibidos</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Monto</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($pagos as $pago)
+                    <tr>
+                        <td>{{ $pago->date }}</td>
+                        <td>S/ {{ $pago->price }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="2">No hay pagos</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <!-- TOTALES -->
+    <div class="section">
+        <table class="totals-table">
+            <tr>
+                <td>
+                    <div class="totals-title">Total Pagado</div>
+                    <div class="totals-value">S/ {{ $total_pagado }}</div>
+                </td>
+                <td>
+                    <div class="totals-title">Deuda Total</div>
+                    <div class="totals-value">S/ {{ $deuda_total }}</div>
+                </td>
+                <td>
+                    <div class="totals-title">Total Cuotas</div>
+                    <div class="totals-value">{{ $total_cuotas }}</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+</body>
 </html>

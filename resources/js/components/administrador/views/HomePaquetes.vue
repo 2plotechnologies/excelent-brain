@@ -4,7 +4,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4 mt-2 header-section">
       <div class="d-flex align-items-center gap-3">
         <h1 class="h3 mb-0 text-gray-800 fw-bold d-flex align-items-center">
-          <i class="fas fa-box-open text-primary me-2"></i> Paquetes Administrador
+          <i class="fas fa-box-open text-primary me-2"></i> Paquetes & Sesiones
         </h1>
         <div class="deudas-badge" v-if="metricas.vencidas > 0">
           <i class="fas fa-user-times me-1"></i> Deudas
@@ -25,6 +25,9 @@
           @input="filtrarPaquetes"
         >
       </div>
+      <button class="btn btn-success fw-bold flex-shrink-0 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalMembresias">
+        <i class="fas fa-plus me-1"></i> Nuevo Paquete
+      </button>
     </div>
 
     <!-- Tarjetas de Métricas -->
@@ -310,6 +313,8 @@
       </div>
     </div>
 
+    <ModalMembresias :idUsuario="idUsuario" vista="buscar" @membresiaGuardada="cargarPaquetes(1)"></ModalMembresias>
+
     <!-- Paginación -->
     <div class="d-flex justify-content-center mt-4" v-if="pagination.last_page > 1">
       <nav aria-label="Page navigation">
@@ -332,8 +337,13 @@
 </template>
 
 <script>
+import ModalMembresias from '../../recepcionista/components/pagos/ModalMembresias.vue';
+
 export default {
   name: 'HomePaquetes',
+  components: {
+    ModalMembresias
+  },
   data() {
     return {
       paquetesFiltrados: [],

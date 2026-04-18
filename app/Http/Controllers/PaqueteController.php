@@ -27,6 +27,7 @@ class PaqueteController extends Controller
             ->leftJoin('users as u', 'u.id', '=', 'membresias.user_id')
             ->select(
                 'membresias.*',
+                'membresias.cuotas as total_cuotas_reales',
                 'pt.name as patient_name',
                 'pt.nombres as patient_nombres',
                 'pt.dni as patient_dni',
@@ -105,10 +106,9 @@ class PaqueteController extends Controller
                     }
                 }
             }
-            
             $membresia->debe = $deuda_total;
             $membresia->cuotas_vencidas = $cuotas_vencidas;
-            $membresia->total_cuotas = count($deudas) + count($pagos); 
+            $membresia->total_cuotas = $membresia->total_cuotas_reales; 
             $membresia->deudas = clone $deudas;
             
             // La primera cita está al final de la colección (ya que está ordenada por fecha desc)
@@ -142,7 +142,9 @@ class PaqueteController extends Controller
                 'm.inicio',
                 'm.fin',
                 'm.estado',
+                'm.cuotas',
                 'm.descuento',
+                'm.monto as precio_base',
                 'm.registro',
                 'pt.name as patient_name',
                 'pt.nombres as patient_nombres',
@@ -186,7 +188,7 @@ class PaqueteController extends Controller
         
         $membresia->debe = $deuda_total;
         $membresia->cuotas_vencidas = $cuotas_vencidas;
-        $membresia->total_cuotas = count($deudas) + count($pagos); 
+        $membresia->total_cuotas = $membresia->cuotas; 
         $membresia->deudas = clone $deudas;
         
         // La primera cita está al final de la colección (ya que está ordenada por fecha desc)
@@ -211,7 +213,7 @@ class PaqueteController extends Controller
             'deudas' => $deudas,
             'cuotas_vencidas' => $cuotas_vencidas,
             'deuda_total' => $deuda_total,
-            'total_cuotas' => $pagos->count() + $deudas->count(),
+            'total_cuotas' => $membresia->cuotas,
             'total_citas' => $citas->count(),
             'total_pagado' => $pagos->sum('price'),
             'status_name' => $membresia->status_name,

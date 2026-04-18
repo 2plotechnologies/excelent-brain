@@ -618,6 +618,20 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "nav-link",
     attrs: {
+      to: "/recepcionista/paquetes"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-box-open"
+  }), _vm._v(" "), _c("span", [_vm._v("Paquetes")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "nav-item nav__list",
+    on: {
+      click: function click($event) {
+        return _vm.activeSidebar();
+      }
+    }
+  }, [_c("router-link", {
+    staticClass: "nav-link",
+    attrs: {
       to: "/recepcionista/pacientes/seguimiento"
     }
   }, [_c("i", {

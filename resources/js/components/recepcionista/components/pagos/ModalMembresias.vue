@@ -375,9 +375,11 @@ export default {
 				this.$swal({
 					title: 'Se guardó la membresía',
 					showConfirmButton: false,
-					icon:'success'
-				})
+					icon:'success',
+					timer: 1000
+				});
 				alertify.notify('<i class="fa-regular fa-calendar-check"></i> Membresía guardada', 'success', 10);
+				this.$emit('membresiaGuardada');
 			} else
 				alertify.notify('<i class="fa-regular fa-bomb"></i> Hubo un error guardando', 'danger', 10);
 			

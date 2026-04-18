@@ -726,6 +726,9 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     evoluciones: function evoluciones() {
       this.evolution.type = this.dataUser.profession === 'Psiquiatra' ? 1 : 2, this.evolution.date = (0,_helpers_Time_js__WEBPACK_IMPORTED_MODULE_4__.dateNow)(), this.evolution.schedule = this.getTiempo(), this.evolution.professional_id = this.dataUser.id;
     },
+    refreshEvoluciones: function refreshEvoluciones() {
+      this.getHistories();
+    },
     addCie: function addCie() {
       var verify = true;
       if (this.datosConsulta.cies.length === 0) {
@@ -907,10 +910,32 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }))();
     },
     dondeEsta: function dondeEsta(tips) {
+      var tipoColores = {
+        1: 'evolucionPsiquiatria',
+        2: 'evolucionPsicologia',
+        3: 'evolucionTipo3',
+        4: 'evolucionTipo4',
+        5: 'evolucionTipo5',
+        6: 'evolucionTipo6',
+        7: 'evolucionTerapista',
+        8: 'evolucionTipo8'
+      };
+      if (tipoColores[tips]) return tipoColores[tips];
       var valor = null;
       if (valor = this.evolucionPsiquiatria.indexOf(tips) > -1) return 'evolucionPsiquiatria';else if (valor = this.evolucionPsicologia.indexOf(tips) > -1) return 'evolucionPsicologia';else if (valor = this.evolucionTerapista.indexOf(tips) > -1) return 'evolucionTerapista';else if (valor = this.evolucionTecnologo.indexOf(tips) > -1) return 'evolucionTecnologo';else if (valor = this.evolucionNutricion.indexOf(tips) > -1) return 'evolucionNutricion';else return 'evoOtro';
     },
     dondeEsta2: function dondeEsta2(tips) {
+      var tipoNombres = {
+        1: 'Psiquiatría',
+        2: 'Psicología',
+        3: 'Certificado',
+        4: 'Kurame',
+        5: 'Membresía',
+        6: 'Nutrición',
+        7: 'Terapista',
+        8: 'Otro'
+      };
+      if (tipoNombres[tips]) return tipoNombres[tips];
       var valor = null;
       if (valor = this.evolucionPsiquiatria.indexOf(tips) > -1) return 'Psiquiatría';else if (valor = this.evolucionPsicologia.indexOf(tips) > -1) return 'Psicología';else if (valor = this.evolucionTerapista.indexOf(tips) > -1) return 'Terapista';else if (valor = this.evolucionTecnologo.indexOf(tips) > -1) return 'Tec. Médico';else if (valor = this.evolucionNutricion.indexOf(tips) > -1) return 'Nutrición';else return 'Otro sin especificar';
     },
@@ -1238,6 +1263,9 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   props: ['idPaciente', 'idProfesional'],
+  mounted: function mounted() {
+    this.pedirArchivos();
+  },
   watch: {
     idPaciente: function idPaciente() {
       this.pedirArchivos();
@@ -1846,11 +1874,13 @@ __webpack_require__.r(__webpack_exports__);
   props: {
     datosModal: Object
   },
+  emits: ['evolutionUpdated'],
   methods: {
     editEvolution: function editEvolution() {
       var _this = this;
       this.axios.post('/api/editEvolution', this.datosModal).then(function (res) {
         _this.$swal(res.data.msg);
+        _this.$emit('evolutionUpdated', _this.datosModal);
       });
     }
   }
@@ -2097,6 +2127,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   title: 'Evolución guardada exitosamente',
                   icon: 'success'
                 });
+                _this2.$emit('evolutionUpdated', _this2.datosModal);
               })["catch"](function (err) {
                 if (err.response.status == 500) {
                   _this2.$swal({
@@ -2149,6 +2180,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   props: {
     datosModal: Object
   },
+  emits: ['evolutionUpdated'],
   computed: {
     updatedData: function updatedData() {
       this.datos = this.datosModal;
@@ -4449,7 +4481,7 @@ var render = function render() {
       staticClass: "card-evolution"
     }, [_c("div", {
       staticClass: "historia-info"
-    }, [_c("p", [_c("b", [_vm._v("Clase:")]), _vm._v(" " + _vm._s(evolution.type_evolution ? evolution.type_evolution.clasificacion : "Sin asignar"))]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Profesional:")]), _vm._v(" " + _vm._s(evolution.professional ? evolution.professional.name : "Sin asignar") + " ")]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Diagnóstico: ")]), _vm._v(" " + _vm._s(evolution ? _vm.maxStringCharacter(evolution.content, 50) : "...") + " ")])]), _vm._v(" "), _c("div", {
+    }, [_c("p", [_c("b", [_vm._v("Clase:")]), _vm._v(" " + _vm._s(evolution.clasificacion_combinada || (evolution.type_evolution ? evolution.type_evolution.clasificacion : "Sin asignar")))]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Profesional:")]), _vm._v(" " + _vm._s(evolution.professional ? evolution.professional.name : "Sin asignar") + " ")]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Diagnóstico: ")]), _vm._v(" " + _vm._s(evolution ? _vm.maxStringCharacter(evolution.content, 50) : "...") + " ")])]), _vm._v(" "), _c("div", {
       staticClass: "card-evolution__image d-none"
     }, [_c("img", {
       staticClass: "card-evolution-image",
@@ -4578,10 +4610,16 @@ var render = function render() {
   }), 0)])])])])]), _vm._v(" "), _c("updated-modal", {
     attrs: {
       datosModal: _vm.dataModal
+    },
+    on: {
+      evolutionUpdated: _vm.refreshEvoluciones
     }
   }), _vm._v(" "), _c("edit-modal", {
     attrs: {
       datosModal: _vm.dataModal
+    },
+    on: {
+      evolutionUpdated: _vm.refreshEvoluciones
     }
   }), _vm._v(" "), _c("modalVerDetalle", {
     attrs: {
@@ -8472,7 +8510,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.evolucionPsiquiatria .card-header[data-v-10302f26]{ background: #e74a3b\n}\n.evolucionPsicologia .card-header[data-v-10302f26]{ background: #4e73df\n}\n.evolucionTerapista .card-header[data-v-10302f26]{ background: #46fd83\n}\n.evolucionTecnologo .card-header[data-v-10302f26]{ background: #ff8c4a\n}\n.evolucionNutricion .card-header[data-v-10302f26]{ background: #ffde4a\n}\n.evoOtro .card-header[data-v-10302f26]{ background: rgb(88, 88, 107)}\n.tarjeta .card-header[data-v-10302f26]:hover {\r\n\tcursor: pointer;\n}\nh4[data-v-10302f26] {\r\n\tfont-weight: 500;\n}\n#cardPerfil .badge[data-v-10302f26]{cursor:pointer;}\n.btn--edit[data-v-10302f26] {\r\n\twidth: 95%;\r\n\tmax-width: 180px;\r\n\tdisplay: block;\r\n\tbackground: #6236FF;\r\n\tborder: none;\r\n\tborder-radius: 5px;\r\n\tpadding: 5px 0;\r\n\toutline: none;\r\n\tcolor: #fff;\r\n\tborder: 5px;\n}\n.btn--iteration[data-v-10302f26]:active {\r\n\ttransform: scale(.95);\n}\n.ques[data-v-10302f26] {\r\n\theight: 44px;\r\n\toverflow: hidden;\r\n\ttransition: height .5s ease;\n}\n.collapse[data-v-10302f26] {\r\n\tpadding: 10px;\r\n\tbackground: rgba(235, 235, 235, 0.37);\r\n\tcursor: pointer;\n}\n.collapse__paragraph[data-v-10302f26] {\r\n\tpadding: 10px;\r\n\tcursor: pointer;\r\n\t-webkit-user-select: none;\r\n\t   -moz-user-select: none;\r\n\t        user-select: none;\n}\n.collpase__textarea[data-v-10302f26] {\r\n\tpadding: 10px;\r\n\theight: 80%;\n}\n.collapse[data-v-10302f26]:hover {\r\n\tbackground: rgba(231, 231, 231, 0.788);\n}\n.collpase__textarea textarea[data-v-10302f26] {\r\n\tmin-height: 120px !important;\r\n\tmax-height: 100% !important;\n}\r\n\r\n/*.card-evolution {\r\n\t display: grid;\r\n    grid-template-columns: 70% 1fr;\r\n    place-items: center;\r\n    grid-gap: 25px; \r\n}*/\n.card-evolution__image[data-v-10302f26] {\r\n\twidth: 100%;\n}\n.historia-info[data-v-10302f26] {\r\n\twidth: 100%;\n}\n.card-evolution-image[data-v-10302f26] {\r\n\twidth: 100%;\n}\n.flex-gap[data-v-10302f26] {\r\n\tgap: 25px;\n}\n.cie-content[data-v-10302f26] {\r\n\twidth: 100%;\r\n\tbackground-color: #fff;\r\n\tborder: .3px solid #22222260;\r\n\tvisibility: hidden;\r\n\tposition: absolute;\r\n\tz-index: 10000;\r\n\ttransition: visibility 1s normal 3s;\n}\n#diagnostico:focus~.cie-content[data-v-10302f26] {\r\n\tvisibility: visible;\r\n\t/* display: block !important; */\n}\n.cie-item[data-v-10302f26]:active {\r\n\tvisibility: visible;\r\n\topacity: 0;\r\n\t/* display: block !important; */\n}\n.flex-gap[data-v-10302f26] {\r\n\tgap: 15px;\n}\n.pointer[data-v-10302f26] {\r\n\tcursor: pointer;\n}\n.cie--hover[data-v-10302f26]:hover:not(.cie-danger) {\r\n\tbackground: rgb(236, 236, 236);\n}\n.cie-danger[data-v-10302f26] {\r\n\tbackground: rgb(255, 207, 207);\r\n\tcursor: no-drop;\n}\n.diagnostico-input[data-v-10302f26] {\r\n\toverflow: auto;\r\n\theight: 100%;\r\n\tmin-height: 320px;\r\n\tpadding-bottom: 50px;\r\n\t/* min-height: 150px; */\n}\n.update-diagnostic[data-v-10302f26] {\r\n\ttop: 0;\r\n\tright: 0;\r\n\tbottom: 0;\n}\n@media screen and (max-width: 750px) {\n.card-evolution[data-v-10302f26] {\r\n\t\tgrid-template-columns: 1fr;\n}\n.card-evolution__image[data-v-10302f26] {\r\n\t\tdisplay: none;\n}\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.evolucionPsiquiatria .card-header[data-v-10302f26], .evolucionTipo1 .card-header[data-v-10302f26]{ background: #e74a3b\n}\n.evolucionPsicologia .card-header[data-v-10302f26], .evolucionTipo2 .card-header[data-v-10302f26]{ background: #4e73df\n}\n.evolucionTerapista .card-header[data-v-10302f26], .evolucionTipo7 .card-header[data-v-10302f26]{ background: #9b59b6\n}\n.evolucionTecnologo .card-header[data-v-10302f26], .evolucionTipo3 .card-header[data-v-10302f26]{ background: #2ecc71\n}\n.evolucionTipo4 .card-header[data-v-10302f26]{ background: #808000\n}\n.evolucionTipo5 .card-header[data-v-10302f26]{ background: #ff8c00\n}\n.evolucionTipo6 .card-header[data-v-10302f26]{ background: #f1c40f\n}\n.evolucionTipo8 .card-header[data-v-10302f26]{ background: #ff69b4\n}\n.evoOtro .card-header[data-v-10302f26]{ background: rgb(88, 88, 107)}\n.tarjeta .card-header[data-v-10302f26]:hover {\r\n\tcursor: pointer;\n}\nh4[data-v-10302f26] {\r\n\tfont-weight: 500;\n}\n#cardPerfil .badge[data-v-10302f26]{cursor:pointer;}\n.btn--edit[data-v-10302f26] {\r\n\twidth: 95%;\r\n\tmax-width: 180px;\r\n\tdisplay: block;\r\n\tbackground: #6236FF;\r\n\tborder: none;\r\n\tborder-radius: 5px;\r\n\tpadding: 5px 0;\r\n\toutline: none;\r\n\tcolor: #fff;\r\n\tborder: 5px;\n}\n.btn--iteration[data-v-10302f26]:active {\r\n\ttransform: scale(.95);\n}\n.ques[data-v-10302f26] {\r\n\theight: 44px;\r\n\toverflow: hidden;\r\n\ttransition: height .5s ease;\n}\n.collapse[data-v-10302f26] {\r\n\tpadding: 10px;\r\n\tbackground: rgba(235, 235, 235, 0.37);\r\n\tcursor: pointer;\n}\n.collapse__paragraph[data-v-10302f26] {\r\n\tpadding: 10px;\r\n\tcursor: pointer;\r\n\t-webkit-user-select: none;\r\n\t   -moz-user-select: none;\r\n\t        user-select: none;\n}\n.collpase__textarea[data-v-10302f26] {\r\n\tpadding: 10px;\r\n\theight: 80%;\n}\n.collapse[data-v-10302f26]:hover {\r\n\tbackground: rgba(231, 231, 231, 0.788);\n}\n.collpase__textarea textarea[data-v-10302f26] {\r\n\tmin-height: 120px !important;\r\n\tmax-height: 100% !important;\n}\r\n\r\n/*.card-evolution {\r\n\t display: grid;\r\n    grid-template-columns: 70% 1fr;\r\n    place-items: center;\r\n    grid-gap: 25px; \r\n}*/\n.card-evolution__image[data-v-10302f26] {\r\n\twidth: 100%;\n}\n.historia-info[data-v-10302f26] {\r\n\twidth: 100%;\n}\n.card-evolution-image[data-v-10302f26] {\r\n\twidth: 100%;\n}\n.flex-gap[data-v-10302f26] {\r\n\tgap: 25px;\n}\n.cie-content[data-v-10302f26] {\r\n\twidth: 100%;\r\n\tbackground-color: #fff;\r\n\tborder: .3px solid #22222260;\r\n\tvisibility: hidden;\r\n\tposition: absolute;\r\n\tz-index: 10000;\r\n\ttransition: visibility 1s normal 3s;\n}\n#diagnostico:focus~.cie-content[data-v-10302f26] {\r\n\tvisibility: visible;\r\n\t/* display: block !important; */\n}\n.cie-item[data-v-10302f26]:active {\r\n\tvisibility: visible;\r\n\topacity: 0;\r\n\t/* display: block !important; */\n}\n.flex-gap[data-v-10302f26] {\r\n\tgap: 15px;\n}\n.pointer[data-v-10302f26] {\r\n\tcursor: pointer;\n}\n.cie--hover[data-v-10302f26]:hover:not(.cie-danger) {\r\n\tbackground: rgb(236, 236, 236);\n}\n.cie-danger[data-v-10302f26] {\r\n\tbackground: rgb(255, 207, 207);\r\n\tcursor: no-drop;\n}\n.diagnostico-input[data-v-10302f26] {\r\n\toverflow: auto;\r\n\theight: 100%;\r\n\tmin-height: 320px;\r\n\tpadding-bottom: 50px;\r\n\t/* min-height: 150px; */\n}\n.update-diagnostic[data-v-10302f26] {\r\n\ttop: 0;\r\n\tright: 0;\r\n\tbottom: 0;\n}\n@media screen and (max-width: 750px) {\n.card-evolution[data-v-10302f26] {\r\n\t\tgrid-template-columns: 1fr;\n}\n.card-evolution__image[data-v-10302f26] {\r\n\t\tdisplay: none;\n}\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

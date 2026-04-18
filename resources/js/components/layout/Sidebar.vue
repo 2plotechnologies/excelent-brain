@@ -290,6 +290,13 @@
 						</li>
 
 						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link  to="/recepcionista/paquetes" class="nav-link">
+										<i class="fas fa-box-open"></i>
+										<span>Paquetes</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
 								<router-link  to="/recepcionista/pacientes/seguimiento" class="nav-link">
 										<i class="fa-solid fa-heart-circle-check"></i>
 										<span>Seguimiento</span>

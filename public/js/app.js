@@ -7800,9 +7800,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 }
                 if (_this2.caso.pago == '3' || _this2.caso.pago == 3) {
                   _this2.caso.pago = 1;
-                  _this2.cita.payment.pay_status = _this2.caso.pago;
-                  _this2.cita.payment.adelanto = _this2.caso.monto_adelanto;
-                  //this.$emit('actualizarAdelanto', this.caso.monto_adelanto)
+                  _this2.dataCita.payment.pay_status = _this2.caso.pago;
+                  _this2.dataCita.payment.adelanto = parseFloat(_this2.dataCita.payment.adelanto || 0) + parseFloat(_this2.caso.monto_adelanto);
+                  _this2.dataCita.payment.price = parseFloat(_this2.dataCita.payment.price) - parseFloat(_this2.caso.monto_adelanto);
+                  _this2.$emit('actualizarAdelanto', _this2.caso.monto_adelanto, _this2.dataCita.id);
                 }
               })["catch"](function (err) {
                 console.error(err);
@@ -8467,6 +8468,16 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         this.hoursProfessional = [];
         this.schedulesInvalid = [];
         this.horariosAll = [];
+      }
+    },
+    actualizarAdelantoTable: function actualizarAdelantoTable(adelanto, citaId) {
+      var cita = this.citas.find(function (c) {
+        var _c$payment;
+        return c.id === citaId || ((_c$payment = c.payment) === null || _c$payment === void 0 ? void 0 : _c$payment.id) === citaId;
+      });
+      if (cita && cita.payment) {
+        cita.payment.price = parseFloat(cita.payment.price) - parseFloat(adelanto);
+        cita.payment.adelanto = parseFloat(cita.payment.adelanto || 0) + parseFloat(adelanto);
       }
     },
     changeMode: function changeMode(id) {
@@ -9144,9 +9155,15 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       // El modal de bootstrap 5 ya maneja la transición por los atributos data-bs, pero asignamos datos.
     },
     // ----- METODOS VIEJOS COMPATIBILIDAD -----
-    actualizarAdelanto: function actualizarAdelanto(adelanto) {
-      this.horasMalas[this.indexElegido].payment.price = parseFloat(this.horasMalas[this.indexElegido].payment.price) - parseFloat(adelanto);
-      this.horasMalas[this.indexElegido].payment.adelanto = parseFloat(this.horasMalas[this.indexElegido].payment.adelanto) + parseFloat(adelanto);
+    actualizarAdelanto: function actualizarAdelanto(adelanto, citaId) {
+      var cita = this.horasMalas.find(function (h) {
+        var _h$payment;
+        return h.id === citaId || ((_h$payment = h.payment) === null || _h$payment === void 0 ? void 0 : _h$payment.id) === citaId;
+      });
+      if (cita && cita.payment) {
+        cita.payment.price = parseFloat(cita.payment.price) - parseFloat(adelanto);
+        cita.payment.adelanto = parseFloat(cita.payment.adelanto || 0) + parseFloat(adelanto);
+      }
     },
     validarYEliminar: function validarYEliminar(id) {
       var _this4 = this;
@@ -15650,6 +15667,9 @@ var render = function render() {
     attrs: {
       cita: _vm.cita,
       idUsuario: _vm.idUsuario
+    },
+    on: {
+      actualizarAdelanto: _vm.actualizarAdelantoTable
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita ? _c("modal-estado", {
     attrs: {
@@ -15914,7 +15934,16 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-sync"
-  }), _vm._v(" Actualizar")])])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" Actualizar")])]), _vm._v(" "), _c("div", {
+    staticClass: "col-auto ms-auto"
+  }, [_c("router-link", {
+    staticClass: "btn btn-primary font-weight-bold shadow-sm",
+    attrs: {
+      to: "/recepcionista/paquetes"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-box-open"
+  }), _vm._v(" Paquetes")])], 1)]), _vm._v(" "), _c("div", {
     staticClass: "d-flex mb-3 gap-2 flex-wrap"
   }, [_c("button", {
     staticClass: "btn btn-sm rounded-pill font-weight-bold",
@@ -16975,6 +17004,10 @@ var routes = [{
     path: 'limbo',
     name: 'limbo',
     component: HomeLimbo
+  }, {
+    path: 'paquetes',
+    name: 'paquetesRecepcionista',
+    component: HomePaquetes
   }]
 }, {
   path: '/:pathMedia(.*)',
