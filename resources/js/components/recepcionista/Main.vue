@@ -1,5 +1,5 @@
 <template>
-   <div id="wrapper">
+   <div id="wrapper" class="recepcion-theme">
         <side-bar :rolUser="rol"></side-bar>
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
@@ -42,3 +42,25 @@ export default{
     }
 }
 </script>
+
+<style>
+.recepcion-theme .recepcion-sidebar {
+    background-color: #0f1729 !important;
+    background-image: none !important;
+}
+
+.recepcion-theme .btn-primary {
+    background-color: #3B82F6;
+    border-color: #3B82F6;
+}
+
+.recepcion-theme .btn-primary:hover,
+.recepcion-theme .btn-primary:focus,
+.recepcion-theme .btn-primary:active,
+.recepcion-theme .btn-primary:not(:disabled):not(.disabled).active,
+.recepcion-theme .show > .btn-primary.dropdown-toggle,
+.recepcion-theme .btn-primary:not(:disabled):not(.disabled):active {
+    background-color: #2563EB;
+    border-color: #2563EB;
+}
+</style>

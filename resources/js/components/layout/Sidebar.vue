@@ -3,7 +3,7 @@
 		class="navbar-nav sidebar sidebar-dark accordion d-print-none"
 		:class="{ 'bg-warning': rolUser === 'profesional',
 		'bg-dark': rolUser === 'administrador',
-		'bg-success': rolUser === 'recepcionista',
+		'recepcion-sidebar': rolUser === 'recepcionista',
 		'bg-danger': rolUser === 'interno'}"
 		id="accordionSidebar">
 				<!-- Rol del admin -->
