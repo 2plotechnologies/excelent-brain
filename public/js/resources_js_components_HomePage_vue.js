@@ -220,6 +220,9 @@ var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c("main", [_c("div", {
+    "class": {
+      "recepcion-theme": _vm.currentUser.rol === "recepcionista"
+    },
     attrs: {
       id: "wrapper"
     }
@@ -369,7 +372,7 @@ var render = function render() {
     "class": {
       "bg-warning": _vm.rolUser === "profesional",
       "bg-dark": _vm.rolUser === "administrador",
-      "bg-success": _vm.rolUser === "recepcionista",
+      "recepcion-sidebar": _vm.rolUser === "recepcionista",
       "bg-danger": _vm.rolUser === "interno"
     },
     attrs: {
@@ -918,7 +921,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.alertify-notifier .ajs-message{\r\n\tbackground: rgb(8 8 8 / 95%)!;\r\n    color: #fff!important;\r\n    text-align: left!important;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.alertify-notifier .ajs-message{\r\n\tbackground: rgb(8 8 8 / 95%) !important;\r\n    color: #fff!important;\r\n    text-align: left!important;\n}\r\n\r\n/* Tema Recepción */\n.recepcion-theme .recepcion-sidebar {\r\n    background-color: #0f1729 !important;\r\n    background-image: none !important;\n}\n.recepcion-theme .btn-primary {\r\n    background-color: #3B82F6 !important;\r\n    border-color: #3B82F6 !important;\n}\n.recepcion-theme .btn-primary:hover,\r\n.recepcion-theme .btn-primary:focus,\r\n.recepcion-theme .btn-primary:active,\r\n.recepcion-theme .btn-primary:not(:disabled):not(.disabled).active,\r\n.recepcion-theme .show > .btn-primary.dropdown-toggle,\r\n.recepcion-theme .btn-primary:not(:disabled):not(.disabled):active {\r\n    background-color: #2563EB !important;\r\n    border-color: #2563EB !important;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
