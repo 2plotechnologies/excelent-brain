@@ -19,10 +19,11 @@ use App\Models\Relative;
 use App\Models\Medical_evolution;
 use App\Models\Payment_method;
 use App\Models\Precio;
+use App\Models\Membresia;
 use App\Models\Reschedule;
 use App\Models\Schedule;
 use App\Models\Triaje;
-use Barryvdh\DomPDF\Facade as PDF;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Faker\Provider\ar_SA\Payment as Ar_SAPayment;
 use Illuminate\Support\Facades\App;
 use PhpParser\Node\Stmt\TryCatch;
@@ -140,6 +141,10 @@ class AppointmentController extends Controller
 
 			$paciente_prueba = Patient::where('dni',$request->get('dni'))->first();
 
+            $scheduleInfo = Schedule::find($request->get('schedule_id'));
+            $hora_inicio = $scheduleInfo ? $scheduleInfo->check_time : null;
+            $hora_fin = $scheduleInfo ? $scheduleInfo->departure_date : null;
+            $duracion = ($hora_inicio && $hora_fin) ? \Carbon\Carbon::parse($hora_fin)->diffInMinutes(\Carbon\Carbon::parse($hora_inicio)) : null;
 
 		/* $condition = Patient::where('dni', '=', $request->dni)
 		->with('medical_evolutions')
@@ -217,7 +222,10 @@ class AppointmentController extends Controller
 				'status'=> 1,
 				'patient_id' => $patient->id,
 				'formato_nuevo' => $request->get('formato_nuevo'),
-				'recomendacion_comentario' => $request->get('recomendacion_comentario')
+				'recomendacion_comentario' => $request->get('recomendacion_comentario'),
+				'hora_inicio' => $hora_inicio,
+				'hora_fin' => $hora_fin,
+				'duracion' => $duracion
 			]);
 
 			$payment = Payment::create([
@@ -280,7 +288,10 @@ class AppointmentController extends Controller
 				'status'=> 1,
 				'patient_id' => $paciente_prueba->id,
 				'formato_nuevo' => $request->get('formato_nuevo'),
-				'recomendacion_comentario' => $request->get('recomendacion_comentario')
+				'recomendacion_comentario' => $request->get('recomendacion_comentario'),
+				'hora_inicio' => $hora_inicio,
+				'hora_fin' => $hora_fin,
+				'duracion' => $duracion
 			]);
 
 			$payment = Payment::create([
@@ -805,6 +816,11 @@ class AppointmentController extends Controller
 		
 		//return var_dump( $cita->id ); die();
 
+		$scheduleInfo = Schedule::find($request->get('schedule_id'));
+		$hora_inicio = $scheduleInfo ? $scheduleInfo->check_time : null;
+		$hora_fin = $scheduleInfo ? $scheduleInfo->departure_date : null;
+		$duracion = ($hora_inicio && $hora_fin) ? \Carbon\Carbon::parse($hora_fin)->diffInMinutes(\Carbon\Carbon::parse($hora_inicio)) : null;
+
 		$nuevaCita = Appointment::create([
 			'professional_id' => $request->get('professional_id'),
 			'date' => $request->get('date'),
@@ -819,7 +835,10 @@ class AppointmentController extends Controller
 			'patient_id' =>$request->get('patient_id'),
 			'idMembresia' =>$request->get('idMembresia'),
 			'num_sesion' =>$request->get('num_sesion'),
-			'formato_nuevo' => 1
+			'formato_nuevo' => 1,
+			'hora_inicio' => $hora_inicio,
+			'hora_fin' => $hora_fin,
+			'duracion' => $duracion
 		]);
 		$cita->update([
 			'status' => 4,
@@ -973,6 +992,21 @@ class AppointmentController extends Controller
 			}
 			
 			updateFieldStatus($appointment, $valueStatus);
+			
+			// Si la cita pertenece a un paquete/membresia, auto-completar si cumple las sesiones indicadas
+			if ($appointment->idMembresia && $appointment->idMembresia > 0) {
+				$membresia = Membresia::find($appointment->idMembresia);
+				if ($membresia && $membresia->estado == 2) {
+					$precio = Precio::find($membresia->tipo);
+					if ($precio) {
+						$realizadas = Appointment::where('idMembresia', $membresia->id)->where('status', 2)->count();
+						if ($realizadas >= $precio->sesiones) {
+							$membresia->estado = 3; // 3 = Completado
+							$membresia->save();
+						}
+					}
+				}
+			}
 		}else{
 			updateFieldStatus($appointment, $valueStatus);
 		}
@@ -1326,12 +1360,33 @@ class AppointmentController extends Controller
 
 	public function intercambiar(Request $request){
 		$horaTemporal = $request->input('horaPrimero');
+		$horaElegido = $request->input('horaElegido');
 
 		$cita = Appointment::find($request->input('idPrimero'));
-		$cita->update([ 'schedule_id' =>  $request->input('horaElegido') ]);
+
+		$dataCita1 = [ 'schedule_id' =>  $horaElegido ];
+		if ($horaElegido) {
+			$s1 = Schedule::find($horaElegido);
+			if ($s1) {
+				$dataCita1['hora_inicio'] = $s1->check_time;
+				$dataCita1['hora_fin'] = $s1->departure_date;
+				$dataCita1['duracion'] = \Carbon\Carbon::parse($s1->departure_date)->diffInMinutes(\Carbon\Carbon::parse($s1->check_time));
+			}
+		}
+		$cita->update($dataCita1);
 
 		$cita2 = Appointment::find($request->input('idElegido'));
-		$cita2->update([ 'schedule_id' => $horaTemporal ]);
+		
+		$dataCita2 = [ 'schedule_id' => $horaTemporal ];
+		if ($horaTemporal) {
+			$s2 = Schedule::find($horaTemporal);
+			if ($s2) {
+				$dataCita2['hora_inicio'] = $s2->check_time;
+				$dataCita2['hora_fin'] = $s2->departure_date;
+				$dataCita2['duracion'] = \Carbon\Carbon::parse($s2->departure_date)->diffInMinutes(\Carbon\Carbon::parse($s2->check_time));
+			}
+		}
+		$cita2->update($dataCita2);
 
 		return response()->json(['mensaje' => 'se actualizó la cita']);
 

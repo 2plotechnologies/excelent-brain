@@ -6,7 +6,7 @@ use App\Models\Appointment;
 use App\Models\Extra_payment;
 use App\Models\Payment;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade as PDF;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Calculation\TextData\Extract;
 

@@ -235,7 +235,7 @@ export default {
 
   updated() {
     //this.updateValues;
-		//console.log('ver paciente rel ',this.dataPatient.relative)
+		//console.log('ver paciente rel ',this.dataPatient.relative);
   },
 
   created () {

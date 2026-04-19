@@ -1,203 +1,126 @@
 <template>
 	<div class="container-fluid p-2">
+		<!-- Controles superiores -->
 		<div class="row mb-3 gx-3 align-items-center">
-			<div class="col-auto"><input type="date" class="form-control shadow-sm" v-model="fecha" @change="obtenerHorarios()"></div>
-			<div class="col-auto"><button class="btn btn-outline-primary mx-2 border-0" @click="verHorariosAyer()"><i class="fas fa-history"></i> Ayer</button></div>
-			<div class="col-auto"><button class="btn btn-outline-primary mx-2 border-0" @click="verHorariosHoy()"><i class="fa-regular fa-clock"></i> Hoy</button></div>
-			<div class="col-auto"><button class="btn btn-outline-secondary mx-2 border-0" @click="verHorariosMañana()"><i class="far fa-hourglass"></i> Mañana</button></div>
-			<div class="col-auto"><button class="btn btn-outline-secondary mx-2 border-0" @click="verHorariosMañana()"><i class="far fa-hourglass"></i> Pasado Mañana</button></div>
+			<div class="col-auto"><input type="date" class="form-control shadow-sm font-weight-bold" v-model="fecha" @change="obtenerHorarios()"></div>
+			<div class="col-auto"><button class="btn btn-outline-primary mx-1 border-0 font-weight-bold" @click="verHorariosAyer()"><i class="fas fa-chevron-left"></i> Ayer</button></div>
+			<div class="col-auto"><button class="btn btn-outline-primary mx-1 border-0 font-weight-bold" @click="verHorariosHoy()"><i class="fa-regular fa-clock"></i> Hoy</button></div>
+			<div class="col-auto"><button class="btn btn-outline-primary mx-1 border-0 font-weight-bold" @click="verHorariosMañana()">Mañana <i class="fas fa-chevron-right"></i></button></div>
 			<div class="col-auto"><button class="btn btn-outline-secondary mx-2 border-0" @click="refrescarHorarios()"><i class="fas fa-sync"></i> Actualizar</button></div>
-			<div class="col-auto d-none"><button class="btn btn-outline-secondary border-0 mx-2" data-bs-target="#modalBuscarPacienteExterno" data-bs-toggle="modal"><i class="fa-solid fa-magnifying-glass"></i> Buscar paciente</button></div>
+			<div class="col-auto ms-auto"><router-link to="/recepcionista/paquetes" class="btn btn-primary font-weight-bold shadow-sm"><i class="fas fa-box-open"></i> Paquetes</router-link></div>
 		</div>
-		<div class="accordion ">
-			<div class="accordion-item"  v-for="(doctor, index) in doctores" :key="doctor.id">
-				<h2 class="accordion-header">
-				<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#panel_'+doctor.id" aria-expanded="false" :aria-controls="'$panel_'+doctor.id">
-					<i class="fa-solid fa-user-doctor"></i> <span class="mt-1 ms-3">{{doctor.profession}} {{doctor.name}}</span>
-				</button>
-				</h2>
-				<div class="accordion-collapse collapse" :id="'panel_'+doctor.id">
-					<div class="accordion-body">
-						<table class="table table-hover table-sm">
-							<thead  >
-								<tr>
-									<th>#</th>
-									<th>Hora</th>
-									<th>Servicio</th>
-									<th>Paciente</th>
-									<th>Modo</th>
-									<th>Pago</th>
-									<th>Estado</th>
-									<th>Opciones</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr v-for="(hora, indice) in doctor.horarios" :key="hora.id" >
-									<td class="d-none" v-if="hora.libre=='0'">{{horasMalas[hora.indexOcupado].id}}</td>
-									<td>{{ indice+1 }}</td>
-									<td  @click="modalInfo(horasMalas[hora.indexOcupado])" class="puntero" data-bs-toggle="modal" data-bs-target="#infoModal">{{ horaLatam1(hora.check_time) }} - {{ horaLatam2(hora.departure_date) }}</td>
-									<td v-if="hora.libre=='0'">
-										<span v-if="horasMalas[hora.indexOcupado].formato_nuevo=='0'">
-											<span v-if="horasMalas[hora.indexOcupado].clasification==1">Psiquiatría</span>
-											<span v-if="horasMalas[hora.indexOcupado].clasification==2">Psicología</span>
-											<span v-if="horasMalas[hora.indexOcupado].clasification==3">Certificado</span>
-											<span v-if="horasMalas[hora.indexOcupado].clasification==4">Kurame</span>
-										</span>
-										<span v-else>
-											<p class="mb-0" v-html="queServicio(horasMalas[hora.indexOcupado])"></p>
-										</span>
-										<!-- <span v-if="horasMalas[hora.indexOcupado].formato_nuevo=='0'">{{ tipoViejo[horasMalas[hora.indexOcupado].type-1] }}:</span> -->
-									</td>
-									<td v-else></td>
-									<td class="puntero" v-if="hora.libre=='0'" data-bs-toggle="modal" data-bs-target="#patientModal" @click="asignar(horasMalas[hora.indexOcupado]); modalInfo(horasMalas[hora.indexOcupado]);">
-										<span class="badge rounded-5 p-2"
-										:class="{
-											'bg-white': [1].includes(horasMalas[hora.indexOcupado].patient.ultimoSemaforo?.codigo),
-											'bg-success': [2,3,4].includes(horasMalas[hora.indexOcupado].patient.ultimoSemaforo?.codigo),
-											'bg-warning': [5,6,7].includes(horasMalas[hora.indexOcupado].patient.ultimoSemaforo?.codigo),
-											'bg-danger': [8,9,10].includes(horasMalas[hora.indexOcupado].patient.ultimoSemaforo?.codigo),
-											'bg-secondary': !horasMalas[hora.indexOcupado].patient.ultimoSemaforo,
-										}">
-											<span v-if="horasMalas[hora.indexOcupado].patient.ultimoSemaforo?.codigo==1" title="Neutro"><i class="fas fa-smile"></i></span>
-											<span v-else-if="horasMalas[hora.indexOcupado].patient.ultimoSemaforo?.codigo==2" title="Cumplidor"> <i class="fas fa-laugh-wink"></i> </span>
-											<span v-else-if="horasMalas[hora.indexOcupado].patient.ultimoSemaforo?.codigo==3" title="Promotor"> <i class="fas fa-laugh-wink"></i> </span>
-											<span v-else-if="horasMalas[hora.indexOcupado].patient.ultimoSemaforo?.codigo==4" title="Wow"> <i class="fas fa-laugh-wink"></i> </span>
-											<span v-else-if="horasMalas[hora.indexOcupado].patient.ultimoSemaforo?.codigo==5" title="Reprogramador"> <i class="fas fa-meh"></i> </span>
-											<span v-else-if="horasMalas[hora.indexOcupado].patient.ultimoSemaforo?.codigo==6" title="Exigente"> <i class="fas fa-meh"></i> </span>
-											<span v-else-if="horasMalas[hora.indexOcupado].patient.ultimoSemaforo?.codigo==7" title="Deudor"> <i class="fas fa-angry"></i> </span>
-											<span v-else-if="horasMalas[hora.indexOcupado].patient.ultimoSemaforo?.codigo==8" title="Insatisfecho"> <i class="fas fa-frown"></i> </span>
-											<span v-else-if="horasMalas[hora.indexOcupado].patient.ultimoSemaforo?.codigo==9" title="Paciente de riesgo"> <i class="fas fa-frown"></i> </span>
-											<span v-else-if="horasMalas[hora.indexOcupado].patient.ultimoSemaforo?.codigo==10" title="Problemático"> <i class="fas fa-frown"></i> </span>
-											<span v-if="!horasMalas[hora.indexOcupado].patient.ultimoSemaforo" title="Normal"> <i class="fas fa-smile"></i> </span>
-										</span>
-										<span class="text-uppercase" >{{ (horasMalas[hora.indexOcupado].patient.name).toLowerCase() }} {{ horasMalas[hora.indexOcupado].patient.nombres }}</span>
-									</td>
-									<td v-else>
-										<button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalNuevaCita" @click="prepararAutomaticos(index, indice)" v-if="hora.libre=='1'"><i class="fa-regular fa-circle-check"></i> Libre para citar</button>
-									</td>
-									<td v-if="hora.libre==0" :title="horasMalas[hora.indexOcupado].mode == 1 ? 'Presencial':'Virtual'">
-										<a @click="changeMode(horasMalas[hora.indexOcupado].id, indice)" v-if="horasMalas[hora.indexOcupado].mode == 1" class="btn btn-info btn-sm"><i class="far fa-user"></i></a>
-										<a @click="changeMode(horasMalas[hora.indexOcupado].id, indice)" v-else class="btn btn-primary btn-sm"><i class="fas fa-desktop"></i></a>
-									</td>
-									<td v-else></td>
-									<td>
-										<a v-if="hora.libre == 0 && horasMalas[hora.indexOcupado].payment" 
-											@click="modalInfo(horasMalas[hora.indexOcupado]);indexElegido = hora.indexOcupado" 
-											data-bs-toggle="modal" 
-											data-bs-target="#pagoModal" 
-											class="btn btn-icon-split btn-sm"
-											:class='{
-												"btn-warning": horasMalas[hora.indexOcupado].payment.pay_status == 1 && horasMalas[hora.indexOcupado].payment.adelanto > 0,
-												"btn-secondary": horasMalas[hora.indexOcupado].payment.pay_status == 1 && horasMalas[hora.indexOcupado].payment.adelanto == 0,
-												"btn-success": horasMalas[hora.indexOcupado].payment.pay_status == 2,
-												"btn-danger": [3, null].includes(horasMalas[hora.indexOcupado].payment.pay_status)
-											}'>
-											<span class="icon text-white-50">
-												<i :class='{
-													"fa-regular fa-circle-question": horasMalas[hora.indexOcupado].payment.pay_status == 1,
-													"fas fa-check": horasMalas[hora.indexOcupado].payment.pay_status == 2,
-													"fas fa-exclamation-circle": [3, null].includes(horasMalas[hora.indexOcupado].payment.pay_status)
-												}'></i>
-											</span>
-											<span class="text labels" v-if="parseInt(horasMalas[hora.indexOcupado].payment.pay_status) == 1 && horasMalas[hora.indexOcupado].payment.adelanto > 0">Con adelanto</span>
-    									<span class="text labels" v-else-if="horasMalas[hora.indexOcupado].payment.pay_status == 1">Sin pagar</span>
-											<span class="text labels" v-else-if="horasMalas[hora.indexOcupado].payment.pay_status == 2">Pagado</span>
-											<span class="text labels" v-else-if="[3, null].includes(horasMalas[hora.indexOcupado].payment.pay_status)">Anulado</span>
-										</a>
-									</td>
 
-									<td>
-										<a v-if="hora.libre==0" @click="modalInfo(horasMalas[hora.indexOcupado])" data-bs-toggle="modal" data-bs-target="#modalEstado" class="btn btn-icon-split btn-sm"
-										:class='{
-										"btn-secondary": horasMalas[hora.indexOcupado].status == 1,
-										"btn-info": horasMalas[hora.indexOcupado].status == 2,
-										"btn-danger": horasMalas[hora.indexOcupado].status == 3
-										}'>
-											<span class="icon text-white-50">
-												<i :class="{
-													'fas fa-exclamation-circle': horasMalas[hora.indexOcupado].status == 1,
-													'fas fa-check': horasMalas[hora.indexOcupado].status == 2,
-													'fas fa-times': [3,4,null].includes(horasMalas[hora.indexOcupado].status)
-												}"></i>
-											</span>
-											<span class="text labels" v-if="horasMalas[hora.indexOcupado].status == 1">Sin confirmar</span>
-											<span class="text labels" v-else-if="horasMalas[hora.indexOcupado].status == 2">Confirmado</span>
-											<span class="text labels" v-else-if="horasMalas[hora.indexOcupado].status == 3">Anulado</span>
-											<span class="text labels" v-else-if="horasMalas[hora.indexOcupado].status == 4">Reprogramado</span>
-										</a>
-									</td>
-									<td v-if="hora.libre==0">
-										<a class="btn btn-success btn-circle btn-sm" title="Hacer intercambio" @click="intercambiarHorario(horasMalas[hora.indexOcupado])" data-bs-target="#modalIntercambio" data-bs-toggle="modal">
-											<i class="fas fa-retweet"></i>
-										</a>
-										<a v-if="horasMalas[hora.indexOcupado].status == 3"  title="Cita cancelada"  class="btn btn-danger btn-circle btn-sm"><i class="fas fa-calendar"></i></a>
-										<a v-else @click="modalInfo(horasMalas[hora.indexOcupado])" title="Reprogramar cita" data-bs-target="#reprogModal" data-bs-toggle="modal" class="btn btn-info btn-circle btn-sm"><i class="fas fa-calendar"></i></a>
-										
-										<!-- <a @click="modalInfo(cita)" title="Información de la cita" data-toggle="modal" data-target="#infoModal" class="btn btn-info btn-circle btn-sm"><i class="fas fa-info"></i></a> -->
-										<a @click="eliminar(horasMalas[hora.indexOcupado].id)" title="Eliminar" class="btn btn-danger btn-circle btn-sm"><i class="fas fa-trash"></i></a>
+		<!-- Filtros por profesión (Opcional, si existen en los datos) -->
+		<div class="d-flex mb-3 gap-2 flex-wrap">
+			<button class="btn btn-sm rounded-pill font-weight-bold" 
+							:class="filtroActual == 'Todos' ? 'btn-primary' : 'btn-light text-muted border'" 
+							@click="filtroActual = 'Todos'">Todos</button>
+			<button v-for="prof in profesionesUnicas" :key="prof" class="btn btn-sm rounded-pill font-weight-bold" 
+							:class="filtroActual == prof ? 'btn-primary' : 'btn-light text-muted border'" 
+							@click="filtroActual = prof">{{ prof }}</button>
+		</div>
 
-										<!-- Sin numero -->
-										<a v-if="horasMalas[hora.indexOcupado].patient.phone ? false : true"
-										class="btn btn-secondary btn-circle btn-sm"
-										title="Sin número">
-										<i class="fab fa-whatsapp"></i>
-										</a>
+		<!-- Contenedor del Calendario Grid -->
+		<div class="calendar-wrapper bg-white shadow-sm rounded border">
+			
+			<div class="calendar-header d-flex border-bottom bg-light">
+				<!-- Cabecera Esquina (Eje Y) -->
+				<div class="time-axis-header text-center py-3 border-right text-muted font-weight-bold" style="min-width: 60px;">
+					<i class="far fa-clock"></i>
+				</div>
+				<!-- Cabecera Doctores (Eje X scrolleable) -->
+				<div class="doctors-header-container d-flex flex-grow-1 overflow-hidden" ref="headerScroll">
+					<div class="doctor-header text-center py-2 border-right text-dark" v-for="doctor in doctoresFiltrados" :key="'h-'+doctor.id">
+						<div>
+							<span class="badge badge-pill mt-1" :style="'background-color: ' + stringToColor(doctor.name)"> &nbsp; </span>
+							<strong class="mx-1">{{doctor.profession}}</strong>
+						</div>
+						<div class="font-weight-bold text-truncate px-1" :title="doctor.name">{{doctor.name.split(' ')[0]}} {{doctor.name.split(' ')[1] || ''}}</div>
+						<small class="text-muted">{{ citasPorDoctor(doctor.id) }} citas</small>
+					</div>
+					<div v-if="cargando" class="py-3 px-3 w-100 text-center text-primary align-self-center my-4">
+						<i class="fas fa-circle-notch fa-spin fa-2x mb-2"></i><br>
+						<span class="font-weight-bold">Obteniendo agenda...</span>
+					</div>
+					<div v-else-if="doctoresFiltrados.length == 0" class="py-3 px-3 w-100 text-center text-muted align-self-center my-4 font-weight-bold">No hay profesionales para mostrar el día de hoy.</div>
+				</div>
+			</div>
 
-										<!-- Cita virtual - con link -->
-										<a 
-										:href="`https://wa.me/51${horasMalas[hora.indexOcupado].patient ? horasMalas[hora.indexOcupado].patient.phone.replaceAll(' ', '') : ''}?text=Buen día ${horasMalas[hora.indexOcupado].patient ? horasMalas[hora.indexOcupado].patient.name + ' '+ horasMalas[hora.indexOcupado].patient.nombres : ''}, 
-										le recordamos que tiene reservada una cita online el día de hoy a las 
-										${horasMalas[hora.indexOcupado].schedule ? horaLatam2(horasMalas[hora.indexOcupado].schedule.check_time) : ''}, 
-										le dejo el enlace de la cita ${horasMalas[hora.indexOcupado].link}`"
-										target="_blank" 
-										title="Enviar mensaje (cita virtual)" 
-										class="btn btn-info btn-circle btn-sm"
-										v-else-if="horasMalas[hora.indexOcupado].link"
-										>
-										<i class="fab fa-whatsapp"></i>
-										</a>
+			<!-- Cuerpo del Calendario -->
+			<div class="calendar-body d-flex" style="height: 600px; overflow-y: auto;" @scroll="syncScroll">
+				<!-- Eje Y Horas -->
+				<div class="time-axis border-right bg-white" style="min-width: 60px;">
+					<div class="time-slot-label text-center border-bottom text-muted small position-relative" v-for="hora in horasGrid" :key="'lbl-'+hora">
+						<span style="position: absolute; top: -10px; right: 8px; background: white; padding: 0 4px;">{{ hora }}:00</span>
+					</div>
+				</div>
+				<!-- Columnas de doctores locales -->
+				<div class="doctors-body-container d-flex flex-grow-1" style="overflow-x: auto; position: relative;" ref="bodyScroll" @scroll="syncScrollX">
+					<!-- Malla de fondo (grid lines) -->
+					<div class="grid-lines-container" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0;">
+						<div class="grid-line border-bottom" v-for="hora in horasGrid" :key="'gl-'+hora"></div>
+					</div>
 
-										<!-- Cita presencial -->
-										<a 
-										:href="`whatsapp://send?phone=51${horasMalas[hora.indexOcupado].patient ? horasMalas[hora.indexOcupado].patient.phone.replaceAll(' ', '') : ''}&text=Buen día ${horasMalas[hora.indexOcupado].patient ? horasMalas[hora.indexOcupado].patient.name + ' '+ horasMalas[hora.indexOcupado].patient.nombres : ''}, le recordamos que tiene reservada una cita: %0AFecha ${fechaLatam(horasMalas[hora.indexOcupado].date)} %0AHora: ${horaLatam2(horasMalas[hora.indexOcupado].schedule.check_time)} %0AProfesional: ${horasMalas[hora.indexOcupado].professional.name} %0AEn el Centro Psicológico y Psiquiátrico EXCELENTEMENTE. Al culminar su sesión, no se olvide de reservar su próxima cita.`"
+					<div class="doctor-column border-right position-relative" v-for="(doctor, dIndex) in doctoresFiltrados" :key="'col-'+doctor.id" style="z-index: 1;">
+						
+						<!-- Slots Libres (Clickeables para crear cita) -->
+						<div v-for="(horaFree, hIndex) in getHorasLibres(doctor.id)" :key="'free-'+horaFree.id" 
+								class="free-slot" 
+								:style="slotStyle(horaFree.check_time, horaFree.departure_date)"
+								@click="crearCitaEnSlot(doctor, horaFree)" 
+								data-bs-toggle="modal" data-bs-target="#modalNuevaCita"
+								title="Click para nueva cita">
+						</div>
 
-										target="_blank" 
-										title="Enviar recordatorio de cita" 
-										class="btn btn-info btn-circle btn-sm"
-										v-else-if="!horasMalas[hora.indexOcupado].link"
-										>
-										<i class="fab fa-whatsapp"></i>
-										</a>
-										<a 
-										:href="`whatsapp://send?phone=51${horasMalas[hora.indexOcupado].patient ? horasMalas[hora.indexOcupado].patient.phone : ''}&text=Buen día ${horasMalas[hora.indexOcupado].patient ? horasMalas[hora.indexOcupado].patient.name + ' '+ horasMalas[hora.indexOcupado].patient.nombres : ''}, esperamos se encuentre bien, le enviamos la encuesta de satisfacción de su cita en el Centro Psicológico y Psiquiátrico EXCELENTEMENTE, con ello nos ayudara a seguir mejorando en nuestra atención, gracias por su tiempo. 😊 https://forms.gle/VbnwkK85sXyoiVN5A`"
-										target="_blank" 
-										title="Enviar mensaje" 
-										class="btn btn-primary btn-circle btn-sm"
-										>
-										<i class="fa fa-align-justify"></i>
-										</a>
-										<button data-bs-toggle="modal" @click="buscarRecetas(horasMalas[hora.indexOcupado].patient.id)" data-bs-target="#recetasModal" class="btn btn-info btn-circle btn-sm" title="Ver recetas">
-											<i class="fas fa-file"></i>
-										</button>
-										<button @click="citaTemp = horasMalas[hora.indexOcupado]" data-bs-toggle="modal" data-bs-target="#modalTiemposEspera" class="btn btn-warning btn-circle btn-sm" title="Tiempos de espera" >
-											<i class="fa-regular fa-clock"></i>
-										</button>
-									</td>
-									<td v-else></td>
+						<!-- Slots Ocupados (Citas) -->
+						<div v-for="(horaOcup, hIndex) in getHorasOcupadas(doctor.id)" :key="'ocup-'+horaOcup.id" 
+								class="booked-slot shadow-sm p-1" 
+								:style="[slotStyle(horaOcup.schedule ? horaOcup.schedule.check_time : null, horaOcup.schedule ? horaOcup.schedule.departure_date : null, horaOcup), { borderLeft: '4px solid ' + stringToColor(doctor.name) }]"
+								@click="abrirDetallesCita(horaOcup)"
+								@mouseover="mostrarTooltip($event, horaOcup, doctor)"
+								@mouseleave="ocultarTooltip"
+								@mousemove="moverTooltip($event)"
+								data-bs-toggle="modal" data-bs-target="#modalAccionesCita">
+							
+							<div class="booked-content h-100 position-relative overflow-hidden" :class="bgPorSemaforo(horaOcup)">
+								<div class="font-weight-bold text-truncate small lh-1 pt-1"><i :class="horaOcup.mode == 1 ? 'far fa-user' : 'fas fa-desktop'"></i> {{ horaOcup.patient.name.split(' ')[0] }} {{ horaOcup.patient.nombres.split(' ')[0] }}</div>
+								<div class="text-muted small mt-1" style="font-size: 0.7rem;">{{ formatHora(horaOcup.schedule ? horaOcup.schedule.check_time : '') }} - {{ formatHora(horaOcup.schedule ? horaOcup.schedule.departure_date : '') }}</div>
 								
-								</tr>
-								<tr v-if="doctor.horarios.length==0">
-									<td colspan="3">El profesional no trabaja este día</td>
-								</tr>
-							</tbody>
-						</table>
+								<!-- Iconos estado -->
+								<div class="position-absolute" style="bottom: 2px; right: 4px;">
+									<i class="fas fa-wallet small" :class="horaOcup.payment && horaOcup.payment.pay_status == 1 ? 'text-danger':'text-success'"></i>
+								</div>
+							</div>
+
+						</div>
 
 					</div>
 				</div>
 			</div>
-			
+
 		</div>
+
+		<!-- Tooltip Flotante -->
+		<div v-show="tooltipData" class="custom-tooltip shadow-lg p-2 rounded bg-white text-dark border border-secondary" :style="tooltipStyle">
+			<div class="font-weight-bold text-uppercase border-bottom pb-1 mb-1" style="font-size: 0.85rem;">{{ tooltipData ? tooltipData.paciente : '' }}</div>
+			<div class="small"><i class="far fa-clock"></i> {{ tooltipData ? tooltipData.hora : '' }}</div>
+			<div class="small"><i class="fas fa-user-md"></i> {{ tooltipData ? tooltipData.doctor : '' }}</div>
+			<div class="small mt-1 px-1 bg-light rounded text-center border font-weight-bold" style="font-size: 0.75rem;">{{ tooltipData ? tooltipData.estado : '' }}</div>
+		</div>
+
+		<!-- Modales -->
 		<ModalNuevaCita :profesionalElegido="profesionalElegido" :horaElegida="horaElegida" :idUsuario="idUsuario" :fechaElegida='fecha' @actualizarListadoCitas="actualizarListadoCitas" :idSede="idSede"></ModalNuevaCita>
+		
+		<!-- Nuevo modal de acciones centralizado -->
+		<ModalAccionesCita v-if="cita" :cita="cita" :indiceElegido="indexElegido" :precios="precios"
+			@changeMode="changeMode"
+			@openModal="distribuirAperturaModal"
+			@intercambiar="intercambiarHorario"
+			@eliminar="validarYEliminar"
+			@buscarRecetas="buscarRecetas"
+			@tiemposEspera="abrirTiemposEspera"
+		/>
+
     <modal-estado v-if="cita" :dataCit="cita" :idUsuario="idUsuario"></modal-estado>
     <pago-modal v-if="cita" :cita="cita" :idUsuario="idUsuario" :idSede="idSede" @actualizarAdelanto="actualizarAdelanto"></pago-modal>
 		<modal-patient v-if="cita" :dataCit="cita"></modal-patient>
@@ -211,6 +134,7 @@
 
 	</div>
 </template>
+
 <script>
 	import moment from 'moment'
 	import PagoModal from './PagoModal.vue'
@@ -223,21 +147,52 @@
 	import ModalIntercambio from './ModalIntercambio.vue'
 	import modalVerRecetas from './ModalVerRecetas.vue'
 	import modalTiemposEspera from './ModalTiemposEspera.vue'
+	import ModalAccionesCita from './ModalAccionesCita.vue'
 		
 	import alertify from 'alertifyjs'
 	
 	export default{
 		name: 'VistaCuaderno',
 		data(){ return{
-			fecha: moment().format('YYYY-MM-DD'), doctores:[], horasSolas:[], horasMalas:[], profesionalElegido:[], horaElegida:[], alternativo:false, precios:[], recetas:[],
-			tipoViejo:['Terapia Inicial niño/adolescente', 'Terapia Inicial adulto', 'Terapia Inicial pareja', 'Terapia Inicial familiar', 'Terapia continua niño/adolescente', 'Terapia continua adulto', 'Terapia continua pareja', 'Terapia continua familiar', 'Orientación Vocacional', 'Sucamec inicial', 'Sucamec renovación', 'Kurame' ], indexElegido:-1, idUsuario:-1,
+			fecha: moment().format('YYYY-MM-DD'), 
+			doctores:[], 
+			horasSolas:[], 
+			horasMalas:[], 
+			profesionalElegido:[], 
+			horaElegida:[], 
+			precios:[], 
+			recetas:[],
+			indexElegido:-1, 
+			idUsuario:-1,
 			cita: {
 				address:{patient:{address:{}}, patient:[]},
 				patient:{address:[], relative:[]}
-			}, posibles:[], primero:{patient:[]}, citaTemp:[]
+			}, 
+			posibles:[], 
+			primero:{patient:[]}, 
+			citaTemp:[],
+			
+			// Variables de Calendario Grid
+			cargando: true,
+			horasGrid: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+			horaInicioGrid: 8,
+			pixelsPorMinuto: 1.5,
+			filtroActual: 'Todos',
+			tooltipData: null,
+			tooltipStyle: { top: '0px', left: '0px', position: 'fixed', zIndex: 1055, pointerEvents: 'none', minWidth: '150px', maxWidth: '250px' },
 		}},
 		props:[ 'nombreUser', 'idSede'],
-		components: { PagoModal, ModalEstadoCita, ModalNuevaCita, ModalPatient, InfoModal, ReprogModal, ModalSearchPatient, ModalIntercambio, modalVerRecetas, modalTiemposEspera },
+		components: { PagoModal, ModalEstadoCita, ModalNuevaCita, ModalPatient, InfoModal, ReprogModal, ModalSearchPatient, ModalIntercambio, modalVerRecetas, modalTiemposEspera, ModalAccionesCita },
+		computed: {
+			profesionesUnicas() {
+				const profesiones = this.doctores.map(d => d.profession).filter(p => p != null && p.trim() != '');
+				return [...new Set(profesiones)];
+			},
+			doctoresFiltrados() {
+				if(this.filtroActual === 'Todos') return this.doctores;
+				return this.doctores.filter(d => d.profession === this.filtroActual);
+			}
+		},
 		methods:{
 			dayWeek (day) {
 				switch (day) {
@@ -257,73 +212,222 @@
 					this.obtenerHorarios();
 				})
 			},
-			asignar(dato){
-				this.cita = dato;
-			},
-			actualizarAdelanto(adelanto){
-				this.horasMalas[this.indexElegido].payment.price = parseFloat(this.horasMalas[this.indexElegido].payment.price) - parseFloat(adelanto)
-				this.horasMalas[this.indexElegido].payment.adelanto = parseFloat(this.horasMalas[this.indexElegido].payment.adelanto) + parseFloat(adelanto)
-			},
-			async eliminar(id){
-      this.$swal({
-          title: '¿Quieres eliminar esta cita?',
-					html: 'Ingrese un motivo para eliminar la cita. <br> <small>No se generará falta</small>',
-					input: 'text',
-          showCancelButton: true,
-          confirmButtonText: 'Si',
-          cancelButtonText: `No`, //denyButtonText
-      }).then((result) => {
-				if( result.value =='')
-					alertify.notify('No elimiando, falta rellenar un motivo' , 'danger', 5);
-				else
-          if(result.isConfirmed){
-              this.axios.post('/api/eliminarCita/'+id, {razon: result.value, usuario: this.nombreUser })
-              .then((res) => {
-								console.log(res.data)
-                this.$swal('Cita eliminada con exito')
-              });
-            this.obtenerHorarios();
-          }
-      })
-   	 },
 			async obtenerHorarios(){
+				this.cargando = true;
 				let dia = this.dayWeek(moment(this.fecha).format('d')-1)
-				//console.log('que pediria', `/api/horarioCuadernoOcupado/${this.fecha}/${dia}`);
 				
 				await this.axios.get(`/api/horarioCuadernoOcupado/${this.fecha}/${dia}`)
-				.then(res => { console.log(res.data);
+				.then(res => { 
 					moment.locale('es')
 					alertify.notify('<i class="fa-regular fa-calendar-check"></i> Datos del ' + moment(this.fecha).format('DD [de] MMMM') , 'success', 5);
 					this.horasSolas = res.data.solos;
 					this.horasMalas = res.data.invalidos;
 
+					// Filtrar horas solas por doctor
 					this.doctores.forEach(profesional =>{
-						/* let hora = this.horasSolas.findIndex( horaSola => horaSola.professional_id === profesional.id)
-						//console.log('hora', hora);
-						if(hora>-1)
-							profesional.horarios.push(this.horasSolas[hora]) */
 						profesional.horarios = this.horasSolas
 						.filter( horaSola => parseInt(horaSola.professional_id) == parseInt(profesional.id) )
 						.map(horaSola=> ({...horaSola, libre:1, indexOcupado:-1}) )
 					});
 
+					// Cruzar con horas malas
 					let ocupado = false;
 					this.doctores.forEach(profesional=>{
 						profesional.horarios.forEach(horario=>{
 							ocupado = this.horasMalas.findIndex(hora => hora.schedule_id == horario.id)
 							if(ocupado>-1){
+								// Ya no agregamos indexOcupado en horario porque iteraremos directamente horasMalas
 								horario.libre=0;
 								horario.indexOcupado=ocupado;
-							}/* else{
-								horario.libre=1;
-								horario.indexOcupado=-1
-							} */
+							}
 						})
 					})
+				}).finally(() => {
+					this.cargando = false;
+				}).catch(() => {
+					this.cargando = false;
 				})
 			},
-			horaLatam1(horita){ return moment(horita, 'HH:mm:ss').format('h:mm') },
-			horaLatam2(horita){ return moment(horita, 'HH:mm:ss').format('h:mm a') },
+
+			// ----- METODOS CALENDARIO -----
+			citasPorDoctor(id) {
+				return this.horasMalas.filter(h => h.professional_id == id).length;
+			},
+			getHorasLibres(idProf) {
+				let doc = this.doctores.find(d => d.id == idProf);
+				if(!doc || !doc.horarios) return [];
+				return doc.horarios.filter(h => h.libre == 1);
+			},
+			getHorasOcupadas(idProf) {
+				let ocupadas = this.horasMalas.filter(h => h.professional_id == idProf && parseInt(h.status) !== 5);
+				
+				// Ordenar por hora de inicio
+				ocupadas.sort((a, b) => {
+					let t1 = a.schedule && a.schedule.check_time ? a.schedule.check_time : '23:59:59';
+					let t2 = b.schedule && b.schedule.check_time ? b.schedule.check_time : '23:59:59';
+					return t1.localeCompare(t2);
+				});
+
+				// Agrupar superposiciones (Clusters) para evitar que una cita tape a otra
+				let clusters = [];
+				let currentCluster = [];
+				let clusterEnd = '00:00:00';
+				
+				ocupadas.forEach(cita => {
+					let start = cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00';
+					let end = cita.schedule && cita.schedule.departure_date ? cita.schedule.departure_date : '00:00:00';
+					
+					if(currentCluster.length === 0) {
+						currentCluster.push(cita);
+						clusterEnd = end;
+					} else {
+						if(start < clusterEnd) { // Hay superposición
+							currentCluster.push(cita);
+							if(end > clusterEnd) clusterEnd = end;
+						} else { // No hay superposición, cerrar cluster
+							clusters.push(currentCluster);
+							currentCluster = [cita];
+							clusterEnd = end;
+						}
+					}
+				});
+				if(currentCluster.length > 0) clusters.push(currentCluster);
+				
+				// Asignar los anchos y posiciones basados en el tamaño del cluster
+				clusters.forEach(cluster => {
+					let len = cluster.length;
+					cluster.forEach((cita, idx) => {
+						cita._width = 95 / len;
+						cita._left = (95 / len) * idx;
+					});
+				});
+
+				return ocupadas;
+			},
+			slotStyle(check_time, departure_date, citaData = null) {
+				if(!check_time || !departure_date) return {};
+				let [h1, m1] = check_time.split(':').map(Number);
+				let [h2, m2] = departure_date.split(':').map(Number);
+
+				let iniMinutos = (h1 * 60 + m1) - (this.horaInicioGrid * 60);
+				let finMinutos = (h2 * 60 + m2) - (this.horaInicioGrid * 60);
+				
+				let topPx = iniMinutos * this.pixelsPorMinuto;
+				let heightPx = (finMinutos - iniMinutos) * this.pixelsPorMinuto;
+				
+				let stl = {
+					top: topPx + 'px',
+					height: Math.max(heightPx, 20) + 'px' // min-height de seguridad
+				};
+
+				if(citaData && citaData._width !== undefined) {
+					stl.width = `calc(${citaData._width}% - 8px)`;
+					stl.left = `calc(${citaData._left}% + 4px)`;
+					stl.position = 'absolute';
+				}
+
+				return stl;
+			},
+			stringToColor(str) {
+				if(!str) return '#1cc88a';
+				let hash = 0;
+				for (let i = 0; i < str.length; i++) {
+					hash = str.charCodeAt(i) + ((hash << 5) - hash);
+				}
+				const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+				return '#' + "00000".substring(0, 6 - c.length) + c;
+			},
+			formatHora(h) {
+				if(!h) return '';
+				return moment(h, 'HH:mm:ss').format('HH:mm');
+			},
+			syncScrollX(e) {
+        if(this.$refs.headerScroll) {
+            this.$refs.headerScroll.scrollLeft = e.target.scrollLeft;
+        }
+      },
+			syncScroll(e){
+				// Para si quisieramos sincronizar etiquetas Y al moverse, en este layout CSS grid-lines abarca todo
+			},
+			mostrarTooltip(e, cita, doctor) {
+				let horaRango = this.formatHora(cita.schedule ? cita.schedule.check_time : '') + ' - ' + this.formatHora(cita.schedule ? cita.schedule.departure_date : '');
+				
+				let estado = 'Sin Confirmar';
+				if(cita.status == 2) estado = 'Confirmado';
+				if(cita.status == 3) estado = 'Anulado';
+				if(cita.status == 4) estado = 'Reprogramado';
+
+				this.tooltipData = {
+					paciente: cita.patient.name.split(' ')[0] + ' ' + cita.patient.nombres.split(' ')[0],
+					hora: horaRango,
+					doctor: doctor.name,
+					estado: estado
+				};
+				this.moverTooltip(e);
+			},
+			moverTooltip(e) {
+				if(this.tooltipData) {
+					this.tooltipStyle.top = (e.clientY + 15) + 'px';
+					this.tooltipStyle.left = (e.clientX + 15) + 'px';
+				}
+			},
+			ocultarTooltip() {
+				this.tooltipData = null;
+			},
+			crearCitaEnSlot(doctor, horaLibre) {
+				// Buscar el indice en el array para compatibilidad con el v-for de la logica original
+				let hIndex = doctor.horarios.findIndex(h => h.id == horaLibre.id);
+				let dIndex = this.doctores.findIndex(d => d.id == doctor.id);
+				this.prepararAutomaticos(dIndex, hIndex);
+			},
+			abrirDetallesCita(citaMalas) {
+				this.cita = citaMalas;
+				this.indexElegido = this.horasMalas.findIndex(x => x.id == citaMalas.id);
+			},
+			bgPorSemaforo(horaOcup) {
+				if(!horaOcup.patient || !horaOcup.patient.ultimoSemaforo) return 'bg-white';
+				let cod = horaOcup.patient.ultimoSemaforo.codigo;
+				if([1].includes(cod)) return 'bg-white';
+				if([2,3,4].includes(cod)) return 'bg-success text-white';
+				if([5,6,7].includes(cod)) return 'bg-warning text-dark';
+				if([8,9,10].includes(cod)) return 'bg-danger text-white';
+				return 'bg-white';
+			},
+			distribuirAperturaModal(data, tModalId, indexG){
+				this.cita = data;
+				this.indexElegido = indexG;
+				// El modal de bootstrap 5 ya maneja la transición por los atributos data-bs, pero asignamos datos.
+			},
+
+			// ----- METODOS VIEJOS COMPATIBILIDAD -----
+			actualizarAdelanto(adelanto, citaId){
+				const cita = this.horasMalas.find(h => h.id === citaId || h.payment?.id === citaId);
+				if(cita && cita.payment){
+					cita.payment.price = parseFloat(cita.payment.price) - parseFloat(adelanto)
+					cita.payment.adelanto = parseFloat(cita.payment.adelanto || 0) + parseFloat(adelanto)
+				}
+			},
+			validarYEliminar(id){
+				this.$swal({
+						title: '¿Quieres eliminar esta cita?',
+						html: 'Ingrese un motivo para eliminar la cita. <br> <small>No se generará falta</small>',
+						input: 'text',
+						showCancelButton: true,
+						confirmButtonText: 'Si',
+						cancelButtonText: `No`,
+				}).then((result) => {
+					if( result.value =='')
+						alertify.notify('No eliminado, falta rellenar un motivo' , 'danger', 5);
+					else
+						if(result.isConfirmed){
+								this.axios.post('/api/eliminarCita/'+id, {razon: result.value, usuario: this.nombreUser })
+								.then((res) => {
+									this.$swal('Cita eliminada con exito')
+									this.obtenerHorarios();
+								});
+						}
+				})
+			},
 			prepararAutomaticos(indexProfesional, indexHorario){
 				this.profesionalElegido = this.doctores[indexProfesional];
 				this.horaElegida = this.profesionalElegido.horarios[indexHorario];
@@ -333,25 +437,14 @@
 				await this.axios.get('/api/listarPreciosTodos')
 				.then( response => this.precios = response.data)
 			},
-			actualizarListadoCitas(){
-				this.obtenerHorarios();
-			},
-			modalInfo (data) {
-			if( data.status!=4 )
-      	this.cita = data;
-    	},
+			actualizarListadoCitas(){ this.obtenerHorarios(); },
 			verHorariosAyer(){ this.fecha = moment().subtract(1, 'day').format('YYYY-MM-DD'); this.obtenerHorarios(); },
 			verHorariosHoy(){ this.fecha = moment().format('YYYY-MM-DD'); this.obtenerHorarios(); },
 			verHorariosMañana(){ this.fecha = moment().add(1, 'day').format('YYYY-MM-DD'); this.obtenerHorarios(); },
-			verHorariosPasado(){ this.fecha = moment().add(2, 'day').format('YYYY-MM-DD'); this.obtenerHorarios(); },
 			refrescarHorarios(){ this.obtenerHorarios(); },
-			queServicio(servicio){
-				let texto =  this.precios.find(x=> x.id == servicio.type).descripcion
-				if( servicio.membresia )
-					texto +='<small><br>'+servicio.num_sesion+' de '+servicio.membresia.precio.sesiones+' ('+ servicio.membresia.precio.descripcion +')</small>'
-				return texto;
-			},
-			changeMode(id, indice){
+			
+			changeMode(id, indiceP){
+				let targetIndex = this.indexElegido > -1 ? this.indexElegido : indiceP; 
 				this.$swal.fire({
 					title: 'Actualizar',
 					text: "¿Está seguro de cambiar el modo de la cita?",
@@ -365,11 +458,12 @@
 					if (result.isConfirmed) {
 						this.axios.get(`/api/updateModeAppoinment/${id}`)
 						.then(res =>{
-							this.horasMalas[indice].mode==1? this.horasMalas[indice].mode=0: this.horasMalas[indice].mode=1
+							//this.horasMalas[targetIndex].mode==1? this.horasMalas[targetIndex].mode=0: this.horasMalas[targetIndex].mode=1
+							this.obtenerHorarios();
 						})
 					}
 				})
-    	},
+			},
 			buscarRecetas(id){
 				this.axios(`/api/verRecetaPorId/${id}`)
 				.then(res =>{
@@ -382,41 +476,40 @@
 				this.primero = laCita;
 				this.posibles = this.horasMalas.filter(posible=> posible.professional_id == idProf && posible.date == this.fecha && laCita.id != posible.id )
 			},
-			faltanDatos(paciente){
-				//console.log('paciente', paciente)
-				if( !paciente.name || !paciente.phone || !paciente.email || paciente.gender==2 || !paciente.address.address || !paciente.relative.name || !paciente.relative.phone || !paciente.kinship)
-					return true
-				else return false
-			},
-			fechaLatam(fecha){
-				if(fecha) return moment(fecha).format('DD/MM/YYYY');
-			},
+			abrirTiemposEspera(cita) {
+				this.citaTemp = cita;
+			}
 		},
 		mounted(){
 			this.axios.get('/api/user')
 			.then((res) => {
 				this.idUsuario = parseInt(res.data.user.id)
-				this.tienePrivilegios = res.data.user.privilegios
 			})
 			this.listarProfesionales();
 			this.listarPrecios();
 		}
-
 	}
 </script>
+
+<style scoped>
+	.calendar-wrapper { display: flex; flex-direction: column; overflow: hidden; }
+	.doctor-header { min-width: 250px; flex: 1; }
+	.doctor-column { min-width: 250px; flex: 1; }
+	.time-slot-label { height: 90px; } /* 60 minutos * 1.5px/min = 90px */
+	.grid-line { height: 90px; box-sizing: border-box; }
+	.free-slot { position: absolute; width: calc(100% - 10px); left: 5px; opacity: 0; cursor: pointer; transition: opacity 0.2s; background: rgba(28, 200, 138, 0.1); border-radius: 4px; box-sizing: border-box;}
+	.free-slot:hover { opacity: 1; border: 1px dashed #1cc88a; }
+	
+	.booked-slot { position: absolute; width: calc(100% - 10px); left: 5px; cursor: pointer; transition: transform 0.1s; border-radius: 6px; overflow: hidden; background-color: #f8f9fc;}
+	.booked-slot:hover { transform: scale(1.02); z-index: 10!important; }
+	.booked-content { padding: 4px; border-radius: 4px; }
+	.doctors-header-container::-webkit-scrollbar { display: none; }
+</style>
 <style>
-	.puntero{ cursor: pointer; }
 	.alertify-notifier .ajs-message{width: 400px!important;}
 	.alertify-notifier.ajs-right .ajs-message.ajs-visible { right: 400px!important; }
 	.alertify-notifier .ajs-message.ajs-success{
 		background: rgb(22 205 65 / 95%)!important;
     text-shadow: none!important;
 	}
-	.accordion-button:not(.collapsed) {
-    color: #003a25!important;
-    background-color: #1cc88a!important
-	}
-	.accordion-button:focus { box-shadow: 0 0 0 0.25rem #1cc88aa6 } 
-	/* .accordion-button:focus { box-shadow: 0 0 0 0.25rem rgb(253 102 13 / 25%); } */
-	.accordion button:hover { background-color: #ebebebbf; }
 </style>

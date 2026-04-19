@@ -1,6 +1,6 @@
 <template>
 <main>
-    <div id="wrapper">
+    <div id="wrapper" :class="{'recepcion-theme': currentUser.rol === 'recepcionista'}">
         <side-bar :rolUser="this.currentUser.rol" :idSede="currentUser.idSede"></side-bar>
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
@@ -127,8 +127,29 @@ export default {
 
 <style>
 .alertify-notifier .ajs-message{
-	background: rgb(8 8 8 / 95%)!;
+	background: rgb(8 8 8 / 95%) !important;
     color: #fff!important;
     text-align: left!important;
+}
+
+/* Tema Recepción */
+.recepcion-theme .recepcion-sidebar {
+    background-color: #0f1729 !important;
+    background-image: none !important;
+}
+
+.recepcion-theme .btn-primary {
+    background-color: #3B82F6 !important;
+    border-color: #3B82F6 !important;
+}
+
+.recepcion-theme .btn-primary:hover,
+.recepcion-theme .btn-primary:focus,
+.recepcion-theme .btn-primary:active,
+.recepcion-theme .btn-primary:not(:disabled):not(.disabled).active,
+.recepcion-theme .show > .btn-primary.dropdown-toggle,
+.recepcion-theme .btn-primary:not(:disabled):not(.disabled):active {
+    background-color: #2563EB !important;
+    border-color: #2563EB !important;
 }
 </style>

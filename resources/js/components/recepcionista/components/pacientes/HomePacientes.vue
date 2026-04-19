@@ -1,6 +1,7 @@
 <template>
   <main>
-    <div class="d-sm-flex align-items-center justify-content-around mt-4">
+    <div v-if="vistaActual === 'lista'">
+      <div class="d-sm-flex align-items-center justify-content-around mt-4">
         <div class="d-none d-sm-inline-block form-inline w-100">
             <div class="input-group">
                 <div class="input-group-prepend">
@@ -35,7 +36,7 @@
         <tr v-for="(paciente, index) in busqueda" :key = "index">
           <th>{{ index+1 }}</th>
 
-					<td class="text-capitalize" @click="prepararPaciente(paciente)" data-bs-toggle="modal" data-bs-target="#modalEdicionPaciente" style="cursor:pointer">
+					<td class="text-capitalize" @click="abrirDetallePaciente(paciente)" style="cursor:pointer">
 						<span v-if="paciente.vivo==0"><i class="fas fa-cross"></i></span>  
 						{{ paciente.name ? paciente.name.toUpperCase() : 'SIN NOMBRE' }} {{ paciente.nombres ? paciente.nombres.toUpperCase() : '' }}
 					</td>
@@ -124,6 +125,14 @@
         </tr>
       </tbody>
     </table>
+    </div>
+    
+    <DetallePaciente 
+      v-else 
+      :pacienteId="dataPaciente.id" 
+      @volver="vistaActual = 'lista'" 
+      @editarPaciente="dataPaciente = $event" 
+    />
 
 		<ModalEdicionPaciente :dataPatient="dataPaciente"></ModalEdicionPaciente>
     <modal-recetas v-if="data" :dataPatient="data"></modal-recetas>
@@ -143,6 +152,7 @@
 </template>
 
 <script>
+import DetallePaciente from './DetallePaciente.vue';
 import ModalEdicionPaciente from './ModalEditarPaciente.vue';
 import ModalRecetas from './ModalRecetas.vue';
 import ModalFaltas from './ModalFaltas.vue';
@@ -162,7 +172,7 @@ export default {
 
   data () {
     return {
-      dataPatients: [], queId:null,
+      dataPatients: [], queId:null, vistaActual: 'lista',
       data: null, dataTriajes:null,
       busqueda: [], like:0, id:-1, cantFaltas:-1, reprogramaciones:[],
       totalPatients:[], nombrePaciente:'',
@@ -186,7 +196,7 @@ export default {
     }
   },
 
-  components: { ModalEdicionPaciente, ModalRecetas, ModalFaltas, ModalTriaje, ModalVerTriajesViejos, ModalNewPatient, ModalVerEstados, ModalCambiarLike, ModalVerFaltas, ModalVerHobbies, ModalVerReprogramacionesViejos, OffVerMembresias, ModalAcuerdos },
+  components: { DetallePaciente, ModalEdicionPaciente, ModalRecetas, ModalFaltas, ModalTriaje, ModalVerTriajesViejos, ModalNewPatient, ModalVerEstados, ModalCambiarLike, ModalVerFaltas, ModalVerHobbies, ModalVerReprogramacionesViejos, OffVerMembresias, ModalAcuerdos },
 
   props: {
     profesionales:null
@@ -278,6 +288,10 @@ export default {
       .then(response => {
         this.profesionales=response.data;
       })
+    },
+    abrirDetallePaciente(paciente) {
+      this.prepararPaciente(paciente);
+      this.vistaActual = 'detalle';
     },
 		prepararPaciente(paciente){
 			if(!paciente.relative[0]) paciente.relative[0]={

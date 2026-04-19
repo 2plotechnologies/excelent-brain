@@ -27,6 +27,8 @@ use App\Http\Controllers\Zung_depressionController;
 use App\Http\Controllers\ExtrasController;
 use App\Http\Controllers\LimboController;
 use App\Http\Controllers\SimpleController;
+use App\Http\Controllers\PaqueteController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -94,6 +96,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/pedirArchivos', [PatientController::class, 'pedirArchivos']);
         Route::post('/pedirArchivosTriaje', [PatientController::class, 'pedirArchivosTriaje']);
         Route::get('xlsx_recep/{date}', [PatientController::class, 'createXlsx']);
+        Route::get('patient/{id}/full-details', [PatientController::class, 'getFullPatientDetails']);
 
         // Admin-only patient routes
         Route::middleware('role:administrador,recepcionista')->group(function () {
@@ -101,8 +104,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('searchPatientByNameDniAdmin/{nombre}', [PatientController::class, 'searchPatientByNameDniAdmin']);
             Route::get('returnTotalPatients', [PatientController::class, 'returnTotalPatients']);
             Route::get('xlsx_admin/{date}', [PatientController::class, 'monthXlsx']);
-            Route::get('discharge/{id}/{idProfesional}', [PatientController::class, 'discharge']);
+            //Route::get('discharge/{id}/{idProfesional}', [PatientController::class, 'discharge']);
             Route::get('agePerMonth/{month}', [PatientController::class, 'agePerMonth']);
+        });
+
+        // Admin-only patient routes
+        Route::middleware('role:administrador,recepcionista,profesional')->group(function () {
+            Route::get('discharge/{id}/{idProfesional}', [PatientController::class, 'discharge']);
         });
     });
 
@@ -186,12 +194,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('getPatientsPsiq/{date}', [Medical_evolutionController::class, 'getPatientsPsiq']);
         Route::post('pedirReporte/{idReporte}', [ExtrasController::class, 'pedirReporte']);
         Route::post('pedirReporteGerencial/{idReporte}', [ExtrasController::class, 'pedirReporteGerencial']);
-        Route::post('buscarCartera', [ExtrasController::class, 'buscarCartera']);
+        //Route::post('buscarCartera', [ExtrasController::class, 'buscarCartera']);
         Route::post('actualizarPrecioAdmin', [ExtrasController::class, 'actualizarPrecioAdmin']);
         Route::post('crearPrecioNuevo', [ExtrasController::class, 'crearPrecioNuevo']);
         Route::get('listarPreciosTodos', [ExtrasController::class, 'listarPreciosTodos']);
         Route::post('reportsJimmy', [SimpleController::class, 'reportsJimmy']);
+        Route::get('seguimiento-crm', [ExtrasController::class, 'seguimientoCrm']);
     });
+
+    // ── REPORTS (incluyendo profesional) ──────────────────────────────────────────────────
+    Route::middleware('role:administrador,recepcionista,profesional')->group(function () {
+        Route::post('buscarCartera', [ExtrasController::class, 'buscarCartera']);
+    }); 
 
     // ── EXTRAS ────────────────────────────────────────────────────────────────
     Route::group([], function () {
@@ -217,6 +231,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('cambiarEstadoMembresia/{id}/{estado}/{congelar}', [ExtrasController::class, 'cambiarEstadoMembresia']);
         Route::post('insertarSeguimiento', [ExtrasController::class, 'insertarSeguimiento']);
         Route::get('pedirHistorialSeguimientos/{id}', [ExtrasController::class, 'pedirHistorialSeguimientos']);
+        Route::get('listarPaquetes', [PaqueteController::class, 'listarPaquetes']);
+        Route::get('reportePaquete/{id}', [PaqueteController::class, 'pdfReportePaquete']);
     });
 
     // ── PROFESSIONALS & SCHEDULES ─────────────────────────────────────────────
@@ -281,4 +297,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/buscarRUC/{ruc}', [SimpleController::class, 'buscarRUC']);
     Route::post('/crearNutricionPrimera', [SimpleController::class, 'crearNutricionPrimera']);
     Route::post('/listarNutriciones', [SimpleController::class, 'listarNutriciones']);
+
+    //Dashboard.
+    Route::get('/dashboardRecepcion', [DashboardController::class, 'dashboardRecepcion']);
 });

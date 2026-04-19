@@ -3,7 +3,7 @@
 		class="navbar-nav sidebar sidebar-dark accordion d-print-none"
 		:class="{ 'bg-warning': rolUser === 'profesional',
 		'bg-dark': rolUser === 'administrador',
-		'bg-success': rolUser === 'recepcionista',
+		'recepcion-sidebar': rolUser === 'recepcionista',
 		'bg-danger': rolUser === 'interno'}"
 		id="accordionSidebar">
 				<!-- Rol del admin -->
@@ -54,6 +54,12 @@
 							<router-link  to="/administrador/precios-servicios" class="nav-link">
 								<i class="fas fa-money-bill-wave-alt"></i>
 									<span>Precios de servicios</span>
+							</router-link>
+						</li>
+						<li class="nav-item nav__list" @click="activeSidebar()">
+							<router-link  to="/administrador/paquetes" class="nav-link">
+								<i class="fas fa-box"></i>
+									<span>Paquetes</span>
 							</router-link>
 						</li>
 						<!-- Nav Item - Dashboard -->
@@ -242,9 +248,9 @@
 				
 						<!-- Nav Item - Dashboard -->
 						<li class="nav-item nav__list active" @click="activeSidebar()">
-								<router-link  to="/recepcionista/home" class="nav-link">
-										<i class="fas fa-home"></i>
-										<span>Citas</span>
+								<router-link  to="/recepcionista/dashboard" class="nav-link">
+										<i class="fas fa-chart-line"></i>
+										<span>Dashboard</span>
 								</router-link>
 						</li>
 
@@ -257,8 +263,15 @@
 						</div>
 
 						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link  to="/recepcionista/home" class="nav-link">
+										<i class="fas fa-calendar-check"></i>
+										<span>Citas</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
 								<router-link  to="/recepcionista/pagos" class="nav-link">
-										<i class="fas fa-file-alt"></i>
+										<i class="fas fa-credit-card"></i>
 										<span>Pagos</span>
 								</router-link>
 						</li>
@@ -280,6 +293,20 @@
 								<router-link  to="/recepcionista/pacientes" class="nav-link">
 										<i class="fas fa-hospital-user"></i>
 										<span>Pacientes</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link  to="/recepcionista/paquetes" class="nav-link">
+										<i class="fas fa-box-open"></i>
+										<span>Paquetes</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link  to="/recepcionista/pacientes/seguimiento" class="nav-link">
+										<i class="fa-solid fa-heart-circle-check"></i>
+										<span>Seguimiento</span>
 								</router-link>
 						</li>
 

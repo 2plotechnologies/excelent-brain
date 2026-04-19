@@ -283,6 +283,15 @@ class ScheduleController extends Controller
                 'check_time' => $check_time,
                 'departure_date' => $departure_date
             ]);
+
+            $duracion = \Carbon\Carbon::parse($departure_date)->diffInMinutes(\Carbon\Carbon::parse($check_time));
+            
+            Appointment::where('schedule_id', $id)->update([
+                'hora_inicio' => $check_time,
+                'hora_fin' => $departure_date,
+                'duracion' => $duracion
+            ]);
+
             return response()->json([
                 'mensaje' => 'success'
             ]);

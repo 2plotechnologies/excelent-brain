@@ -398,7 +398,7 @@ class PatientController extends Controller
 		if($idUsuario==10){
 			$evoluciones = Patient::where('id',$idPaciente)
 			->with('cies', 'initial_psychiatric_history', 'initial_psychological_history', 'relative', 'appointments', 'prescriptions')
-			->with('medical_evolutions.professional','medical_evolutions.comentarios')
+			->with('medical_evolutions.professional','medical_evolutions.comentarios', 'medical_evolutions.typeEvolution')
 			->with(['medical_evolutions'=> function($query) {
 				$query->where('activo','=', 1);
 			}])
@@ -409,7 +409,7 @@ class PatientController extends Controller
 	
 			$evoluciones = Patient::where('id',$idPaciente)
 			->with('cies', 'initial_psychiatric_history', 'initial_psychological_history', 'relative', 'appointments', 'prescriptions')
-			->with('medical_evolutions.professional','medical_evolutions.comentarios')
+			->with('medical_evolutions.professional','medical_evolutions.comentarios', 'medical_evolutions.typeEvolution')
 			->with(['medical_evolutions'=> function($query) use($threeMonthsAgo) {
 				$query->where('activo','=', 1)
 				->whereBetween('date', [ $threeMonthsAgo, now() ]);
@@ -421,6 +421,51 @@ class PatientController extends Controller
 		}
 		
 		//return response()->json([$evoluciones]); die();
+
+		// Verificar si la evolución viene de una cita con membresía (idMembresia > 0)
+			$citasConMembresia = Appointment::where('patient_id', $idPaciente)
+				->where('idMembresia', '>', 0)
+				->pluck('date', 'id')
+				->toArray();
+			
+			// Obtener la clasificación de membresía (tipo 5)
+			$clasificacionMembresia = DB::table('precios_clasificacion')->where('id', 5)->first();
+			
+			if ($evoluciones && $evoluciones->medical_evolutions) {
+				foreach ($evoluciones->medical_evolutions as $evol) {
+					$tipoOriginal = $evol->type;
+					$esMembresia = false;
+					
+					// Buscar si hay una cita en la misma fecha para este paciente
+					foreach ($citasConMembresia as $appointmentId => $citaDate) {
+						if ($citaDate == $evol->date) {
+							// Verificar que el profesional sea el mismo
+							$appointment = Appointment::find($appointmentId);
+							if ($appointment && $appointment->professional_id == $evol->professional_id) {
+								$esMembresia = true;
+								break;
+							}
+						}
+					}
+					
+					if ($esMembresia) {
+						// Obtener la clasificación original si existe
+						$clasificacionOriginal = '';
+						if ($evol->typeEvolution) {
+							$clasificacionOriginal = $evol->typeEvolution->clasificacion;
+						}
+						
+						// Crear clasificación combinada
+						if ($clasificacionOriginal) {
+							$evol->clasificacion_combinada = $clasificacionOriginal . ' - ' . ($clasificacionMembresia->clasificacion ?? 'Membresía');
+						} else {
+							$evol->clasificacion_combinada = $clasificacionMembresia->clasificacion ?? 'Membresía';
+						}
+						
+						$evol->type = 5; // Membresía
+					}
+				}
+			}
 		
 		$triaje = DB::table('triaje')->where('patient_id', $evoluciones->id)->get();
 		$evoluciones->triajes = $triaje ;
@@ -722,7 +767,7 @@ class PatientController extends Controller
 			// Use mime-detected extension — do NOT trust client-supplied name/extension
 			$fileName = time() . '_' . uniqid() . '.' . $file->extension();
 			// Store outside public/ so files are not directly accessible via URL
-			$file->storeAs('archivos', $fileName, 'private');
+			$file->storeAs('archivos', $fileName);
 
 			$archivo = DB::table('archivos')->insertGetId([
 				'patient_id' => $request->get('idPaciente'),
@@ -833,4 +878,56 @@ class PatientController extends Controller
 			return $seguimientos;
 		}
 
+		public function getFullPatientDetails($id)
+		{
+			$patient = Patient::with([
+				'address', 
+				'relative', 
+				'prescriptions',
+				'appointments' => function ($q) {
+					$q->orderBy('date', 'desc');
+				},
+				'appointments.professional',
+				'medical_evolutions' => function ($q) {
+					$q->orderBy('date', 'desc');
+				},
+				'medical_evolutions.professional',
+				'medical_evolutions.typeEvolution',
+				'initial_psychiatric_history',
+				'initial_psychological_history'
+			])->find($id);
+
+			if (!$patient) {
+				return response()->json(['error' => 'Patient not found'], 404);
+			}
+
+			// Additional Data via DB queries or other models
+			$patient->triajes = DB::table('triaje')->where('patient_id', $id)->orderBy('id', 'desc')->get();
+			$patient->semaforo_estados = DB::table('semaforo')->where('patient_id', $id)->orderBy('registro', 'desc')->get();
+			$patient->deudas_financieras = DB::table('deudas')->where('patient_id', $id)->orderBy('fecha', 'desc')->get();
+			$patient->archivos_list = DB::table('archivos')->where('patient_id', $id)->get();
+			$patient->archivos_triaje = DB::table('triaje_archivo')->where('patient_id', $id)->get();
+			$patient->faltas_historial = DB::table('faltas as f')
+				->join('professionals as p', 'p.id', '=', 'f.idProfesional')
+				->join('schedules as s', 's.id', '=', 'f.idHorario')
+				->where('f.idPaciente', $id)
+				->select('f.*', 'p.name as professional_name', 's.check_time as hora')
+				->get();
+
+			$patient->membresias = Membresia::where('patient_id', $id)
+				->with('precio')
+				->orderBy('id', 'desc')->get();
+
+			$patient->sos_estado = DB::table('sos')->where('idPaciente', $id)->orderBy('id', 'desc')->get();
+
+			// Psychologist tests
+			$patient->scrs = DB::table('scrs')->where('patient_id', $id)->get();
+			$patient->burns = DB::table('burns')->where('patient_id', $id)->get();
+			$patient->gads = DB::table('gads')->where('patient_id', $id)->get();
+			$patient->zung_anxieties = DB::table('zung_anxieties')->where('patient_id', $id)->get();
+			$patient->zung_depressions = DB::table('zung_depressions')->where('patient_id', $id)->get();
+			$patient->millons = DB::table('millons')->where('patient_id', $id)->get();
+
+			return response()->json($patient);
+		}
 }

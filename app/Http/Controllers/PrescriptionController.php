@@ -8,7 +8,7 @@ use App\Models\Patient;
 use Illuminate\Http\Request;
 use App\Models\Prescription;
 use App\Models\Professional;
-use Barryvdh\DomPDF\Facade as PDF;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\TryCatch;
 

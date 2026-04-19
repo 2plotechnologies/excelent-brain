@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[371],{1564:(e,n,t)=>{t.r(n),t.d(n,{default:()=>a});const a=(0,t(1900).Z)({},(function(){var e=this,n=e.$createElement,t=e._self._c||n;return t("div",[t("h1",[e._v("Pagina no encontrada")]),e._v(" "),t("router-link",{attrs:{to:"/"}},[e._v("Volver a la pagina de Inicio")])],1)}),[],!1,null,null,null).exports}}]);

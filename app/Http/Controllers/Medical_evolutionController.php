@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Medical_evolution;
 use App\Models\Patient;
 use App\Models\Prescription;
-use Barryvdh\DomPDF\Facade as PDF;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 
 class Medical_evolutionController extends Controller
@@ -74,50 +74,104 @@ class Medical_evolutionController extends Controller
 
 	public function pdfEvolutionCompleto ($id){
 		$historia = Patient::where('id', $id)
-		->with('initial_psychiatric_history.professional', 'initial_psychological_history', 'medical_evolutions','medical_evolutions.professional')
-		->first();
+			->with('initial_psychiatric_history.professional', 'initial_psychological_history', 'medical_evolutions.professional')
+			->first();
+
+		// Procesamiento de firmas a Base64 para dompdf
+		$historia = $this->procesarFirmasBase64($historia);
+
+		// Calcular edad (puedes simplificarlo con Carbon)
+		$age = \Carbon\Carbon::parse($historia->birth_date)->age;
 		
-		$age = date("Y",strtotime(date('d-m-Y'))) - date("Y",strtotime($historia->birth_date));
-		if(date("m",strtotime(date('d-m-Y'))) < date("m",strtotime($historia->birth_date))){
-			$age--;
-		}else if(date("m",strtotime(date('d-m-Y'))) == date("m",strtotime($historia->birth_date))){
-			if(date("d",strtotime(date('d-m-Y'))) <= date("d",strtotime($historia->birth_date))){
-				$age--;
-			}
-		}
-		$historia->full='si';
+		$historia->full = 'si';
 
 		$pdf = PDF::loadView('profesional.pdf_paciente', compact('historia', 'age'));
-		
 		$pdf->setPaper('a4', 'portrait');
+		
 		return $pdf->stream('mi-archivo.pdf');
 	}
+
 
 	public function pdfEvolutionRestringido ($id){
 		$threeMonthsAgo = now()->subMonths(6);
 
 		$historia = Patient::where('id', $id)
-		->with('initial_psychiatric_history.professional', 'initial_psychological_history','medical_evolutions.professional')
-		->with(['medical_evolutions'=> function($query) use($threeMonthsAgo) {
-			$query->where('activo','=', 1)
-			->whereBetween('date', [ $threeMonthsAgo, now() ]);
-		}])
-		->first();
+			->with('initial_psychiatric_history.professional', 'initial_psychological_history','medical_evolutions.professional')
+			->with(['medical_evolutions'=> function($query) use($threeMonthsAgo) {
+				$query->where('activo','=', 1)
+				->whereBetween('date', [ $threeMonthsAgo, now() ]);
+			}])
+			->first();
+
+		// Procesamiento de firmas
+		$historia = $this->procesarFirmasBase64($historia);
 		
-		$age = date("Y",strtotime(date('d-m-Y'))) - date("Y",strtotime($historia->birth_date));
-		if(date("m",strtotime(date('d-m-Y'))) < date("m",strtotime($historia->birth_date))){
-			$age--;
-		}else if(date("m",strtotime(date('d-m-Y'))) == date("m",strtotime($historia->birth_date))){
-			if(date("d",strtotime(date('d-m-Y'))) <= date("d",strtotime($historia->birth_date))){
-				$age--;
-			}
-		}
-		$historia->full='no';
+		// Cálculo de edad (Simplificado)
+		$age = \Carbon\Carbon::parse($historia->birth_date)->age;
+		
+		$historia->full = 'no';
 
 		$pdf = PDF::loadView('profesional.pdf_paciente', compact('historia', 'age'));
-		
 		$pdf->setPaper('a4', 'portrait');
+		
 		return $pdf->stream('mi-archivo.pdf');
+	}
+
+	private function _convertirImagenBase64($signingPath) {
+		if (!$signingPath || $signingPath === '-' || $signingPath === '') return $signingPath;
+
+		$path = storage_path('app/public/' . ltrim($signingPath, '/'));
+		
+		// Búsqueda en rutas alternativas donde puede estar la imagen
+		if (!file_exists($path)) {
+			$pathAlt1 = public_path(ltrim($signingPath, '/')); 
+			$pathAlt2 = public_path('img/' . ltrim($signingPath, '/'));
+			$pathAlt3 = public_path('firmas/' . basename($signingPath));
+			
+			if (file_exists($pathAlt1)) {
+				$path = $pathAlt1;
+			} elseif (file_exists($pathAlt2)) {
+				$path = $pathAlt2;
+			} elseif (file_exists($pathAlt3)) {
+				$path = $pathAlt3;
+			}
+		}
+
+		if (file_exists($path)) {
+			try {
+				$type = pathinfo($path, PATHINFO_EXTENSION);
+				$data = file_get_contents($path);
+				return 'data:image/' . $type . ';base64,' . base64_encode($data);
+			} catch (\Exception $e) {
+				return ''; 
+			}
+		}
+		return '';
+	}
+
+	private function procesarFirmasBase64($historia) {
+		// 1. Historia Psiquiátrica Inicial
+		if ($historia->initial_psychiatric_history && $historia->initial_psychiatric_history->professional) {
+			$prof = $historia->initial_psychiatric_history->professional;
+			$prof->signing = $this->_convertirImagenBase64($prof->signing);
+		}
+
+		// 2. Historia Psicológica Inicial
+		if ($historia->initial_psychological_history && $historia->initial_psychological_history->professional) {
+			$prof = $historia->initial_psychological_history->professional;
+			$prof->signing = $this->_convertirImagenBase64($prof->signing);
+		}
+
+		// 3. Evoluciones Médicas
+		if ($historia->medical_evolutions) {
+			foreach ($historia->medical_evolutions as $evolucion) {
+				if ($evolucion->professional) {
+					$evolucion->professional->signing = $this->_convertirImagenBase64($evolucion->professional->signing);
+				}
+			}
+		}
+
+		return $historia;
 	}
 
 	/**
