@@ -64,6 +64,7 @@ const HomePacientes = () => import('./components/interno/HomePacientes.vue');
 
 
 // --- RECPCIONISTA
+const HomeDashboardRecepcionista = () => import('./components/recepcionista/components/dashboard/HomeDashboard.vue');
 const MainRecepcionista = () => import('./components/recepcionista/Main.vue');
 const HomeRecepcionista = () => import('./components/recepcionista/components/Home.vue');
 const HomeRecepcionistaProfesional = () => import('./components/recepcionista/components/profesionales/HomeProfesional.vue');
@@ -456,6 +457,11 @@ export const routes = [
     component: HomePage,
     meta: { requiresAuth: true },
     children: [
+      {
+        path: 'dashboard',
+        name: 'dashboardRecepcionista',
+        component: HomeDashboardRecepcionista
+      },
       {
         path: 'home',
         name: 'homeRecepcionista',

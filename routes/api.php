@@ -28,6 +28,7 @@ use App\Http\Controllers\ExtrasController;
 use App\Http\Controllers\LimboController;
 use App\Http\Controllers\SimpleController;
 use App\Http\Controllers\PaqueteController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -296,4 +297,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/buscarRUC/{ruc}', [SimpleController::class, 'buscarRUC']);
     Route::post('/crearNutricionPrimera', [SimpleController::class, 'crearNutricionPrimera']);
     Route::post('/listarNutriciones', [SimpleController::class, 'listarNutriciones']);
+
+    //Dashboard.
+    Route::get('/dashboardRecepcion', [DashboardController::class, 'dashboardRecepcion']);
 });

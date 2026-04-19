@@ -248,9 +248,9 @@
 				
 						<!-- Nav Item - Dashboard -->
 						<li class="nav-item nav__list active" @click="activeSidebar()">
-								<router-link  to="/recepcionista/home" class="nav-link">
-										<i class="fas fa-home"></i>
-										<span>Citas</span>
+								<router-link  to="/recepcionista/dashboard" class="nav-link">
+										<i class="fas fa-chart-line"></i>
+										<span>Dashboard</span>
 								</router-link>
 						</li>
 
@@ -263,8 +263,15 @@
 						</div>
 
 						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link  to="/recepcionista/home" class="nav-link">
+										<i class="fas fa-calendar-check"></i>
+										<span>Citas</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
 								<router-link  to="/recepcionista/pagos" class="nav-link">
-										<i class="fas fa-file-alt"></i>
+										<i class="fas fa-credit-card"></i>
 										<span>Pagos</span>
 								</router-link>
 						</li>

@@ -558,11 +558,11 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "nav-link",
     attrs: {
-      to: "/recepcionista/home"
+      to: "/recepcionista/dashboard"
     }
   }, [_c("i", {
-    staticClass: "fas fa-home"
-  }), _vm._v(" "), _c("span", [_vm._v("Citas")])])], 1), _vm._v(" "), _c("hr", {
+    staticClass: "fas fa-chart-line"
+  }), _vm._v(" "), _c("span", [_vm._v("Dashboard")])])], 1), _vm._v(" "), _c("hr", {
     staticClass: "sidebar-divider"
   }), _vm._v(" "), _c("div", {
     staticClass: "sidebar-heading"
@@ -576,10 +576,24 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "nav-link",
     attrs: {
+      to: "/recepcionista/home"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-calendar-check"
+  }), _vm._v(" "), _c("span", [_vm._v("Citas")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "nav-item nav__list",
+    on: {
+      click: function click($event) {
+        return _vm.activeSidebar();
+      }
+    }
+  }, [_c("router-link", {
+    staticClass: "nav-link",
+    attrs: {
       to: "/recepcionista/pagos"
     }
   }, [_c("i", {
-    staticClass: "fas fa-file-alt"
+    staticClass: "fas fa-credit-card"
   }), _vm._v(" "), _c("span", [_vm._v("Pagos")])])], 1), _vm._v(" "), _c("li", {
     staticClass: "nav-item nav__list",
     on: {
