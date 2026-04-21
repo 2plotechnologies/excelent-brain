@@ -66,7 +66,11 @@ export default {
 						return
 					}
 					localStorage.setItem('token', token)
-					this.$router.push({ path: `/${rol}/home` })
+					let targetPath = `/${rol}/home`;
+					if (rol === 'recepcionista' || rol === 'profesional') {
+						targetPath = `/${rol}/dashboard`;
+					}
+					this.$router.push({ path: targetPath })
 				}).catch((err) => {
 					console.log(err)
 					this.errors = err.response?.data?.errors ?? {}

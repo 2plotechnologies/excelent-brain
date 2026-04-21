@@ -300,4 +300,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Dashboard.
     Route::get('/dashboardRecepcion', [DashboardController::class, 'dashboardRecepcion']);
+    Route::get('/dashboardProfesional', [DashboardController::class, 'dashboardProfesional']);
+    Route::get('/dashboardModuloPacientes', [DashboardController::class, 'dashboardModuloPacientes']);
+    Route::get('/dashboardModuloCitas', [DashboardController::class, 'dashboardModuloCitas']);
 });

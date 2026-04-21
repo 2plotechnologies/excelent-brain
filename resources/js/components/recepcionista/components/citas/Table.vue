@@ -8,13 +8,23 @@
 					<button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#calendario-tab" type="button" role="tab" aria-controls="calendario-tab" aria-selected="false"><i class="fa-regular fa-calendar-days"></i> Vista calendario</button>
 				</li>
 				<li class="nav-item" role="presentation">
-					<button class="nav-link active font-weight-bold" id="book-tab" data-bs-toggle="tab" data-bs-target="#cuaderno-tab" type="button" role="tab" aria-controls="cuaderno-tab" aria-selected="true"><i class="fa-regular fa-calendar-days text-success"></i> Calendario Programado</button>
+					<button class="nav-link active font-weight-bold" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#tab-dashboard" type="button" role="tab" aria-controls="tab-dashboard" aria-selected="true"><i class="fas fa-chart-pie text-primary"></i> Dashboard</button>
+				</li>
+				<li class="nav-item" role="presentation">
+					<button class="nav-link" id="book-tab" data-bs-toggle="tab" data-bs-target="#cuaderno-tab" type="button" role="tab" aria-controls="cuaderno-tab" aria-selected="false"><i class="fa-regular fa-calendar-days text-success"></i> Calendario Programado</button>
 				</li>
 				<li class="nav-item" role="presentation">
 					<button class="nav-link " id="home-tab" data-bs-toggle="tab" data-bs-target="#inicio-tab" type="button" role="tab" aria-controls="inicio-tab" aria-selected="false"><i class="fas fa-search"></i> Búsqueda del paciente</button>
 				</li>
 			</ul>
 			<div class="tab-content" id="myTabContent">
+				<!-- Tab Dashboard (Nueva) -->
+				<div class="tab-pane fade show active" id="tab-dashboard" role="tabpanel" aria-labelledby="dashboard-tab" tabindex="0">
+					<div class="mt-4">
+						<dashboard-citas></dashboard-citas>
+					</div>
+				</div>
+				<!-- Fin Tab Dashboard -->
 				<!-- Inicio de primera tab -->
 				<div class="tab-pane fade " id="inicio-tab" role="tabpanel" aria-labelledby="inicio-tab" tabindex="0">
 					<div class="d-sm-flex align-items-center justify-content-around mt-4 px-3" style="gap: 10px;">
@@ -216,7 +226,7 @@
 				<div class="tab-pane fade" id="calendario-tab" role="tabpanel" aria-labelledby="calendario-tab" tabindex="0">
 					<vista-calendario :profesionales="profesionales" ></vista-calendario>
 				</div>
-				<div class="tab-pane fade show active" id="cuaderno-tab" role="tabpanel" aria-labelledby="cuaderno-tab" tabindex="0">
+				<div class="tab-pane fade" id="cuaderno-tab" role="tabpanel" aria-labelledby="cuaderno-tab" tabindex="0">
 					<vista-cuaderno :nombreUser="nombreUser" :idSede="idSede" ></vista-cuaderno>
 				</div>
 				<!-- Fin de segunda tab -->
@@ -241,9 +251,7 @@ import ModalPatient from './ModalPatient_table.vue'
 import ModalEstadoCita from './ModalEstadoCita.vue'
 import ReprogModal from './ReprogModal.vue'
 import ModalVerRecetasRepetido from './ModalVerRecetasRepetido.vue'
-
-
-
+import DashboardCitas from './DashboardCitas.vue'
 
 import VistaCalendario from './VistaCalendario.vue'
 import VistaCuaderno from './VistaCuaderno.vue'
@@ -254,7 +262,7 @@ import alertify from 'alertifyjs'
 export default {
   name: 'table-cita',
 
-  components: { PagoModal, InfoModal, ReprogModal, ModalEstadoCita, VistaCalendario, VistaCuaderno, ModalPatient, ModalVerRecetasRepetido },
+  components: { PagoModal, InfoModal, ReprogModal, ModalEstadoCita, VistaCalendario, VistaCuaderno, ModalPatient, ModalVerRecetasRepetido, DashboardCitas },
 
   props: {
     profes:Array,

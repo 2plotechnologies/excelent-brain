@@ -1,0 +1,384 @@
+<template>
+  <div class="px-3" style="background-color: #f8f9fc; min-height: 100vh;">
+      
+      <!-- DASHBOARD CARDS ROW -->
+      <div class="d-flex flex-wrap mb-4" style="gap: 15px;">
+          <!-- Citas Hoy -->
+          <div class="card flex-fill py-1 shadow-sm border-0" style="border-left: 4px solid #4e73df; border-radius:10px;">
+              <div class="card-body py-2 px-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                          <div class="text-xs text-muted mb-1">Citas Hoy</div>
+                          <div class="h4 mb-0 font-weight-bold text-dark">{{ dashData.totalCitasHoy }}</div>
+                      </div>
+                      <div class="icon-circle bg-primary-light p-2 rounded" style="background:#eaf2ff">
+                          <i class="far fa-calendar-alt text-primary"></i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!-- Confirmadas -->
+          <div class="card flex-fill py-1 shadow-sm border-0" style="border-left: 4px solid #1cc88a; border-radius:10px;">
+              <div class="card-body py-2 px-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                          <div class="text-xs text-muted mb-1">Confirmadas</div>
+                          <div class="h4 mb-0 font-weight-bold text-dark">{{ dashData.totalCitasCompletadas }}</div>
+                      </div>
+                      <div class="icon-circle bg-success-light p-2 rounded" style="background:#e8fdf5">
+                          <i class="far fa-check-circle text-success"></i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!-- Pendientes -->
+          <div class="card flex-fill py-1 shadow-sm border-0" style="border-left: 4px solid #f6c23e; border-radius:10px;">
+              <div class="card-body py-2 px-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                          <div class="text-xs text-muted mb-1">Pendientes</div>
+                          <div class="h4 mb-0 font-weight-bold text-dark">{{ dashData.totalCitasPendientes }}</div>
+                      </div>
+                      <div class="icon-circle bg-warning-light p-2 rounded" style="background:#fef6e5">
+                          <i class="far fa-clock text-warning"></i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!-- Canceladas -->
+          <div class="card flex-fill py-1 shadow-sm border-0" style="border-left: 4px solid #e74a3b; border-radius:10px;">
+              <div class="card-body py-2 px-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                          <div class="text-xs text-muted mb-1">Canceladas</div>
+                          <div class="h4 mb-0 font-weight-bold text-dark">{{ dashData.totalCitasCanceladas }}</div>
+                      </div>
+                      <div class="icon-circle bg-danger-light p-2 rounded" style="background:#fbe3e4">
+                          <i class="far fa-times-circle text-danger"></i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!-- Reprogramadas -->
+          <div class="card flex-fill py-1 shadow-sm border-0" style="border-left: 4px solid #36b9cc; border-radius:10px;">
+              <div class="card-body py-2 px-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                          <div class="text-xs text-muted mb-1">Reprogramadas</div>
+                          <div class="h4 mb-0 font-weight-bold text-dark">{{ dashData.totalCitasReprogramadas }}</div>
+                      </div>
+                      <div class="icon-circle bg-info-light p-2 rounded" style="background:#eaf8fa">
+                          <i class="fas fa-sync-alt text-info"></i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!-- No Asistencias -->
+          <div class="card flex-fill py-1 shadow-sm border-0" style="border-left: 4px solid #858796; border-radius:10px;">
+              <div class="card-body py-2 px-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                          <div class="text-xs text-muted mb-1">No Asistencias</div>
+                          <div class="h4 mb-0 font-weight-bold text-dark">{{ dashData.totalCitasNoAsistidas }}</div>
+                      </div>
+                      <div class="icon-circle bg-secondary-light p-2 rounded" style="background:#f8f9fc">
+                          <i class="fas fa-user-times text-secondary"></i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!-- Ocupacion -->
+          <div class="card flex-fill py-1 shadow-sm border-0" style="border-left: 4px solid #eaecf4; border-radius:10px;">
+              <div class="card-body py-2 px-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                          <div class="text-xs text-muted mb-1">Profesionales</div>
+                          <div class="h4 mb-0 font-weight-bold text-dark">{{ profesionalesCount }}</div>
+                          <div class="text-xs text-muted mt-1">Activos esta sem.</div>
+                      </div>
+                      <div class="icon-circle bg-light p-2 rounded" style="background:#f8f9fc">
+                          <i class="fas fa-user-md text-secondary"></i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="row mb-4">
+          <!-- Estado Citas Hoy (Donut) -->
+          <div class="col-md-4 mb-3 mb-md-0">
+              <div class="card h-100 border-0 shadow-sm" style="border-radius:10px;">
+                  <div class="card-body">
+                      <h6 class="font-weight-bold text-dark mb-4">Estado de Citas - Hoy</h6>
+                      <div style="position: relative; height: 100%; width: 100%;" v-if="estadosCitasHoyObj.labels.length">
+                          <Doughnut :chart-data="estadosCitasHoyObj" :chart-options="donutOptions" />
+                      </div>
+                      <div v-else class="text-center text-muted d-flex h-100 align-items-center justify-content-center">Sin datos hoy</div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Ocupacion Semanal por Profesional (Bar) -->
+          <div class="col-md-4 mb-3 mb-md-0">
+              <div class="card h-100 border-0 shadow-sm" style="border-radius:10px;">
+                  <div class="card-body">
+                      <h6 class="font-weight-bold text-dark mb-4">Ocupación Semanal por Profesional</h6>
+                      <div style="position: relative; height: 100%; width: 100%;" v-if="ocupacionObj.labels.length">
+                          <Bar :chart-data="ocupacionObj" :chart-options="barOptions" />
+                      </div>
+                      <div v-else class="text-center text-muted d-flex h-100 align-items-center justify-content-center">Sin datos</div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Tipos de Citas Semana (Donut) -->
+          <div class="col-md-4">
+              <div class="card h-100 border-0 shadow-sm" style="border-radius:10px;">
+                  <div class="card-body">
+                      <h6 class="font-weight-bold text-dark mb-4">Tipos de Citas - Semana</h6>
+                      <div style="position: relative; height: 100%; width: 100%;" v-if="tiposSemanaObj.labels.length">
+                          <Doughnut :chart-data="tiposSemanaObj" :chart-options="donutOptions" />
+                      </div>
+                      <div v-else class="text-center text-muted d-flex h-100 align-items-center justify-content-center">Sin datos de tipos</div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Citas del Dia List -->
+      <div class="row">
+          <div class="col-12">
+              <div class="card border-0 shadow-sm" style="border-radius:10px;">
+                  <div class="card-header bg-white border-0 pt-4 pb-0 d-flex align-items-center">
+                      <h5 class="mb-0 font-weight-bold text-dark w-100">
+                          <i class="far fa-clock text-primary"></i> Agenda del Día
+                          <span class="badge badge-primary bg-primary text-white ml-2" style="font-size:0.8rem;">{{ dashData.citasHoy ? dashData.citasHoy.length : 0 }} citas</span>
+                      </h5>
+                  </div>
+                  <div class="card-body">
+                      <div v-if="dashData.citasHoy && dashData.citasHoy.length > 0">
+                          <div class="list-group list-group-flush">
+                              <div v-for="(cita, index) in dashData.citasHoy" :key="index" class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center border-bottom">
+                                  <div class="d-flex align-items-center w-50">
+                                      <div class="text-center mr-4" style="min-width: 60px;">
+                                          <strong class="text-dark d-block mb-1">{{ formatHora(cita.schedule ? cita.schedule.check_time : '') }}</strong>
+                                          <small class="text-muted">{{ formatHora(cita.schedule ? cita.schedule.departure_date : '') }}</small>
+                                      </div>
+                                      <div class="mr-3 text-center" style="min-width: 40px;">
+                                          <div class="icon-circle p-2 mx-auto" :class="getTypeColor(cita.precio ? cita.precio.descripcion : '').bg" style="width: 2.2rem; height: 2.2rem;">
+                                              <i :class="getTypeColor(cita.precio ? cita.precio.descripcion : '').icon"></i>
+                                          </div>
+                                          <small class="font-weight-bold mt-1 d-block" :class="getTypeColor(cita.precio ? cita.precio.descripcion : '').text">{{ formatCode(cita.precio ? cita.precio.descripcion : '') }}</small>
+                                      </div>
+                                      <div>
+                                          <h6 class="mb-1 font-weight-bold text-dark">{{ cita.patient ? cita.patient.name + ' ' + cita.patient.nombres : 'Sin datos' }}</h6>
+                                          <small class="text-muted d-block">{{ cita.professional ? cita.professional.nombre || cita.professional.name : '...' }} <i class="fas fa-video ml-1" v-if="cita.mode == 2"></i></small>
+                                      </div>
+                                  </div>
+                                  <div class="d-flex align-items-center justify-content-end w-50">
+                                      <span class="text-warning font-weight-bold" title="Pendiente de pago" v-if="cita.payment && cita.payment.pay_status == 1"><i class="fas fa-dollar-sign"></i></span>
+                                      <span class="text-success font-weight-bold" title="Cancelado" v-else-if="cita.payment && cita.payment.pay_status == 2"><i class="fas fa-dollar-sign"></i></span>
+                                      
+                                      <!-- status badge -->
+                                      <span class="badge py-2 px-3 mx-3" style="font-size: 0.8rem; border-radius:15px;" :class="getStatusBadge(cita.status).class">
+                                          <i :class="getStatusBadge(cita.status).icon" class="mr-1"></i> {{ getStatusBadge(cita.status).text }}
+                                      </span>
+                                      
+                                      <a href="#" class="text-primary mr-3 text-decoration-none" v-if="cita.status != 3"><i class="fas fa-sync-alt mr-1"></i> Reprogramar</a>
+                                      <button class="btn btn-link text-muted"><i class="fas fa-ellipsis-h"></i></button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div v-else class="text-center py-5 text-muted">
+                          <p class="mb-0">No hay citas programadas para el día de hoy.</p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+  </div>
+</template>
+
+<script>
+import { Doughnut, Bar } from 'vue-chartjs/legacy'
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, BarElement } from 'chart.js'
+
+ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, BarElement, ChartDataLabels)
+
+export default {
+  name: 'DashboardCitas',
+  components: { Doughnut, Bar },
+  data() {
+      return {
+          dashData: {
+              totalCitasHoy: 0,
+              totalCitasPendientes: 0,
+              totalCitasCompletadas: 0,
+              totalCitasCanceladas: 0,
+              totalCitasReprogramadas: 0,
+              totalCitasNoAsistidas: 0,
+              citasSemanalesPorTipo: [],
+              ocupacionSemanalPorProfesional: []
+          },
+          profesionalesCount: 0,
+          estadosCitasHoyObj: { labels: [], datasets: [{ backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#0ea5e9'], data: [] }] },
+          tiposSemanaObj: { labels: [], datasets: [{ backgroundColor: ['#3b82f6', '#0ea5e9', '#10b981', '#a855f7', '#f59e0b'], data: [] }] },
+          ocupacionObj: { labels: ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'], datasets: [] },
+          
+          donutOptions: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                  legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } },
+                  datalabels: { display: false }
+              },
+              cutout: '65%'
+          },
+          barOptions: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                  legend: { display: false },
+                  datalabels: { display: false }
+              },
+              scales: {
+                  x: { grid: { display: false } },
+                  y: { beginAtZero: true, border: { dash: [4, 4] }, grid: { borderDash: [4, 4] } }
+              }
+          }
+      }
+  },
+  mounted() {
+      this.fetchDashboardData();
+      setInterval(this.fetchDashboardData, 300000); // 5 minutes reload
+  },
+  methods: {
+      async fetchDashboardData() {
+          try {
+              let { data } = await this.axios.get('/api/dashboardModuloCitas');
+              this.dashData = data;
+              
+              // Estado de citas hoy
+              this.estadosCitasHoyObj.labels = ['Confirmadas', 'Programadas/Pendientes', 'Canceladas', 'Reprogramadas'];
+              this.estadosCitasHoyObj.datasets[0].data = [
+                  data.totalCitasCompletadas || 0,
+                  data.totalCitasPendientes || 0,
+                  data.totalCitasCanceladas || 0,
+                  data.totalCitasReprogramadas || 0
+              ];
+              // Si no hay citas hoy, limpiamos para que renderize "Sin datos" (o dejamos el chart vacio)
+              if (this.estadosCitasHoyObj.datasets[0].data.every(v => v === 0)) {
+                  this.estadosCitasHoyObj.labels = []; // trigger fallback
+              }
+
+              // Tipos semana
+              if (data.citasSemanalesPorTipo && data.citasSemanalesPorTipo.length > 0) {
+                  this.tiposSemanaObj.labels = data.citasSemanalesPorTipo.map(c => c.descripcion);
+                  this.tiposSemanaObj.datasets[0].data = data.citasSemanalesPorTipo.map(c => c.total);
+              }
+
+              // Ocupacion semanal
+              if (data.ocupacionSemanalPorProfesional && data.ocupacionSemanalPorProfesional.length > 0) {
+                  const diasBase = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
+                  const mapProf = {};
+                  const uniqueProfs = new Set();
+                  
+                  data.ocupacionSemanalPorProfesional.forEach(row => {
+                      uniqueProfs.add(row.profesional);
+                      if(!mapProf[row.profesional]) {
+                          mapProf[row.profesional] = [0,0,0,0,0,0,0];
+                      }
+                      let indexDia = diasBase.indexOf(row.dia);
+                      if(indexDia !== -1) {
+                          mapProf[row.profesional][indexDia] = row.total;
+                      }
+                  });
+                  this.profesionalesCount = uniqueProfs.size + 1;
+
+                  const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+                  let dsets = [];
+                  let cId = 0;
+                  
+                  for(let prof in mapProf) {
+                      dsets.push({
+                          label: prof,
+                          data: mapProf[prof],
+                          backgroundColor: colors[cId % colors.length],
+                          barThickness: 6,
+                          borderRadius: 2
+                      });
+                      cId++;
+                  }
+                  
+                  this.ocupacionObj.datasets = dsets;
+              } else {
+                  this.profesionalesCount = 0;
+                  this.ocupacionObj.datasets = [];
+              }
+
+              // Force Vue to re-render charts internally if needed
+              this.ocupacionObj = Object.assign({}, this.ocupacionObj);
+              this.estadosCitasHoyObj = Object.assign({}, this.estadosCitasHoyObj);
+              this.tiposSemanaObj = Object.assign({}, this.tiposSemanaObj);
+
+          } catch(e) {
+              console.error("Error fetching Dashboard Citas:", e);
+          }
+      },
+      formatHora(hora) {
+          if(!hora) return '';
+          let hs = hora.split(':');
+          if(hs.length >= 2) {
+              return hs[0] + ':' + hs[1];
+          }
+          return hora;
+      },
+      formatCode(desc) {
+          if(!desc) return 'GEN';
+          let str = desc.toLowerCase();
+          if(str.includes('psiqui')) return 'PSQ';
+          if(str.includes('psicol') || str.includes('terapia')) return 'PSI';
+          if(str.includes('nutri')) return 'NUT';
+          if(str.includes('taller')) return 'TAL';
+          if(str.includes('paquete')) return 'PAQ';
+          return 'GEN';
+      },
+      getTypeColor(desc) {
+          let code = this.formatCode(desc);
+          if(code === 'PSQ') return { bg: 'bg-info-light', text: 'text-info', icon: 'fas fa-stethoscope text-info' };
+          if(code === 'NUT') return { bg: 'bg-success-light', text: 'text-success', icon: 'fas fa-apple-alt text-success' };
+          if(code === 'PSI') return { bg: 'bg-primary-light', text: 'text-primary', icon: 'fas fa-brain text-primary' };
+          return { bg: 'bg-secondary-light', text: 'text-secondary', icon: 'fas fa-notes-medical text-secondary' };
+      },
+      getStatusBadge(status) {
+          // 1: Sin confirmar, 2: Confirmado, 3: Anulado/Cancelado, 4: Reprogramado
+          if(status == 1) return { class: 'badge-warning text-dark', icon: 'far fa-clock', text: 'Pendiente' };
+          if(status == 2) return { class: 'badge-success', icon: 'far fa-check-circle', text: 'Confirmada' };
+          if(status == 3) return { class: 'badge-danger', icon: 'far fa-times-circle', text: 'Cancelada' };
+          if(status == 4) return { class: 'badge-info', icon: 'fas fa-sync-alt', text: 'Reprogramada' };
+          return { class: 'badge-secondary', icon: 'far fa-circle', text: 'N/A' };
+      }
+  }
+}
+</script>
+
+<style scoped>
+.icon-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 10px;
+}
+.card {
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+.card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+}
+</style>

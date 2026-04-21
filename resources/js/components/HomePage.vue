@@ -66,8 +66,14 @@ export default {
 
     methods: {
 			routePathValidation () {
-				if (this.$router.history.current.path.split("/")[1] !== this.currentUser.rol) {
-						this.$router.push({ path: `/${this.currentUser.rol}/home` })    
+				const currentPath = this.$router.history.current.path;
+				const rol = this.currentUser.rol;
+				if (currentPath.split("/")[1] !== rol || currentPath === `/${rol}` || currentPath === `/${rol}/`) {
+					let targetPath = `/${rol}/home`;
+					if (rol === 'recepcionista' || rol === 'profesional') {
+						targetPath = `/${rol}/dashboard`;
+					}
+					this.$router.push({ path: targetPath }).catch(()=>{})    
 				}
 			},
 			capitalizarPrimeraLetra(texto) {

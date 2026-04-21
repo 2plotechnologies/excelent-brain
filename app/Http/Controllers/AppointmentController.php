@@ -96,6 +96,9 @@ class AppointmentController extends Controller
 		->get()->toArray();
 
 
+		.
+
+
 		$appointments.sort(function(a,b){
 			return parseInt(a.id) - parseInt(b.id);
 		});

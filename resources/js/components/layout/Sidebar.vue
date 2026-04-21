@@ -88,7 +88,7 @@
 						<!-- Sidebar - Brand -->
 						<a 
 						class="sidebar-brand d-flex align-items-center justify-content-center" 
-						href="/profesional/home"
+						href="/profesional/dashboard"
 						>
 								<div class="sidebar-brand-icon">
 										<i class="fas fa-user-md"></i>
@@ -98,6 +98,13 @@
 
 						<!-- Nav Item - Dashboard -->
 						<li class="nav-item nav__list active" @click="activeSidebar()">
+								<router-link  to="/profesional/dashboard" class="nav-link">
+										<i class="fas fa-chart-line"></i>
+										<span>Dashboard</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
 								<router-link  to="/profesional/home" class="nav-link">
 										<i class="fas fa-home"></i>
 										<span>Inicio</span>
@@ -238,7 +245,7 @@
 						<!-- Sidebar - Brand -->
 						<a 
 						class="sidebar-brand d-flex align-items-center justify-content-center" 
-						href="/recepcionista/home"
+						href="/recepcionista/dashboard"
 						>
 								<div class="sidebar-brand-icon">
 										<i class="fas fa-user-md"></i>

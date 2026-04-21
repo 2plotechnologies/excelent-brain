@@ -34,8 +34,12 @@ __webpack_require__.r(__webpack_exports__);
           return;
         }
         localStorage.setItem('token', token);
+        var targetPath = "/".concat(rol, "/home");
+        if (rol === 'recepcionista' || rol === 'profesional') {
+          targetPath = "/".concat(rol, "/dashboard");
+        }
         _this.$router.push({
-          path: "/".concat(rol, "/home")
+          path: targetPath
         });
       })["catch"](function (err) {
         var _err$response$data$er, _err$response;

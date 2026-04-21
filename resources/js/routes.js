@@ -55,7 +55,7 @@ const mdq = () => import('./components/profesional/components/examenes/MDQ.vue')
 const PrintReceta = () => import('./components/profesional/components/recetas/PrintReceta.vue')
 const KairosTable = () => import('./components/profesional/components/recetas/KairosTable.vue')
 const HomeKurame = () => import('./components/profesional/components/kurame/HomeKurame.vue')
-
+const HomeDashboardProfesional = () => import('./components/profesional/components/dashboard/HomeDashboardProfesional.vue')
 
 // --- INTERNO
 
@@ -236,6 +236,11 @@ export const routes = [
     component: HomePage,
     meta: { requiresAuth: true },
     children: [
+      {
+        path: 'dashboard',
+        name: 'dashboardProfesional',
+        component: HomeDashboardProfesional
+      },
       {
         path: 'home',
         name: 'homeProfesional',

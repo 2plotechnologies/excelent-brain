@@ -1,21 +1,155 @@
 <template>
   <main>
     <div v-if="vistaActual === 'lista'">
-      <div class="d-sm-flex align-items-center justify-content-around mt-4">
-        <div class="d-none d-sm-inline-block form-inline w-100">
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <button class="btn btn-success shadow-sm" type="button" @click="searchPatients()">
-                        <i class="fas fa-search fa-sm"></i>
-                    </button>
+        <!-- DASHBOARD CARDS -->
+        <div class="row mt-4 mb-3">
+            <div class="col-xl-2 col-md-4 mb-2">
+                <div class="card h-100 py-1" style="border-left: 4px solid #4e73df; border-radius:10px;">
+                    <div class="card-body py-2 px-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="text-xs text-muted mb-1">Pacientes Activos</div>
+                                <div class="h4 mb-0 font-weight-bold text-dark">{{ dashData.pacientesActivos }}</div>
+                                <div class="text-xs text-muted mt-1">Total registrados</div>
+                            </div>
+                            <div class="icon-circle bg-primary-light p-2 rounded" style="background:#eaf2ff">
+                                <i class="fas fa-users text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <input type="text" class="form-control bg-white shadow-sm border-0 small" id="searchNamePatient"
-                placeholder="Buscar por apellidos, nombres o DNI..." autocomplete="off" @keyup.enter="searchPatients()">
+            </div>
+            <div class="col-xl-2 col-md-4 mb-2">
+                <div class="card h-100 py-1" style="border-left: 4px solid #1cc88a; border-radius:10px;">
+                    <div class="card-body py-2 px-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="text-xs text-muted mb-1">Nuevos del Mes</div>
+                                <div class="h4 mb-0 font-weight-bold text-dark">{{ dashData.nuevosDelMes }}</div>
+                                <div class="text-xs text-muted mt-1">Este mes</div>
+                            </div>
+                            <div class="icon-circle bg-success-light p-2 rounded" style="background:#e8fdf5">
+                                <i class="fas fa-user-plus text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4 mb-2">
+                <div class="card h-100 py-1" style="border-left: 4px solid #eaecf4; border-radius:10px;">
+                    <div class="card-body py-2 px-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="text-xs text-muted mb-1">Con Cita Hoy</div>
+                                <div class="h4 mb-0 font-weight-bold text-dark">{{ dashData.conCitaHoy }}</div>
+                                <div class="text-xs text-muted mt-1">Pacientes agendados</div>
+                            </div>
+                            <div class="icon-circle bg-light p-2 rounded" style="background:#f8f9fc">
+                                <i class="far fa-calendar text-secondary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4 mb-2">
+                <div class="card h-100 py-1" style="border-left: 4px solid #f6c23e; border-radius:10px;">
+                    <div class="card-body py-2 px-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="text-xs text-muted mb-1">Pacientes con Deuda</div>
+                                <div class="h4 mb-0 font-weight-bold text-dark">{{ dashData.conDeuda }}</div>
+                                <div class="text-xs text-muted mt-1">Sin pago hoy</div>
+                            </div>
+                            <div class="icon-circle bg-warning-light p-2 rounded" style="background:#fef6e5">
+                                <i class="fas fa-dollar-sign text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4 mb-2">
+                <div class="card h-100 py-1" style="border-left: 4px solid #e74a3b; border-radius:10px;">
+                    <div class="card-body py-2 px-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="text-xs text-muted mb-1">Casos SOS</div>
+                                <div class="h4 mb-0 font-weight-bold text-dark">{{ dashData.casosSOS }}</div>
+                                <div class="text-xs text-muted mt-1">Emergencias activas</div>
+                            </div>
+                            <div class="icon-circle bg-danger-light p-2 rounded" style="background:#fbe3e4">
+                                <i class="fas fa-exclamation-triangle text-danger"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4 mb-2">
+                <div class="card h-100 py-1" style="border-left: 4px solid #1cc88a; border-radius:10px;">
+                    <div class="card-body py-2 px-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="text-xs text-muted mb-1">Tasa Retención</div>
+                                <div class="h4 mb-0 font-weight-bold text-dark">{{ parseInt(dashData.tasaRetencion) }}%</div>
+                                <div class="text-xs text-muted mt-1">Pacientes recurrentes</div>
+                            </div>
+                            <div class="icon-circle bg-success-light p-2 rounded" style="background:#e8fdf5">
+                                <i class="far fa-check-circle text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-		<button class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#modalNewPatient"><i class="fas fa-user-nurse"></i> Crear paciente nuevo</button>
-		<p class="mt-3 mb-1">Últimos 20 pacientes registrados</p>
+
+        <!-- SEARCH AND BUTTONS -->
+        <div class="row align-items-center mb-3">
+            <div class="col-lg-6 mb-2 mb-lg-0">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <button class="btn btn-white bg-white border-right-0 border" type="button" @click="searchPatients()">
+                            <i class="fas fa-search text-muted"></i>
+                        </button>
+                    </div>
+                    <input type="text" class="form-control bg-white border-left-0 border" id="searchNamePatient"
+                    placeholder="Buscar por DNI, nombre o celular..." autocomplete="off" @keyup.enter="searchPatients()" style="box-shadow:none;">
+                </div>
+            </div>
+            <div class="col-lg-6 text-lg-right text-center">
+                <button class="btn btn-primary shadow-sm mr-1" data-bs-toggle="modal" data-bs-target="#modalNewPatient"><i class="fas fa-user-plus"></i> Nuevo Paciente</button>
+                <router-link to="/recepcionista/home" class="btn shadow-sm text-white mr-1" style="background-color: #f97316;"><i class="fas fa-plus"></i> Nueva Cita</router-link>
+                <button class="btn btn-white border shadow-sm mr-1"><i class="far fa-credit-card"></i> Cobrar Deuda</button>
+                <router-link to="/recepcionista/paquetes" class="btn btn-white border shadow-sm"><i class="fas fa-box"></i> Nuevo Paquete</router-link>
+            </div>
+        </div>
+
+        <!-- CHARTS -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="card h-100 border-0 shadow-sm" style="border-radius:10px;">
+                    <div class="card-body" style="overflow: scroll;">
+                        <h6 class="font-weight-bold text-dark mb-4">Tipos de Atención</h6>
+                        <div style="position: relative; height: 250px; width: 100%;" v-if="tiposDataLoaded">
+                            <Doughnut :chart-data="donutObj" :chart-options="pieOptions" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm" style="border-radius:10px;">
+                    <div class="card-body" style="overflow: scroll;">
+                        <h6 class="font-weight-bold text-dark mb-4">Estados de Pacientes</h6>
+                        <div 
+                          :style="{ height: (barObj.labels.length * 50) + 'px', position: 'relative', width: '100%' }"
+                          v-if="dashData.completadas !== undefined"
+                        >
+                            <Bar :chart-data="barObj" :chart-options="barOptions" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+		<p class="mt-3 mb-1 font-weight-bold text-dark">Últimos pacientes registrados</p>
     <table class="table table-hover mt-4">
       <thead>
         <tr>
@@ -152,6 +286,12 @@
 </template>
 
 <script>
+import { Doughnut, Bar } from 'vue-chartjs/legacy'
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, BarElement } from 'chart.js'
+
+ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, BarElement, ChartDataLabels)
+
 import DetallePaciente from './DetallePaciente.vue';
 import ModalEdicionPaciente from './ModalEditarPaciente.vue';
 import ModalRecetas from './ModalRecetas.vue';
@@ -174,6 +314,61 @@ export default {
     return {
       dataPatients: [], queId:null, vistaActual: 'lista',
       data: null, dataTriajes:null,
+      dashData: { pacientesActivos:0, nuevosDelMes:0, conCitaHoy:0, conDeuda:0, casosSOS:0, tasaRetencion:0, pendientes:0, completadas:0, canceladas:0, reprogramadas:0, tiposAtencion:[] },
+      tiposDataLoaded: false,
+      donutObj: {
+          labels: [],
+          datasets: [{ backgroundColor: ['#1e60ff','#f97316','#10b981','#a855f7', '#ff0000', '#00ff00', '#ff00ff', '#00ffff'], data: [] }]
+      },
+      barObj: {
+        labels: ['Confirmadas','Pendientes','Canceladas','Reprogramadas'],
+        datasets: [{
+          label: 'Pacientes',
+          backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#0ea5e9'],
+          borderWidth: 0,
+          data: [0, 0, 0, 0],
+          categoryPercentage: 0.9, // 🔥 menos espacio entre categorías
+          barPercentage: 0.9,// 🔥 barras más gruesas
+          barThickness: undefined,       
+        }]
+      },
+      pieOptions: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+          datalabels: {
+            display: false // 🔥 CLAVE
+          }
+        }
+      },
+      barOptions: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        layout: {
+          padding: 0 // 🔥 elimina espacio extra
+        },
+        plugins: {
+          legend: { display: false },
+          datalabels: { display: false }
+        },
+        scales: {
+          x: {
+            display: false,
+            beginAtZero: true
+          },
+          y: {
+            grid: { display: false, drawBorder: false },
+            ticks: {
+              color: '#6b7280',
+              padding: 5
+            }
+          }
+        }
+      },
       busqueda: [], like:0, id:-1, cantFaltas:-1, reprogramaciones:[],
       totalPatients:[], nombrePaciente:'',
 			estados:[
@@ -196,13 +391,32 @@ export default {
     }
   },
 
-  components: { DetallePaciente, ModalEdicionPaciente, ModalRecetas, ModalFaltas, ModalTriaje, ModalVerTriajesViejos, ModalNewPatient, ModalVerEstados, ModalCambiarLike, ModalVerFaltas, ModalVerHobbies, ModalVerReprogramacionesViejos, OffVerMembresias, ModalAcuerdos },
+  components: { Doughnut, Bar, DetallePaciente, ModalEdicionPaciente, ModalRecetas, ModalFaltas, ModalTriaje, ModalVerTriajesViejos, ModalNewPatient, ModalVerEstados, ModalCambiarLike, ModalVerFaltas, ModalVerHobbies, ModalVerReprogramacionesViejos, OffVerMembresias, ModalAcuerdos },
 
   props: {
     profesionales:null
   },
 
   methods: {
+
+    async fetchDashboardPacientes() {
+        try {
+            let res = await this.axios.get('/api/dashboardModuloPacientes');
+            let data = res.data;
+            this.dashData = data;
+            if(data.tiposAtencion && data.tiposAtencion.length > 0) {
+                this.donutObj.labels = data.tiposAtencion.map(t => t.descripcion);
+                this.donutObj.datasets[0].data = data.tiposAtencion.map(t => t.total);
+                this.tiposDataLoaded = true;
+            }
+            this.barObj.datasets[0].data = [
+                data.completadas || 0,
+                data.pendientes || 0,
+                data.canceladas || 0,
+                data.reprogramadas || 0
+            ];
+        } catch(e) { console.error(e) }
+    },
 
     updateFaults(id,faults){
       if(confirm('Estás seguro de agregar una falta a este usuario?')){
@@ -319,7 +533,7 @@ export default {
     this.getPatients();
 		this.listarprofesional();
 		this.hobbies.sort();
-
+    this.fetchDashboardPacientes();
   }
 }
 </script>

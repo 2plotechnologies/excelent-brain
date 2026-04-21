@@ -377,12 +377,26 @@ var render = function render() {
   }), _vm._v(" "), _c("span", [_vm._v("Usuarios")])])], 1)]) : _vm._e(), _vm._v(" "), _vm.rolUser === "profesional" ? _c("div", [_c("a", {
     staticClass: "sidebar-brand d-flex align-items-center justify-content-center",
     attrs: {
-      href: "/profesional/home"
+      href: "/profesional/dashboard"
     }
   }, [_vm._m(1), _vm._v(" "), _c("div", {
     staticClass: "sidebar-brand-text mx-3"
   }, [_vm._v(_vm._s(_vm.rolUser))])]), _vm._v(" "), _c("li", {
     staticClass: "nav-item nav__list active",
+    on: {
+      click: function click($event) {
+        return _vm.activeSidebar();
+      }
+    }
+  }, [_c("router-link", {
+    staticClass: "nav-link",
+    attrs: {
+      to: "/profesional/dashboard"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-chart-line"
+  }), _vm._v(" "), _c("span", [_vm._v("Dashboard")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "nav-item nav__list",
     on: {
       click: function click($event) {
         return _vm.activeSidebar();
@@ -544,7 +558,7 @@ var render = function render() {
   }), _vm._v(" "), _c("span", [_vm._v("Triaje")])])], 1)]) : _vm._e(), _vm._v(" "), _vm.rolUser === "recepcionista" ? _c("div", [_c("a", {
     staticClass: "sidebar-brand d-flex align-items-center justify-content-center",
     attrs: {
-      href: "/recepcionista/home"
+      href: "/recepcionista/dashboard"
     }
   }, [_vm._m(3), _vm._v(" "), _c("div", {
     staticClass: "sidebar-brand-text mx-3"
