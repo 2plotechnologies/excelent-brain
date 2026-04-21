@@ -884,6 +884,8 @@ class PatientController extends Controller
 				'address', 
 				'relative', 
 				'prescriptions',
+				'initial_psychological_history',
+				'initial_psychiatric_history',
 				'appointments' => function ($q) {
 					$q->orderBy('date', 'desc');
 				},

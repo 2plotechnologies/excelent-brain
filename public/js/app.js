@@ -6075,51 +6075,62 @@ __webpack_require__.r(__webpack_exports__);
     precios: Array
   },
   methods: {
-    queServicio: function queServicio(servicio) {
-      if (!this.precios || !servicio || !servicio.type) return '';
+    getServiceLabel: function getServiceLabel(servicio) {
+      if (!this.precios || !servicio || !servicio.type) return 'Servicio';
       var pr = this.precios.find(function (x) {
         return x.id == servicio.type;
       });
-      if (!pr) return '';
-      var texto = pr.descripcion;
-      if (servicio.membresia) texto += '<small><br>' + servicio.num_sesion + ' de ' + servicio.membresia.precio.sesiones + ' (' + servicio.membresia.precio.descripcion + ')</small>';
-      return texto;
+      return pr ? pr.descripcion : 'Servicio';
     },
-    paymentClass: function paymentClass(payment) {
-      if (!payment) return '';
-      if (payment.pay_status == 1 && payment.adelanto > 0) return 'btn-warning';
-      if (payment.pay_status == 1 && payment.adelanto == 0) return 'btn-secondary text-white';
-      if (payment.pay_status == 2) return 'btn-success text-white';
-      if ([3, null].includes(payment.pay_status)) return 'btn-danger text-white';
-      return '';
+    isPayStatus: function isPayStatus(status) {
+      var hasAdelanto = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      if (!this.cita || !this.cita.payment) return false;
+      var p = this.cita.payment;
+      if (status === 1) {
+        if (hasAdelanto === 1) return p.pay_status == 1 && p.adelanto > 0;
+        if (hasAdelanto === 0) return p.pay_status == 1 && p.adelanto == 0;
+      }
+      return p.pay_status == status;
     },
-    paymentLabel: function paymentLabel(payment) {
-      if (!payment) return '';
-      if (parseInt(payment.pay_status) == 1 && payment.adelanto > 0) return 'Adelanto';
-      if (parseInt(payment.pay_status) == 1 && payment.adelanto == 0) return 'Sin pagar';
-      if (payment.pay_status == 2) return 'Pagado';
-      if ([3, null].includes(payment.pay_status)) return 'Anulado';
-      return '';
+    isAtencion: function isAtencion(tipo) {
+      if (!this.cita) return false;
+      var _this$cita = this.cita,
+        entrance = _this$cita.entrance,
+        attention = _this$cita.attention,
+        status = _this$cita.status;
+      if (tipo === 'espera') return entrance && !attention;
+      if (tipo === 'atencion') return attention && status != 5;
+      if (tipo === 'atendido') return status == 5;
+      return false;
+    },
+    calcularEspera: function calcularEspera() {
+      if (!this.cita || !this.cita.entrance) return '—';
+      var start = moment__WEBPACK_IMPORTED_MODULE_0___default()(this.cita.entrance, 'HH:mm:ss');
+      var end = this.cita.attention ? moment__WEBPACK_IMPORTED_MODULE_0___default()(this.cita.attention, 'HH:mm:ss') : moment__WEBPACK_IMPORTED_MODULE_0___default()();
+      var diff = end.diff(start, 'minutes');
+      return diff > 0 ? "".concat(diff, " min") : '0 min';
     },
     statusClass: function statusClass(status) {
-      if (status == 1) return 'btn-secondary text-white';
-      if (status == 2) return 'btn-info text-white';
-      if (status == 3) return 'btn-danger text-white';
-      if (status == 4) return 'btn-warning';
-      return 'btn-light';
+      if (status == 1) return 'status-badge-secondary';
+      if (status == 2) return 'status-badge-success';
+      if (status == 3) return 'status-badge-danger';
+      if (status == 4) return 'status-badge-info';
+      return 'status-badge-light';
     },
     statusLabel: function statusLabel(status) {
-      if (status == 1) return 'Sin confrm';
-      if (status == 2) return 'Confirmado';
-      if (status == 3) return 'Anulado';
-      if (status == 4) return 'Reprog';
+      if (status == 1) return 'Pendiente';
+      if (status == 2) return 'Confirmada';
+      if (status == 3) return 'Anulada';
+      if (status == 4) return 'Reprogramada';
       return 'Estado';
     },
     fechaLatam: function fechaLatam(fecha) {
       if (fecha) return moment__WEBPACK_IMPORTED_MODULE_0___default()(fecha).format('DD/MM/YYYY');
+      return '—';
     },
     horaLatam2: function horaLatam2(horita) {
-      if (horita) return moment__WEBPACK_IMPORTED_MODULE_0___default()(horita, 'HH:mm:ss').format('h:mm a');
+      if (horita) return moment__WEBPACK_IMPORTED_MODULE_0___default()(horita, 'HH:mm:ss').format('HH:mm');
+      return '—';
     },
     getWhatsappLink: function getWhatsappLink(c) {
       if (!c || !c.patient) return '#';
@@ -6829,6 +6840,71 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       listaPacientes: [],
       busquedaTexto: '',
       timerBusqueda: null,
+      pasos: [{
+        id: 1,
+        label: 'Paciente',
+        icon: 'fa-user'
+      }, {
+        id: 2,
+        label: 'Tipo',
+        icon: 'fa-stethoscope'
+      }, {
+        id: 3,
+        label: 'Profesional',
+        icon: 'fa-user-md'
+      }, {
+        id: 4,
+        label: 'Fecha/Hora',
+        icon: 'fa-calendar-alt'
+      }, {
+        id: 5,
+        label: 'Modalidad',
+        icon: 'fa-home'
+      }, {
+        id: 6,
+        label: 'Pago',
+        icon: 'fa-dollar-sign'
+      }, {
+        id: 7,
+        label: 'Confirmar',
+        icon: 'fa-check-circle'
+      }],
+      categorias: [{
+        id: 2,
+        label: 'Psicológica',
+        desc: 'Sesión de terapia psicológica',
+        icon: 'fa-brain'
+      }, {
+        id: 1,
+        label: 'Psiquiátrica',
+        desc: 'Consulta psiquiátrica y medicación',
+        icon: 'fa-pills'
+      }, {
+        id: 6,
+        label: 'Nutricional',
+        desc: 'Consulta nutricional',
+        icon: 'fa-apple-alt'
+      }, {
+        id: 3,
+        label: 'Certificado',
+        desc: 'Certificado médico o psicológico',
+        icon: 'fa-file-medical'
+      }, {
+        id: 7,
+        label: 'Terapia',
+        desc: 'Masajes y terapia corporal',
+        icon: 'fa-hands-helping'
+      }, {
+        id: 8,
+        label: 'Triaje',
+        desc: 'Triaje por médico o psicólogo',
+        icon: 'fa-stethoscope'
+      }, {
+        id: 4,
+        label: 'Kurame',
+        desc: 'Servicios de Kurame',
+        icon: 'fa-star'
+      }],
       precios: [],
       nosrecomienda: true,
       precioNuevo: true,
@@ -6993,6 +7069,67 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         document.querySelector('#modalNuevoPaciente .btn-close').click();
       }
     },
+    nextStep: function nextStep() {
+      if (this.pasoActual === 1) {
+        if (!this.cita.dni) {
+          alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe seleccionar o registrar un paciente', 5);
+          return;
+        }
+      }
+      if (this.pasoActual === 2) {
+        if (!this.cita.clasification) {
+          alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe seleccionar un tipo de consulta', 5);
+          return;
+        }
+        if (!this.cita.type) {
+          alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe seleccionar un servicio específico', 5);
+          return;
+        }
+      }
+      if (this.pasoActual === 5) {
+        if (!this.cita.mode) {
+          alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe seleccionar una modalidad', 5);
+          return;
+        }
+      }
+      if (this.pasoActual < 7) this.pasoActual++;
+    },
+    prevStep: function prevStep() {
+      if (this.pasoActual > 1) this.pasoActual--;
+    },
+    seleccionarCategoria: function seleccionarCategoria(id) {
+      this.cita.clasification = id;
+      this.cita.type = '';
+      this.precioDinamico();
+    },
+    seleccionarServicio: function seleccionarServicio(id) {
+      this.cita.type = id;
+      this.precioDinamico();
+      this.nextStep();
+    },
+    seleccionarModalidad: function seleccionarModalidad(mode) {
+      this.cita.mode = mode;
+      this.esPresencial = mode == 1;
+      this.nextStep();
+    },
+    getLabelCategoria: function getLabelCategoria(id) {
+      var cat = this.categorias.find(function (c) {
+        return c.id == id;
+      });
+      return cat ? cat.label : '';
+    },
+    getLabelServicio: function getLabelServicio(id) {
+      var sub = this.precios.find(function (p) {
+        return p.id == id;
+      });
+      return sub ? sub.descripcion : '';
+    },
+    getLabelModalidad: function getLabelModalidad(mode) {
+      if (mode == 1) return 'Presencial';
+      if (mode == 2) return 'Virtual';
+      if (mode == 3) return 'Domicilio';
+      return '';
+    },
     horaLatam1: function horaLatam1(horita) {
       return moment__WEBPACK_IMPORTED_MODULE_2___default()(horita, 'HH:mm:ss').format('hh:mm');
     },
@@ -7148,7 +7285,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               //formData.append('patient_condition', this.cita.patient_condition); //El sistema evalúa la condición: nuevo o continuo, no es necesario pasar
               formData.append('recomendation', _this6.cita.recomendation);
               formData.append('recomendacion_comentario', _this6.cita.recomendacion_comentario);
-              formData.append('mode', _this6.esPresencial ? 1 : 2);
+              formData.append('mode', _this6.cita.mode);
               formData.append('link', _this6.cita.link);
               formData.append('type_dni', _this6.cita.type_dni);
               formData.append('contacto', _this6.cita.contacto);
@@ -10083,47 +10220,34 @@ var render = function render() {
       role: "document"
     }
   }, [_vm.cita && _vm.cita.patient ? _c("div", {
-    staticClass: "modal-content"
-  }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body pt-2"
+    staticClass: "modal-content border-0 shadow-lg",
+    staticStyle: {
+      "border-radius": "20px",
+      overflow: "hidden"
+    }
   }, [_c("div", {
-    staticClass: "d-flex align-items-center mb-3"
-  }, [_c("div", [_c("h5", {
-    staticClass: "mb-0 text-uppercase font-weight-bold"
-  }, [_vm._v(_vm._s(_vm.cita.patient.name) + " " + _vm._s(_vm.cita.patient.nombres))]), _vm._v(" "), _c("div", {
-    staticClass: "text-muted small mt-1"
+    staticClass: "modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center"
+  }, [_vm._m(0), _vm._v(" "), _c("div", [_c("h5", {
+    staticClass: "modal-title font-weight-bold text-dark mb-1"
+  }, [_vm._v("Detalle de Cita")]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex gap-2 mt-1 flex-wrap"
+  }, [_c("span", {
+    staticClass: "badge-status",
+    "class": _vm.statusClass(_vm.cita.status)
   }, [_c("i", {
-    staticClass: "fas fa-clock mr-1"
-  }), _vm._v(" " + _vm._s(_vm.horaLatam2(_vm.cita.schedule ? _vm.cita.schedule.check_time : "")) + " - " + _vm._s(_vm.horaLatam2(_vm.cita.schedule ? _vm.cita.schedule.departure_date : "")) + "\n              "), _c("br"), _vm._v(" "), _c("i", {
-    staticClass: "fas fa-user-md mr-1"
-  }), _vm._v(" " + _vm._s(_vm.cita.professional ? _vm.cita.professional.name : "N/A") + "\n            ")])])]), _vm._v(" "), _vm.cita.formato_nuevo == "0" ? _c("p", {
-    staticClass: "mb-1 text-muted"
-  }, [_c("strong", [_vm._v("Tipo: ")]), _vm._v(" \n            Viejo formato\n        ")]) : _c("p", {
-    staticClass: "mb-3 text-dark mt-2 p-2 bg-light rounded",
-    domProps: {
-      innerHTML: _vm._s(_vm.queServicio(_vm.cita))
-    }
-  }), _vm._v(" "), _c("hr"), _vm._v(" "), _c("h6", {
-    staticClass: "font-weight-bold text-secondary mb-3 text-center"
-  }, [_vm._v("Selecciona una acción")]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex flex-wrap gap-2 justify-content-center pb-2"
-  }, [_c("button", {
-    staticClass: "btn btn-sm text-white font-weight-bold",
-    "class": _vm.cita.mode == 1 ? "btn-info" : "btn-primary",
-    attrs: {
-      title: "Cambiar modo",
-      "data-bs-dismiss": "modal"
-    },
-    on: {
-      click: function click($event) {
-        return _vm.$emit("changeMode", _vm.cita.id, _vm.indiceElegido);
-      }
-    }
+    staticClass: "fas fa-check-circle mr-1"
+  }), _vm._v(" " + _vm._s(_vm.statusLabel(_vm.cita.status)) + "\n              ")]), _vm._v(" "), _vm.cita.type ? _c("span", {
+    staticClass: "badge-service"
   }, [_c("i", {
-    "class": _vm.cita.mode == 1 ? "far fa-user" : "fas fa-desktop"
-  }), _vm._v(" " + _vm._s(_vm.cita.mode == 1 ? "Presencial" : "Virtual") + "\n          ")]), _vm._v(" "), _vm.cita.payment ? _c("button", {
-    staticClass: "btn btn-sm shadow-sm font-weight-bold",
-    "class": _vm.paymentClass(_vm.cita.payment),
+    staticClass: "fas fa-stethoscope mr-1"
+  }), _vm._v(" " + _vm._s(_vm.getServiceLabel(_vm.cita)) + "\n              ")]) : _vm._e()])])]), _vm._v(" "), _vm._m(1)]), _vm._v(" "), _c("div", {
+    staticClass: "modal-body px-4 pt-4"
+  }, [_c("div", {
+    staticClass: "status-cards-grid mb-4"
+  }, [_c("div", {
+    staticClass: "status-card h-100",
     attrs: {
       "data-bs-toggle": "modal",
       "data-bs-target": "#pagoModal"
@@ -10133,11 +10257,202 @@ var render = function render() {
         return _vm.$emit("openModal", _vm.cita, "#pagoModal", _vm.indiceElegido);
       }
     }
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
+    staticClass: "status-options mt-2"
+  }, [_c("div", {
+    staticClass: "status-option",
+    "class": {
+      active: _vm.isPayStatus(1, 0)
+    }
+  }, [_vm._v("No Pagado")]), _vm._v(" "), _c("div", {
+    staticClass: "status-option active-warning",
+    "class": {
+      active: _vm.isPayStatus(1, 1)
+    }
+  }, [_vm._v("Con Adelanto")]), _vm._v(" "), _c("div", {
+    staticClass: "status-option active-success",
+    "class": {
+      active: _vm.isPayStatus(2)
+    }
+  }, [_vm._v("Pagado")])])]), _vm._v(" "), _c("div", {
+    staticClass: "status-card h-100",
+    attrs: {
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#modalEstado"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.$emit("openModal", _vm.cita, "#modalEstado", _vm.indiceElegido);
+      }
+    }
+  }, [_vm._m(3), _vm._v(" "), _c("div", {
+    staticClass: "status-options mt-2"
+  }, [_c("div", {
+    staticClass: "status-option",
+    "class": {
+      active: _vm.cita.status == 1
+    }
+  }, [_vm._v("No Confirmado")]), _vm._v(" "), _c("div", {
+    staticClass: "status-option active-success",
+    "class": {
+      active: _vm.cita.status == 2
+    }
+  }, [_vm._v("Confirmado")])])]), _vm._v(" "), _c("div", {
+    staticClass: "status-card h-100",
+    attrs: {
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#modalTiemposEspera"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.$emit("tiemposEspera", _vm.cita);
+      }
+    }
+  }, [_vm._m(4), _vm._v(" "), _c("div", {
+    staticClass: "status-options mt-2"
+  }, [_c("div", {
+    staticClass: "status-option",
+    "class": {
+      active: _vm.isAtencion("espera")
+    }
+  }, [_vm._v("En espera")]), _vm._v(" "), _c("div", {
+    staticClass: "status-option",
+    "class": {
+      active: _vm.isAtencion("atencion")
+    }
+  }, [_vm._v("En atención")]), _vm._v(" "), _c("div", {
+    staticClass: "status-option",
+    "class": {
+      active: _vm.isAtencion("atendido")
+    }
+  }, [_vm._v("Atendido")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "info-section mb-4"
+  }, [_vm._m(5), _vm._v(" "), _c("div", {
+    staticClass: "time-control-container p-3 d-flex align-items-center justify-content-between text-center"
+  }, [_c("div", {
+    staticClass: "time-item px-2"
+  }, [_c("div", {
+    staticClass: "time-label"
+  }, [_vm._v("Hora de llegada")]), _vm._v(" "), _vm.cita.entrance ? _c("div", {
+    staticClass: "time-value"
+  }, [_vm._v(_vm._s(_vm.horaLatam2(_vm.cita.entrance)))]) : _c("button", {
+    staticClass: "btn btn-registrar btn-sm",
+    attrs: {
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#modalTiemposEspera"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.$emit("tiemposEspera", _vm.cita);
+      }
+    }
+  }, [_vm._v("Registrar")])]), _vm._v(" "), _c("div", {
+    staticClass: "time-item px-2 border-left border-right"
+  }, [_c("div", {
+    staticClass: "time-label"
+  }, [_vm._v("Hora de atención")]), _vm._v(" "), _c("div", {
+    staticClass: "time-value"
+  }, [_vm._v(_vm._s(_vm.cita.attention ? _vm.horaLatam2(_vm.cita.attention) : "—"))])]), _vm._v(" "), _c("div", {
+    staticClass: "time-item px-2"
+  }, [_c("div", {
+    staticClass: "time-label"
+  }, [_vm._v("Tiempo espera")]), _vm._v(" "), _c("div", {
+    staticClass: "time-value"
+  }, [_vm._v(_vm._s(_vm.calcularEspera()))])])])]), _vm._v(" "), _c("div", {
+    staticClass: "info-section mb-4"
+  }, [_c("div", {
+    staticClass: "section-label mb-2"
+  }, [_vm._v("PACIENTE")]), _vm._v(" "), _c("div", {
+    staticClass: "patient-card p-3 d-flex align-items-center justify-content-between"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center overflow-hidden"
+  }, [_vm._m(6), _vm._v(" "), _c("div", {
+    staticClass: "overflow-hidden"
+  }, [_c("div", {
+    staticClass: "patient-name font-weight-bold text-truncate"
+  }, [_vm._v(_vm._s(_vm.cita.patient.name) + " " + _vm._s(_vm.cita.patient.nombres))]), _vm._v(" "), _c("div", {
+    staticClass: "patient-dni text-muted small text-truncate"
+  }, [_vm._v("DNI: " + _vm._s(_vm.cita.patient.dni || "—") + " · " + _vm._s(_vm.cita.patient.phone || "—"))])])]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-link text-dark text-decoration-none small p-0 ms-2",
+    attrs: {
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#infoModal"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.$emit("openModal", _vm.cita, "#infoModal", _vm.indiceElegido);
+      }
+    }
   }, [_c("i", {
-    staticClass: "fas fa-wallet"
-  }), _vm._v(" " + _vm._s(_vm.paymentLabel(_vm.cita.payment)) + "\n          ")]) : _vm._e(), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-sm shadow-sm font-weight-bold",
-    "class": _vm.statusClass(_vm.cita.status),
+    staticClass: "fas fa-external-link-alt mr-1"
+  }), _vm._v(" Perfil\n            ")])])]), _vm._v(" "), _c("div", {
+    staticClass: "details-grid mb-4"
+  }, [_c("div", {
+    staticClass: "detail-item"
+  }, [_vm._m(7), _vm._v(" "), _c("div", {
+    staticClass: "detail-content overflow-hidden"
+  }, [_c("div", {
+    staticClass: "detail-label text-uppercase"
+  }, [_vm._v("Fecha")]), _vm._v(" "), _c("div", {
+    staticClass: "detail-value"
+  }, [_vm._v(_vm._s(_vm.fechaLatam(_vm.cita.date)))])])]), _vm._v(" "), _c("div", {
+    staticClass: "detail-item"
+  }, [_vm._m(8), _vm._v(" "), _c("div", {
+    staticClass: "detail-content overflow-hidden"
+  }, [_c("div", {
+    staticClass: "detail-label text-uppercase"
+  }, [_vm._v("Hora")]), _vm._v(" "), _c("div", {
+    staticClass: "detail-value text-truncate"
+  }, [_vm._v(_vm._s(_vm.horaLatam2(_vm.cita.schedule ? _vm.cita.schedule.check_time : "")) + " - " + _vm._s(_vm.horaLatam2(_vm.cita.schedule ? _vm.cita.schedule.departure_date : "")))])])]), _vm._v(" "), _c("div", {
+    staticClass: "detail-item"
+  }, [_vm._m(9), _vm._v(" "), _c("div", {
+    staticClass: "detail-content overflow-hidden"
+  }, [_c("div", {
+    staticClass: "detail-label text-uppercase"
+  }, [_vm._v("Profesional")]), _vm._v(" "), _c("div", {
+    staticClass: "detail-value text-truncate"
+  }, [_vm._v(_vm._s(_vm.cita.professional ? _vm.cita.professional.name : "N/A"))])])]), _vm._v(" "), _c("div", {
+    staticClass: "detail-item"
+  }, [_vm._m(10), _vm._v(" "), _c("div", {
+    staticClass: "detail-content overflow-hidden"
+  }, [_c("div", {
+    staticClass: "detail-label text-uppercase"
+  }, [_vm._v("Modalidad")]), _vm._v(" "), _c("div", {
+    staticClass: "detail-value"
+  }, [_vm._v(_vm._s(_vm.cita.mode == 1 ? "Presencial" : "Virtual"))])])])]), _vm._v(" "), _c("hr", {
+    staticClass: "my-4",
+    staticStyle: {
+      opacity: "0.1"
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "d-flex flex-wrap gap-2 justify-content-center pb-4"
+  }, [_vm.cita.status != 3 ? _c("button", {
+    staticClass: "btn btn-action btn-outline-primary",
+    attrs: {
+      "data-bs-target": "#reprogModal",
+      "data-bs-toggle": "modal"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.$emit("openModal", _vm.cita, "#reprogModal", _vm.indiceElegido);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-sync-alt mr-2"
+  }), _vm._v(" Reprogramar\n          ")]) : _vm._e(), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-action btn-outline-danger",
+    attrs: {
+      "data-bs-dismiss": "modal"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.$emit("eliminar", _vm.cita.id);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times-circle mr-2"
+  }), _vm._v(" Cancelar\n          ")]), _vm._v(" "), _vm.cita.status != 3 ? _c("button", {
+    staticClass: "btn btn-action btn-outline-secondary",
     attrs: {
       "data-bs-toggle": "modal",
       "data-bs-target": "#modalEstado"
@@ -10148,9 +10463,41 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-info-circle"
-  }), _vm._v(" " + _vm._s(_vm.statusLabel(_vm.cita.status)) + "\n          ")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-sm btn-success text-white shadow-sm font-weight-bold",
+    staticClass: "fas fa-ban mr-2"
+  }), _vm._v(" Anular\n          ")]) : _vm._e(), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-action btn-outline-secondary",
+    attrs: {
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#modalEstado"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.$emit("openModal", _vm.cita, "#modalEstado", _vm.indiceElegido);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-user-slash mr-2"
+  }), _vm._v(" No Asistió\n          ")]), _vm._v(" "), _c("div", {
+    staticClass: "w-100 d-flex justify-content-center gap-2 mt-2"
+  }, [_c("a", {
+    staticClass: "btn btn-action btn-outline-success",
+    attrs: {
+      href: _vm.getWhatsappLink(_vm.cita),
+      target: "_blank"
+    }
+  }, [_c("i", {
+    staticClass: "fab fa-whatsapp mr-2"
+  }), _vm._v(" WhatsApp\n            ")]), _vm._v(" "), _c("a", {
+    staticClass: "btn btn-action btn-outline-dark",
+    attrs: {
+      href: "tel:" + (_vm.cita.patient.phone || "").replace(/\s/g, "")
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-phone-alt mr-2"
+  }), _vm._v(" Llamar\n            ")])]), _vm._v(" "), _c("div", {
+    staticClass: "w-100 d-flex justify-content-center gap-4 mt-3"
+  }, [_c("button", {
+    staticClass: "btn btn-link text-muted p-0 small",
     attrs: {
       "data-bs-target": "#modalIntercambio",
       "data-bs-toggle": "modal",
@@ -10163,39 +10510,8 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-retweet"
-  }), _vm._v(" Intercambiar\n          ")]), _vm._v(" "), _vm.cita.status == 3 ? _c("button", {
-    staticClass: "btn btn-sm btn-danger text-white shadow-sm font-weight-bold"
-  }, [_c("i", {
-    staticClass: "fas fa-calendar-times"
-  }), _vm._v(" Cancelada")]) : _c("button", {
-    staticClass: "btn btn-sm btn-info text-white shadow-sm font-weight-bold",
-    attrs: {
-      "data-bs-target": "#reprogModal",
-      "data-bs-toggle": "modal",
-      title: "Reprogramar"
-    },
-    on: {
-      click: function click($event) {
-        return _vm.$emit("openModal", _vm.cita, "#reprogModal", _vm.indiceElegido);
-      }
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-calendar-alt"
-  }), _vm._v(" Reprogramar\n          ")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-sm btn-danger text-white shadow-sm font-weight-bold",
-    attrs: {
-      title: "Eliminar",
-      "data-bs-dismiss": "modal"
-    },
-    on: {
-      click: function click($event) {
-        return _vm.$emit("eliminar", _vm.cita.id);
-      }
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-trash-alt"
-  }), _vm._v(" Eliminar\n          ")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-sm btn-secondary text-white shadow-sm font-weight-bold",
+  }), _vm._v(" Intercambiar\n            ")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-link text-muted p-0 small",
     attrs: {
       "data-bs-toggle": "modal",
       "data-bs-target": "#recetasModal",
@@ -10208,64 +10524,114 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-file-medical"
-  }), _vm._v(" Recetas\n          ")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-sm btn-warning text-dark font-weight-bold shadow-sm",
+  }), _vm._v(" Recetas\n            ")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-link text-muted p-0 small",
     attrs: {
-      "data-bs-toggle": "modal",
-      "data-bs-target": "#modalTiemposEspera",
-      title: "Tiempos de espera"
+      title: "Cambiar modo",
+      "data-bs-dismiss": "modal"
     },
     on: {
       click: function click($event) {
-        return _vm.$emit("tiemposEspera", _vm.cita);
+        return _vm.$emit("changeMode", _vm.cita.id, _vm.indiceElegido);
       }
     }
   }, [_c("i", {
-    staticClass: "fa-regular fa-clock"
-  }), _vm._v(" Tiempos\n          ")]), _vm._v(" "), _c("a", {
-    staticClass: "btn btn-sm btn-success text-white shadow-sm font-weight-bold",
-    attrs: {
-      href: _vm.getWhatsappLink(_vm.cita),
-      target: "_blank"
-    }
-  }, [_c("i", {
-    staticClass: "fab fa-whatsapp"
-  }), _vm._v(" WhastApp\n          ")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-sm btn-primary text-white shadow-sm font-weight-bold",
-    attrs: {
-      "data-bs-toggle": "modal",
-      "data-bs-target": "#infoModal"
-    },
-    on: {
-      click: function click($event) {
-        return _vm.$emit("openModal", _vm.cita, "#infoModal", _vm.indiceElegido);
-      }
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-eye"
-  }), _vm._v(" Más Detalles\n          ")])])])]) : _vm._e()])]);
+    "class": _vm.cita.mode == 1 ? "far fa-user" : "fas fa-desktop"
+  }), _vm._v(" " + _vm._s(_vm.cita.mode == 1 ? "Modo" : "Modo") + "\n            ")])])])])]) : _vm._e()])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header border-0 pb-0"
-  }, [_c("h5", {
-    staticClass: "modal-title font-weight-bold text-success"
+    staticClass: "icon-header-container mr-3"
   }, [_c("i", {
-    staticClass: "fas fa-calendar-check mr-2"
-  }), _vm._v(" Detalles de la Cita\n        ")]), _vm._v(" "), _c("button", {
-    staticClass: "btn-close close",
+    staticClass: "fas fa-calendar-alt text-primary h4 mb-0"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn-close-custom",
     attrs: {
       type: "button",
       "data-bs-dismiss": "modal",
       "aria-label": "Close"
     }
-  }, [_c("span", {
-    attrs: {
-      "aria-hidden": "true"
-    }
-  }, [_vm._v("×")])])]);
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "status-card-header"
+  }, [_c("i", {
+    staticClass: "fas fa-sack-dollar text-warning"
+  }), _vm._v(" "), _c("span", [_vm._v("PAGO")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "status-card-header"
+  }, [_c("i", {
+    staticClass: "fas fa-check-double text-success"
+  }), _vm._v(" "), _c("span", [_vm._v("CONFIRMACIÓN")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "status-card-header"
+  }, [_c("i", {
+    staticClass: "fas fa-stethoscope text-info"
+  }), _vm._v(" "), _c("span", [_vm._v("ATENCIÓN")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "section-label mb-2"
+  }, [_c("i", {
+    staticClass: "fas fa-stopwatch mr-1"
+  }), _vm._v(" CONTROL DE TIEMPOS")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "patient-avatar mr-3"
+  }, [_c("i", {
+    staticClass: "fas fa-user text-primary"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "detail-icon"
+  }, [_c("i", {
+    staticClass: "fas fa-calendar-day text-primary"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "detail-icon"
+  }, [_c("i", {
+    staticClass: "fas fa-clock text-info"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "detail-icon"
+  }, [_c("i", {
+    staticClass: "fas fa-user-md text-warning"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "detail-icon"
+  }, [_c("i", {
+    staticClass: "fas fa-video text-secondary"
+  })]);
 }];
 render._withStripped = true;
 
@@ -11750,7 +12116,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
 /* harmony export */ });
 var render = function render() {
-  var _vm$cita$membresia, _vm$cita$membresia$pr, _vm$cita$membresia2, _vm$cita$membresia$pr2, _vm$cita$membresia3;
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", [_c("div", {
@@ -11774,29 +12139,55 @@ var render = function render() {
       keydown: _vm.prevenirEvent
     }
   }, [_c("div", {
+    staticClass: "wizard-stepper d-flex justify-content-between mb-4 border-bottom pb-3 overflow-auto"
+  }, _vm._l(_vm.pasos, function (step) {
+    return _c("div", {
+      key: step.id,
+      staticClass: "step-item d-flex align-items-center",
+      "class": {
+        active: _vm.pasoActual === step.id,
+        completed: _vm.pasoActual > step.id
+      }
+    }, [_c("div", {
+      staticClass: "step-icon d-flex align-items-center justify-content-center rounded-pill"
+    }, [_c("i", {
+      staticClass: "fas",
+      "class": step.icon
+    })]), _vm._v(" "), _c("span", {
+      staticClass: "step-label ms-2 d-none d-md-inline"
+    }, [_vm._v(_vm._s(step.label))]), _vm._v(" "), step.id < 7 ? _c("div", {
+      staticClass: "step-connector mx-3 d-none d-lg-block"
+    }) : _vm._e()]);
+  }), 0), _vm._v(" "), _c("div", {
     directives: [{
       name: "show",
       rawName: "v-show",
       value: _vm.pasoActual === 1,
       expression: "pasoActual === 1"
     }]
-  }, [_vm._m(1), _vm._v(" "), _c("div", {
-    staticClass: "card mb-3"
   }, [_c("div", {
-    staticClass: "card-body"
+    staticClass: "row justify-content-center"
   }, [_c("div", {
-    staticClass: "input-group mb-3"
-  }, [_vm._m(2), _vm._v(" "), _c("input", {
+    staticClass: "col-md-10"
+  }, [_c("p", {
+    staticClass: "mb-3 lead text-center font-weight-bold"
+  }, [_vm._v("Seleccionar Paciente")]), _vm._v(" "), _c("div", {
+    staticClass: "card border-0 shadow-sm rounded-4 mb-4"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("div", {
+    staticClass: "input-group mb-4 bg-light rounded-pill p-1"
+  }, [_vm._m(1), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.busquedaTexto,
       expression: "busquedaTexto"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control border-0 bg-transparent",
     attrs: {
       type: "text",
-      placeholder: "Buscar por DNI o Nombres..."
+      placeholder: "Buscar por nombre, DNI o celular..."
     },
     domProps: {
       value: _vm.busquedaTexto
@@ -11809,15 +12200,18 @@ var render = function render() {
       }
     }
   })]), _vm._v(" "), _c("div", {
-    staticClass: "list-group",
+    staticClass: "list-group list-group-flush",
     staticStyle: {
-      "max-height": "300px",
+      "max-height": "400px",
       "overflow-y": "auto"
     }
   }, [_vm._l(_vm.listaPacientes, function (paciente) {
     return _c("button", {
       key: paciente.id,
-      staticClass: "list-group-item list-group-item-action d-flex justify-content-between align-items-center",
+      staticClass: "list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 rounded-4 mb-2 p-3 transition-all",
+      "class": {
+        "bg-primary-light": _vm.cita.dni === paciente.dni
+      },
       attrs: {
         type: "button"
       },
@@ -11826,14 +12220,20 @@ var render = function render() {
           return _vm.seleccionarPaciente(paciente);
         }
       }
-    }, [_c("div", [_c("strong", [_vm._v(_vm._s(paciente.name) + " " + _vm._s(paciente.nombres))]), _vm._v(" "), _c("br"), _vm._v(" "), _c("small", {
+    }, [_c("div", {
+      staticClass: "d-flex align-items-center"
+    }, [_vm._m(2, true), _vm._v(" "), _c("div", [_c("h6", {
+      staticClass: "mb-0 font-weight-bold"
+    }, [_vm._v(_vm._s(paciente.name) + " " + _vm._s(paciente.nombres))]), _vm._v(" "), _c("small", {
       staticClass: "text-muted"
-    }, [_vm._v("DNI: " + _vm._s(paciente.dni))])]), _vm._v(" "), _c("span", {
-      staticClass: "btn btn-sm btn-outline-primary"
-    }, [_vm._v("Seleccionar")])]);
+    }, [_vm._v("DNI: " + _vm._s(paciente.dni) + " · " + _vm._s(paciente.phone))])])]), _vm._v(" "), _c("i", {
+      staticClass: "fas fa-chevron-right text-muted"
+    })]);
   }), _vm._v(" "), _vm.listaPacientes.length === 0 ? _c("div", {
-    staticClass: "text-center text-muted my-3"
-  }, [_vm._v("\r\n\t\t\t\t\t\t\t\t\t\tNo se encontraron pacientes.\r\n\t\t\t\t\t\t\t\t\t")]) : _vm._e()], 2), _vm._v(" "), _vm._m(3)])])]), _vm._v(" "), _c("div", {
+    staticClass: "text-center text-muted py-5"
+  }, [_c("i", {
+    staticClass: "fas fa-user-slash fa-3x mb-3 text-light"
+  }), _vm._v(" "), _c("p", [_vm._v("No se encontraron pacientes.")])]) : _vm._e()], 2), _vm._v(" "), _vm._m(3)])])])])]), _vm._v(" "), _c("div", {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -11841,223 +12241,316 @@ var render = function render() {
       expression: "pasoActual === 2"
     }]
   }, [_c("div", {
-    staticClass: "d-flex justify-content-between align-items-center mb-2"
-  }, [_vm._m(4), _vm._v(" "), _c("div", [_c("span", {
-    staticClass: "badge bg-secondary me-2 fs-6"
-  }, [_vm._v("Paciente: " + _vm._s(_vm.cita.name) + " " + _vm._s(_vm.cita.nombres) + " (" + _vm._s(_vm.cita.dni) + ")")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-sm btn-outline-secondary",
-    attrs: {
-      type: "button"
+    staticClass: "row justify-content-center"
+  }, [_c("div", {
+    staticClass: "col-md-10"
+  }, [_c("p", {
+    staticClass: "mb-3 lead text-center font-weight-bold"
+  }, [_vm._v("Tipo de Consulta")]), _vm._v(" "), _c("div", {
+    staticClass: "row mb-4"
+  }, _vm._l(_vm.categorias, function (cat) {
+    return _c("div", {
+      key: cat.id,
+      staticClass: "col-md-6 mb-3"
+    }, [_c("div", {
+      staticClass: "card h-100 border-0 shadow-sm rounded-4 selectable-card transition-all",
+      "class": {
+        active: _vm.cita.clasification == cat.id
+      },
+      on: {
+        click: function click($event) {
+          return _vm.seleccionarCategoria(cat.id);
+        }
+      }
+    }, [_c("div", {
+      staticClass: "card-body d-flex align-items-center p-3"
+    }, [_c("div", {
+      staticClass: "category-icon me-3 d-flex align-items-center justify-content-center rounded-3",
+      "class": "bg-cat-" + cat.id
+    }, [_c("i", {
+      staticClass: "fas",
+      "class": cat.icon
+    })]), _vm._v(" "), _c("div", {
+      staticClass: "flex-grow-1"
+    }, [_c("h6", {
+      staticClass: "mb-1 font-weight-bold text-dark"
+    }, [_vm._v(_vm._s(cat.label))]), _vm._v(" "), _c("small", {
+      staticClass: "text-muted small"
+    }, [_vm._v(_vm._s(cat.desc))])]), _vm._v(" "), _c("div", {
+      staticClass: "ms-2"
+    }, [_vm.cita.clasification == cat.id ? _c("i", {
+      staticClass: "fas fa-check-circle text-primary"
+    }) : _vm._e()])])])]);
+  }), 0), _vm._v(" "), _vm.cita.clasification ? _c("div", {
+    staticClass: "card border-0 shadow-sm rounded-4 mb-4"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_vm._m(4), _vm._v(" "), _c("div", {
+    staticClass: "list-group list-group-flush rounded-4 overflow-hidden border"
+  }, _vm._l(_vm.precios, function (precio) {
+    return precio.idClasificacion == _vm.cita.clasification && precio.servicio == "1" && precio.id != 48 && precio.id != 49 && precio.activo == "1" ? _c("button", {
+      key: precio.id,
+      staticClass: "list-group-item list-group-item-action border-0 d-flex justify-content-between align-items-center p-3",
+      "class": {
+        "bg-light": _vm.cita.type == precio.id
+      },
+      attrs: {
+        type: "button"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.seleccionarServicio(precio.id);
+        }
+      }
+    }, [_c("span", [_vm._v(_vm._s(precio.descripcion))]), _vm._v(" "), _c("span", {
+      staticClass: "badge bg-soft-primary text-primary rounded-pill"
+    }, [_vm._v("S/ " + _vm._s(parseFloat(precio.nuevos).toFixed(2)))])]) : _vm._e();
+  }), 0)])]) : _vm._e()])])]), _vm._v(" "), _c("div", {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.pasoActual === 3,
+      expression: "pasoActual === 3"
+    }]
+  }, [_c("div", {
+    staticClass: "row justify-content-center"
+  }, [_c("div", {
+    staticClass: "col-md-8 text-center py-5"
+  }, [_c("p", {
+    staticClass: "mb-4 lead font-weight-bold"
+  }, [_vm._v("Profesional Asignado")]), _vm._v(" "), _c("div", {
+    staticClass: "professional-card p-5 bg-white shadow-sm rounded-5 mb-4 border transition-all"
+  }, [_vm._m(5), _vm._v(" "), _c("h3", {
+    staticClass: "mb-1 text-dark font-weight-bold"
+  }, [_vm._v(_vm._s(_vm.profesionalElegido.name))]), _vm._v(" "), _c("p", {
+    staticClass: "text-primary mb-0 fs-5"
+  }, [_vm._v(_vm._s(_vm.profesionalElegido.profession))]), _vm._v(" "), _vm._m(6)]), _vm._v(" "), _c("p", {
+    staticClass: "text-muted small"
+  }, [_vm._v("El profesional ha sido seleccionado previamente en el calendario.")])])])]), _vm._v(" "), _c("div", {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.pasoActual === 4,
+      expression: "pasoActual === 4"
+    }]
+  }, [_c("div", {
+    staticClass: "row justify-content-center"
+  }, [_c("div", {
+    staticClass: "col-md-8 text-center py-5"
+  }, [_c("p", {
+    staticClass: "mb-4 lead font-weight-bold"
+  }, [_vm._v("Fecha y Hora de la Cita")]), _vm._v(" "), _c("div", {
+    staticClass: "card border-0 shadow-sm rounded-5 bg-light-gradient p-5 mb-4"
+  }, [_c("div", {
+    staticClass: "row align-items-center"
+  }, [_c("div", {
+    staticClass: "col-md-6 border-end"
+  }, [_vm._m(7), _vm._v(" "), _c("h4", {
+    staticClass: "mb-0 text-dark font-weight-bold"
+  }, [_vm._v(_vm._s(_vm.fechaElegida))]), _vm._v(" "), _c("p", {
+    staticClass: "text-muted mb-0"
+  }, [_vm._v("Fecha seleccionada")])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_vm._m(8), _vm._v(" "), _c("h4", {
+    staticClass: "mb-0 text-dark font-weight-bold"
+  }, [_vm._v(_vm._s(_vm.horaLatam1(_vm.horaElegida.check_time)) + " - " + _vm._s(_vm.horaLatam1(_vm.horaElegida.departure_date)))]), _vm._v(" "), _c("p", {
+    staticClass: "text-muted mb-0"
+  }, [_vm._v("Horario reservado")])])])]), _vm._v(" "), _vm._m(9)])])]), _vm._v(" "), _c("div", {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.pasoActual === 5,
+      expression: "pasoActual === 5"
+    }]
+  }, [_c("div", {
+    staticClass: "row justify-content-center"
+  }, [_c("div", {
+    staticClass: "col-md-10"
+  }, [_c("p", {
+    staticClass: "mb-4 lead text-center font-weight-bold"
+  }, [_vm._v("Modalidad de Atención")]), _vm._v(" "), _c("div", {
+    staticClass: "row justify-content-center"
+  }, [_c("div", {
+    staticClass: "col-md-4 mb-4"
+  }, [_c("div", {
+    staticClass: "card h-100 border-0 shadow-sm rounded-4 selectable-card transition-all p-4 text-center",
+    "class": {
+      active: _vm.cita.mode == 1
     },
     on: {
       click: function click($event) {
-        _vm.pasoActual = 1;
+        return _vm.seleccionarModalidad(1);
       }
     }
-  }, [_c("i", {
-    staticClass: "fas fa-arrow-left"
-  }), _vm._v(" Cambiar")])])]), _vm._v(" "), _c("div", {
-    staticClass: "card"
+  }, [_vm._m(10), _vm._v(" "), _c("h5", {
+    staticClass: "font-weight-bold"
+  }, [_vm._v("Presencial")]), _vm._v(" "), _c("p", {
+    staticClass: "small text-muted mb-0"
+  }, [_vm._v("Atención en consultorio físico.")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4 mb-4"
+  }, [_c("div", {
+    staticClass: "card h-100 border-0 shadow-sm rounded-4 selectable-card transition-all p-4 text-center",
+    "class": {
+      active: _vm.cita.mode == 2
+    },
+    on: {
+      click: function click($event) {
+        return _vm.seleccionarModalidad(2);
+      }
+    }
+  }, [_vm._m(11), _vm._v(" "), _c("h5", {
+    staticClass: "font-weight-bold"
+  }, [_vm._v("Virtual")]), _vm._v(" "), _c("p", {
+    staticClass: "small text-muted mb-0"
+  }, [_vm._v("Videollamada por plataforma online.")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4 mb-4"
+  }, [_c("div", {
+    staticClass: "card h-100 border-0 shadow-sm rounded-4 selectable-card transition-all p-4 text-center",
+    "class": {
+      active: _vm.cita.mode == 3
+    },
+    on: {
+      click: function click($event) {
+        return _vm.seleccionarModalidad(3);
+      }
+    }
+  }, [_vm._m(12), _vm._v(" "), _c("h5", {
+    staticClass: "font-weight-bold"
+  }, [_vm._v("Domicilio")]), _vm._v(" "), _c("p", {
+    staticClass: "small text-muted mb-0"
+  }, [_vm._v("Visita al domicilio del paciente.")])])])]), _vm._v(" "), _vm.cita.mode == 2 ? _c("div", {
+    staticClass: "card border-0 shadow-sm rounded-4 bg-light mt-3"
   }, [_c("div", {
     staticClass: "card-body"
   }, [_c("div", {
-    staticClass: "row row-cols-2"
-  }, [_c("div", {
-    staticClass: "col"
-  }, [_c("p", {
-    staticClass: "mb-0"
-  }, [_c("strong", [_vm._v("Profesional:")]), _vm._v(" " + _vm._s(_vm.profesionalElegido.name))]), _vm._v(" "), _c("p", {
-    staticClass: "mb-0"
-  }, [_c("strong", [_vm._v("Profesión:")]), _vm._v(" " + _vm._s(_vm.profesionalElegido.profession))]), _vm._v(" "), _c("p", {
-    staticClass: "mb-0"
-  }, [_c("strong", [_vm._v("Última atención:")]), _vm._v(" "), _vm.cita.etiqueta == "" ? _c("span", {
-    staticClass: "badge rounded-pill text-bg-dark",
-    attrs: {
-      title: "Última atención"
-    }
-  }, [_c("i", {
-    staticClass: "fa-solid fa-asterisk"
-  }), _vm._v(" Sin registro previo")]) : _vm._e(), _vm._v(" "), _vm.cita.etiqueta ? _c("span", {
-    staticClass: "badge rounded-pill text-bg-primary",
-    attrs: {
-      title: "Última atención"
-    }
-  }, [_c("i", {
-    staticClass: "fa-solid fa-genderless"
-  }), _vm._v(" " + _vm._s(_vm.cita.etiqueta))]) : _vm._e()]), _vm._v(" "), _vm.cita.membresia ? _c("p", {
-    staticClass: "mb-0"
-  }, [_c("strong", [_vm._v("Paquete activo:")]), _vm._v(" "), _c("span", {
-    staticClass: "badge rounded-pill text-bg-warning",
-    attrs: {
-      title: "Última atención"
-    }
-  }, [_c("i", {
-    staticClass: "far fa-star"
-  }), _vm._v(" " + _vm._s((_vm$cita$membresia = _vm.cita.membresia) === null || _vm$cita$membresia === void 0 ? void 0 : _vm$cita$membresia.precio.descripcion))]), _vm._v(" "), _c("span", {
-    staticClass: "badge rounded-pill text-bg-dark px-2"
-  }, [_vm._v("hasta " + _vm._s(_vm.fechaLatam(_vm.cita.membresia.fin)) + " de " + _vm._s((_vm$cita$membresia$pr = (_vm$cita$membresia2 = _vm.cita.membresia) === null || _vm$cita$membresia2 === void 0 ? void 0 : _vm$cita$membresia2.precio.sesiones) !== null && _vm$cita$membresia$pr !== void 0 ? _vm$cita$membresia$pr : 0) + " " + _vm._s(((_vm$cita$membresia$pr2 = (_vm$cita$membresia3 = _vm.cita.membresia) === null || _vm$cita$membresia3 === void 0 ? void 0 : _vm$cita$membresia3.precio.sesiones) !== null && _vm$cita$membresia$pr2 !== void 0 ? _vm$cita$membresia$pr2 : 0) != 1 ? "sesiones totales" : "sesión."))])]) : _vm._e()]), _vm._v(" "), _c("div", {
-    staticClass: "col"
-  }, [_c("p", {
-    staticClass: "mb-0"
-  }, [_c("strong", [_vm._v("Fecha:")]), _vm._v(" " + _vm._s(_vm.fechaElegida))]), _vm._v(" "), _c("p", {
-    staticClass: "mb-0"
-  }, [_c("strong", [_vm._v("Horario:")]), _vm._v(" " + _vm._s(_vm.horaLatam1(_vm.horaElegida.check_time)) + " - " + _vm._s(_vm.horaLatam2(_vm.horaElegida.departure_date)))]), _vm._v(" "), _c("p", {
-    staticClass: "mb-0"
-  }, [_c("strong", [_vm._v("Status anterior:")]), _vm._v(" " + _vm._s(_vm.nombreStatus(_vm.cita.prev_status)) + " ")])])])])]), _vm._v(" "), _vm.alertaDeudas ? _c("div", {
-    staticClass: "alert alert-danger agrandar m-4",
-    attrs: {
-      role: "alert"
-    }
-  }, [_c("i", {
-    staticClass: "fa-regular fa-comment-dots"
-  }), _vm._v(" "), _c("strong", [_vm._v("Alto!")]), _vm._v(" "), _c("span", {
-    domProps: {
-      innerHTML: _vm._s(_vm.mensajeDeudas)
-    }
-  })]) : _vm._e(), _vm._v(" "), _vm.cita.membresia ? _c("div", {
-    staticClass: "alert alert-warning agrandar m-4",
-    attrs: {
-      role: "alert"
-    }
-  }, [_c("i", {
-    staticClass: "fa-regular fa-comment-dots"
-  }), _vm._v(" "), _c("strong", [_vm._v("Membresía activa:")]), _vm._v(" "), _c("span", {
-    domProps: {
-      innerHTML: _vm._s(_vm.cita.membresia.descripcion)
-    }
-  }), _vm._v(" "), _c("span", [_vm._v("hasta " + _vm._s(_vm.fechaLatam(_vm.cita.membresia.fin)))])]) : _vm._e(), _vm._v(" "), _c("div", {
-    staticClass: "card my-2"
-  }, [_c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "form-group row mt-3"
-  }, [_c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Clasificación de Consulta")]), _vm._v(" "), _c("select", {
+    staticClass: "form-group mb-0"
+  }, [_vm._m(13), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.cita.clasification,
-      expression: "cita.clasification"
+      value: _vm.cita.link,
+      expression: "cita.link"
     }],
-    staticClass: "form-select",
+    staticClass: "form-control rounded-pill border-0 shadow-none px-4",
     attrs: {
-      name: "clasification",
-      id: "clasification"
+      type: "text",
+      placeholder: "Ingrese el link de la reunión virtual"
+    },
+    domProps: {
+      value: _vm.cita.link
     },
     on: {
-      change: [function ($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.cita, "clasification", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }, function ($event) {
-        _vm.precioDinamico();
-        _vm.cita.type = "";
-      }]
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "link", $event.target.value);
+      }
     }
-  }, [_c("option", {
-    attrs: {
-      value: "3"
-    }
-  }, [_vm._v("Certificado")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "4"
-    }
-  }, [_vm._v("Kurame")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "6"
-    }
-  }, [_vm._v("Nutrición")]), _vm._v(" "), _vm.profesionalElegido.idProfesion == "1" ? _c("option", {
-    attrs: {
-      value: "1",
-      selected: ""
-    }
-  }, [_vm._v("Psiquiatrica")]) : _vm._e(), _vm._v(" "), _vm.profesionalElegido.idProfesion == "2" ? _c("option", {
-    attrs: {
-      value: "2",
-      selected: ""
-    }
-  }, [_vm._v("Psicológica")]) : _vm._e(), _vm._v(" "), _vm.profesionalElegido.idProfesion == "7" ? _c("option", {
-    attrs: {
-      value: "7",
-      selected: ""
-    }
-  }, [_vm._v("Terapista")]) : _vm._e(), _vm._v(" "), _vm.profesionalElegido.idProfesion == "8" ? _c("option", {
-    attrs: {
-      value: "8",
-      selected: ""
-    }
-  }, [_vm._v("Tecnólogo")]) : _vm._e()])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Tipo de servicio")]), _vm._v(" "), _c("select", {
+  })])])]) : _vm._e()])])]), _vm._v(" "), _c("div", {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.pasoActual === 6,
+      expression: "pasoActual === 6"
+    }]
+  }, [_c("div", {
+    staticClass: "row justify-content-center"
+  }, [_c("div", {
+    staticClass: "col-md-10"
+  }, [_c("p", {
+    staticClass: "mb-4 lead text-center font-weight-bold"
+  }, [_vm._v("Información de Pago y Notas")]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-md-6 mb-4"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm rounded-4 bg-white p-4 h-100"
+  }, [_vm._m(14), _vm._v(" "), _c("div", {
+    staticClass: "form-check form-switch mb-4 custom-switch"
+  }, [_c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.cita.type,
-      expression: "cita.type"
+      value: _vm.tieneAdelanto,
+      expression: "tieneAdelanto"
     }],
-    staticClass: "form-select",
+    staticClass: "form-check-input",
     attrs: {
-      name: "type",
-      id: "sltServicio"
+      type: "checkbox",
+      id: "checkAdelanto"
+    },
+    domProps: {
+      checked: Array.isArray(_vm.tieneAdelanto) ? _vm._i(_vm.tieneAdelanto, null) > -1 : _vm.tieneAdelanto
     },
     on: {
       change: [function ($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.cita, "type", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+        var $$a = _vm.tieneAdelanto,
+          $$el = $event.target,
+          $$c = $$el.checked ? true : false;
+        if (Array.isArray($$a)) {
+          var $$v = null,
+            $$i = _vm._i($$a, $$v);
+          if ($$el.checked) {
+            $$i < 0 && (_vm.tieneAdelanto = $$a.concat([$$v]));
+          } else {
+            $$i > -1 && (_vm.tieneAdelanto = $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
+          }
+        } else {
+          _vm.tieneAdelanto = $$c;
+        }
       }, function ($event) {
         return _vm.precioDinamico();
       }]
     }
-  }, [_vm._l(_vm.precios, function (precio) {
-    return precio.idClasificacion == _vm.cita.clasification && precio.servicio == "1" && precio.id != 48 && precio.id != 49 && precio.activo == "1" ? _c("option", {
-      domProps: {
-        value: precio.id
-      }
-    }, [_vm._v(_vm._s(precio.descripcion))]) : _vm._e();
-  }), _vm._v(" "), _vm.cita.club == "1" && _vm.cita.clasification == "1" ? _c("option", {
+  }), _vm._v(" "), _c("label", {
+    staticClass: "form-check-label ms-2",
     attrs: {
-      value: "48"
+      "for": "checkAdelanto"
     }
-  }, [_vm._v("Terapia Club Excelentemente")]) : _vm._e(), _vm._v(" "), _vm.cita.club == "1" && _vm.cita.clasification == "2" ? _c("option", {
-    attrs: {
-      value: "48"
-    }
-  }, [_vm._v("Terapia Club Excelentemente")]) : _vm._e()], 2)]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
+  }, [_vm._v("¿Registrar adelanto?")])]), _vm._v(" "), _vm.tieneAdelanto ? _c("div", {
+    staticClass: "transition-all slide-down"
+  }, [_c("div", {
+    staticClass: "form-group mb-3"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Status")]), _vm._v(" "), _c("select", {
+    staticClass: "small text-muted font-weight-bold"
+  }, [_vm._v("Monto del adelanto (S/)")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group"
+  }, [_c("span", {
+    staticClass: "input-group-text bg-light border-0"
+  }, [_vm._v("S/")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.cita.new_status,
-      expression: "cita.new_status"
+      value: _vm.descuentoAdelanto,
+      expression: "descuentoAdelanto"
     }],
-    staticClass: "form-select",
+    staticClass: "form-control border-0 bg-light",
     attrs: {
-      name: "type",
-      id: "sltServicio"
+      type: "number"
     },
+    domProps: {
+      value: _vm.descuentoAdelanto
+    },
+    on: {
+      keyup: function keyup($event) {
+        return _vm.precioDinamico();
+      },
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.descuentoAdelanto = $event.target.value;
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "form-group mb-3"
+  }, [_c("label", {
+    staticClass: "small text-muted font-weight-bold"
+  }, [_vm._v("Método de pago del adelanto")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.monedaAdelanto,
+      expression: "monedaAdelanto"
+    }],
+    staticClass: "form-select border-0 bg-light",
     on: {
       change: function change($event) {
         var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
@@ -12066,21 +12559,111 @@ var render = function render() {
           var val = "_value" in o ? o._value : o.value;
           return val;
         });
-        _vm.$set(_vm.cita, "new_status", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+        _vm.monedaAdelanto = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
       }
     }
-  }, _vm._l(_vm.status, function (statu) {
+  }, _vm._l(_vm.monedas, function (moneda) {
     return _c("option", {
+      key: moneda.id,
       domProps: {
-        value: statu.id
+        value: moneda.id
       }
-    }, [_vm._v(_vm._s(statu.stat))]);
-  }), 0)])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
+    }, [_vm._v(_vm._s(moneda.tipo))]);
+  }), 0)]), _vm._v(" "), _c("div", {
+    staticClass: "form-group"
+  }, [_c("label", {
+    staticClass: "small text-muted font-weight-bold"
+  }, [_vm._v("Referencia del adelanto")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.razonAdelanto,
+      expression: "razonAdelanto"
+    }],
+    staticClass: "form-control border-0 bg-light",
+    attrs: {
+      type: "text",
+      placeholder: "Ej: Pago por Yape, Fecha..."
+    },
+    domProps: {
+      value: _vm.razonAdelanto
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.razonAdelanto = $event.target.value;
+      }
+    }
+  })])]) : _vm._e(), _vm._v(" "), _c("hr", {
+    staticClass: "my-4 op-1"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "form-group mb-0"
+  }, [_c("label", {
+    staticClass: "small text-muted font-weight-bold d-block mb-2"
+  }, [_vm._v("Referencia de llegada")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.recomendation,
+      expression: "cita.recomendation"
+    }],
+    staticClass: "form-select border-0 bg-light rounded-3",
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.cita, "recomendation", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "",
+      selected: ""
+    }
+  }, [_vm._v("Ninguno / Desconocido")]), _vm._v(" "), _vm._l(_vm.recomendaciones, function (reco) {
+    return _c("option", {
+      key: reco,
+      domProps: {
+        value: reco
+      }
+    }, [_vm._v(_vm._s(reco))]);
+  })], 2)])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 mb-4"
   }, [_c("div", {
-    staticClass: "col-sm-6 my-2"
+    staticClass: "card border-0 shadow-sm rounded-4 bg-white p-4 h-100"
+  }, [_vm._m(15), _vm._v(" "), _c("div", {
+    staticClass: "form-group h-100 d-flex flex-column"
+  }, [_c("textarea", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.cita.recomendacion_comentario,
+      expression: "cita.recomendacion_comentario"
+    }],
+    staticClass: "form-control border-0 bg-light rounded-4 flex-grow-1 p-3",
+    attrs: {
+      rows: "8",
+      placeholder: "Observaciones extras sobre la cita o el paciente..."
+    },
+    domProps: {
+      value: _vm.cita.recomendacion_comentario
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.cita, "recomendacion_comentario", $event.target.value);
+      }
+    }
+  })])])])]), _vm._v(" "), _c("div", {
+    staticClass: "row align-items-center mt-3"
   }, [_c("div", {
-    staticClass: "form-switch"
+    staticClass: "col-sm-6 text-sm-start text-center mb-3 mb-sm-0"
+  }, [_c("div", {
+    staticClass: "form-check form-switch custom-switch d-inline-block"
   }, [_c("input", {
     directives: [{
       name: "model",
@@ -12091,8 +12674,7 @@ var render = function render() {
     staticClass: "form-check-input",
     attrs: {
       type: "checkbox",
-      role: "switch",
-      id: "flePrecio"
+      id: "checkNuevo"
     },
     domProps: {
       checked: Array.isArray(_vm.precioNuevo) ? _vm._i(_vm.precioNuevo, null) > -1 : _vm.precioNuevo
@@ -12118,452 +12700,141 @@ var render = function render() {
       }]
     }
   }), _vm._v(" "), _c("label", {
-    staticClass: "form-check-label",
+    staticClass: "form-check-label ms-2",
     attrs: {
-      "for": "flePrecio"
+      "for": "checkNuevo"
     }
-  }, [_vm.precioNuevo ? _c("span", [_c("i", {
-    staticClass: "fa-solid fa-pizza-slice"
-  }), _vm._v(" Precio de nuevo cliente")]) : _c("span", [_c("i", {
-    staticClass: "fa-solid fa-champagne-glasses"
-  }), _vm._v(" Precio de cliente continuante")])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6 my-2"
-  }, [_c("div", {
-    staticClass: "form-switch"
-  }, [_c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.esPresencial,
-      expression: "esPresencial"
-    }],
-    staticClass: "form-check-input",
-    attrs: {
-      type: "checkbox",
-      role: "switch",
-      id: "flePresencial"
-    },
-    domProps: {
-      checked: Array.isArray(_vm.esPresencial) ? _vm._i(_vm.esPresencial, null) > -1 : _vm.esPresencial
-    },
-    on: {
-      change: function change($event) {
-        var $$a = _vm.esPresencial,
-          $$el = $event.target,
-          $$c = $$el.checked ? true : false;
-        if (Array.isArray($$a)) {
-          var $$v = null,
-            $$i = _vm._i($$a, $$v);
-          if ($$el.checked) {
-            $$i < 0 && (_vm.esPresencial = $$a.concat([$$v]));
-          } else {
-            $$i > -1 && (_vm.esPresencial = $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
-          }
-        } else {
-          _vm.esPresencial = $$c;
-        }
-      }
-    }
-  }), _vm._v(" "), _c("label", {
-    staticClass: "form-check-label",
-    attrs: {
-      "for": "flePresencial"
-    }
-  }, [_vm.esPresencial ? _c("span", [_c("i", {
-    staticClass: "far fa-user"
-  }), _vm._v(" Reunión presencial")]) : _c("span", [_c("i", {
-    staticClass: "fas fa-desktop"
-  }), _vm._v(" Reunión virtual")])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4 my-2"
-  }, [_c("div", {
-    staticClass: "form-switch"
-  }, [_c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.nosrecomienda,
-      expression: "nosrecomienda"
-    }],
-    staticClass: "form-check-input",
-    attrs: {
-      type: "checkbox",
-      role: "switch",
-      id: "flexSwitchCheckDefault"
-    },
-    domProps: {
-      checked: Array.isArray(_vm.nosrecomienda) ? _vm._i(_vm.nosrecomienda, null) > -1 : _vm.nosrecomienda
-    },
-    on: {
-      change: function change($event) {
-        var $$a = _vm.nosrecomienda,
-          $$el = $event.target,
-          $$c = $$el.checked ? true : false;
-        if (Array.isArray($$a)) {
-          var $$v = null,
-            $$i = _vm._i($$a, $$v);
-          if ($$el.checked) {
-            $$i < 0 && (_vm.nosrecomienda = $$a.concat([$$v]));
-          } else {
-            $$i > -1 && (_vm.nosrecomienda = $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
-          }
-        } else {
-          _vm.nosrecomienda = $$c;
-        }
-      }
-    }
-  }), _vm._v(" "), _vm._m(5)])]), _vm._v(" "), _vm.nosrecomienda ? _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-sm-4 my-1"
-  }, [_c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.recomendation,
-      expression: "cita.recomendation"
-    }],
-    staticClass: "form-select text-capitalize",
-    attrs: {
-      name: "",
-      id: ""
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.cita, "recomendation", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }
-    }
-  }, [_c("option", {
-    attrs: {
-      value: "",
-      selected: ""
-    }
-  }, [_vm._v("Ninguno")]), _vm._v(" "), _vm._l(_vm.recomendaciones, function (reco) {
-    return _c("option", {
-      staticClass: "text-capitalize",
-      domProps: {
-        value: reco
-      }
-    }, [_vm._v(_vm._s(reco))]);
-  })], 2)]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-8"
-  }, [_c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.recomendacion_comentario,
-      expression: "cita.recomendacion_comentario"
-    }],
-    staticClass: "form-control text-capitalize",
-    attrs: {
-      type: "text",
-      placeholder: "¿Comentario extra sobre la recomendación?",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.recomendacion_comentario
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "recomendacion_comentario", $event.target.value);
-      }
-    }
-  })])]) : _vm._e(), _vm._v(" "), !_vm.esPresencial ? _c("div", {
-    staticClass: "col-sm-12 my-1"
-  }, [_c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.cita.link,
-      expression: "cita.link"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "link",
-      id: "link",
-      placeholder: "Ingrese el link de la reunión virtual",
-      autocomplete: "off"
-    },
-    domProps: {
-      value: _vm.cita.link
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.cita, "link", $event.target.value);
-      }
-    }
-  })]) : _vm._e()]), _vm._v(" "), _c("div", {
-    staticClass: "row d-flex align-content-end"
-  }, [_c("div", {
+  }, [_vm._v(_vm._s(_vm.precioNuevo ? "Paciente Nuevo" : "Paciente Continuante"))])])]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-6"
   }, [_c("div", {
-    staticClass: "form-switch"
-  }, [_c("input", {
+    staticClass: "card bg-primary text-white border-0 rounded-4 shadow-sm"
+  }, [_c("div", {
+    staticClass: "card-body p-3 d-flex justify-content-between align-items-center"
+  }, [_c("span", {
+    staticClass: "small font-weight-bold"
+  }, [_vm._v("Total a cobrar:")]), _vm._v(" "), _c("h4", {
+    staticClass: "mb-0 font-weight-bold"
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.cita.price).toFixed(2)))])])])])])])])]), _vm._v(" "), _c("div", {
     directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.tieneAdelanto,
-      expression: "tieneAdelanto"
-    }],
-    staticClass: "form-check-input",
-    attrs: {
-      type: "checkbox",
-      role: "switch",
-      id: "fleAdelanto"
-    },
-    domProps: {
-      checked: Array.isArray(_vm.tieneAdelanto) ? _vm._i(_vm.tieneAdelanto, null) > -1 : _vm.tieneAdelanto
-    },
-    on: {
-      change: [function ($event) {
-        var $$a = _vm.tieneAdelanto,
-          $$el = $event.target,
-          $$c = $$el.checked ? true : false;
-        if (Array.isArray($$a)) {
-          var $$v = null,
-            $$i = _vm._i($$a, $$v);
-          if ($$el.checked) {
-            $$i < 0 && (_vm.tieneAdelanto = $$a.concat([$$v]));
-          } else {
-            $$i > -1 && (_vm.tieneAdelanto = $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
-          }
-        } else {
-          _vm.tieneAdelanto = $$c;
-        }
-      }, function ($event) {
-        _vm.precioDinamico();
-        _vm.descuentoAdelanto = 0;
-      }]
-    }
-  }), _vm._v(" "), _c("label", {
-    staticClass: "form-check-label",
-    attrs: {
-      "for": "fleAdelanto"
-    }
-  }, [!_vm.tieneAdelanto ? _c("span", [_c("i", {
-    staticClass: "fa-solid fa-percent"
-  }), _vm._v(" ¿Tiene adelanto?")]) : _c("span", {
-    staticClass: "text-danger"
+      name: "show",
+      rawName: "v-show",
+      value: _vm.pasoActual === 7,
+      expression: "pasoActual === 7"
+    }]
+  }, [_c("div", {
+    staticClass: "row justify-content-center"
+  }, [_c("div", {
+    staticClass: "col-md-10"
+  }, [_c("p", {
+    staticClass: "mb-4 lead text-center font-weight-bold"
+  }, [_vm._v("Resumen de la Cita")]), _vm._v(" "), _c("div", {
+    staticClass: "ticket-container bg-white shadow-lg rounded-5 overflow-hidden border"
+  }, [_vm._m(16), _vm._v(" "), _c("div", {
+    staticClass: "ticket-body p-4 p-md-5"
+  }, [_c("div", {
+    staticClass: "row mb-5"
+  }, [_c("div", {
+    staticClass: "col-md-6 mb-4"
+  }, [_c("label", {
+    staticClass: "xs-label text-muted font-weight-bold text-uppercase ls-1 d-block mb-1"
+  }, [_vm._v("Paciente")]), _vm._v(" "), _c("h5", {
+    staticClass: "font-weight-bold text-dark mb-0"
   }, [_c("i", {
-    staticClass: "fa-regular fa-money-bill-1"
-  }), _vm._v(" No posee adelanto")])]), _vm._v(" "), _vm.tieneAdelanto ? _c("div", [_c("label", {
-    staticClass: "mb-0 mt-2",
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Adelanto en S/:")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.descuentoAdelanto,
-      expression: "descuentoAdelanto"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "number",
-      min: "0",
-      step: "1"
-    },
-    domProps: {
-      value: _vm.descuentoAdelanto
-    },
-    on: {
-      keyup: function keyup($event) {
-        return _vm.precioDinamico();
-      },
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.descuentoAdelanto = $event.target.value;
-      }
-    }
-  }), _vm._v(" "), _c("label", {
-    staticClass: "mt-2",
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Descripción adicional")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.razonAdelanto,
-      expression: "razonAdelanto"
-    }],
-    staticClass: "form-control mb-2",
-    attrs: {
-      type: "text",
-      placeholder: "Ingrese la fecha del adelanto"
-    },
-    domProps: {
-      value: _vm.razonAdelanto
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.razonAdelanto = $event.target.value;
-      }
-    }
-  })]) : _vm._e()])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+    staticClass: "fas fa-user-circle me-2 text-primary"
+  }), _vm._v(_vm._s(_vm.cita.name) + " " + _vm._s(_vm.cita.nombres))]), _vm._v(" "), _c("p", {
+    staticClass: "text-muted small ms-4"
+  }, [_vm._v("DNI: " + _vm._s(_vm.cita.dni))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 mb-4 text-md-end"
+  }, [_c("label", {
+    staticClass: "xs-label text-muted font-weight-bold text-uppercase ls-1 d-block mb-1"
+  }, [_vm._v("Tipo de Atención")]), _vm._v(" "), _c("h5", {
+    staticClass: "font-weight-bold text-dark mb-0"
+  }, [_vm._v(_vm._s(_vm.getLabelCategoria(_vm.cita.clasification)))]), _vm._v(" "), _c("p", {
+    staticClass: "text-primary small mb-0"
+  }, [_vm._v(_vm._s(_vm.getLabelServicio(_vm.cita.type)))])])]), _vm._v(" "), _c("div", {
+    staticClass: "row mb-5 bg-light rounded-4 p-4 mx-0"
   }, [_c("div", {
-    staticClass: "form-switch"
-  }, [_c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.tieneRebaja,
-      expression: "tieneRebaja"
-    }],
-    staticClass: "form-check-input",
+    staticClass: "col-md-6 mb-3 mb-md-0 d-flex align-items-center"
+  }, [_vm._m(17), _vm._v(" "), _c("div", [_c("h6", {
+    staticClass: "mb-0 font-weight-bold"
+  }, [_vm._v(_vm._s(_vm.fechaElegida))]), _vm._v(" "), _c("small", {
+    staticClass: "text-muted"
+  }, [_vm._v("Fecha asignada")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 d-flex align-items-center justify-content-md-end"
+  }, [_vm._m(18), _vm._v(" "), _c("div", {
+    staticClass: "text-md-end"
+  }, [_c("h6", {
+    staticClass: "mb-0 font-weight-bold"
+  }, [_vm._v(_vm._s(_vm.horaLatam1(_vm.horaElegida.check_time)) + " - " + _vm._s(_vm.horaLatam1(_vm.horaElegida.departure_date)))]), _vm._v(" "), _c("small", {
+    staticClass: "text-muted"
+  }, [_vm._v("Horario reservado")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "row Ticket-details"
+  }, [_c("div", {
+    staticClass: "col-md-4 mb-4"
+  }, [_c("h6", {
+    staticClass: "font-weight-bold text-muted small text-uppercase mb-2"
+  }, [_vm._v("Profesional")]), _vm._v(" "), _c("p", {
+    staticClass: "mb-0 font-weight-bold"
+  }, [_vm._v(_vm._s(_vm.profesionalElegido.name))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4 mb-4"
+  }, [_c("h6", {
+    staticClass: "font-weight-bold text-muted small text-uppercase mb-2"
+  }, [_vm._v("Modalidad")]), _vm._v(" "), _c("p", {
+    staticClass: "mb-0 font-weight-bold"
+  }, [_c("span", {
+    staticClass: "badge rounded-pill bg-soft-info text-info px-3"
+  }, [_vm._v(_vm._s(_vm.getLabelModalidad(_vm.cita.mode)))])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4 mb-4 text-md-end"
+  }, [_c("h6", {
+    staticClass: "font-weight-bold text-muted small text-uppercase mb-2"
+  }, [_vm._v("Total a Pagar")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 font-weight-bold text-success"
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.cita.price).toFixed(2)))])])]), _vm._v(" "), _vm.cita.recomendacion_comentario ? _c("div", {
+    staticClass: "notes-section mt-4 bg-soft-warning p-4 rounded-4 border-dashed border-warning"
+  }, [_vm._m(19), _vm._v(" "), _c("p", {
+    staticClass: "mb-0 small text-dark fst-italic"
+  }, [_vm._v(_vm._s(_vm.cita.recomendacion_comentario))])]) : _vm._e()]), _vm._v(" "), _vm._m(20)])])])]), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer border-0 justify-content-between px-4 pb-4"
+  }, [_c("div", [_vm.pasoActual > 1 ? _c("button", {
+    staticClass: "btn btn-outline-secondary btn-lg rounded-pill px-4",
     attrs: {
-      type: "checkbox",
-      role: "switch",
-      id: "fleRebaja"
-    },
-    domProps: {
-      checked: Array.isArray(_vm.tieneRebaja) ? _vm._i(_vm.tieneRebaja, null) > -1 : _vm.tieneRebaja
+      type: "button"
     },
     on: {
-      change: [function ($event) {
-        var $$a = _vm.tieneRebaja,
-          $$el = $event.target,
-          $$c = $$el.checked ? true : false;
-        if (Array.isArray($$a)) {
-          var $$v = null,
-            $$i = _vm._i($$a, $$v);
-          if ($$el.checked) {
-            $$i < 0 && (_vm.tieneRebaja = $$a.concat([$$v]));
-          } else {
-            $$i > -1 && (_vm.tieneRebaja = $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
-          }
-        } else {
-          _vm.tieneRebaja = $$c;
-        }
-      }, function ($event) {
-        _vm.precioDinamico();
-        _vm.descuentoRebaja = 0;
-      }]
+      click: _vm.prevStep
     }
-  }), _vm._v(" "), _c("label", {
-    staticClass: "form-check-label",
-    attrs: {
-      "for": "fleRebaja"
-    }
-  }, [!_vm.tieneRebaja ? _c("span", [_c("i", {
-    staticClass: "fa-solid fa-percent"
-  }), _vm._v(" ¿Tiene rebaja?")]) : _c("span", {
-    staticClass: "text-danger"
   }, [_c("i", {
-    staticClass: "fa-regular fa-money-bill-1"
-  }), _vm._v(" Sin rebaja")])]), _vm._v(" "), _vm.tieneRebaja ? _c("div", [_c("label", {
-    staticClass: "mb-0 mt-2",
+    staticClass: "fas fa-arrow-left me-2"
+  }), _vm._v(" Anterior\r\n\t\t\t\t\t\t\t")]) : _vm._e()]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex"
+  }, [_vm.pasoActual === 1 ? _c("button", {
+    staticClass: "btn btn-light-danger btn-lg rounded-pill px-4 me-2",
     attrs: {
-      "for": ""
+      type: "button",
+      "data-bs-dismiss": "modal"
     }
-  }, [_vm._v("Rebaja a aplicar en S/")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.descuentoRebaja,
-      expression: "descuentoRebaja"
-    }],
-    staticClass: "form-control",
+  }, [_vm._v("\r\n\t\t\t\t\t\t\t\tCancelar\r\n\t\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm.pasoActual < 7 ? _c("button", {
+    staticClass: "btn btn-primary btn-lg rounded-pill px-5 shadow-sm",
     attrs: {
-      type: "number",
-      min: "0",
-      step: "0.5"
-    },
-    domProps: {
-      value: _vm.descuentoRebaja
+      type: "button"
     },
     on: {
-      change: function change($event) {
-        return _vm.precioDinamico();
-      },
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.descuentoRebaja = $event.target.value;
-      }
+      click: _vm.nextStep
     }
-  }), _vm._v(" "), _c("label", {
-    staticClass: "mb-0 mt-2",
+  }, [_vm._v("\r\n\t\t\t\t\t\t\t\tSiguiente "), _c("i", {
+    staticClass: "fas fa-arrow-right ms-2"
+  })]) : _vm._e(), _vm._v(" "), _vm.pasoActual === 7 && _vm.cita.vivo == 1 ? _c("button", {
+    staticClass: "btn btn-success btn-lg rounded-pill px-5 shadow-sm",
     attrs: {
-      "for": ""
+      type: "submit"
     }
-  }, [_vm._v("Motivo de la rebaja")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.razonRebaja,
-      expression: "razonRebaja"
-    }],
-    staticClass: "form-control my-2",
-    attrs: {
-      type: "text",
-      placeholder: "Ingresa una razón para la rebaja"
-    },
-    domProps: {
-      value: _vm.razonRebaja
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.razonRebaja = $event.target.value;
-      }
-    }
-  })]) : _vm._e(), _vm._v(" "), _vm.tieneAdelanto ? _c("div", [_c("label", {
-    staticClass: "mb-0 mt-2",
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Método de pago")]), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.monedaAdelanto,
-      expression: "monedaAdelanto"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "sltMonedas3"
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.monedaAdelanto = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
-      }
-    }
-  }, _vm._l(_vm.monedas, function (moneda) {
-    return _c("option", {
-      domProps: {
-        value: moneda.id
-      }
-    }, [_vm._v(_vm._s(moneda.tipo))]);
-  }), 0)]) : _vm._e()])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card my-2"
-  }, [_c("div", {
-    staticClass: "card-body"
-  }, [_c("div", {
-    staticClass: "col-sm-12 text-center"
-  }, [_c("h1", {
-    staticClass: "display-6"
-  }, [_c("small", {
-    staticClass: "fw-light text-secondary"
-  }, [_vm._v("Precio a cobrar")]), _vm._v(" S/ " + _vm._s(parseFloat(_vm.cita.price).toFixed(2)))])])])]), _vm._v(" "), _vm.cita.vivo == 1 && _vm.pasoActual === 2 ? _c("div", {
-    staticClass: "modal-footer border-0 justify-content-center"
-  }, [_vm._m(6), _vm._v(" "), _vm._m(7)]) : _vm.cita.vivo != 1 && _vm.pasoActual === 2 ? _c("div", [_vm._m(8)]) : _vm._e()])])])])])]), _vm._v(" "), _c("div", {
+  }, [_c("i", {
+    staticClass: "fas fa-save me-2"
+  }), _vm._v(" Registrar Cita\r\n\t\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm.pasoActual === 7 && _vm.cita.vivo != 1 ? _c("div", {
+    staticClass: "alert alert-danger mb-0 rounded-pill"
+  }, [_c("i", {
+    staticClass: "fas fa-cross me-2"
+  }), _vm._v(" El paciente figura como fallecido.\r\n\t\t\t\t\t\t\t")]) : _vm._e()])])])])])])]), _vm._v(" "), _c("div", {
     staticClass: "modal fade",
     staticStyle: {
       "z-index": "1060"
@@ -12578,9 +12849,9 @@ var render = function render() {
     staticClass: "modal-dialog modal-dialog-scrollable modal-xl"
   }, [_c("div", {
     staticClass: "modal-content"
-  }, [_vm._m(9), _vm._v(" "), _c("div", {
+  }, [_vm._m(21), _vm._v(" "), _c("div", {
     staticClass: "modal-body"
-  }, [_vm._m(10), _vm._v(" "), _c("div", {
+  }, [_vm._m(22), _vm._v(" "), _c("div", {
     staticClass: "card mb-3"
   }, [_c("div", {
     staticClass: "card-body"
@@ -12588,7 +12859,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col"
-  }, [_vm._m(11), _vm._v(" "), _c("select", {
+  }, [_vm._m(23), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12624,7 +12895,7 @@ var render = function render() {
     }
   }, [_vm._v("Pasaporte")])])]), _vm._v(" "), _c("div", {
     staticClass: "col"
-  }, [_vm._m(12), _vm._v(" "), _c("input", {
+  }, [_vm._m(24), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12725,7 +12996,7 @@ var render = function render() {
     staticClass: "fas fa-search"
   })])])]), _vm._v(" "), _c("div", {
     staticClass: "col-4"
-  }, [_vm._m(13), _vm._v(" "), _c("input", {
+  }, [_vm._m(25), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12750,7 +13021,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-4"
-  }, [_vm._m(14), _vm._v(" "), _c("input", {
+  }, [_vm._m(26), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12777,7 +13048,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(15), _vm._v(" "), _c("input", {
+  }, [_vm._m(27), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12801,7 +13072,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(16), _vm._v(" "), _c("select", {
+  }, [_vm._m(28), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12848,7 +13119,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(17), _vm._v(" "), _c("select", {
+  }, [_vm._m(29), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12897,7 +13168,7 @@ var render = function render() {
     }
   }, [_vm._v("Sin instrucción")])])]), _vm._v(" "), _c("div", {
     staticClass: "col"
-  }, [_vm._m(18), _vm._v(" "), _c("input", {
+  }, [_vm._m(30), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12925,7 +13196,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(19), _vm._v(" "), _c("select", {
+  }, [_vm._m(31), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12957,7 +13228,7 @@ var render = function render() {
     }, [_vm._v(_vm._s(departamento.departamento))]);
   }), 0)]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(20), _vm._v(" "), _c("select", {
+  }, [_vm._m(32), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12989,7 +13260,7 @@ var render = function render() {
     }, [_vm._v(_vm._s(provincia.provincia))]);
   }), 0)]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(21), _vm._v(" "), _c("select", {
+  }, [_vm._m(33), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13021,7 +13292,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(22), _vm._v(" "), _c("input", {
+  }, [_vm._m(34), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13047,7 +13318,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(23), _vm._v(" "), _c("select", {
+  }, [_vm._m(35), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13115,7 +13386,7 @@ var render = function render() {
         _vm.$set(_vm.cita, "email", $event.target.value);
       }
     }
-  })])])])]), _vm._v(" "), _vm._m(24), _vm._v(" "), _c("div", {
+  })])])])]), _vm._v(" "), _vm._m(36), _vm._v(" "), _c("div", {
     staticClass: "card"
   }, [_c("div", {
     staticClass: "card-body"
@@ -13123,7 +13394,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(25), _vm._v(" "), _c("input", {
+  }, [_vm._m(37), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13149,7 +13420,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(26), _vm._v(" "), _c("input", {
+  }, [_vm._m(38), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13175,7 +13446,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(27), _vm._v(" "), _c("input", {
+  }, [_vm._m(39), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13335,84 +13606,178 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("p", {
-    staticClass: "mb-2 lead text-success"
-  }, [_c("strong", [_c("i", {
-    staticClass: "fas fa-search"
-  }), _vm._v(" Seleccionar Paciente")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
   return _c("span", {
-    staticClass: "input-group-text"
+    staticClass: "input-group-text border-0 bg-transparent ps-3"
   }, [_c("i", {
-    staticClass: "fas fa-search"
+    staticClass: "fas fa-search text-muted"
   })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "mt-3 text-center"
+    staticClass: "avatar-circle me-3 bg-soft-primary d-flex align-items-center justify-content-center"
+  }, [_c("i", {
+    staticClass: "fas fa-user text-primary"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mt-4 text-center"
   }, [_c("button", {
-    staticClass: "btn btn-success",
+    staticClass: "btn btn-outline-primary border-dashed w-100 py-3 rounded-4",
     attrs: {
       type: "button",
       "data-bs-toggle": "modal",
       "data-bs-target": "#modalNuevoPaciente"
     }
   }, [_c("i", {
-    staticClass: "fas fa-plus"
-  }), _vm._v(" Nuevo paciente\r\n\t\t\t\t\t\t\t\t\t")])]);
+    staticClass: "fas fa-plus-circle me-2"
+  }), _vm._v(" Crear paciente nuevo\r\n\t\t\t\t\t\t\t\t\t\t\t")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("p", {
-    staticClass: "mb-0 lead text-success"
-  }, [_c("strong", [_c("i", {
-    staticClass: "fas fa-ticket-alt"
-  }), _vm._v(" Datos de la Nueva Cita")])]);
+    staticClass: "small text-muted mb-3 font-weight-bold"
+  }, [_c("i", {
+    staticClass: "fas fa-list me-2"
+  }), _vm._v("Seleccionar Servicio Específico")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "avatar-xl mx-auto mb-4 bg-soft-primary d-flex align-items-center justify-content-center rounded-circle border border-primary"
+  }, [_c("i", {
+    staticClass: "fas fa-user-md fa-4x text-primary"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mt-4 badge bg-success-light text-success px-4 py-2 rounded-pill"
+  }, [_c("i", {
+    staticClass: "fas fa-check-circle me-2"
+  }), _vm._v("Disponible para esta atención\r\n\t\t\t\t\t\t\t\t\t")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mb-3 text-primary"
+  }, [_c("i", {
+    staticClass: "far fa-calendar-alt fa-3x"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mb-3 text-info"
+  }, [_c("i", {
+    staticClass: "far fa-clock fa-3x"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "alert bg-soft-info border-0 text-info rounded-4"
+  }, [_c("i", {
+    staticClass: "fas fa-info-circle me-2"
+  }), _vm._v("Este horario ha sido bloqueado en el calendario para este paciente.\r\n\t\t\t\t\t\t\t\t")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modalidad-icon mx-auto mb-3 text-primary d-flex align-items-center justify-content-center rounded-circle bg-soft-primary"
+  }, [_c("i", {
+    staticClass: "fas fa-building fa-2x"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modalidad-icon mx-auto mb-3 text-info d-flex align-items-center justify-content-center rounded-circle bg-soft-info"
+  }, [_c("i", {
+    staticClass: "fas fa-laptop-house fa-2x"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modalidad-icon mx-auto mb-3 text-warning d-flex align-items-center justify-content-center rounded-circle bg-soft-warning"
+  }, [_c("i", {
+    staticClass: "fas fa-car-side fa-2x"
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("label", {
-    staticClass: "form-check-label",
-    attrs: {
-      "for": "flexSwitchCheckDefault"
-    }
-  }, [_vm._v("Referencia "), _c("span", {
-    staticClass: "text-danger"
-  }, [_vm._v("*")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("button", {
-    staticClass: "btn btn-lg btn-outline-secondary",
-    attrs: {
-      type: "button",
-      "data-bs-dismiss": "modal"
-    }
+    staticClass: "small font-weight-bold text-muted"
   }, [_c("i", {
-    staticClass: "fas fa-times"
-  }), _vm._v(" Cerrar")]);
+    staticClass: "fas fa-link me-2"
+  }), _vm._v("Link de la reunión")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("button", {
-    staticClass: "btn btn-lg btn-outline-primary",
-    attrs: {
-      type: "submit"
-    }
+  return _c("h6", {
+    staticClass: "font-weight-bold mb-4 d-flex align-items-center"
   }, [_c("i", {
-    staticClass: "fas fa-save"
-  }), _vm._v(" Registrar cita")]);
+    staticClass: "fas fa-wallet text-primary me-2"
+  }), _vm._v("Configuración de Pago\r\n\t\t\t\t\t\t\t\t\t\t\t")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("p", {
-    staticClass: "text-dark text-end"
-  }, [_vm._v("Restringido porque el paciente esta reportado como fallecido ( "), _c("i", {
-    staticClass: "fas fa-cross"
-  }), _vm._v(" )")]);
+  return _c("h6", {
+    staticClass: "font-weight-bold mb-4 d-flex align-items-center"
+  }, [_c("i", {
+    staticClass: "fas fa-sticky-note text-warning me-2"
+  }), _vm._v("Notas Adicionales\r\n\t\t\t\t\t\t\t\t\t\t\t")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "ticket-header bg-soft-primary p-4 border-bottom d-flex align-items-center"
+  }, [_c("div", {
+    staticClass: "badge bg-primary p-3 rounded-circle me-3"
+  }, [_c("i", {
+    staticClass: "fas fa-file-invoice fa-2x text-white"
+  })]), _vm._v(" "), _c("div", [_c("h5", {
+    staticClass: "mb-0 font-weight-bold text-dark"
+  }, [_vm._v("Confirmación de Reserva")]), _vm._v(" "), _c("p", {
+    staticClass: "text-muted small mb-0"
+  }, [_vm._v("Por favor, revise los datos antes de registrar.")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "me-3 text-info"
+  }, [_c("i", {
+    staticClass: "far fa-calendar-check fa-2x"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "me-3 text-info"
+  }, [_c("i", {
+    staticClass: "far fa-clock fa-2x"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "font-weight-bold text-warning-dark small text-uppercase mb-2"
+  }, [_c("i", {
+    staticClass: "fas fa-sticky-note me-2"
+  }), _vm._v("Notas Adicionales")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "ticket-footer bg-light p-4 text-center border-top"
+  }, [_c("p", {
+    staticClass: "text-muted small mb-0"
+  }, [_c("i", {
+    staticClass: "fas fa-shield-alt me-2"
+  }), _vm._v("Sistema de Gestión de Citas Excelentemente - Recepción")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -19208,7 +19573,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.gap-2[data-v-4fc44170] { gap: 0.5rem;\n}\n.shadow-sm[data-v-4fc44170] { box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\r\n/* Main Layout */\n.modal-content[data-v-4fc44170] {\r\n  background: #ffffff;\n}\r\n\r\n/* Header */\n.icon-header-container[data-v-4fc44170] {\r\n  background: #f0f7ff;\r\n  width: 44px;\r\n  height: 44px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  border-radius: 12px;\n}\n.btn-close-custom[data-v-4fc44170] {\r\n  background: #f8f9fa;\r\n  border: none;\r\n  width: 32px;\r\n  height: 32px;\r\n  border-radius: 50%;\r\n  color: #adb5bd;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  transition: all 0.2s;\r\n  cursor: pointer;\n}\n.btn-close-custom[data-v-4fc44170]:hover { background: #e9ecef; color: #495057;\n}\r\n\r\n/* Badges */\n.badge-status[data-v-4fc44170] {\r\n  padding: 4px 12px;\r\n  border-radius: 50px;\r\n  font-size: 0.7rem;\r\n  font-weight: 700;\r\n  text-transform: uppercase;\n}\n.status-badge-success[data-v-4fc44170] { background: #e7fcf3; color: #0ca678; border: 1px solid #c3fae8;\n}\n.status-badge-secondary[data-v-4fc44170] { background: #f1f3f5; color: #495057; border: 1px solid #e9ecef;\n}\n.status-badge-danger[data-v-4fc44170] { background: #fff5f5; color: #e03131; border: 1px solid #ffe3e3;\n}\n.status-badge-info[data-v-4fc44170] { background: #e7f5ff; color: #1971c2; border: 1px solid #d0ebff;\n}\n.badge-service[data-v-4fc44170] {\r\n  padding: 4px 12px;\r\n  border-radius: 50px;\r\n  font-size: 0.7rem;\r\n  font-weight: 700;\r\n  text-transform: uppercase;\r\n  background: #fff4e6;\r\n  color: #fd7e14;\r\n  border: 1px solid #ffe8cc;\n}\r\n\r\n/* Status Cards */\n.status-cards-grid[data-v-4fc44170] {\r\n  display: grid;\r\n  grid-template-columns: repeat(3, 1fr);\r\n  gap: 12px;\n}\n.status-card[data-v-4fc44170] {\r\n  background: #f8f9fc;\r\n  border-radius: 14px;\r\n  padding: 12px;\r\n  border: 1px solid #f1f3f9;\r\n  cursor: pointer;\r\n  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);\n}\n.status-card[data-v-4fc44170]:hover { border-color: #dbe4ff; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.03);\n}\n.status-card-header[data-v-4fc44170] {\r\n  font-size: 0.65rem;\r\n  font-weight: 800;\r\n  color: #adb5bd;\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 6px;\r\n  letter-spacing: 1px;\n}\n.status-options[data-v-4fc44170] {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 3px;\n}\n.status-option[data-v-4fc44170] {\r\n  padding: 6px 10px;\r\n  border-radius: 8px;\r\n  font-size: 0.75rem;\r\n  color: #868e96;\r\n  border: 1px solid transparent;\n}\n.status-option.active[data-v-4fc44170] {\r\n  background: #ffffff;\r\n  border-color: #e9ecef;\r\n  font-weight: 700;\r\n  color: #495057;\r\n  box-shadow: 0 2px 4px rgba(0,0,0,0.02);\n}\n.status-option.active-warning.active[data-v-4fc44170] { background: #fff9db; border-color: #ffe066; color: #f08c00;\n}\n.status-option.active-success.active[data-v-4fc44170] { background: #ebfbee; border-color: #8ce99a; color: #2b8a3e;\n}\r\n\r\n/* Sections */\n.section-label[data-v-4fc44170] {\r\n  font-size: 0.7rem;\r\n  font-weight: 800;\r\n  color: #adb5bd;\r\n  letter-spacing: 1px;\r\n  text-transform: uppercase;\n}\n.time-control-container[data-v-4fc44170], .patient-card[data-v-4fc44170] {\r\n  background: #f8f9fc;\r\n  border-radius: 16px;\r\n  border: 1px solid #f1f3f9;\n}\n.time-item[data-v-4fc44170] { text-align: center; flex: 1;\n}\n.time-label[data-v-4fc44170] { font-size: 0.65rem; color: #adb5bd; margin-bottom: 2px;\n}\n.time-value[data-v-4fc44170] { font-size: 0.9rem; font-weight: 800; color: #495057;\n}\n.btn-registrar[data-v-4fc44170] {\r\n  background: #ffffff;\r\n  border: 1px solid #dee2e6;\r\n  border-radius: 10px;\r\n  padding: 4px 12px;\r\n  font-weight: 700;\r\n  font-size: 0.75rem;\r\n  color: #495057;\r\n  transition: all 0.2s;\n}\n.btn-registrar[data-v-4fc44170]:hover { background: #f8f9fa; border-color: #ced4da;\n}\r\n\r\n/* Patient Card */\n.patient-avatar[data-v-4fc44170] {\r\n  background: #e7f5ff;\r\n  width: 44px;\r\n  height: 44px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  border-radius: 50%;\r\n  flex-shrink: 0;\n}\n.patient-name[data-v-4fc44170] { font-size: 0.95rem; color: #212529; line-height: 1.2;\n}\n.patient-dni[data-v-4fc44170] { font-size: 0.75rem;\n}\r\n\r\n/* Details Grid */\n.details-grid[data-v-4fc44170] {\r\n  display: grid;\r\n  grid-template-columns: 1fr 1fr;\r\n  gap: 12px;\n}\n.detail-item[data-v-4fc44170] {\r\n  display: flex;\r\n  align-items: center;\r\n  background: #f8f9fc;\r\n  padding: 12px;\r\n  border-radius: 14px;\r\n  border: 1px solid #f1f3f9;\n}\n.detail-icon[data-v-4fc44170] {\r\n  width: 36px;\r\n  height: 36px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  background: #fff;\r\n  border-radius: 10px;\r\n  margin-right: 12px;\r\n  font-size: 1rem;\r\n  box-shadow: 0 2px 4px rgba(0,0,0,0.02);\n}\n.detail-label[data-v-4fc44170] { font-size: 0.65rem; color: #adb5bd; font-weight: 800; margin-bottom: 0;\n}\n.detail-value[data-v-4fc44170] { font-size: 0.85rem; font-weight: 700; color: #495057;\n}\r\n\r\n/* Action Buttons */\n.btn-action[data-v-4fc44170] {\r\n  border-radius: 12px;\r\n  padding: 10px 16px;\r\n  font-weight: 700;\r\n  font-size: 0.8rem;\r\n  transition: all 0.2s;\r\n  min-width: 130px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\n}\n.btn-action[data-v-4fc44170]:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.05);\n}\n.border-left[data-v-4fc44170] { border-left: 1px solid #e9ecef!important;\n}\n.border-right[data-v-4fc44170] { border-right: 1px solid #e9ecef!important;\n}\n.gap-2[data-v-4fc44170] { gap: 0.5rem;\n}\n.gap-3[data-v-4fc44170] { gap: 0.75rem;\n}\n.gap-4[data-v-4fc44170] { gap: 1.5rem;\n}\n.mr-2[data-v-4fc44170] { margin-right: 0.5rem;\n}\n.mr-3[data-v-4fc44170] { margin-right: 0.75rem;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -19256,7 +19621,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.ajs-message{border-radius: 5px!important;}\n.ajs-success { background-color: rgb(33, 201, 89)!important;\n}\n.ajs-danger, .alertify-notifier .ajs-message.ajs-error { background-color: rgb(232, 27, 0)!important; color:white!important;\n}\n.form-switch label{cursor: pointer;}\n.alert-danger {\r\n    color: #ffffff;\r\n    background-color: #ff3521;\n}\n.agrandar{transition: all 0.2s ease-in-out;}\n.agrandar:hover{transform: scale(1.05);}\n.modal label{\r\n\tcolor: #737373;\r\n\tfont-weight: 500;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.wizard-stepper {\r\n\tbackground-color: #f8f9fa;\r\n\tmargin: -1rem -1rem 1.5rem -1rem;\r\n\tpadding: 1.5rem 1rem;\n}\n.step-item {\r\n\topacity: 0.5;\r\n\ttransition: all 0.3s ease;\n}\n.step-item.active {\r\n\topacity: 1;\r\n\ttransform: scale(1.05);\n}\n.step-item.completed {\r\n\topacity: 0.8;\n}\n.step-item.completed .step-icon {\r\n\tbackground-color: #28a745 !important;\r\n\tcolor: white;\n}\n.step-item.active .step-icon {\r\n\tbackground-color: #0d6efd !important;\r\n\tcolor: white;\r\n\tbox-shadow: 0 0 15px rgba(13, 110, 253, 0.4);\n}\n.step-icon {\r\n\twidth: 35px;\r\n\theight: 35px;\r\n\tbackground-color: #dee2e6;\r\n\tcolor: #6c757d;\r\n\tfont-size: 0.9rem;\n}\n.step-label {\r\n\tfont-size: 0.85rem;\r\n\tfont-weight: 600;\n}\n.step-connector {\r\n\theight: 2px;\r\n\tbackground-color: #dee2e6;\r\n\tflex-grow: 1;\r\n\tmin-width: 20px;\n}\n.step-item.completed .step-connector {\r\n\tbackground-color: #28a745;\n}\n.bg-primary-light { background-color: #e7f1ff !important;\n}\n.bg-soft-primary { background-color: rgba(13, 110, 253, 0.1);\n}\n.bg-soft-info { background-color: rgba(13, 202, 240, 0.1);\n}\n.bg-soft-warning { background-color: rgba(255, 193, 7, 0.1);\n}\n.bg-soft-success { background-color: rgba(40, 167, 69, 0.1);\n}\n.bg-light-gradient { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);\n}\n.avatar-circle, .avatar-xl {\r\n\twidth: 48px;\r\n\theight: 48px;\r\n\tborder-radius: 50%;\n}\n.avatar-xl {\r\n\twidth: 100px;\r\n\theight: 100px;\n}\n.category-icon {\r\n\twidth: 50px;\r\n\theight: 50px;\r\n\tfont-size: 1.2rem;\n}\n.bg-cat-1 { background-color: rgba(111, 66, 193, 0.1); color: #6f42c1;\n}\n.bg-cat-2 { background-color: rgba(13, 110, 253, 0.1); color: #0d6efd;\n}\n.bg-cat-3 { background-color: rgba(25, 135, 84, 0.1); color: #198754;\n}\n.bg-cat-4 { background-color: rgba(255, 193, 7, 0.1); color: #ffc107;\n}\n.bg-cat-6 { background-color: rgba(220, 53, 69, 0.1); color: #dc3545;\n}\n.bg-cat-7 { background-color: rgba(13, 202, 240, 0.1); color: #0dcaf0;\n}\n.bg-cat-8 { background-color: rgba(108, 117, 125, 0.1); color: #6c757d;\n}\n.selectable-card {\r\n\tcursor: pointer;\r\n\tborder: 2px solid transparent !important;\n}\n.selectable-card:hover {\r\n\ttransform: translateY(-5px);\r\n\tbox-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;\n}\n.selectable-card.active {\r\n\tborder-color: #0d6efd !important;\r\n\tbackground-color: rgba(13, 110, 253, 0.02);\n}\n.custom-switch .form-check-input {\r\n\twidth: 3rem;\r\n\theight: 1.5rem;\n}\n.ticket-container {\r\n\tmax-width: 600px;\r\n\tmargin: 0 auto;\n}\n.border-dashed { border-style: dashed !important;\n}\n.transition-all { transition: all 0.3s ease;\n}\n.ls-1 { letter-spacing: 1px;\n}\n.btn-light-danger {\r\n\tbackground-color: #ffe5e5;\r\n\tcolor: #d9534f;\r\n\tborder: none;\n}\n.btn-light-danger:hover {\r\n\tbackground-color: #ffd1d1;\n}\n.bg-success-light { background-color: rgba(40, 167, 69, 0.1);\n}\n.text-warning-dark { color: #856404;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

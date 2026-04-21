@@ -258,32 +258,158 @@
 
       <!-- HISTORIAL Medico -->
       <div class="tab-pane fade" id="historial" role="tabpanel">
-        <div class="card border">
-          <div class="card-body p-4">
-            <h5 class="card-title font-weight-bold mb-4">Evoluciones Clínicas</h5>
-            <div class="table-responsive">
-              <table class="table table-hover table-sm align-middle">
-                <thead>
-                  <tr>
-                    <th>Fecha</th>
-                    <th>Profesional</th>
-                    <th>Descripción</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="evo in paciente.medical_evolutions" :key="evo.id">
-                    <td style="white-space: nowrap">{{ formatDate(evo.date) }}</td>
-                    <td style="white-space: nowrap">{{ evo.professional ? evo.professional.name : '' }}</td>
-                    <td class="text-muted small">{{ evo.content }}</td>
-                  </tr>
-                  <tr v-if="!paciente.medical_evolutions || paciente.medical_evolutions.length == 0">
-                    <td colspan="3" class="text-center text-muted py-3">Aún no cuenta con evoluciones</td>
-                  </tr>
-                </tbody>
-              </table>
+        
+        <!-- Accordions for Initial Evaluations -->
+        <div class="accordion mb-4 bg-white shadow-sm rounded-lg" id="accordionInitialHistories" v-if="paciente.initial_psychological_history || paciente.initial_psychiatric_history">
+          <!-- Evaluación Psicológica Inicial -->
+          <div class="accordion-item border-0 border-bottom rounded-top" v-if="paciente.initial_psychological_history">
+            <h2 class="accordion-header" id="headingPsycho">
+              <button class="accordion-button bg-light text-primary font-weight-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePsycho" aria-expanded="true" aria-controls="collapsePsycho">
+                Evaluación Psicológica Inicial
+                <span class="ms-3 text-muted small" style="font-weight: normal" v-if="paciente.initial_psychological_history.created_at">
+                   - {{ formatDate(paciente.initial_psychological_history.created_at) }}
+                </span>
+              </button>
+            </h2>
+            <div id="collapsePsycho" class="accordion-collapse collapse show" aria-labelledby="headingPsycho" data-bs-parent="#accordionInitialHistories">
+              <div class="accordion-body px-4 py-4" style="background-color: #fbfcff;">
+                
+                <div class="mb-3">
+                  <h6 class="text-secondary fw-bold small"><i class="fas fa-user-md text-primary me-2"></i>MOTIVO DE CONSULTA</h6>
+                  <p class="small mb-0 text-dark">{{ paciente.initial_psychological_history.illness }}</p>
+                </div>
+
+                <div class="mb-3">
+                  <h6 class="text-secondary fw-bold small"><i class="fas fa-notes-medical text-primary me-2"></i>ANTECEDENTES</h6>
+                  <p class="small mb-0 text-dark">{{ paciente.initial_psychological_history.antecedent }}</p>
+                </div>
+
+                <div class="mb-3">
+                  <h6 class="text-secondary fw-bold small"><i class="fas fa-chart-line text-primary me-2"></i>DINÁMICA FAMILIAR / SOCIAL</h6>
+                  <p class="small mb-0 text-dark">{{ paciente.initial_psychological_history.dynamic }}</p>
+                </div>
+
+                <div class="mb-3">
+                  <h6 class="text-secondary fw-bold small"><i class="fas fa-smile-beam text-primary me-2"></i>ACTITUD DEL PACIENTE</h6>
+                  <p class="small mb-0 text-dark">{{ paciente.initial_psychological_history.attitude }}</p>
+                </div>
+
+                <div class="mb-3">
+                  <h6 class="text-secondary fw-bold small"><i class="fas fa-stethoscope text-primary me-2"></i>DIAGNÓSTICO INICIAL</h6>
+                  <div class="p-2 rounded bg-white border border-light small text-dark mt-1 shadow-sm">
+                    {{ paciente.initial_psychological_history.dx }}
+                  </div>
+                </div>
+
+                <div class="mb-0 bg-light p-3 border rounded">
+                  <h6 class="text-secondary fw-bold small"><i class="fas fa-tasks text-primary me-2"></i>PLAN DE TRATAMIENTO</h6>
+                  <p class="small mb-0 text-dark" style="white-space: pre-wrap;">{{ paciente.initial_psychological_history.plan }}</p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          
+          <!-- Eval. Psiquiátrica Inicial -->
+          <div class="accordion-item border-0" v-if="paciente.initial_psychiatric_history">
+            <h2 class="accordion-header" id="headingPsychiatric">
+              <button class="accordion-button collapsed bg-light text-success font-weight-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePsychiatric" aria-expanded="false" aria-controls="collapsePsychiatric">
+                Eval. Psiquiátrica Inicial
+                <span class="ms-3 text-muted small" style="font-weight: normal" v-if="paciente.initial_psychiatric_history.created_at">
+                  - {{ formatDate(paciente.initial_psychiatric_history.created_at) }}
+                </span>
+              </button>
+            </h2>
+            <div id="collapsePsychiatric" class="accordion-collapse collapse" aria-labelledby="headingPsychiatric" data-bs-parent="#accordionInitialHistories">
+              <div class="accordion-body px-4 py-4" style="background-color: #f8fdfa;">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <h6 class="text-secondary fw-bold small"><i class="fas fa-file-medical-alt text-success me-2"></i>ANTECEDENTES GENERALES</h6>
+                    <p class="small mb-0 text-dark">{{ paciente.initial_psychiatric_history.general_antecedent }}</p>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <h6 class="text-secondary fw-bold small"><i class="fas fa-thermometer-half text-success me-2"></i>SIGNOS Y SÍNTOMAS PRINCIPALES</h6>
+                    <p class="small mb-0 text-dark">{{ paciente.initial_psychiatric_history.main_signs_symptoms }}</p>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <h6 class="text-secondary fw-bold small"><i class="fas fa-disease text-success me-2"></i>ENFERMEDAD ACTUAL</h6>
+                    <p class="small mb-0 text-dark">{{ paciente.initial_psychiatric_history.illness }}</p>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <h6 class="text-secondary fw-bold small"><i class="fas fa-brain text-success me-2"></i>EXAMEN MENTAL (APC)</h6>
+                    <p class="small mb-0 text-dark">{{ paciente.initial_psychiatric_history.apc }}</p>
+                  </div>
+                  
+                  <div class="col-12 mt-2">
+                    <div class="row bg-white p-3 rounded border mx-0 mb-3 shadow-sm">
+                      <div class="col-md-3 mb-2"><strong class="small text-muted d-block">Lenguaje</strong><span class="small text-dark">{{paciente.initial_psychiatric_history.languaje}}</span></div>
+                      <div class="col-md-3 mb-2"><strong class="small text-muted d-block">Pensamiento</strong><span class="small text-dark">{{paciente.initial_psychiatric_history.thought}}</span></div>
+                      <div class="col-md-3 mb-2"><strong class="small text-muted d-block">Afecto</strong><span class="small text-dark">{{paciente.initial_psychiatric_history.affect}}</span></div>
+                      <div class="col-md-3 mb-2"><strong class="small text-muted d-block">Percepción</strong><span class="small text-dark">{{paciente.initial_psychiatric_history.percetion}}</span></div>
+                      <div class="col-md-3 mb-2"><strong class="small text-muted d-block">Func. Superior</strong><span class="small text-dark">{{paciente.initial_psychiatric_history.superior_function}}</span></div>
+                      <div class="col-md-3 mb-2"><strong class="small text-muted d-block">Abstracción</strong><span class="small text-dark">{{paciente.initial_psychiatric_history.abstraction}}</span></div>
+                      <div class="col-md-3 mb-2"><strong class="small text-muted d-block">Conciencia</strong><span class="small text-dark">{{paciente.initial_psychiatric_history.conscience}}</span></div>
+                      <div class="col-md-3 mb-2"><strong class="small text-muted d-block">Insight</strong><span class="small text-dark">{{paciente.initial_psychiatric_history.insight}}</span></div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <h6 class="text-secondary fw-bold small"><i class="fas fa-exclamation-triangle text-success me-2"></i>PROBLEMAS DIAGNÓSTICOS</h6>
+                    <p class="small mb-0 text-dark">{{ paciente.initial_psychiatric_history.diagnostic_problems }}</p>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <h6 class="text-secondary fw-bold small"><i class="fas fa-stethoscope text-success me-2"></i>DIAGNÓSTICO</h6>
+                    <div class="p-2 rounded bg-white border border-light small text-dark shadow-sm">
+                       {{ paciente.initial_psychiatric_history.diagnostic }}
+                    </div>
+                  </div>
+                  <div class="col-12 mt-2">
+                    <div class="bg-light p-3 border rounded text-dark">
+                      <h6 class="text-secondary fw-bold small"><i class="fas fa-tasks text-success me-2"></i>PLAN DE TRATAMIENTO</h6>
+                      <p class="small mb-0" style="white-space: pre-wrap;">{{ paciente.initial_psychiatric_history.plan }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        <h6 class="font-weight-bold mb-3 mt-4 text-dark px-2"><i class="fas fa-clipboard-list text-primary me-2"></i> Evoluciones de Seguimiento</h6>
+        <div class="card border">
+          <div class="card-body p-0">
+            <div class="list-group list-group-flush">
+              <div v-for="evo in paciente.medical_evolutions" :key="evo.id" class="list-group-item p-4">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="d-flex align-items-center">
+                    <div class="bg-light text-success border rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                      <i class="fas fa-file-medical"></i>
+                    </div>
+                    <div>
+                      <h6 class="mb-0 font-weight-bold text-dark">{{ evo.professional ? evo.professional.name : 'Profesional Médico' }}</h6>
+                      <small class="text-muted"><i class="far fa-clock me-1"></i> {{ formatDateTime(evo.date, evo.hora) }}</small>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="mt-3 ms-2 ms-sm-5 ps-sm-2">
+                  <p class="small text-dark mb-1"><strong>Diagnóstico y Resumen de Sesión:</strong></p>
+                  <p class="small text-muted mb-3" style="white-space: pre-wrap;">{{ evo.content || evo.descripcion }}</p>
+                  
+                  <div v-if="evo.plan" class="p-3 bg-light rounded text-dark small border-start border-warning border-3 mb-3">
+                    <strong class="text-warning"><i class="fas fa-stethoscope me-1"></i> Tratamiento / Plan:</strong><br/>
+                    <span style="white-space: pre-wrap;">{{ evo.plan }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="!paciente.medical_evolutions || paciente.medical_evolutions.length == 0" class="p-4 text-center text-muted">
+                Aún no cuenta con evoluciones de seguimiento cronológico.
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- TRIAJE -->

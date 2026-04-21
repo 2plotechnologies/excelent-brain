@@ -2688,36 +2688,228 @@ var render = function render() {
       id: "historial",
       role: "tabpanel"
     }
+  }, [_vm.paciente.initial_psychological_history || _vm.paciente.initial_psychiatric_history ? _c("div", {
+    staticClass: "accordion mb-4 bg-white shadow-sm rounded-lg",
+    attrs: {
+      id: "accordionInitialHistories"
+    }
+  }, [_vm.paciente.initial_psychological_history ? _c("div", {
+    staticClass: "accordion-item border-0 border-bottom rounded-top"
+  }, [_c("h2", {
+    staticClass: "accordion-header",
+    attrs: {
+      id: "headingPsycho"
+    }
+  }, [_c("button", {
+    staticClass: "accordion-button bg-light text-primary font-weight-bold",
+    attrs: {
+      type: "button",
+      "data-bs-toggle": "collapse",
+      "data-bs-target": "#collapsePsycho",
+      "aria-expanded": "true",
+      "aria-controls": "collapsePsycho"
+    }
+  }, [_vm._v("\n              Evaluación Psicológica Inicial\n              "), _vm.paciente.initial_psychological_history.created_at ? _c("span", {
+    staticClass: "ms-3 text-muted small",
+    staticStyle: {
+      "font-weight": "normal"
+    }
+  }, [_vm._v("\n                 - " + _vm._s(_vm.formatDate(_vm.paciente.initial_psychological_history.created_at)) + "\n              ")]) : _vm._e()])]), _vm._v(" "), _c("div", {
+    staticClass: "accordion-collapse collapse show",
+    attrs: {
+      id: "collapsePsycho",
+      "aria-labelledby": "headingPsycho",
+      "data-bs-parent": "#accordionInitialHistories"
+    }
   }, [_c("div", {
+    staticClass: "accordion-body px-4 py-4",
+    staticStyle: {
+      "background-color": "#fbfcff"
+    }
+  }, [_c("div", {
+    staticClass: "mb-3"
+  }, [_vm._m(15), _vm._v(" "), _c("p", {
+    staticClass: "small mb-0 text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychological_history.illness))])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3"
+  }, [_vm._m(16), _vm._v(" "), _c("p", {
+    staticClass: "small mb-0 text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychological_history.antecedent))])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3"
+  }, [_vm._m(17), _vm._v(" "), _c("p", {
+    staticClass: "small mb-0 text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychological_history.dynamic))])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3"
+  }, [_vm._m(18), _vm._v(" "), _c("p", {
+    staticClass: "small mb-0 text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychological_history.attitude))])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3"
+  }, [_vm._m(19), _vm._v(" "), _c("div", {
+    staticClass: "p-2 rounded bg-white border border-light small text-dark mt-1 shadow-sm"
+  }, [_vm._v("\n                  " + _vm._s(_vm.paciente.initial_psychological_history.dx) + "\n                ")])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-0 bg-light p-3 border rounded"
+  }, [_vm._m(20), _vm._v(" "), _c("p", {
+    staticClass: "small mb-0 text-dark",
+    staticStyle: {
+      "white-space": "pre-wrap"
+    }
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychological_history.plan))])])])])]) : _vm._e(), _vm._v(" "), _vm.paciente.initial_psychiatric_history ? _c("div", {
+    staticClass: "accordion-item border-0"
+  }, [_c("h2", {
+    staticClass: "accordion-header",
+    attrs: {
+      id: "headingPsychiatric"
+    }
+  }, [_c("button", {
+    staticClass: "accordion-button collapsed bg-light text-success font-weight-bold",
+    attrs: {
+      type: "button",
+      "data-bs-toggle": "collapse",
+      "data-bs-target": "#collapsePsychiatric",
+      "aria-expanded": "false",
+      "aria-controls": "collapsePsychiatric"
+    }
+  }, [_vm._v("\n              Eval. Psiquiátrica Inicial\n              "), _vm.paciente.initial_psychiatric_history.created_at ? _c("span", {
+    staticClass: "ms-3 text-muted small",
+    staticStyle: {
+      "font-weight": "normal"
+    }
+  }, [_vm._v("\n                - " + _vm._s(_vm.formatDate(_vm.paciente.initial_psychiatric_history.created_at)) + "\n              ")]) : _vm._e()])]), _vm._v(" "), _c("div", {
+    staticClass: "accordion-collapse collapse",
+    attrs: {
+      id: "collapsePsychiatric",
+      "aria-labelledby": "headingPsychiatric",
+      "data-bs-parent": "#accordionInitialHistories"
+    }
+  }, [_c("div", {
+    staticClass: "accordion-body px-4 py-4",
+    staticStyle: {
+      "background-color": "#f8fdfa"
+    }
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-md-6 mb-3"
+  }, [_vm._m(21), _vm._v(" "), _c("p", {
+    staticClass: "small mb-0 text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.general_antecedent))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 mb-3"
+  }, [_vm._m(22), _vm._v(" "), _c("p", {
+    staticClass: "small mb-0 text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.main_signs_symptoms))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 mb-3"
+  }, [_vm._m(23), _vm._v(" "), _c("p", {
+    staticClass: "small mb-0 text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.illness))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 mb-3"
+  }, [_vm._m(24), _vm._v(" "), _c("p", {
+    staticClass: "small mb-0 text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.apc))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-12 mt-2"
+  }, [_c("div", {
+    staticClass: "row bg-white p-3 rounded border mx-0 mb-3 shadow-sm"
+  }, [_c("div", {
+    staticClass: "col-md-3 mb-2"
+  }, [_c("strong", {
+    staticClass: "small text-muted d-block"
+  }, [_vm._v("Lenguaje")]), _c("span", {
+    staticClass: "small text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.languaje))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-2"
+  }, [_c("strong", {
+    staticClass: "small text-muted d-block"
+  }, [_vm._v("Pensamiento")]), _c("span", {
+    staticClass: "small text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.thought))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-2"
+  }, [_c("strong", {
+    staticClass: "small text-muted d-block"
+  }, [_vm._v("Afecto")]), _c("span", {
+    staticClass: "small text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.affect))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-2"
+  }, [_c("strong", {
+    staticClass: "small text-muted d-block"
+  }, [_vm._v("Percepción")]), _c("span", {
+    staticClass: "small text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.percetion))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-2"
+  }, [_c("strong", {
+    staticClass: "small text-muted d-block"
+  }, [_vm._v("Func. Superior")]), _c("span", {
+    staticClass: "small text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.superior_function))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-2"
+  }, [_c("strong", {
+    staticClass: "small text-muted d-block"
+  }, [_vm._v("Abstracción")]), _c("span", {
+    staticClass: "small text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.abstraction))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-2"
+  }, [_c("strong", {
+    staticClass: "small text-muted d-block"
+  }, [_vm._v("Conciencia")]), _c("span", {
+    staticClass: "small text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.conscience))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3 mb-2"
+  }, [_c("strong", {
+    staticClass: "small text-muted d-block"
+  }, [_vm._v("Insight")]), _c("span", {
+    staticClass: "small text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.insight))])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 mb-3"
+  }, [_vm._m(25), _vm._v(" "), _c("p", {
+    staticClass: "small mb-0 text-dark"
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.diagnostic_problems))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 mb-3"
+  }, [_vm._m(26), _vm._v(" "), _c("div", {
+    staticClass: "p-2 rounded bg-white border border-light small text-dark shadow-sm"
+  }, [_vm._v("\n                     " + _vm._s(_vm.paciente.initial_psychiatric_history.diagnostic) + "\n                  ")])]), _vm._v(" "), _c("div", {
+    staticClass: "col-12 mt-2"
+  }, [_c("div", {
+    staticClass: "bg-light p-3 border rounded text-dark"
+  }, [_vm._m(27), _vm._v(" "), _c("p", {
+    staticClass: "small mb-0",
+    staticStyle: {
+      "white-space": "pre-wrap"
+    }
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.plan))])])])])])])]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm._m(28), _vm._v(" "), _c("div", {
     staticClass: "card border"
   }, [_c("div", {
-    staticClass: "card-body p-4"
-  }, [_c("h5", {
-    staticClass: "card-title font-weight-bold mb-4"
-  }, [_vm._v("Evoluciones Clínicas")]), _vm._v(" "), _c("div", {
-    staticClass: "table-responsive"
-  }, [_c("table", {
-    staticClass: "table table-hover table-sm align-middle"
-  }, [_vm._m(15), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.medical_evolutions, function (evo) {
-    return _c("tr", {
-      key: evo.id
-    }, [_c("td", {
+    staticClass: "card-body p-0"
+  }, [_c("div", {
+    staticClass: "list-group list-group-flush"
+  }, [_vm._l(_vm.paciente.medical_evolutions, function (evo) {
+    return _c("div", {
+      key: evo.id,
+      staticClass: "list-group-item p-4"
+    }, [_c("div", {
+      staticClass: "d-flex justify-content-between align-items-start mb-2"
+    }, [_c("div", {
+      staticClass: "d-flex align-items-center"
+    }, [_vm._m(29, true), _vm._v(" "), _c("div", [_c("h6", {
+      staticClass: "mb-0 font-weight-bold text-dark"
+    }, [_vm._v(_vm._s(evo.professional ? evo.professional.name : "Profesional Médico"))]), _vm._v(" "), _c("small", {
+      staticClass: "text-muted"
+    }, [_c("i", {
+      staticClass: "far fa-clock me-1"
+    }), _vm._v(" " + _vm._s(_vm.formatDateTime(evo.date, evo.hora)))])])])]), _vm._v(" "), _c("div", {
+      staticClass: "mt-3 ms-2 ms-sm-5 ps-sm-2"
+    }, [_vm._m(30, true), _vm._v(" "), _c("p", {
+      staticClass: "small text-muted mb-3",
       staticStyle: {
-        "white-space": "nowrap"
+        "white-space": "pre-wrap"
       }
-    }, [_vm._v(_vm._s(_vm.formatDate(evo.date)))]), _vm._v(" "), _c("td", {
+    }, [_vm._v(_vm._s(evo.content || evo.descripcion))]), _vm._v(" "), evo.plan ? _c("div", {
+      staticClass: "p-3 bg-light rounded text-dark small border-start border-warning border-3 mb-3"
+    }, [_vm._m(31, true), _c("br"), _vm._v(" "), _c("span", {
       staticStyle: {
-        "white-space": "nowrap"
+        "white-space": "pre-wrap"
       }
-    }, [_vm._v(_vm._s(evo.professional ? evo.professional.name : ""))]), _vm._v(" "), _c("td", {
-      staticClass: "text-muted small"
-    }, [_vm._v(_vm._s(evo.content))])]);
-  }), _vm._v(" "), !_vm.paciente.medical_evolutions || _vm.paciente.medical_evolutions.length == 0 ? _c("tr", [_c("td", {
-    staticClass: "text-center text-muted py-3",
-    attrs: {
-      colspan: "3"
-    }
-  }, [_vm._v("Aún no cuenta con evoluciones")])]) : _vm._e()], 2)])])])])]), _vm._v(" "), _c("div", {
+    }, [_vm._v(_vm._s(evo.plan))])]) : _vm._e()])]);
+  }), _vm._v(" "), !_vm.paciente.medical_evolutions || _vm.paciente.medical_evolutions.length == 0 ? _c("div", {
+    staticClass: "p-4 text-center text-muted"
+  }, [_vm._v("\n              Aún no cuenta con evoluciones de seguimiento cronológico.\n            ")]) : _vm._e()], 2)])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
     attrs: {
       id: "triaje",
@@ -2783,7 +2975,7 @@ var render = function render() {
     staticClass: "table-responsive"
   }, [_c("table", {
     staticClass: "table table-hover table-sm"
-  }, [_vm._m(16), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.prescriptions, function (receta) {
+  }, [_vm._m(32), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.prescriptions, function (receta) {
     return _c("tr", {
       key: receta.id
     }, [_c("td", {
@@ -2849,7 +3041,7 @@ var render = function render() {
     staticClass: "card-title font-weight-bold mb-4"
   }, [_vm._v("Archivos y Documentos")]), _vm._v(" "), _c("table", {
     staticClass: "table table-sm table-hover align-middle"
-  }, [_vm._m(17), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.archivos_list || [], function (doc) {
+  }, [_vm._m(33), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.archivos_list || [], function (doc) {
     return _c("tr", {
       key: doc.id
     }, [_c("td", {
@@ -2888,7 +3080,7 @@ var render = function render() {
     staticClass: "card-title font-weight-bold mb-4"
   }, [_vm._v("Deudas y Cuentas")]), _vm._v(" "), _c("table", {
     staticClass: "table table-sm table-hover"
-  }, [_vm._m(18), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.deudas_financieras || [], function (deuda) {
+  }, [_vm._m(34), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.deudas_financieras || [], function (deuda) {
     return _c("tr", {
       key: deuda.id
     }, [_c("td", {
@@ -3114,7 +3306,141 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("Fecha")]), _vm._v(" "), _c("th", [_vm._v("Profesional")]), _vm._v(" "), _c("th", [_vm._v("Descripción")])])]);
+  return _c("h6", {
+    staticClass: "text-secondary fw-bold small"
+  }, [_c("i", {
+    staticClass: "fas fa-user-md text-primary me-2"
+  }), _vm._v("MOTIVO DE CONSULTA")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "text-secondary fw-bold small"
+  }, [_c("i", {
+    staticClass: "fas fa-notes-medical text-primary me-2"
+  }), _vm._v("ANTECEDENTES")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "text-secondary fw-bold small"
+  }, [_c("i", {
+    staticClass: "fas fa-chart-line text-primary me-2"
+  }), _vm._v("DINÁMICA FAMILIAR / SOCIAL")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "text-secondary fw-bold small"
+  }, [_c("i", {
+    staticClass: "fas fa-smile-beam text-primary me-2"
+  }), _vm._v("ACTITUD DEL PACIENTE")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "text-secondary fw-bold small"
+  }, [_c("i", {
+    staticClass: "fas fa-stethoscope text-primary me-2"
+  }), _vm._v("DIAGNÓSTICO INICIAL")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "text-secondary fw-bold small"
+  }, [_c("i", {
+    staticClass: "fas fa-tasks text-primary me-2"
+  }), _vm._v("PLAN DE TRATAMIENTO")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "text-secondary fw-bold small"
+  }, [_c("i", {
+    staticClass: "fas fa-file-medical-alt text-success me-2"
+  }), _vm._v("ANTECEDENTES GENERALES")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "text-secondary fw-bold small"
+  }, [_c("i", {
+    staticClass: "fas fa-thermometer-half text-success me-2"
+  }), _vm._v("SIGNOS Y SÍNTOMAS PRINCIPALES")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "text-secondary fw-bold small"
+  }, [_c("i", {
+    staticClass: "fas fa-disease text-success me-2"
+  }), _vm._v("ENFERMEDAD ACTUAL")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "text-secondary fw-bold small"
+  }, [_c("i", {
+    staticClass: "fas fa-brain text-success me-2"
+  }), _vm._v("EXAMEN MENTAL (APC)")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "text-secondary fw-bold small"
+  }, [_c("i", {
+    staticClass: "fas fa-exclamation-triangle text-success me-2"
+  }), _vm._v("PROBLEMAS DIAGNÓSTICOS")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "text-secondary fw-bold small"
+  }, [_c("i", {
+    staticClass: "fas fa-stethoscope text-success me-2"
+  }), _vm._v("DIAGNÓSTICO")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "text-secondary fw-bold small"
+  }, [_c("i", {
+    staticClass: "fas fa-tasks text-success me-2"
+  }), _vm._v("PLAN DE TRATAMIENTO")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "font-weight-bold mb-3 mt-4 text-dark px-2"
+  }, [_c("i", {
+    staticClass: "fas fa-clipboard-list text-primary me-2"
+  }), _vm._v(" Evoluciones de Seguimiento")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "bg-light text-success border rounded-circle d-flex align-items-center justify-content-center me-3",
+    staticStyle: {
+      width: "40px",
+      height: "40px"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-file-medical"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("p", {
+    staticClass: "small text-dark mb-1"
+  }, [_c("strong", [_vm._v("Diagnóstico y Resumen de Sesión:")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("strong", {
+    staticClass: "text-warning"
+  }, [_c("i", {
+    staticClass: "fas fa-stethoscope me-1"
+  }), _vm._v(" Tratamiento / Plan:")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;

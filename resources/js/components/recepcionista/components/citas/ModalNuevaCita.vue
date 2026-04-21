@@ -10,214 +10,380 @@
 			</div>
 			<div class="modal-body">
 				<form class="user" @submit="insertar" @keydown="prevenirEvent">
+					<!-- Stepper Header -->
+					<div class="wizard-stepper d-flex justify-content-between mb-4 border-bottom pb-3 overflow-auto">
+						<div v-for="step in pasos" :key="step.id" class="step-item d-flex align-items-center" :class="{ 'active': pasoActual === step.id, 'completed': pasoActual > step.id }">
+							<div class="step-icon d-flex align-items-center justify-content-center rounded-pill">
+								<i class="fas" :class="step.icon"></i>
+							</div>
+							<span class="step-label ms-2 d-none d-md-inline">{{ step.label }}</span>
+							<div v-if="step.id < 7" class="step-connector mx-3 d-none d-lg-block"></div>
+						</div>
+					</div>
+
+					<!-- Step 1: Paciente -->
 					<div v-show="pasoActual === 1">
-						<p class="mb-2 lead text-success"><strong><i class="fas fa-search"></i> Seleccionar Paciente</strong></p>
-						<div class="card mb-3">
-							<div class="card-body">
-								<div class="input-group mb-3">
-									<span class="input-group-text"><i class="fas fa-search"></i></span>
-									<input type="text" class="form-control" placeholder="Buscar por DNI o Nombres..." v-model="busquedaTexto" @keyup="buscarPacientes">
-								</div>
-								<div class="list-group" style="max-height: 300px; overflow-y: auto;">
-									<button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" v-for="paciente in listaPacientes" :key="paciente.id" @click="seleccionarPaciente(paciente)">
-										<div>
-											<strong>{{ paciente.name }} {{ paciente.nombres }}</strong>
-											<br>
-											<small class="text-muted">DNI: {{ paciente.dni }}</small>
+						<div class="row justify-content-center">
+							<div class="col-md-10">
+								<p class="mb-3 lead text-center font-weight-bold">Seleccionar Paciente</p>
+								<div class="card border-0 shadow-sm rounded-4 mb-4">
+									<div class="card-body p-4">
+										<div class="input-group mb-4 bg-light rounded-pill p-1">
+											<span class="input-group-text border-0 bg-transparent ps-3"><i class="fas fa-search text-muted"></i></span>
+											<input type="text" class="form-control border-0 bg-transparent" placeholder="Buscar por nombre, DNI o celular..." v-model="busquedaTexto" @keyup="buscarPacientes">
 										</div>
-										<span class="btn btn-sm btn-outline-primary">Seleccionar</span>
-									</button>
-									<div v-if="listaPacientes.length === 0" class="text-center text-muted my-3">
-										No se encontraron pacientes.
+										<div class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
+											<button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 rounded-4 mb-2 p-3 transition-all" v-for="paciente in listaPacientes" :key="paciente.id" @click="seleccionarPaciente(paciente)" :class="{ 'bg-primary-light': cita.dni === paciente.dni }">
+												<div class="d-flex align-items-center">
+													<div class="avatar-circle me-3 bg-soft-primary d-flex align-items-center justify-content-center">
+														<i class="fas fa-user text-primary"></i>
+													</div>
+													<div>
+														<h6 class="mb-0 font-weight-bold">{{ paciente.name }} {{ paciente.nombres }}</h6>
+														<small class="text-muted">DNI: {{ paciente.dni }} · {{ paciente.phone }}</small>
+													</div>
+												</div>
+												<i class="fas fa-chevron-right text-muted"></i>
+											</button>
+											<div v-if="listaPacientes.length === 0" class="text-center text-muted py-5">
+												<i class="fas fa-user-slash fa-3x mb-3 text-light"></i>
+												<p>No se encontraron pacientes.</p>
+											</div>
+										</div>
+										<div class="mt-4 text-center">
+											<button type="button" class="btn btn-outline-primary border-dashed w-100 py-3 rounded-4" data-bs-toggle="modal" data-bs-target="#modalNuevoPaciente">
+												<i class="fas fa-plus-circle me-2"></i> Crear paciente nuevo
+											</button>
+										</div>
 									</div>
-								</div>
-								<div class="mt-3 text-center">
-									<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalNuevoPaciente">
-										<i class="fas fa-plus"></i> Nuevo paciente
-									</button>
 								</div>
 							</div>
 						</div>
 					</div>
 
+					<!-- Step 2: Tipo -->
 					<div v-show="pasoActual === 2">
-						<div class="d-flex justify-content-between align-items-center mb-2">
-							<p class="mb-0 lead text-success"><strong><i class="fas fa-ticket-alt"></i> Datos de la Nueva Cita</strong></p>
-							<div>
-								<span class="badge bg-secondary me-2 fs-6">Paciente: {{ cita.name }} {{ cita.nombres }} ({{ cita.dni }})</span>
-								<button type="button" class="btn btn-sm btn-outline-secondary" @click="pasoActual = 1"><i class="fas fa-arrow-left"></i> Cambiar</button>
-							</div>
-						</div>
-
-					<div class="card">
-						<div class="card-body">
-							<div class="row row-cols-2">
-								<div class="col">
-									<p class="mb-0"><strong>Profesional:</strong> {{ profesionalElegido.name }}</p>
-									<p class="mb-0"><strong>Profesión:</strong> {{ profesionalElegido.profession }}</p>
-									<p class="mb-0"><strong>Última atención:</strong> 
-										<span title="Última atención" v-if="cita.etiqueta==''" class="badge rounded-pill text-bg-dark"><i class="fa-solid fa-asterisk"></i> Sin registro previo</span>
-										<span title="Última atención" v-if="cita.etiqueta" class="badge rounded-pill text-bg-primary"><i class="fa-solid fa-genderless"></i> {{cita.etiqueta}}</span>
-									</p>
-									<p class="mb-0" v-if="cita.membresia"><strong>Paquete activo:</strong> 
-										<span title="Última atención" class="badge rounded-pill text-bg-warning"><i class="far fa-star"></i> {{cita.membresia?.precio.descripcion}}</span> <span class="badge rounded-pill text-bg-dark px-2">hasta {{ fechaLatam(cita.membresia.fin) }} de {{ cita.membresia?.precio.sesiones ?? 0 }} {{ (cita.membresia?.precio.sesiones ?? 0) != 1 ? 'sesiones totales': 'sesión.' }}</span> 
-									</p>
+						<div class="row justify-content-center">
+							<div class="col-md-10">
+								<p class="mb-3 lead text-center font-weight-bold">Tipo de Consulta</p>
 								
+								<div class="row mb-4">
+									<div v-for="cat in categorias" :key="cat.id" class="col-md-6 mb-3">
+										<div class="card h-100 border-0 shadow-sm rounded-4 selectable-card transition-all" :class="{ 'active': cita.clasification == cat.id }" @click="seleccionarCategoria(cat.id)">
+											<div class="card-body d-flex align-items-center p-3">
+												<div class="category-icon me-3 d-flex align-items-center justify-content-center rounded-3" :class="'bg-cat-' + cat.id">
+													<i class="fas" :class="cat.icon"></i>
+												</div>
+												<div class="flex-grow-1">
+													<h6 class="mb-1 font-weight-bold text-dark">{{ cat.label }}</h6>
+													<small class="text-muted small">{{ cat.desc }}</small>
+												</div>
+												<div class="ms-2">
+													<i class="fas fa-check-circle text-primary" v-if="cita.clasification == cat.id"></i>
+												</div>
+											</div>
+										</div>
+									</div>
 								</div>
-								<div class="col">
-									<p class="mb-0"><strong>Fecha:</strong> {{ fechaElegida }}</p>							
-									<p class="mb-0"><strong>Horario:</strong> {{ horaLatam1(horaElegida.check_time) }} - {{ horaLatam2(horaElegida.departure_date) }}</p>							
-									<p class="mb-0"><strong>Status anterior:</strong> {{ nombreStatus(cita.prev_status) }} </p>							
 
+								<div class="card border-0 shadow-sm rounded-4 mb-4" v-if="cita.clasification">
+									<div class="card-body p-4">
+										<p class="small text-muted mb-3 font-weight-bold"><i class="fas fa-list me-2"></i>Seleccionar Servicio Específico</p>
+										<div class="list-group list-group-flush rounded-4 overflow-hidden border">
+											<button type="button" v-for="precio in precios" :key="precio.id" v-if="precio.idClasificacion==cita.clasification && precio.servicio=='1' && precio.id!=48 && precio.id!=49 && precio.activo=='1'" class="list-group-item list-group-item-action border-0 d-flex justify-content-between align-items-center p-3" @click="seleccionarServicio(precio.id)" :class="{ 'bg-light': cita.type == precio.id }">
+												<span>{{ precio.descripcion }}</span>
+												<span class="badge bg-soft-primary text-primary rounded-pill">S/ {{ parseFloat(precio.nuevos).toFixed(2) }}</span>
+											</button>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<div class="alert alert-danger agrandar m-4" role="alert" v-if="alertaDeudas" >
-						<i class="fa-regular fa-comment-dots"></i> <strong>Alto!</strong> <span v-html="mensajeDeudas"></span>
-					</div>
-
-					<div class="alert alert-warning agrandar m-4" role="alert" v-if="cita.membresia" >
-						<i class="fa-regular fa-comment-dots"></i> <strong>Membresía activa:</strong> <span v-html="cita.membresia.descripcion"></span> <span>hasta {{ fechaLatam(cita.membresia.fin) }}</span>
-					</div>
-
-
-			
-					<div class="card my-2">
-						<div class="card-body">
-							<div class="form-group row mt-3">
-								<div class="col-sm-4">
-									<label for="">Clasificación de Consulta</label>
-									<select
-									class="form-select"
-									name="clasification"
-									id="clasification"
-									v-model="cita.clasification"
-									@change="precioDinamico(); cita.type=''"
-									>
-										<option value="3">Certificado</option>
-										<option value="4">Kurame</option>
-										<option value="6">Nutrición</option>
-										<option value="1" v-if="profesionalElegido.idProfesion=='1'" selected >Psiquiatrica</option>
-										<option value="2" v-if="profesionalElegido.idProfesion=='2'" selected >Psicológica</option>
-										<option value="7" v-if="profesionalElegido.idProfesion=='7'" selected >Terapista</option>
-										<option value="8" v-if="profesionalElegido.idProfesion=='8'" selected >Tecnólogo</option>
-									</select>
+					<!-- Step 3: Profesional -->
+					<div v-show="pasoActual === 3">
+						<div class="row justify-content-center">
+							<div class="col-md-8 text-center py-5">
+								<p class="mb-4 lead font-weight-bold">Profesional Asignado</p>
+								<div class="professional-card p-5 bg-white shadow-sm rounded-5 mb-4 border transition-all">
+									<div class="avatar-xl mx-auto mb-4 bg-soft-primary d-flex align-items-center justify-content-center rounded-circle border border-primary">
+										<i class="fas fa-user-md fa-4x text-primary"></i>
+									</div>
+									<h3 class="mb-1 text-dark font-weight-bold">{{ profesionalElegido.name }}</h3>
+									<p class="text-primary mb-0 fs-5">{{ profesionalElegido.profession }}</p>
+									<div class="mt-4 badge bg-success-light text-success px-4 py-2 rounded-pill">
+										<i class="fas fa-check-circle me-2"></i>Disponible para esta atención
+									</div>
 								</div>
-								<div class="col-sm-4">
-									<label for="">Tipo de servicio</label>
-									<select  class="form-select" name="type" id="sltServicio" v-model="cita.type" @change="precioDinamico()">
-										<option v-for="precio in precios" :value="precio.id" v-if="precio.idClasificacion==cita.clasification && precio.servicio=='1' && precio.id!=48 && precio.id!=49 && precio.activo=='1' ">{{ precio.descripcion}}</option>
-										<option v-if="cita.club=='1' && cita.clasification=='1'" value="48">Terapia Club Excelentemente</option>
-										<option v-if="cita.club=='1' && cita.clasification=='2'" value="48">Terapia Club Excelentemente</option>
-									</select>
-								</div>
-								<div class="col-sm-4">
-									<label for="">Status</label>
-									<select  class="form-select" name="type" id="sltServicio" v-model="cita.new_status" >
-										<option v-for="statu in status" :value="statu.id" >{{ statu.stat }}</option>
-									</select>
-								</div>
+								<p class="text-muted small">El profesional ha sido seleccionado previamente en el calendario.</p>
 							</div>
-							
-							<div class="form-group row">
-								<div class="col-sm-6 my-2">
-									<div class=" form-switch">
-										<input class="form-check-input" type="checkbox" role="switch" id="flePrecio" v-model="precioNuevo" @change="precioDinamico()">
-										<label class="form-check-label" for="flePrecio">
-											<span v-if="precioNuevo"><i class="fa-solid fa-pizza-slice"></i> Precio de nuevo cliente</span>
-											<span v-else><i class="fa-solid fa-champagne-glasses"></i> Precio de cliente continuante</span>
-										</label>
-									</div>
-								</div>
-								<div class="col-sm-6 my-2">
-									<div class=" form-switch">
-										<input class="form-check-input" type="checkbox" role="switch" id="flePresencial" v-model="esPresencial" >
-										<label class="form-check-label" for="flePresencial">
-											<span v-if="esPresencial"><i class="far fa-user"></i> Reunión presencial</span>
-											<span v-else><i class="fas fa-desktop"></i> Reunión virtual</span>
-										</label>
-									</div>
-								</div>
-								<div class="col-sm-4 my-2">
-									<div class=" form-switch">
-										<input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" v-model="nosrecomienda">
-										<label class="form-check-label" for="flexSwitchCheckDefault">Referencia <span class="text-danger">*</span></label>
-									</div>
-								</div>
-							
-								<div class="row" v-if="nosrecomienda">
-									<div class="col-sm-4 my-1" >
-										<select class="form-select text-capitalize" name="" id="" v-model="cita.recomendation" >
-											<option value="" selected>Ninguno</option>
-											<option class="text-capitalize" v-for="reco in recomendaciones" :value="reco">{{ reco }}</option>
-										</select>
-									</div>
-									<div class="col-sm-8">
-										<input type="text" class="form-control text-capitalize" v-model="cita.recomendacion_comentario" placeholder="¿Comentario extra sobre la recomendación?" autocomplete="off">
-									</div>
-								</div>
-								<div class="col-sm-12 my-1" v-if="!esPresencial">
-									<input type="text" class="form-control" name="link" id="link" v-model="cita.link" placeholder="Ingrese el link de la reunión virtual" autocomplete="off">
-								</div>
-							</div>
-							<div class="row d-flex align-content-end">
-								<div class="col-sm-6">
-									<div class=" form-switch">
-										<input class="form-check-input" type="checkbox" role="switch" id="fleAdelanto" v-model="tieneAdelanto" @change="precioDinamico(); descuentoAdelanto=0;">
-										<label class="form-check-label" for="fleAdelanto">
-											<span v-if="!tieneAdelanto"><i class="fa-solid fa-percent"></i> ¿Tiene adelanto?</span>
-											<span v-else class="text-danger"><i class="fa-regular fa-money-bill-1"></i> No posee adelanto</span>
-										</label>
-										<div v-if="tieneAdelanto">
-											<label class="mb-0 mt-2" for="">Adelanto en S/:</label>
-											<input type="number" min="0" step="1" class="form-control" v-model="descuentoAdelanto" @keyup="precioDinamico()">
-											<label class="mt-2" for="">Descripción adicional</label>
-											<input type="text" class="form-control mb-2" placeholder="Ingrese la fecha del adelanto" v-model="razonAdelanto">
-										</div>
-									</div>
-								</div>
-								<div class="col-sm-6">
-									<div class=" form-switch">
-										<input class="form-check-input" type="checkbox" role="switch" id="fleRebaja" v-model="tieneRebaja" @change="precioDinamico(); descuentoRebaja=0;">
-										<label class="form-check-label" for="fleRebaja">
-											<span v-if="!tieneRebaja"><i class="fa-solid fa-percent"></i> ¿Tiene rebaja?</span>
-											<span v-else class="text-danger"><i class="fa-regular fa-money-bill-1"></i> Sin rebaja</span>
-										</label>
-										<div v-if="tieneRebaja">
-											<label class="mb-0 mt-2" for="">Rebaja a aplicar en S/</label>
-											<input type="number" min="0" step="0.5" class="form-control" v-model="descuentoRebaja" @change="precioDinamico()">
-											<label class="mb-0 mt-2" for="">Motivo de la rebaja</label>
-											<input type="text" class="form-control my-2" placeholder="Ingresa una razón para la rebaja" v-model="razonRebaja">
-										</div>
-										<div v-if="tieneAdelanto">
-											<label class="mb-0 mt-2" for="">Método de pago</label>
-											<select class="form-select" id="sltMonedas3" v-model="monedaAdelanto">
-												<option v-for="moneda in monedas" :value="moneda.id">{{ moneda.tipo }}</option>
-											</select>
-										</div>
-									</div>
-								</div>
 						</div>
 					</div>
-				</div>
-				<div class="card my-2">
-					<div class="card-body">
-						<div class="col-sm-12 text-center ">
-							<h1 class="display-6"><small class="fw-light text-secondary">Precio a cobrar</small> S/ {{ parseFloat(cita.price).toFixed(2) }}</h1>
+
+					<!-- Step 4: Fecha/Hora -->
+					<div v-show="pasoActual === 4">
+						<div class="row justify-content-center">
+							<div class="col-md-8 text-center py-5">
+								<p class="mb-4 lead font-weight-bold">Fecha y Hora de la Cita</p>
+								<div class="card border-0 shadow-sm rounded-5 bg-light-gradient p-5 mb-4">
+									<div class="row align-items-center">
+										<div class="col-md-6 border-end">
+											<div class="mb-3 text-primary">
+												<i class="far fa-calendar-alt fa-3x"></i>
+											</div>
+											<h4 class="mb-0 text-dark font-weight-bold">{{ fechaElegida }}</h4>
+											<p class="text-muted mb-0">Fecha seleccionada</p>
+										</div>
+										<div class="col-md-6">
+											<div class="mb-3 text-info">
+												<i class="far fa-clock fa-3x"></i>
+											</div>
+											<h4 class="mb-0 text-dark font-weight-bold">{{ horaLatam1(horaElegida.check_time) }} - {{ horaLatam1(horaElegida.departure_date) }}</h4>
+											<p class="text-muted mb-0">Horario reservado</p>
+										</div>
+									</div>
+								</div>
+								<div class="alert bg-soft-info border-0 text-info rounded-4">
+									<i class="fas fa-info-circle me-2"></i>Este horario ha sido bloqueado en el calendario para este paciente.
+								</div>
+							</div>
 						</div>
 					</div>
-				</div>
 
-					<div class="modal-footer border-0 justify-content-center" v-if="cita.vivo==1 && pasoActual === 2" >
-						<button type="button" class="btn btn-lg btn-outline-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cerrar</button>
-						<button type="submit" class="btn btn-lg btn-outline-primary"><i class="fas fa-save"></i> Registrar cita</button>
+					<!-- Step 5: Modalidad -->
+					<div v-show="pasoActual === 5">
+						<div class="row justify-content-center">
+							<div class="col-md-10">
+								<p class="mb-4 lead text-center font-weight-bold">Modalidad de Atención</p>
+								
+								<div class="row justify-content-center">
+									<div class="col-md-4 mb-4">
+										<div class="card h-100 border-0 shadow-sm rounded-4 selectable-card transition-all p-4 text-center" :class="{ 'active': cita.mode == 1 }" @click="seleccionarModalidad(1)">
+											<div class="modalidad-icon mx-auto mb-3 text-primary d-flex align-items-center justify-content-center rounded-circle bg-soft-primary">
+												<i class="fas fa-building fa-2x"></i>
+											</div>
+											<h5 class="font-weight-bold">Presencial</h5>
+											<p class="small text-muted mb-0">Atención en consultorio físico.</p>
+										</div>
+									</div>
+									<div class="col-md-4 mb-4">
+										<div class="card h-100 border-0 shadow-sm rounded-4 selectable-card transition-all p-4 text-center" :class="{ 'active': cita.mode == 2 }" @click="seleccionarModalidad(2)">
+											<div class="modalidad-icon mx-auto mb-3 text-info d-flex align-items-center justify-content-center rounded-circle bg-soft-info">
+												<i class="fas fa-laptop-house fa-2x"></i>
+											</div>
+											<h5 class="font-weight-bold">Virtual</h5>
+											<p class="small text-muted mb-0">Videollamada por plataforma online.</p>
+										</div>
+									</div>
+									<div class="col-md-4 mb-4">
+										<div class="card h-100 border-0 shadow-sm rounded-4 selectable-card transition-all p-4 text-center" :class="{ 'active': cita.mode == 3 }" @click="seleccionarModalidad(3)">
+											<div class="modalidad-icon mx-auto mb-3 text-warning d-flex align-items-center justify-content-center rounded-circle bg-soft-warning">
+												<i class="fas fa-car-side fa-2x"></i>
+											</div>
+											<h5 class="font-weight-bold">Domicilio</h5>
+											<p class="small text-muted mb-0">Visita al domicilio del paciente.</p>
+										</div>
+									</div>
+								</div>
+
+								<div class="card border-0 shadow-sm rounded-4 bg-light mt-3" v-if="cita.mode == 2">
+									<div class="card-body">
+										<div class="form-group mb-0">
+											<label class="small font-weight-bold text-muted"><i class="fas fa-link me-2"></i>Link de la reunión</label>
+											<input type="text" class="form-control rounded-pill border-0 shadow-none px-4" placeholder="Ingrese el link de la reunión virtual" v-model="cita.link">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
-					<div v-else-if="cita.vivo!=1 && pasoActual === 2">
-						<p class="text-dark text-end">Restringido porque el paciente esta reportado como fallecido ( <i class="fas fa-cross"></i> )</p>
+
+					<!-- Step 6: Pago -->
+					<div v-show="pasoActual === 6">
+						<div class="row justify-content-center">
+							<div class="col-md-10">
+								<p class="mb-4 lead text-center font-weight-bold">Información de Pago y Notas</p>
+								
+								<div class="row">
+									<div class="col-md-6 mb-4">
+										<div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
+											<h6 class="font-weight-bold mb-4 d-flex align-items-center">
+												<i class="fas fa-wallet text-primary me-2"></i>Configuración de Pago
+											</h6>
+											
+											<div class="form-check form-switch mb-4 custom-switch">
+												<input class="form-check-input" type="checkbox" id="checkAdelanto" v-model="tieneAdelanto" @change="precioDinamico()">
+												<label class="form-check-label ms-2" for="checkAdelanto">¿Registrar adelanto?</label>
+											</div>
+
+											<div v-if="tieneAdelanto" class="transition-all slide-down">
+												<div class="form-group mb-3">
+													<label class="small text-muted font-weight-bold">Monto del adelanto (S/)</label>
+													<div class="input-group">
+														<span class="input-group-text bg-light border-0">S/</span>
+														<input type="number" class="form-control border-0 bg-light" v-model="descuentoAdelanto" @keyup="precioDinamico()">
+													</div>
+												</div>
+												<div class="form-group mb-3">
+													<label class="small text-muted font-weight-bold">Método de pago del adelanto</label>
+													<select class="form-select border-0 bg-light" v-model="monedaAdelanto">
+														<option v-for="moneda in monedas" :key="moneda.id" :value="moneda.id">{{ moneda.tipo }}</option>
+													</select>
+												</div>
+												<div class="form-group">
+													<label class="small text-muted font-weight-bold">Referencia del adelanto</label>
+													<input type="text" class="form-control border-0 bg-light" placeholder="Ej: Pago por Yape, Fecha..." v-model="razonAdelanto">
+												</div>
+											</div>
+
+											<hr class="my-4 op-1">
+
+											<div class="form-group mb-0">
+												<label class="small text-muted font-weight-bold d-block mb-2">Referencia de llegada</label>
+												<select class="form-select border-0 bg-light rounded-3" v-model="cita.recomendation" >
+													<option value="" selected>Ninguno / Desconocido</option>
+													<option v-for="reco in recomendaciones" :key="reco" :value="reco">{{ reco }}</option>
+												</select>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-md-6 mb-4">
+										<div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
+											<h6 class="font-weight-bold mb-4 d-flex align-items-center">
+												<i class="fas fa-sticky-note text-warning me-2"></i>Notas Adicionales
+											</h6>
+											<div class="form-group h-100 d-flex flex-column">
+												<textarea class="form-control border-0 bg-light rounded-4 flex-grow-1 p-3" rows="8" placeholder="Observaciones extras sobre la cita o el paciente..." v-model="cita.recomendacion_comentario"></textarea>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="row align-items-center mt-3">
+									<div class="col-sm-6 text-sm-start text-center mb-3 mb-sm-0">
+										<div class="form-check form-switch custom-switch d-inline-block">
+											<input class="form-check-input" type="checkbox" id="checkNuevo" v-model="precioNuevo" @change="precioDinamico()">
+											<label class="form-check-label ms-2" for="checkNuevo">{{ precioNuevo ? 'Paciente Nuevo' : 'Paciente Continuante' }}</label>
+										</div>
+									</div>
+									<div class="col-sm-6">
+										<div class="card bg-primary text-white border-0 rounded-4 shadow-sm">
+											<div class="card-body p-3 d-flex justify-content-between align-items-center">
+												<span class="small font-weight-bold">Total a cobrar:</span>
+												<h4 class="mb-0 font-weight-bold">S/ {{ parseFloat(cita.price).toFixed(2) }}</h4>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
-					</div> <!-- end of pasoActual === 2 -->
+
+					<!-- Step 7: Confirmar -->
+					<div v-show="pasoActual === 7">
+						<div class="row justify-content-center">
+							<div class="col-md-10">
+								<p class="mb-4 lead text-center font-weight-bold">Resumen de la Cita</p>
+								
+								<div class="ticket-container bg-white shadow-lg rounded-5 overflow-hidden border">
+									<div class="ticket-header bg-soft-primary p-4 border-bottom d-flex align-items-center">
+										<div class="badge bg-primary p-3 rounded-circle me-3">
+											<i class="fas fa-file-invoice fa-2x text-white"></i>
+										</div>
+										<div>
+											<h5 class="mb-0 font-weight-bold text-dark">Confirmación de Reserva</h5>
+											<p class="text-muted small mb-0">Por favor, revise los datos antes de registrar.</p>
+										</div>
+									</div>
+									
+									<div class="ticket-body p-4 p-md-5">
+										<div class="row mb-5">
+											<div class="col-md-6 mb-4">
+												<label class="xs-label text-muted font-weight-bold text-uppercase ls-1 d-block mb-1">Paciente</label>
+												<h5 class="font-weight-bold text-dark mb-0"><i class="fas fa-user-circle me-2 text-primary"></i>{{ cita.name }} {{ cita.nombres }}</h5>
+												<p class="text-muted small ms-4">DNI: {{ cita.dni }}</p>
+											</div>
+											<div class="col-md-6 mb-4 text-md-end">
+												<label class="xs-label text-muted font-weight-bold text-uppercase ls-1 d-block mb-1">Tipo de Atención</label>
+												<h5 class="font-weight-bold text-dark mb-0">{{ getLabelCategoria(cita.clasification) }}</h5>
+												<p class="text-primary small mb-0">{{ getLabelServicio(cita.type) }}</p>
+											</div>
+										</div>
+
+										<div class="row mb-5 bg-light rounded-4 p-4 mx-0">
+											<div class="col-md-6 mb-3 mb-md-0 d-flex align-items-center">
+												<div class="me-3 text-info">
+													<i class="far fa-calendar-check fa-2x"></i>
+												</div>
+												<div>
+													<h6 class="mb-0 font-weight-bold">{{ fechaElegida }}</h6>
+													<small class="text-muted">Fecha asignada</small>
+												</div>
+											</div>
+											<div class="col-md-6 d-flex align-items-center justify-content-md-end">
+												<div class="me-3 text-info">
+													<i class="far fa-clock fa-2x"></i>
+												</div>
+												<div class="text-md-end">
+													<h6 class="mb-0 font-weight-bold">{{ horaLatam1(horaElegida.check_time) }} - {{ horaLatam1(horaElegida.departure_date) }}</h6>
+													<small class="text-muted">Horario reservado</small>
+												</div>
+											</div>
+										</div>
+
+										<div class="row Ticket-details">
+											<div class="col-md-4 mb-4">
+												<h6 class="font-weight-bold text-muted small text-uppercase mb-2">Profesional</h6>
+												<p class="mb-0 font-weight-bold">{{ profesionalElegido.name }}</p>
+											</div>
+											<div class="col-md-4 mb-4">
+												<h6 class="font-weight-bold text-muted small text-uppercase mb-2">Modalidad</h6>
+												<p class="mb-0 font-weight-bold"><span class="badge rounded-pill bg-soft-info text-info px-3">{{ getLabelModalidad(cita.mode) }}</span></p>
+											</div>
+											<div class="col-md-4 mb-4 text-md-end">
+												<h6 class="font-weight-bold text-muted small text-uppercase mb-2">Total a Pagar</h6>
+												<h3 class="mb-0 font-weight-bold text-success">S/ {{ parseFloat(cita.price).toFixed(2) }}</h3>
+											</div>
+										</div>
+
+										<div v-if="cita.recomendacion_comentario" class="notes-section mt-4 bg-soft-warning p-4 rounded-4 border-dashed border-warning">
+											<h6 class="font-weight-bold text-warning-dark small text-uppercase mb-2"><i class="fas fa-sticky-note me-2"></i>Notas Adicionales</h6>
+											<p class="mb-0 small text-dark fst-italic">{{ cita.recomendacion_comentario }}</p>
+										</div>
+									</div>
+									
+									<div class="ticket-footer bg-light p-4 text-center border-top">
+										<p class="text-muted small mb-0"><i class="fas fa-shield-alt me-2"></i>Sistema de Gestión de Citas Excelentemente - Recepción</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Navigation Buttons -->
+					<div class="modal-footer border-0 justify-content-between px-4 pb-4">
+						<div>
+							<button type="button" v-if="pasoActual > 1" class="btn btn-outline-secondary btn-lg rounded-pill px-4" @click="prevStep">
+								<i class="fas fa-arrow-left me-2"></i> Anterior
+							</button>
+						</div>
+						<div class="d-flex">
+							<button type="button" class="btn btn-light-danger btn-lg rounded-pill px-4 me-2" data-bs-dismiss="modal" v-if="pasoActual === 1">
+								Cancelar
+							</button>
+							<button type="button" v-if="pasoActual < 7" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm" @click="nextStep">
+								Siguiente <i class="fas fa-arrow-right ms-2"></i>
+							</button>
+							<button type="submit" v-if="pasoActual === 7 && cita.vivo == 1" class="btn btn-success btn-lg rounded-pill px-5 shadow-sm">
+								<i class="fas fa-save me-2"></i> Registrar Cita
+							</button>
+							<div v-if="pasoActual === 7 && cita.vivo != 1" class="alert alert-danger mb-0 rounded-pill">
+								<i class="fas fa-cross me-2"></i> El paciente figura como fallecido.
+							</div>
+						</div>
+					</div>
 				</form>
 			</div>
 		</div>
@@ -409,9 +575,27 @@ export default {
 	data(){
 		return{
 			pasoActual: 1, listaPacientes: [], busquedaTexto: '', timerBusqueda: null,
+			pasos: [
+				{ id: 1, label: 'Paciente', icon: 'fa-user' },
+				{ id: 2, label: 'Tipo', icon: 'fa-stethoscope' },
+				{ id: 3, label: 'Profesional', icon: 'fa-user-md' },
+				{ id: 4, label: 'Fecha/Hora', icon: 'fa-calendar-alt' },
+				{ id: 5, label: 'Modalidad', icon: 'fa-home' },
+				{ id: 6, label: 'Pago', icon: 'fa-dollar-sign' },
+				{ id: 7, label: 'Confirmar', icon: 'fa-check-circle' }
+			],
+			categorias: [
+				{ id: 2, label: 'Psicológica', desc: 'Sesión de terapia psicológica', icon: 'fa-brain' },
+				{ id: 1, label: 'Psiquiátrica', desc: 'Consulta psiquiátrica y medicación', icon: 'fa-pills' },
+				{ id: 6, label: 'Nutricional', desc: 'Consulta nutricional', icon: 'fa-apple-alt' },
+				{ id: 3, label: 'Certificado', desc: 'Certificado médico o psicológico', icon: 'fa-file-medical' },
+				{ id: 7, label: 'Terapia', desc: 'Masajes y terapia corporal', icon: 'fa-hands-helping' },
+				{ id: 8, label: 'Triaje', desc: 'Triaje por médico o psicólogo', icon: 'fa-stethoscope' },
+				{ id: 4, label: 'Kurame', desc: 'Servicios de Kurame', icon: 'fa-star' }
+			],
 			precios: [], nosrecomienda:true, precioNuevo:true, esPresencial: true, masBasicos:true, masEmergencia:false, tieneDescuento:false, descuentoRebaja:0, tieneRebaja:false, razonPorcentaje:'', razonRebaja:'',
 			switchReciec: 1, tieneAdelanto:false, descuentoAdelanto:0, razonAdelanto:'',
-			status:[{id:4, stat:'Ambulatorio'},{id:3, stat:'Clínica de día'},{id:2, stat:'Kurame'},{id:1, stat:'Ninguno'},], //sacado de la DB:tbl status
+			status:[{id:4, stat: 'Ambulatorio'},{id:3, stat: 'Clínica de día'},{id:2, stat: 'Kurame'},{id:1, stat: 'Ninguno'},], //sacado de la DB:tbl status
 			patientNew: false, alertaDeudas:false, mensajeDeudas:'', recomendaciones:['Facebook', 'Instagram', 'TikTok', 'Linkedin', 'Youtube', 'Spotify', 'TV', 'Amigos o familiares', 'Referencia profesional', 'Publicidad escrita', 'Campañas de salud', 'Convenio', 'Paciente Antiguo', 'Otros Centros de Salud', 'Google Maps / Business', 'Referencia del Establecimiento', 'Sucamec', 'Página Web'],
 			cita:{
 				phone:'',
@@ -521,6 +705,63 @@ export default {
 				document.querySelector('#modalNuevoPaciente .btn-close').click();
 			}
 		},
+		nextStep() {
+			if (this.pasoActual === 1) {
+				if (!this.cita.dni) {
+					alertify.error('Debe seleccionar o registrar un paciente', 5);
+					return;
+				}
+			}
+			if (this.pasoActual === 2) {
+				if (!this.cita.clasification) {
+					alertify.error('Debe seleccionar un tipo de consulta', 5);
+					return;
+				}
+				if (!this.cita.type) {
+					alertify.error('Debe seleccionar un servicio específico', 5);
+					return;
+				}
+			}
+			if (this.pasoActual === 5) {
+				if (!this.cita.mode) {
+					alertify.error('Debe seleccionar una modalidad', 5);
+					return;
+				}
+			}
+			if (this.pasoActual < 7) this.pasoActual++;
+		},
+		prevStep() {
+			if (this.pasoActual > 1) this.pasoActual--;
+		},
+		seleccionarCategoria(id) {
+			this.cita.clasification = id;
+			this.cita.type = '';
+			this.precioDinamico();
+		},
+		seleccionarServicio(id) {
+			this.cita.type = id;
+			this.precioDinamico();
+			this.nextStep();
+		},
+		seleccionarModalidad(mode) {
+			this.cita.mode = mode;
+			this.esPresencial = (mode == 1);
+			this.nextStep();
+		},
+		getLabelCategoria(id) {
+			const cat = this.categorias.find(c => c.id == id);
+			return cat ? cat.label : '';
+		},
+		getLabelServicio(id) {
+			const sub = this.precios.find(p => p.id == id);
+			return sub ? sub.descripcion : '';
+		},
+		getLabelModalidad(mode) {
+			if (mode == 1) return 'Presencial';
+			if (mode == 2) return 'Virtual';
+			if (mode == 3) return 'Domicilio';
+			return '';
+		},
 		horaLatam1(horita){ return moment(horita, 'HH:mm:ss').format('hh:mm') },
 		horaLatam2(horita){ return moment(horita, 'HH:mm:ss').format('hh:mm a') },
 		precioDinamico(){
@@ -603,7 +844,7 @@ export default {
 				//formData.append('patient_condition', this.cita.patient_condition); //El sistema evalúa la condición: nuevo o continuo, no es necesario pasar
 				formData.append('recomendation', this.cita.recomendation);
 				formData.append('recomendacion_comentario', this.cita.recomendacion_comentario);
-				formData.append('mode', (this.esPresencial) ? 1: 2 );
+				formData.append('mode', this.cita.mode );
 				formData.append('link', this.cita.link);
 				formData.append('type_dni', this.cita.type_dni);
 				formData.append('contacto', this.cita.contacto);
@@ -953,18 +1194,117 @@ export default {
 </script>
 
 <style>
-.ajs-message{border-radius: 5px!important;}
-.ajs-success { background-color: rgb(33, 201, 89)!important; }
-.ajs-danger, .alertify-notifier .ajs-message.ajs-error { background-color: rgb(232, 27, 0)!important; color:white!important; }
-.form-switch label{cursor: pointer;}
-.alert-danger {
-    color: #ffffff;
-    background-color: #ff3521;
+.wizard-stepper {
+	background-color: #f8f9fa;
+	margin: -1rem -1rem 1.5rem -1rem;
+	padding: 1.5rem 1rem;
 }
-.agrandar{transition: all 0.2s ease-in-out;}
-.agrandar:hover{transform: scale(1.05);}
-.modal label{
-	color: #737373;
-	font-weight: 500;
+.step-item {
+	opacity: 0.5;
+	transition: all 0.3s ease;
 }
+.step-item.active {
+	opacity: 1;
+	transform: scale(1.05);
+}
+.step-item.completed {
+	opacity: 0.8;
+}
+.step-item.completed .step-icon {
+	background-color: #28a745 !important;
+	color: white;
+}
+.step-item.active .step-icon {
+	background-color: #0d6efd !important;
+	color: white;
+	box-shadow: 0 0 15px rgba(13, 110, 253, 0.4);
+}
+.step-icon {
+	width: 35px;
+	height: 35px;
+	background-color: #dee2e6;
+	color: #6c757d;
+	font-size: 0.9rem;
+}
+.step-label {
+	font-size: 0.85rem;
+	font-weight: 600;
+}
+.step-connector {
+	height: 2px;
+	background-color: #dee2e6;
+	flex-grow: 1;
+	min-width: 20px;
+}
+.step-item.completed .step-connector {
+	background-color: #28a745;
+}
+
+.bg-primary-light { background-color: #e7f1ff !important; }
+.bg-soft-primary { background-color: rgba(13, 110, 253, 0.1); }
+.bg-soft-info { background-color: rgba(13, 202, 240, 0.1); }
+.bg-soft-warning { background-color: rgba(255, 193, 7, 0.1); }
+.bg-soft-success { background-color: rgba(40, 167, 69, 0.1); }
+.bg-light-gradient { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); }
+
+.avatar-circle, .avatar-xl {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+}
+.avatar-xl {
+	width: 100px;
+	height: 100px;
+}
+
+.category-icon {
+	width: 50px;
+	height: 50px;
+	font-size: 1.2rem;
+}
+.bg-cat-1 { background-color: rgba(111, 66, 193, 0.1); color: #6f42c1; }
+.bg-cat-2 { background-color: rgba(13, 110, 253, 0.1); color: #0d6efd; }
+.bg-cat-3 { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
+.bg-cat-4 { background-color: rgba(255, 193, 7, 0.1); color: #ffc107; }
+.bg-cat-6 { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; }
+.bg-cat-7 { background-color: rgba(13, 202, 240, 0.1); color: #0dcaf0; }
+.bg-cat-8 { background-color: rgba(108, 117, 125, 0.1); color: #6c757d; }
+
+.selectable-card {
+	cursor: pointer;
+	border: 2px solid transparent !important;
+}
+.selectable-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
+}
+.selectable-card.active {
+	border-color: #0d6efd !important;
+	background-color: rgba(13, 110, 253, 0.02);
+}
+
+.custom-switch .form-check-input {
+	width: 3rem;
+	height: 1.5rem;
+}
+
+.ticket-container {
+	max-width: 600px;
+	margin: 0 auto;
+}
+.border-dashed { border-style: dashed !important; }
+.transition-all { transition: all 0.3s ease; }
+.ls-1 { letter-spacing: 1px; }
+
+.btn-light-danger {
+	background-color: #ffe5e5;
+	color: #d9534f;
+	border: none;
+}
+.btn-light-danger:hover {
+	background-color: #ffd1d1;
+}
+
+.bg-success-light { background-color: rgba(40, 167, 69, 0.1); }
+.text-warning-dark { color: #856404; }
 </style>

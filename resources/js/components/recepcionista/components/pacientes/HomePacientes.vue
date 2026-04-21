@@ -306,7 +306,7 @@ import ModalVerFaltas from './reportes/ModalVerFaltas.vue'
 import ModalVerHobbies from './reportes/ModalVerHobbies.vue'
 import OffVerMembresias from './OffVerMembresias.vue';
 import ModalAcuerdos from './ModalAcuerdos.vue';
-
+//Code.
 export default {
   name: 'HomePacientes',
 
