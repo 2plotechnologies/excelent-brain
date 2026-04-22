@@ -38,7 +38,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// ─── PUBLIC ───────────────────────────────────────────────────────────────────
+// ─── PUBLIC (Sin auth). ───────────────────────────────────────────────────────────────────
 Route::post('login', [AuthController::class, 'login']);
 Route::get('listarPrecios', [ExtrasController::class, 'listarPrecios']);
 Route::get('preciosMembresias', [ExtrasController::class, 'preciosMembresias']);

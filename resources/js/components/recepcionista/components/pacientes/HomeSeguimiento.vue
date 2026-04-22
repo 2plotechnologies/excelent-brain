@@ -90,21 +90,6 @@
         </div>
       </div>
 
-      <div class="alert alert-primary bg-light border">
-        <p class="mb-1 fw-bold">📋 Criterios de Fidelización:</p>
-        <ul class="mb-2">
-          <li><strong>Psicología:</strong> ≥1 mes desde primera atención + ≥4 citas → Fidelizado.</li>
-          <li><strong>Psiquiatría:</strong> ≥60 días desde primera atención + ≥2 citas → Fidelizado.</li>
-          <li><strong>Otros:</strong> ≥1 mes desde primera atención + &lt;4 citas → No Fidelizado.</li>
-        </ul>
-        <p class="mb-1 fw-bold">⚠ Criterios de Recuperación:</p>
-        <ul class="mb-0">
-          <li><strong>Psicología:</strong> No viene hace ≥3 meses → Estado Inactivo.</li>
-          <li><strong>Psiquiatría:</strong> No viene hace ≥6 meses → Estado Inactivo.</li>
-          <li><strong>Otros:</strong> No viene hace ≥3 meses → Estado Inactivo.</li>
-        </ul>
-      </div>
-
       <div class="card">
         <div class="table-responsive">
           <table class="table table-hover mb-0">

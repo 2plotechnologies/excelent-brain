@@ -136,56 +136,187 @@
 
       <!-- DATOS PERSONALES -->
       <div class="tab-pane fade" id="datos" role="tabpanel">
-        <div class="card border mb-4">
-          <div class="card-body p-4 position-relative">
-            <button class="btn btn-outline-primary position-absolute btn-sm" style="top: 20px; right: 20px;" data-bs-toggle="modal" data-bs-target="#modalEdicionPaciente" @click="$emit('editarPaciente', paciente)">
-              <i class="fas fa-edit"></i> Editar Paciente
-            </button>
-            <h5 class="card-title font-weight-bold mb-4">Información General</h5>
-            <div class="row mb-3">
-              <div class="col-md-3 mb-3"><span class="text-muted d-block small mb-1">Nombres</span><strong class="text-dark">{{ paciente.name }}</strong></div>
-              <div class="col-md-3 mb-3"><span class="text-muted d-block small mb-1">Apellidos</span><strong class="text-dark">{{ paciente.nombres }}</strong></div>
-              <div class="col-md-3 mb-3"><span class="text-muted d-block small mb-1">DNI / CE</span><strong class="text-dark">{{ paciente.dni }}</strong></div>
-              <div class="col-md-3 mb-3"><span class="text-muted d-block small mb-1">Fecha Nacimiento</span><strong class="text-dark">{{ paciente.birth_date }}</strong></div>
-              <div class="col-md-3 mb-3"><span class="text-muted d-block small mb-1">Ocupación</span><strong class="text-dark">{{ paciente.occupation }}</strong></div>
-              <div class="col-md-3 mb-3"><span class="text-muted d-block small mb-1">Teléfono</span><strong class="text-dark">{{ paciente.phone }}</strong></div>
-              <div class="col-md-3 mb-3"><span class="text-muted d-block small mb-1">Correo</span><strong class="text-dark" style="word-break: break-all;">{{ paciente.email || 'N/A' }}</strong></div>
+        <div class="position-relative">
+
+          <!-- BOTÓN EDITAR -->
+          <button 
+            class="btn btn-outline-primary btn-sm position-absolute"
+            style="top: 0; right: 0;"
+            data-bs-toggle="modal"
+            data-bs-target="#modalEdicionPaciente"
+            @click="$emit('editarPaciente', paciente)"
+          >
+            <i class="fas fa-pen"></i> Editar Datos
+          </button>
+
+          <h4 class="mb-4 fw-bold">Datos Personales</h4>
+
+          <div class="row g-4">
+
+            <!-- INFORMACIÓN BÁSICA -->
+            <div class="col-md-6">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                  <h6 class="fw-bold mb-3">
+                    <i class="fas fa-user text-primary me-2"></i>
+                    Información Básica
+                  </h6>
+
+                  <div class="mb-2">
+                    <small class="text-muted d-block">Nombre Completo</small>
+                    <strong>{{ paciente.name }} {{ paciente.nombres }}</strong>
+                  </div>
+
+                  <div class="mb-2">
+                    <small class="text-muted d-block">DNI</small>
+                    <strong>{{ paciente.dni }}</strong>
+                  </div>
+
+                  <div class="mb-2">
+                    <small class="text-muted d-block">Edad</small>
+                    <strong>{{ paciente.birth_date }}</strong>
+                  </div>
+
+                  <div class="mb-2">
+                    <small class="text-muted d-block">Género</small>
+                    <strong>{{ paciente.gender || '—' }}</strong>
+                  </div>
+
+                  <div class="mb-2">
+                    <small class="text-muted d-block">Estado Civil</small>
+                    <strong>{{ paciente.civil_status || '—' }}</strong>
+                  </div>
+
+                  <div class="mb-2">
+                    <small class="text-muted d-block">Ocupación</small>
+                    <strong>{{ paciente.occupation || '—' }}</strong>
+                  </div>
+
+                  <div class="mb-2">
+                    <small class="text-muted d-block">Grado de Instrucción</small>
+                    <strong>{{ paciente.education || '—' }}</strong>
+                  </div>
+
+                </div>
+              </div>
             </div>
-            
-            <hr class="my-4">
-            <h5 class="card-title font-weight-bold mb-4">Dirección</h5>
-            <div class="row" v-if="paciente.address">
-              <div class="col-md-4 mb-2"><span class="text-muted d-block small mb-1">Dirección</span><strong class="text-dark">{{ paciente.address.address }}</strong></div>
-              <div class="col-md-4 mb-2"><span class="text-muted d-block small mb-1">Distrito</span><strong class="text-dark">{{ paciente.address.district }}</strong></div>
-              <div class="col-md-4 mb-2"><span class="text-muted d-block small mb-1">Provincia/Departamento</span><strong class="text-dark">{{ paciente.address.province }} - {{ paciente.address.department }}</strong></div>
+
+            <!-- INFORMACIÓN DE CONTACTO -->
+            <div class="col-md-6">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                  <h6 class="fw-bold mb-3">
+                    <i class="fas fa-phone text-primary me-2"></i>
+                    Información de Contacto
+                  </h6>
+
+                  <div class="mb-2">
+                    <small class="text-muted d-block">Teléfono</small>
+                    <strong>{{ paciente.phone }}</strong>
+                  </div>
+
+                  <div class="mb-2">
+                    <small class="text-muted d-block">Email</small>
+                    <strong style="word-break: break-all;">
+                      {{ paciente.email || '—' }}
+                    </strong>
+                  </div>
+
+                  <div class="mb-2" v-if="paciente.address">
+                    <small class="text-muted d-block">Dirección</small>
+                    <strong>{{ paciente.address.address }}</strong>
+                  </div>
+
+                  <div class="mb-2" v-if="paciente.address">
+                    <small class="text-muted d-block">Departamento</small>
+                    <strong>{{ paciente.address.department }}</strong>
+                  </div>
+
+                  <div class="mb-2" v-if="paciente.address">
+                    <small class="text-muted d-block">Provincia</small>
+                    <strong>{{ paciente.address.province }}</strong>
+                  </div>
+
+                  <div class="mb-2" v-if="paciente.address">
+                    <small class="text-muted d-block">Distrito</small>
+                    <strong>{{ paciente.address.district }}</strong>
+                  </div>
+
+                  <div>
+                    <small class="text-muted d-block">Referencia</small>
+                    <strong>{{ paciente.reference || '—' }}</strong>
+                  </div>
+
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        
-        <div class="card border">
-          <div class="card-body p-4">
-            <h5 class="card-title font-weight-bold mb-3">Familiares / Contactos</h5>
-            <div class="table-responsive" v-if="paciente.relative && paciente.relative.length > 0">
-              <table class="table table-borderless table-sm">
-                <thead class="bg-light">
-                  <tr>
-                    <th class="p-2 border-bottom">Nombre</th>
-                    <th class="p-2 border-bottom">Parentesco</th>
-                    <th class="p-2 border-bottom">Teléfono</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="rel in paciente.relative" :key="rel.id" v-show="rel.name">
-                      <td class="p-2">{{ rel.name }}</td>
-                      <td class="p-2">{{ rel.kinship }}</td>
-                      <td class="p-2">{{ rel.phone }}</td>
-                  </tr>
-                </tbody>
-              </table>
+
+            <!-- CONTACTO DE EMERGENCIA -->
+            <div class="col-md-6">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                  <h6 class="fw-bold mb-3 text-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Contacto de Emergencia
+                  </h6>
+
+                  <div v-if="paciente.relative && paciente.relative.length">
+                    <div v-for="rel in paciente.relative" :key="rel.id" v-show="rel.name">
+                      <div class="mb-2">
+                        <small class="text-muted d-block">Nombre</small>
+                        <strong>{{ rel.name }}</strong>
+                      </div>
+
+                      <div class="mb-2">
+                        <small class="text-muted d-block">Teléfono</small>
+                        <strong>{{ rel.phone }}</strong>
+                      </div>
+
+                      <div class="mb-3">
+                        <small class="text-muted d-block">Relación</small>
+                        <strong>{{ rel.kinship }}</strong>
+                      </div>
+
+                      <hr v-if="paciente.relative.length > 1">
+                    </div>
+                  </div>
+
+                  <div v-else>
+                    <small class="text-muted">No hay contactos registrados.</small>
+                  </div>
+
+                </div>
+              </div>
             </div>
-            <div v-else>
-              <p class="text-muted mb-0 small">No hay familiares registrados.</p>
+
+            <!-- INFORMACIÓN DE REGISTRO -->
+            <div class="col-md-6">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                  <h6 class="fw-bold mb-3">
+                    <i class="fas fa-calendar text-primary me-2"></i>
+                    Información de Registro
+                  </h6>
+
+                  <div class="mb-2">
+                    <small class="text-muted d-block">Fecha de Registro</small>
+                    <strong>{{ paciente.created_at }}</strong>
+                  </div>
+
+                  <div class="mb-2">
+                    <small class="text-muted d-block">Última Visita</small>
+                    <strong>{{ paciente.last_visit || '—' }}</strong>
+                  </div>
+
+                  <div>
+                    <small class="text-muted d-block">Total de Evoluciones</small>
+                    <strong>{{ paciente.evolutions_count || 0 }} registros</strong>
+                  </div>
+
+                </div>
+              </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -480,25 +611,47 @@
         </div>
       </div>
 
-      <!-- PRUEБАS PSICOLOGICAS -->
+      <!-- PRUEBAS PSICOLOGICAS -->
       <div class="tab-pane fade" id="pruebas" role="tabpanel">
-        <div class="card border border-light">
-          <div class="card-body p-4">
-             <h5 class="card-title font-weight-bold mb-4">Listado de Pruebas</h5>
-             <!-- Combine tests -->
-             <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between align-items-center px-0 border-bottom" v-for="t in allTests" :key="t.type + t.id">
-                   <div>
-                     <strong class="text-dark">{{ t.testName }}</strong>
-                     <span class="text-muted small d-block mt-1">{{ formatDate(t.created_at) }}</span>
-                   </div>
-                   <!-- badge for score -->
-                   <span class="badge bg-primary rounded-pill px-3 py-2" v-if="t.score || t.total">{{ t.score || t.total }} pts</span>
-                </li>
-             </ul>
-             <div v-if="allTests.length === 0" class="text-center text-muted mt-3">
-               No hay pruebas aplicadas.
-             </div>
+        <div class="row">
+          <div class="col-12 mb-3">
+             <h5 class="card-title font-weight-bold"><i class="fas fa-brain text-primary me-2"></i> Pruebas Psicológicas Aplicadas</h5>
+          </div>
+          <div class="col-md-6 col-lg-4 mb-4" v-for="(t, index) in allTests" :key="t.testName + '_' + (t.id || index)">
+            <div class="card h-100 border-0 shadow-sm" style="border-radius: 10px; overflow: hidden;">
+              <div class="card-header bg-primary text-white border-0 py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h6 class="mb-0 font-weight-bold">{{ t.testName }}</h6>
+                  <i class="fas fa-file-signature opacity-50"></i>
+                </div>
+              </div>
+              <div class="card-body bg-light position-relative">
+                <div class="mb-3">
+                  <span class="text-muted small d-block mb-1"><i class="far fa-calendar-alt me-1"></i> Fecha de Aplicación</span>
+                  <strong class="text-dark">{{ formatDate(t.created_at || t.fecha) }}</strong>
+                </div>
+                
+                <div v-if="t.score || t.total || t.result" class="mb-0">
+                  <span class="text-muted small d-block mb-1"><i class="fas fa-star me-1 text-warning"></i> Puntuación General</span>
+                  <span class="badge bg-success rounded-pill px-3 py-2" style="font-size: 0.9rem;">
+                    {{ t.score || t.total || t.result }} pts
+                  </span>
+                </div>
+                
+                <!-- Background decoration -->
+                <i class="fas fa-clipboard-check position-absolute opacity-10 text-primary" style="bottom: -15px; right: -15px; font-size: 5rem;"></i>
+              </div>
+              <div class="card-footer bg-white border-top-0 py-3 text-center">
+                <button class="btn btn-sm btn-outline-primary w-100 rounded-pill"><i class="fas fa-eye me-1"></i> Ver Detalles Completos</button>
+              </div>
+            </div>
+          </div>
+          
+          <div v-if="allTests.length === 0" class="col-12">
+            <div class="alert alert-light text-center border p-5">
+              <i class="fas fa-folder-open text-muted mb-3" style="font-size: 3rem;"></i>
+              <h6 class="text-muted">No hay pruebas aplicadas en el registro de este paciente.</h6>
+            </div>
           </div>
         </div>
       </div>
@@ -597,18 +750,33 @@ export default {
       return this.paciente.medical_evolutions[0];
     },
     allTests() {
+      const p = this.paciente;
+      if (!p || Object.keys(p).length === 0) return []; // Ensure reactivity triggers when object is populated
+
       let combined = [];
       const addTest = (arr, name) => {
-        if(arr) {
-          arr.forEach(i => combined.push({...i, testName: name, dateStamp: new Date(i.created_at || i.fecha).getTime()}))
+        if(arr && Array.isArray(arr)) {
+          arr.forEach(i => {
+            let d = i.created_at || i.fecha;
+            let time = 0;
+            if (d) {
+              // Convert "YYYY-MM-DD HH:mm:ss" to "YYYY-MM-DDTHH:mm:ss" for strict parsers
+              time = new Date(d.replace(' ', 'T')).getTime();
+            }
+            combined.push({
+              ...i, 
+              testName: name, 
+              dateStamp: isNaN(time) ? 0 : time
+            });
+          });
         }
       }
-      addTest(this.paciente.scrs, 'SCR');
-      addTest(this.paciente.burns, 'Burnout');
-      addTest(this.paciente.gads, 'GAD-7');
-      addTest(this.paciente.zung_anxieties, 'Zung Ansiedad');
-      addTest(this.paciente.zung_depressions, 'Zung Depresión');
-      addTest(this.paciente.millons, 'Millon');
+      addTest(p.scrs, 'SCR');
+      addTest(p.burns, 'Burnout');
+      addTest(p.gads, 'GAD-7');
+      addTest(p.zung_anxieties, 'Zung Ansiedad');
+      addTest(p.zung_depressions, 'Zung Depresión');
+      addTest(p.millons, 'Millon');
       
       return combined.sort((a,b) => b.dateStamp - a.dateStamp);
     }

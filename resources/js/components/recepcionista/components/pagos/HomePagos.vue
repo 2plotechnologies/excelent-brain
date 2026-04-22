@@ -61,175 +61,153 @@
 		</div>
 
 		<div class="table-responsive">
-			<table class="table table-hover mt-1 " id="table_export">
-				<thead class="">
-					<tr class="">
-						<th class="text-primary" colspan="15"><i class="fas fa-angle-right"></i> Cuadro de entradas de dinero</th>
-					</tr>
-					<tr >
-						<td class="text-primaryd-print-none" v-if="tienePrivilegios=='1'">@</td>
-						<td class="text-primary">N°</td>
-						<td class="text-primary"><i class="far fa-user"></i> | Registro</td>
-						<td class="text-primary">Fact. Bol.</td>
-						<td class="text-primary">Ticket</td>
-						<td class="text-primary">Cliente</td>
-						<td class="text-primary">Tipo</td>
-						<td class="text-primary">Obs.</td>
-						<td class="text-primary">Monto</td>
-						<td class="text-primary">Motivo</td>
-						<td class="text-primary">Medio de pago</td>
-						<td class="text-primary">N° Op.</td>
-						<td class="text-primary">Prof.</td>
-						<td class="text-primary">Fecha y Hora</td>
-						<td class="text-primary d-print-none" style="white-space: nowrap">@</td>
+			<table class="table-pagos mt-1" id="table_export">
+				<thead>
+					<tr>
+						<th>Ticket</th>
+						<th>Hora</th>
+						<th>Concepto</th>
+						<th>Tipo</th>
+						<th>Profesional</th>
+						<th>Método</th>
+						<th>Nro. Op.</th>
+						<th>Monto</th>
+						<th class="text-center">Acciones</th>
 					</tr>
 				</thead>
 				<tbody>
-						<tr v-for="(payment, index) in filteredPayments" >
-							<td class="d-print-none" v-if="tienePrivilegios=='1'">
-								<button class="btn btn-sm btn-outline-danger" @click="mostrarModalBorrar(payment.id, payment.originalIndex)" data-bs-toggle="modal" data-bs-target="#modalMotivoBorrar" ><i class="fa-solid fa-xmark"></i></button>
-							</td>
-							<td>
-								<span>{{index+1}}</span>
-							</td>
-							<td class="text-nowrap" v-if="payment.usuario" :title="payment.usuario.nombre" data-bs-toggle="tooltip" data-bs-placement="top" :data-bs-title="payment.usuario.nombre" ><i class="far fa-user"></i> {{payment.created_at | formatedDate}}</td>
-							<td class="text-nowrap" v-else  :title="payment.user.nombre" data-bs-toggle="tooltip" data-bs-placement="top" :data-bs-title="payment.user.nombre"> <i class="far fa-user"></i> {{payment.created_at | formatedDate}}</td>
-							<td class="comprobante-sunat">{{payment.voucher}}</td>
-							<td>{{ payment.id}}</td>
-							<td class="text-capitalize text-nowrap">{{ payment.customer }} <span v-if="payment.observation!=''"></span></td>
-							<!-- <td v-if="payment.pay_status == 1">Sin cancelar</td>
-								<td v-else-if="payment.pay_status == 2">Cancelado</td> -->
-							<td>
-								<span v-if="payment.continuo=='1'">N</span>
-								<span v-else-if="payment.continuo=='2'">C</span>
-								<span v-else-if="payment.continuo=='3'">M</span>
-								<span v-else>
-									<span v-if="payment.continuo=='-1'">X</span>
-									<span v-if="payment.continuo==null">X</span>
-								</span>
-							</td>
-							<td class="text-capitalize ">
-								<span> {{ payment.observation }} </span>
-								<span v-if="payment.descuento>0" > {{ payment.motivoDescuento }} S/ {{ parseFloat(payment.descuento).toFixed(2) }} </span>
-								<span v-if="payment.rebaja>0" > {{ payment.motivoRebaja }} S/ {{ parseFloat(payment.rebaja).toFixed(2) }} </span>
-							</td>
-							<td class="text-nowrap" :class="{'text-danger' : payment.type==6, 'text-primary': payment.type!=6}">S/ <span v-if="payment.type==6">-</span> {{ retornarFloat(payment.price)}}</td>
-							<td class="text-nowrap">
-								<span v-if="payment.type==8">Adelanto de cita</span>
-								<span v-if="payment.type==7">Pago de membresía</span>
-								<span v-if="payment.type==5">Pago de cita</span>
-								<span v-if="payment.type==4">Otros</span>
-								<span v-if="payment.type==3">Informe</span>
-								<span v-if="payment.type==2">Paquete Kurame</span>
-								<span v-if="payment.type==1">Paquete Membresía</span>
-								<span v-if="payment.type==0">Certificado</span>
-								<span v-if="payment.type==15">Pago de membresía</span>
-								<span v-if="payment.type==16">Revaluación gratuita</span>
-								<small v-if="payment.type!=4"><br>{{ payment.detalle }}</small>
-							</td>
-							<td class="text-capitalize"> <span>{{queMoneda(payment.moneda)}}</span> </td>
-							<td>{{ payment.voucher_issued }} </td>
-							<td>{{ payment.profesional_name }}</td>
-							<td>{{ fechaLatam(payment.fechaCita) }} {{ payment.horario }}</td>
-							<td class="d-print-none" style="white-space: nowrap">
-								<button class="btn btn-sm btn-outline-warning" v-if="esAdmin" @click="pagoSeleccionado = payment" title="Dividir pago" data-bs-toggle="modal" data-bs-target="#modalDividirPago" ><i class="fas fa-divide"></i></button>
-								<button class="btn btn-outline-success btn-sm" data-bs-toggle="offcanvas" data-bs-target="#offAdjunto"  @click="verAdjunto(payment.id)" title="Adjuntar archivo"><i class="far fa-file"></i></button>
-								<button class="btn btn-outline-primary btn-sm" title="Editar pago" data-bs-toggle="modal" data-bs-target="#modalEditarPago" @click="editar(payment.originalIndex)" v-if="consultarFecha()"><i class="fa-solid fa-pen-to-square"></i></button>
-								<!-- <a v-if="payment.appointment_id!==0" target="_blank" :href="`/api/pdfCupon/${payment.appointment_id}`" class="btn btn-danger btn-sm"><i class="fa-solid fa-file-pdf"></i> PDF</a> -->
-								<a target="_blank" :href="`/api/pdfExtraCupon/${payment.id}`" title="Ver PDF" class="btn btn-danger btn-sm d-none"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-								<button class="btn btn-outline-primary btn-sm" title="Facturación Electrónica" @click="pagoSeleccionado = payment" data-bs-toggle="modal" data-bs-target="#modalFacturacion"><img :src="require('/img/sunat_logo.webp')" style="width: 15px" alt=""></button>
-							</td>
-						</tr>
+					<tr v-for="transaction in unifiedTransactions" :key="transaction.id">
+						<td>
+							<span class="ticket-id">T-{{ String(transaction.id).padStart(3, '0') }}</span>
+						</td>
+						<td>
+							<span class="hora-txt">{{ transaction.horario || horaLatam(transaction.created_at) }}</span>
+						</td>
+						<td>
+							<div class="concepto-container">
+								<div class="icon-box" :class="transaction.iconBoxClass">
+									<i class="fas" :class="transaction.displayIcon"></i>
+								</div>
+								<div class="concepto-info">
+									<span class="title">{{ transaction.displayTitle }}</span>
+									<span class="subtitle">{{ fechaLatam(transaction.fechaCita || transaction.created_at) }}</span>
+								</div>
+							</div>
+						</td>
+						<td>
+							<span class="badge-custom" :class="transaction.displayBadgeClass">{{ transaction.displayType }}</span>
+						</td>
+						<td>
+							<span class="text-muted">{{ transaction.profesional_name || '—' }}</span>
+						</td>
+						<td>
+							<span class="badge bg-light text-muted fw-normal">{{ queMoneda(transaction.moneda) }}</span>
+						</td>
+						<td>
+							<span class="text-muted small">{{ transaction.voucher_issued || '—' }}</span>
+						</td>
+						<td>
+							<span class="monto-txt" :class="transaction.isIncome ? 'monto-positivo' : 'monto-negativo'">
+								{{ transaction.isIncome ? '+' : '-' }}S/ {{ retornarFloat(transaction.displayAmount) }}
+							</span>
+						</td>
+						<td class="text-center">
+							<div class="d-flex justify-content-center gap-1">
+								<!-- Eye Icon (PDF) -->
+								<a v-if="transaction.source === 'payments'" 
+								   target="_blank" :href="`/api/pdfExtraCupon/${transaction.id}`" 
+								   class="btn-action" title="Ver PDF">
+									<i class="far fa-eye"></i>
+								</a>
+								<a v-else target="_blank" 
+								   :href="`/api/pdfExtraCupon/${transaction.id}?token=${token}`" 
+								   class="btn-action" title="Ver PDF">
+									<i class="far fa-eye"></i>
+								</a>
+
+								<!-- Pencil Icon (Edit) -->
+								<button class="btn-action" title="Editar" 
+										data-bs-toggle="modal" data-bs-target="#modalEditarPago" 
+										@click="editar(transaction.originalIndex)" 
+										v-if="consultarFecha()">
+									<i class="fas fa-pencil-alt"></i>
+								</button>
+
+								<!-- Paperclip Icon (Adjunto) -->
+								<button class="btn-action" data-bs-toggle="offcanvas" data-bs-target="#offAdjunto" 
+										@click="verAdjunto(transaction.id)" title="Adjuntar archivo">
+									<i class="fas fa-paperclip"></i>
+								</button>
+
+								<!-- Three dots menu -->
+								<div class="dropdown dropdown-action d-inline-block">
+									<button class="btn-action dropdown-toggle" type="button" data-bs-toggle="dropdown">
+										<i class="fas fa-ellipsis-v"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li>
+											<button class="dropdown-item" v-if="esAdmin && transaction.source === 'payments'" 
+													@click="pagoSeleccionado = transaction" 
+													data-bs-toggle="modal" data-bs-target="#modalDividirPago">
+												<i class="fas fa-divide"></i> Dividir pago
+											</button>
+										</li>
+										<li>
+											<button class="dropdown-item" v-if="transaction.source === 'payments'" 
+													@click="pagoSeleccionado = transaction" 
+													data-bs-toggle="modal" data-bs-target="#modalFacturacion">
+												<i class="fas fa-file-invoice"></i> Facturación SUNAT
+											</button>
+										</li>
+										<li><hr class="dropdown-divider" v-if="esAdmin"></li>
+										<li>
+											<button class="dropdown-item text-danger" v-if="esAdmin" 
+													@click="mostrarModalBorrar(transaction.id, transaction.originalIndex)" 
+													data-bs-toggle="modal" data-bs-target="#modalMotivoBorrar">
+												<i class="fas fa-trash-alt text-danger"></i> Eliminar
+											</button>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</td>
+					</tr>
 				</tbody>
-				<tfoot>
-					<tr v-for="tipo in sumaTipos">
-						<th colspan="7"></th>
-						<th>{{ tipo.moneda }}</th>
-						<th class="text-nowrap">S/ {{ tipo.suma.toFixed(2) }}</th>
-						<th></th>
-					</tr>
-					<tr>
-						<th colspan="7"></th>
-						<th>Total</th>
-						<th class="text-nowrap">S/ {{ parseFloat(suma).toFixed(2) }}</th>
-						<th></th>
-					</tr>
-				</tfoot>
 			</table>
 		</div>
-		<table class="table table-hover w-100 mt-1" id="table_export2">
-			<thead class="">
-				<tr class="">
-					<th class="text-warning" colspan="15"><i class="fas fa-angle-right"></i> Cuadro de salidas de dinero</th>
-				</tr>
-				<tr>
-					<td class="text-warning d-print-none" v-if="esAdmin">@</td>
-					<td class="text-warning">N°</td>
-					<td class="text-warning"><i class="far fa-user"></i> | Registro</td>
-					<td class="text-warning">Fact. Bol.</td>
-					<td class="text-warning">Ticket</td>
-					<td class="text-warning">Cliente - Motivo</td>
-					<td class="text-warning">Obs.</td>
-					<td class="text-warning">Monto</td>
-					<td class="text-warning">Motivo</td>
-					<td class="text-warning">Medio de pago</td>
-					<td class="text-warning">N° Op.</td>
-					<td class="text-warning">Hora</td>
-					<td class="text-warning d-print-none">@</td>
-				</tr>
-			</thead>
-			<tbody>
-					<tr v-for="(payment, index) in filteredSalidas">
-						<td class="d-print-none" v-if="esAdmin">
-							<button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalMotivoBorrar" ><i class="fa-solid fa-xmark"></i></button>
-						</td>
-						<td>
-							<span>{{index+1}}</span>
-						</td>
-						<td v-if="payment.usuario" style="white-space: nowrap;" :title="payment.usuario.nombre" data-bs-toggle="tooltip" data-bs-placement="top" :data-bs-title="payment.usuario.nombre" ><i class="far fa-user"></i> {{payment.created_at | formatedDate}}</td>
-						<td v-else style="white-space: nowrap;" title="Sin datos" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Sin datos">{{payment.created_at | formatedDate}}</td>
-						<td>{{payment.voucher}}</td>
 
-						<td>{{ payment.id}}</td>
-						<td class="text-capitalize">{{ payment.customer }} <span v-if="payment.observation!=''"></span></td>
-						<!-- <td v-if="payment.pay_status == 1">Sin cancelar</td>
-							<td v-else-if="payment.pay_status == 2">Cancelado</td> -->
-						<td class="text-capitalize">
-							<span> {{ payment.observation }} </span>
-							<span v-if="payment.descuento>0" > {{ payment.motivoDescuento }} S/ {{ parseFloat(payment.descuento).toFixed(2) }} </span>
-							<span v-if="payment.rebaja>0" > {{ payment.motivoRebaja }} S/ {{ parseFloat(payment.rebaja).toFixed(2) }} </span>
-						</td>
-						<td :class="{'text-danger' : payment.type==6, 'text-primary': payment.type!=6}">S/ <span v-if="payment.type==6">-</span> {{ retornarFloat(payment.price)}}</td>
-						<td>
-							
-							<span v-if="payment.type==6">Salida de dinero</span>
-						</td>
-						<td class="text-capitalize"> <span>{{queMoneda(payment.moneda)}}</span> </td>
-						<td>{{ payment.voucher_issued }}</td>
-						<td>{{ horaLatam(payment.created_at) }}</td>
-						<td class="d-print-none" style="white-space: nowrap">
-							<button class="btn btn-outline-success btn-sm" data-bs-toggle="offcanvas" data-bs-target="#offAdjunto"  @click="verAdjunto(payment.id)" title="Adjuntar archivo"><i class="far fa-file"></i></button>
-							<button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarPago" @click="editar(payment.originalIndex)"><i class="fa-solid fa-pen-to-square"></i></button>
-							<a v-if="payment.appointment_id!==0" target="_blank" :href="`/api/pdfCupon/${payment.appointment_id}?token=${token}`" class="btn btn-danger btn-sm"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-							<a target="_blank" :href="`/api/pdfExtraCupon/${payment.id}?token=${token}`" class="btn btn-danger btn-sm"><i class="fa-solid fa-file-pdf"></i> PDF</a>
-						</td>
-					</tr>
-			</tbody>
-			<tfoot>
-				<tr v-for="tipo in sumaSalidas">
-					<th colspan="7"></th>
-					<th>{{ tipo.moneda }}</th>
-					<th>S/ {{ tipo.suma.toFixed(2) }}</th>
-					<th></th>
-				</tr>
-				<tr>
-					<th colspan="7"></th>
-					<th>Total</th>
-					<th>S/ {{ parseFloat(sumaSal).toFixed(2) }}</th>
-					<th></th>
-				</tr>
-			</tfoot>
-		</table>
+		<!-- Resumen de totales -->
+		<div class="row mt-4 mb-4" v-if="unifiedTransactions.length > 0">
+			<div class="col-md-6">
+				<div class="card border-0 shadow-sm p-3">
+					<h6 class="text-primary fw-bold mb-3"><i class="fas fa-list-check me-2"></i>Resumen por Moneda (Ingresos)</h6>
+					<div v-for="tipo in sumaTipos" :key="tipo.moneda" class="d-flex justify-content-between mb-1">
+						<span class="text-muted">{{ tipo.moneda }}:</span>
+						<span class="fw-bold">S/ {{ tipo.suma.toFixed(2) }}</span>
+					</div>
+					<hr>
+					<div class="d-flex justify-content-between">
+						<span class="fw-bold">Total Ingresos:</span>
+						<span class="text-primary fw-bold">S/ {{ parseFloat(suma).toFixed(2) }}</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6" v-if="sumaSalidas.length > 0">
+				<div class="card border-0 shadow-sm p-3">
+					<h6 class="text-danger fw-bold mb-3"><i class="fas fa-list-check me-2"></i>Resumen por Moneda (Egresos)</h6>
+					<div v-for="tipo in sumaSalidas" :key="tipo.moneda" class="d-flex justify-content-between mb-1">
+						<span class="text-muted">{{ tipo.moneda }}:</span>
+						<span class="fw-bold">S/ {{ tipo.suma.toFixed(2) }}</span>
+					</div>
+					<hr>
+					<div class="d-flex justify-content-between">
+						<span class="fw-bold">Total Egresos:</span>
+						<span class="text-danger fw-bold">S/ {{ parseFloat(sumaSal).toFixed(2) }}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<p class="mt-2 text-danger" v-if="eliminados.length>0"><strong>Pagos eliminados</strong></p>
 		<table class="table table-hover w-100 mt-1" id="table_eliminados" v-if="eliminados.length>0">
 			<thead class="">
@@ -393,7 +371,7 @@ export default{
 			filtroActual: 'Todos',
 			payments:[], sumaTipos:[], sumaSalidas:[], salidas:[], monedas:['Efectivo', 'Depósito bancario',  'POS', 'Aplicativo Yape', 'Banco: BCP', 'Banco: BBVA', 'Banco: Interbank', 'Banco: Nación', 'Banco: Scotiabank', 'Aplicativo Plin', 'Open pay'], idSeleccionado:-1,
 			idUsuario: null, tienePrivilegios: null, razon:'', queId:null, queINdex:null, contenido:'', eliminados:[], caso:{id:-1,index:-1,moneda:1, boleta:'', comprobante:'', observacion:'', tipo:-1}, foto:'', habilitarEliminado:false, fecha:moment().format('YYYY-MM-DD'), monedas:[], idSede:1, pagoSeleccionado:null,
-			buscarVacio:true
+			buscarVacio:true, token: localStorage.getItem('token')
 		}
 	},
 	name: 'HomePagos',
@@ -518,7 +496,47 @@ export default{
 
 			queMoneda(idMoneda){
 				return this.monedas.find(x=> x.id == idMoneda)?.tipo
+			},
+			getDisplayType(payment) {
+				if (payment.type == 8) return 'Adelanto';
+				if (payment.type == 5) return 'Cita';
+				if ([1, 2, 7, 15].includes(payment.type)) return 'Cuota';
+				if (payment.type == 4) return 'Ing. Extra';
+				if (payment.type == 6) return 'Egr. Extra';
+				return 'Otro';
+			},
+			getDisplayIcon(payment) {
+				if (payment.type == 8) return 'fa-clock';
+				if (payment.type == 5) return 'fa-calendar-check';
+				if ([1, 2, 7, 15].includes(payment.type)) return 'fa-receipt';
+				if (payment.type == 4) return 'fa-arrow-up-long';
+				if (payment.type == 6) return 'fa-arrow-down-long';
+				return 'fa-circle-info';
+			},
+			getBadgeClass(payment) {
+				if (payment.type == 8) return 'badge-adelanto';
+				if (payment.type == 5) return 'badge-cita';
+				if ([1, 2, 7, 15].includes(payment.type)) return 'badge-cuota';
+				if (payment.type == 4) return 'badge-ingreso';
+				if (payment.type == 6) return 'badge-egreso';
+				return 'badge-secondary';
+			},
+			getIconBoxClass(payment) {
+				if (payment.type == 8) return 'icon-adelanto';
+				if (payment.type == 5) return 'icon-cita';
+				if ([1, 2, 7, 15].includes(payment.type)) return 'icon-cuota';
+				if (payment.type == 4) return 'icon-ingreso';
+				if (payment.type == 6) return 'icon-egreso';
+				return 'icon-otros';
+			},
+			getDisplayTitle(payment) {
+				if (payment.type == 5 || payment.type == 8) {
+					let motivo = payment.detalle || 'Cita';
+					return `${motivo} - ${payment.customer}`;
+				}
+				return payment.observation || payment.customer || 'Sin descripción';
 			}
+
 	},
 	mounted(){
 		this.getAllExtraPayments()
@@ -568,6 +586,46 @@ export default{
 			
 			return result;
 		},
+		unifiedTransactions() {
+			let combined = [];
+			
+			// Add income (payments)
+			this.filteredPayments.forEach(p => {
+				combined.push({
+					...p,
+					isIncome: p.type != 6,
+					displayType: this.getDisplayType(p),
+					displayIcon: this.getDisplayIcon(p),
+					displayBadgeClass: this.getBadgeClass(p),
+					iconBoxClass: this.getIconBoxClass(p),
+					displayAmount: p.price,
+					displayTitle: this.getDisplayTitle(p),
+					source: 'payments'
+				});
+			});
+
+			// Add expenses (salidas)
+			this.filteredSalidas.forEach(s => {
+				// Avoid duplicates if any (though usually separate)
+				if (!combined.find(p => p.id === s.id && p.source === 'payments')) {
+					combined.push({
+						...s,
+						isIncome: false,
+						displayType: 'Egr. Extra',
+						displayIcon: this.getDisplayIcon({type: 6}),
+						displayBadgeClass: this.getBadgeClass({type: 6}),
+						iconBoxClass: this.getIconBoxClass({type: 6}),
+						displayAmount: s.price,
+						displayTitle: s.observation || s.customer || 'Salida de dinero',
+						source: 'salidas'
+					});
+				}
+			});
+
+			// Sort by ID descending
+			return combined.sort((a, b) => b.id - a.id);
+		},
+
 		totalIngresosStats() {
 			if(this.payments.length > 0){
 				return this.payments.reduce((suma, item)=>{
@@ -670,6 +728,157 @@ export default{
 	}
 }
 </script>
-<style>
+<style scoped>
+.table-pagos {
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    width: 100%;
+}
+.table-pagos thead th {
+    border: none !important;
+    color: #adb5bd !important;
+    font-weight: 500 !important;
+    font-size: 0.85rem !important;
+    padding: 10px 15px !important;
+    text-transform: capitalize;
+    background: transparent !important;
+}
+.table-pagos tbody tr {
+    background: white;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+.table-pagos tbody tr:hover {
+    background: #fdfdfd;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+}
+.table-pagos td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-top: 1px solid #f1f3f5;
+    border-bottom: 1px solid #f1f3f5;
+    color: #495057;
+}
+.table-pagos td:first-child {
+    border-left: 1px solid #f1f3f5;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+.table-pagos td:last-child {
+    border-right: 1px solid #f1f3f5;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
 
-</style>
+/* Ticket style */
+.ticket-id {
+    color: #adb5bd;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* Hora style */
+.hora-txt {
+    font-weight: 700;
+    color: #212529;
+}
+
+/* Concepto */
+.concepto-container {
+    display: flex;
+    align-items: center;
+}
+.icon-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    font-size: 1.1rem;
+}
+.icon-cita { background-color: #e7fcf0; color: #2ecc71; }
+.icon-adelanto { background-color: #fff8e1; color: #ffc107; }
+.icon-cuota { background-color: #f3f0ff; color: #9b59b6; }
+.icon-egreso { background-color: #fff0f0; color: #e74c3c; }
+.icon-ingreso { background-color: #e8f5e9; color: #27ae60; }
+.icon-otros { background-color: #f0f4ff; color: #3498db; }
+
+.concepto-info .title {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 2px;
+    text-transform: capitalize;
+}
+.concepto-info .subtitle {
+    display: block;
+    font-size: 0.75rem;
+    color: #95a5a6;
+}
+
+/* Badges */
+.badge-custom {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: capitalize;
+    display: inline-block;
+}
+.badge-cita { background-color: #e3f2fd; color: #1976d2; }
+.badge-adelanto { background-color: #fff3e0; color: #f57c00; }
+.badge-cuota { background-color: #e0f7fa; color: #00838f; }
+.badge-egreso { background-color: #ffebee; color: #c62828; }
+.badge-ingreso { background-color: #e8f5e9; color: #2e7d32; }
+
+/* Monto */
+.monto-txt {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+.monto-positivo { color: #2ecc71; }
+.monto-negativo { color: #e74c3c; }
+
+/* Actions */
+.btn-action {
+    color: #adb5bd;
+    background: transparent;
+    border: none;
+    padding: 5px 8px;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+}
+.btn-action:hover {
+    color: #3498db;
+}
+
+.dropdown-action .dropdown-toggle::after {
+    display: none;
+}
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    padding: 8px;
+}
+.dropdown-item {
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    color: #495057;
+}
+.dropdown-item i {
+    width: 20px;
+    margin-right: 8px;
+    color: #adb5bd;
+}
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+.dropdown-item:hover i {
+    color: #3498db;
+}
+</style>

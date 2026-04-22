@@ -149,116 +149,163 @@
             </div>
         </div>
 
-		<p class="mt-3 mb-1 font-weight-bold text-dark">Últimos pacientes registrados</p>
-    <table class="table table-hover mt-4">
-      <thead>
-        <tr>
-          <th>N°</th>
-          <th>Nombre y apellidos</th>
-          <th>Acuerdos</th>
-          <th>Hobbie</th>
-          <th>Club</th>
-          <th>Paquete</th>
-          <th>Semáforo</th>
-          <th>Triaje</th>
-          <th>Faltas</th>
-          <th>Reprog.</th>
-          <th>Recetas</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(paciente, index) in busqueda" :key = "index">
-          <th>{{ index+1 }}</th>
+		<p class="mt-4 mb-3 font-weight-bold text-dark" style="font-size: 1.1rem;">Últimos pacientes registrados</p>
+    
+    <div class="table-responsive custom-table-container">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th class="text-uppercase text-xs font-weight-bolder opacity-7 ps-4">Paciente</th>
+            <th class="text-uppercase text-xs font-weight-bolder opacity-7 text-center">Estado</th>
+            <th class="text-uppercase text-xs font-weight-bolder opacity-7 text-center">Próxima Cita</th>
+            <th class="text-uppercase text-xs font-weight-bolder opacity-7 text-center">Deuda</th>
+            <th class="text-uppercase text-xs font-weight-bolder opacity-7 text-center">Última Visita</th>
+            <th class="text-uppercase text-xs font-weight-bolder opacity-7 text-end pe-4">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(paciente, index) in busqueda" :key="index" class="patient-row">
+            <!-- PACIENTE -->
+            <td class="ps-4 py-3">
+              <div class="d-flex align-items-center">
+                <div class="avatar-circle me-3" :class="getAvatarBg(index)">
+                  {{ getInitials(paciente.name || paciente.nombres) }}
+                </div>
+                <div class="d-flex flex-column">
+                  <h6 class="mb-0 text-sm font-weight-bold text-dark text-capitalize clickable-name" @click="abrirDetallePaciente(paciente)">
+                    <i v-if="paciente.vivo==0" class="fas fa-cross me-1 text-muted"></i>
+                    {{ (paciente.name + ' ' + (paciente.nombres || '')).trim().toLowerCase() }}
+                  </h6>
+                  <p class="text-xs text-secondary mb-0">
+                    {{ calculateAge(paciente.birth_date) }} años • {{ paciente.gender == 1 ? 'Masculino' : (paciente.gender == 0 ? 'Femenino' : 'Other') }}
+                  </p>
+                </div>
+              </div>
+            </td>
 
-					<td class="text-capitalize" @click="abrirDetallePaciente(paciente)" style="cursor:pointer">
-						<span v-if="paciente.vivo==0"><i class="fas fa-cross"></i></span>  
-						{{ paciente.name ? paciente.name.toUpperCase() : 'SIN NOMBRE' }} {{ paciente.nombres ? paciente.nombres.toUpperCase() : '' }}
-					</td>
-					<td>
-						<button class="btn btn-outline-primary btn-circle btn-md" title="Ver acuerdos" data-bs-toggle="modal" data-bs-target="#modalAcuerdos"
-						@click="dataPaciente = paciente" ><i class="fa-solid fa-handshake-angle"></i></button>
-					</td>
+            <!-- ESTADO -->
+            <td class="text-center">
+              <span class="badge badge-pill badge-status-active">
+                <i class="fas fa-heart me-1"></i> Activo
+              </span>
+            </td>
 
-<!--			
-<td class="text-capitalize" @click="dataProps(paciente)" data-bs-toggle="modal" data-bs-target="#patientModal" style="cursor:pointer"><span v-if="paciente.vivo==0"><i class="fas fa-cross"></i></span>  {{ paciente.name ? lowerCase(paciente.name) : 'Sin nombre' }} {{ lowerCase(paciente.nombres) }}</td>
--->
-					<td>
-						<button v-if="paciente.vivo==1"  class="btn btn-outline-primary btn-circle btn-md" title="Panel de Hobbies" data-bs-toggle="modal" data-bs-target="#modalVerHobbies" @click="misHobbies=JSON.parse(paciente.hobbies); queId = paciente.id; this.$emit('cargarHobbies')">
-							<i class="fa-solid fa-baseball-bat-ball"></i>
-						</button>
-					</td>
-					<td v-if="paciente.vivo==1" >
-						<button class="btn btn-light" v-if="paciente.club=='0'" data-bs-toggle="modal" data-bs-target="#editarClub" @click="datosLike(paciente.club, paciente.id)"><i class="fa-regular fa-hand-back-fist"></i></button>
-						<button class="btn btn-primary" v-if="paciente.club=='1'" data-bs-toggle="modal" data-bs-target="#editarClub" @click="datosLike(paciente.club, paciente.id)"><i class="fa-solid fa-thumbs-up"></i></button>
-						<button class="btn btn-danger" v-if="paciente.club=='2'" data-bs-toggle="modal" data-bs-target="#editarClub" @click="datosLike(paciente.club, paciente.id)"><i class="fa-solid fa-thumbs-down"></i></button>
-					</td>
-					<td v-else></td>
-					<td>
-						<button v-if="paciente.vivo==1" class="btn btn-outline-primary btn-circle"  data-bs-toggle="offcanvas" data-bs-target="#offVerMembresias" @click="queId = paciente.id; nombrePaciente= paciente.name + ' ' + paciente.nombres; dataPaciente = paciente"><i class="far fa-star"></i></button>
-					</td>
-					<td v-if="paciente.vivo==1" >
-						<div v-if="paciente.semaforo[0]">
-							<button v-if="paciente.semaforo[0].codigo==1" class="btn btn-primary btn-circle btn-md" data-bs-toggle="modal" data-bs-target="#modalVerEstados" @click="dataProps(paciente)">
-								<span  title="Neutro"><i class="fas fa-smile"></i></span>
-							</button>
-							<button v-if="paciente.semaforo[0].codigo==2" class="btn btn-success btn-circle btn-md" data-bs-toggle="modal" data-bs-target="#modalVerEstados" @click="dataProps(paciente)">
-								<span title="Cumplidor"> <i class="fas fa-laugh-wink"></i> </span>
-							</button>
-							<button v-if="paciente.semaforo[0].codigo==3" class="btn btn-success btn-circle btn-md" data-bs-toggle="modal" data-bs-target="#modalVerEstados" @click="dataProps(paciente)">
-								<span title="Promotor"> <i class="fas fa-laugh-wink"></i> </span>
-							</button>
-							<button v-if="paciente.semaforo[0].codigo==4" class="btn btn-success btn-circle btn-md" data-bs-toggle="modal" data-bs-target="#modalVerEstados" @click="dataProps(paciente)">
-								<span title="Wow"> <i class="fas fa-laugh-wink"></i> </span>
-							</button>
-							<button v-if="paciente.semaforo[0].codigo==5" class="btn btn-warning btn-circle btn-md" data-bs-toggle="modal" data-bs-target="#modalVerEstados" @click="dataProps(paciente)">
-								<span title="Reprogramador"> <i class="fas fa-meh"></i> </span> 
-							</button>
-							<button v-if="paciente.semaforo[0].codigo==6" class="btn btn-warning btn-circle btn-md" data-bs-toggle="modal" data-bs-target="#modalVerEstados" @click="dataProps(paciente)">
-								<span title="Exigente"> <i class="fas fa-meh"></i> </span>
-							</button>
-							<button v-if="paciente.semaforo[0].codigo==7" class="btn btn-danger btn-circle btn-md" data-bs-toggle="modal" data-bs-target="#modalVerEstados" @click="dataProps(paciente)">
-								<span title="Deudor"> <i class="fas fa-angry"></i> </span>
-							</button>
-							<button v-if="paciente.semaforo[0].codigo==8" class="btn btn-warning btn-circle btn-md" data-bs-toggle="modal" data-bs-target="#modalVerEstados" @click="dataProps(paciente)">
-								<span title="Insatisfecho"> <i class="fas fa-frown"></i> </span>
-							</button>
-							<button v-if="paciente.semaforo[0].codigo==9" class="btn btn-danger btn-circle btn-md" data-bs-toggle="modal" data-bs-target="#modalVerEstados" @click="dataProps(paciente)">
-								<span title="Paciente de riesgo"> <i class="fas fa-frown"></i> </span>
-							</button>
-							<button v-if="paciente.semaforo[0].codigo==10" class="btn btn-danger btn-circle btn-md" data-bs-toggle="modal" data-bs-target="#modalVerEstados" @click="dataProps(paciente)">
-								<span title="Problemático"> <i class="fas fa-frown"></i> </span>
-							</button>
-						</div>
-						<div v-else>
-							<button class="btn btn-secondary btn-circle btn-md" data-bs-toggle="modal" data-bs-target="#modalVerEstados" @click="dataProps(paciente)">
-								<span title="Normal sin registro"><i class="fas fa-smile"></i></span>
-							</button>
-						</div>
-					</td>
-					<td v-else></td>
-					<td>
-						<button class="btn btn-outline-secondary btn-circle btn-md" data-bs-toggle="modal" data-bs-target="#modalVerTriajesViejos" title="Historial de Triajes" @click="verTriajesViejos(index)">{{ paciente.triajes.length }}</button>
-						<button v-if="paciente.vivo==1"  class="btn btn-outline-info btn-circle btn-md" data-bs-toggle="modal" @click="dataProps(paciente)" data-bs-target="#modalTriaje" title="Nuevo triaje"><i class="fa-solid fa-lungs"></i></button>
-					</td>
-          <td>
-            <button class="btn btn-outline-info btn-circle btn-md" data-bs-toggle="modal" data-bs-target="#modalVerFaltas" @click="queId=paciente.id; cantFaltas = paciente.faults;" >{{ paciente.faults }} </button>
-          </td>
-					<td>
-						<button class="btn btn-outline-secondary btn-circle btn-md" data-bs-toggle="modal" data-bs-target="#modalVerReprogramacionesViejos" title="Historial de Reprogramaciones" @click="verReprogramacionesViejos(paciente.id)">{{ paciente.reprogramaciones }}</button>
-					</td>
-          <td>
-            <button
-            class="btn btn-outline-info btn-circle btn-md"
-            @click="dataProps(paciente)"
-            data-bs-toggle="modal"
-            data-bs-target="#recetasModal"
-            >
-            <i class="fa-solid fa-flask-vial"></i></button>
-          </td>
-         
-        </tr>
-      </tbody>
-    </table>
+            <!-- PRÓXIMA CITA -->
+            <td class="text-center">
+              <span class="text-xs font-weight-bold text-secondary">Sin cita</span>
+            </td>
+
+            <!-- DEUDA -->
+            <td class="text-center">
+              <span class="text-xs font-weight-bold text-dark">S/ 0.00</span>
+            </td>
+
+            <!-- ÚLTIMA VISITA -->
+            <td class="text-center">
+              <span class="text-xs font-weight-bold text-secondary">{{ formatDate(paciente.created_at) }}</span>
+            </td>
+
+            <!-- ACCIONES -->
+            <td class="text-end pe-4">
+              <div class="d-flex justify-content-end align-items-center gap-2">
+                <!-- Quick View -->
+                <button class="btn btn-link text-secondary p-0 mb-0" @click="abrirDetallePaciente(paciente)" title="Ver detalle">
+                  <i class="far fa-eye text-lg"></i>
+                </button>
+                
+                <!-- Quick Chat -->
+                <button class="btn btn-link text-secondary p-0 mb-0" title="Enviar mensaje">
+                  <i class="far fa-comment-dots text-lg"></i>
+                </button>
+
+                <!-- More Actions Dropdown -->
+                <div class="dropdown">
+                  <button class="btn btn-link text-secondary p-0 mb-0" type="button" :id="'dropdownMenu' + index" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v text-lg"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" :aria-labelledby="'dropdownMenu' + index">
+                    <li><h6 class="dropdown-header">Acciones del Paciente</h6></li>
+                    
+                    <!-- Acuerdos -->
+                    <li>
+                      <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalAcuerdos" @click="dataPaciente = paciente">
+                        <i class="fa-solid fa-handshake-angle me-2 text-primary"></i> Acuerdos
+                      </a>
+                    </li>
+
+                    <!-- Hobbies -->
+                    <li v-if="paciente.vivo==1">
+                      <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalVerHobbies" @click="misHobbies=JSON.parse(paciente.hobbies); queId = paciente.id; this.$emit('cargarHobbies')">
+                        <i class="fa-solid fa-baseball-bat-ball me-2 text-info"></i> Hobbies
+                      </a>
+                    </li>
+
+                    <!-- Club -->
+                    <li v-if="paciente.vivo==1">
+                      <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editarClub" @click="datosLike(paciente.club, paciente.id)">
+                        <template v-if="paciente.club=='0'"><i class="fa-regular fa-hand-back-fist me-2"></i> Club: Neutro</template>
+                        <template v-if="paciente.club=='1'"><i class="fa-solid fa-thumbs-up me-2 text-success"></i> Club: Like</template>
+                        <template v-if="paciente.club=='2'"><i class="fa-solid fa-thumbs-down me-2 text-danger"></i> Club: Dislike</template>
+                      </a>
+                    </li>
+
+                    <!-- Membresías -->
+                    <li v-if="paciente.vivo==1">
+                      <a class="dropdown-item" href="#" data-bs-toggle="offcanvas" data-bs-target="#offVerMembresias" @click="queId = paciente.id; nombrePaciente= paciente.name + ' ' + paciente.nombres; dataPaciente = paciente">
+                        <i class="far fa-star me-2 text-warning"></i> Paquetes / Membresías
+                      </a>
+                    </li>
+
+                    <!-- Semáforo / Actitud -->
+                    <li v-if="paciente.vivo==1">
+                      <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalVerEstados" @click="dataProps(paciente)">
+                        <i class="fas fa-traffic-light me-2"></i> Estado de Actitud
+                      </a>
+                    </li>
+
+                    <li><hr class="dropdown-divider"></li>
+                    <li><h6 class="dropdown-header">Clínica</h6></li>
+
+                    <!-- Triaje -->
+                    <li>
+                      <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalVerTriajesViejos" @click="verTriajesViejos(index)">
+                        <i class="fa-solid fa-clipboard-list me-2"></i> Historial Triajes ({{ paciente.triajes.length }})
+                      </a>
+                    </li>
+                    <li v-if="paciente.vivo==1">
+                      <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalTriaje" @click="dataProps(paciente)">
+                        <i class="fa-solid fa-lungs me-2 text-info"></i> Nuevo Triaje
+                      </a>
+                    </li>
+
+                    <!-- Faltas -->
+                    <li>
+                      <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalVerFaltas" @click="queId=paciente.id; cantFaltas = paciente.faults;">
+                        <i class="fas fa-user-times me-2 text-danger"></i> Faltas ({{ paciente.faults }})
+                      </a>
+                    </li>
+
+                    <!-- Reprogramaciones -->
+                    <li>
+                      <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalVerReprogramacionesViejos" @click="verReprogramacionesViejos(paciente.id)">
+                        <i class="fas fa-calendar-alt me-2 text-warning"></i> Reprogramaciones ({{ paciente.reprogramaciones }})
+                      </a>
+                    </li>
+
+                    <!-- Recetas -->
+                    <li>
+                      <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#recetasModal" @click="dataProps(paciente)">
+                        <i class="fa-solid fa-flask-vial me-2 text-primary"></i> Recetas
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     </div>
     
     <DetallePaciente 
@@ -524,7 +571,38 @@ export default {
 			.then(response=>{
 				this.reprogramaciones = response.data;
 			})
-		}
+		},
+    calculateAge(birthday) {
+      if (!birthday) return '0';
+      const birthDate = new Date(birthday);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    },
+    getInitials(name) {
+      if (!name) return '??';
+      const parts = name.trim().split(' ');
+      let initials = '';
+      for (let i = 0; i < parts.length && i < 2; i++) {
+        if (parts[i].length > 0 && parts[i] !== '') {
+          initials += parts[i][0].toUpperCase();
+        }
+      }
+      return initials || '??';
+    },
+    getAvatarBg(index) {
+      const bgs = ['bg-primary-soft', 'bg-success-soft', 'bg-info-soft', 'bg-warning-soft', 'bg-danger-soft'];
+      return bgs[index % bgs.length];
+    },
+    formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const options = { day: '2-digit', month: 'short', year: 'numeric' };
+      return new Date(dateStr).toLocaleDateString('es-ES', options);
+    }
   },
 	updated () {
 		this.actualizarDatos
@@ -537,3 +615,93 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.custom-table-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  padding: 1rem;
+}
+
+.table thead th {
+  border-bottom: 1px solid #f0f2f5;
+  color: #8392ab;
+  font-weight: 700;
+  padding: 1rem 0.5rem;
+}
+
+.patient-row {
+  transition: all 0.2s ease;
+}
+
+.patient-row:hover {
+  background-color: #f8fafc !important;
+}
+
+.clickable-name {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.clickable-name:hover {
+  color: #1e60ff !important;
+}
+
+.avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #1e60ff;
+}
+
+.bg-primary-soft { background-color: #eaf2ff; color: #1e60ff; }
+.bg-success-soft { background-color: #e8fdf5; color: #10b981; }
+.bg-info-soft { background-color: #e0f2fe; color: #0ea5e9; }
+.bg-warning-soft { background-color: #fef6e5; color: #f59e0b; }
+.bg-danger-soft { background-color: #fbe3e4; color: #ef4444; }
+
+.badge-status-active {
+  background-color: #e8fdf5;
+  color: #10b981;
+  font-weight: 600;
+  padding: 0.5em 1em;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.text-xs { font-size: 0.75rem !important; }
+.text-sm { font-size: 0.875rem !important; }
+.text-lg { font-size: 1.1rem !important; }
+
+.dropdown-item {
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #4a5568;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-item:hover {
+  background-color: #f7fafc;
+  color: #1e60ff;
+}
+
+.dropdown-header {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: #cbd5e0;
+  letter-spacing: 0.5px;
+  padding: 0.5rem 1rem;
+}
+
+.gap-2 { gap: 0.5rem !important; }
+</style>

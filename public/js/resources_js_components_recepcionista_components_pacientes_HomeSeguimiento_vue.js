@@ -802,13 +802,13 @@ var render = function render() {
         value: estado
       }
     }, [_vm._v(_vm._s(estado))]);
-  })], 2)])])])]), _vm._v(" "), _vm._m(1), _vm._v(" "), _c("div", {
+  })], 2)])])])]), _vm._v(" "), _c("div", {
     staticClass: "card"
   }, [_c("div", {
     staticClass: "table-responsive"
   }, [_c("table", {
     staticClass: "table table-hover mb-0"
-  }, [_vm._m(2), _vm._v(" "), _c("tbody", [_vm.cargando ? _c("tr", [_vm._m(3)]) : [_vm._l(_vm.pacientesFiltrados, function (item) {
+  }, [_vm._m(1), _vm._v(" "), _c("tbody", [_vm.cargando ? _c("tr", [_vm._m(2)]) : [_vm._l(_vm.pacientesFiltrados, function (item) {
     return _c("tr", {
       key: item.patient_id
     }, [_c("td", {
@@ -907,9 +907,9 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-redo-alt"
-  }), _vm._v(" Actualizar ")]), _vm._v(" "), _vm._m(4)])]), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm.interesados.length > 0 ? _c("table", {
+  }), _vm._v(" Actualizar ")]), _vm._v(" "), _vm._m(3)])]), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm.interesados.length > 0 ? _c("table", {
     staticClass: "table table-hover"
-  }, [_vm._m(6), _vm._v(" "), _c("tbody", _vm._l(_vm.interesados, function (interesado, index) {
+  }, [_vm._m(5), _vm._v(" "), _c("tbody", _vm._l(_vm.interesados, function (interesado, index) {
     return _c("tr", {
       directives: [{
         name: "show",
@@ -957,7 +957,7 @@ var render = function render() {
     })]) : _vm._e()])]);
   }), 0)]) : _c("p", {
     staticClass: "my2"
-  }, [_vm._v("No hay registros")]), _vm._v(" "), _vm._m(7), _vm._v(" "), _c("div", {
+  }, [_vm._v("No hay registros")]), _vm._v(" "), _vm._m(6), _vm._v(" "), _c("div", {
     staticClass: "d-flex"
   }, [_c("div", {
     staticClass: "btn-group d-none",
@@ -1026,7 +1026,7 @@ var render = function render() {
     staticClass: "far fa-times-circle"
   }), _vm._v(" Sin respuestas")])])]), _vm._v(" "), _vm.anteriores.length > 0 ? _c("table", {
     staticClass: "table table-hover"
-  }, [_vm._m(8), _vm._v(" "), _c("tbody", _vm._l(_vm.anteriores, function (interesado, index) {
+  }, [_vm._m(7), _vm._v(" "), _c("tbody", _vm._l(_vm.anteriores, function (interesado, index) {
     return _c("tr", {
       directives: [{
         name: "show",
@@ -1109,20 +1109,6 @@ var staticRenderFns = [function () {
   }, [_vm._v("Seguimiento CRM")]), _vm._v(" "), _c("p", {
     staticClass: "text-muted mb-0"
   }, [_vm._v("Gestión de seguimiento, fidelización y recuperación de pacientes")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "alert alert-primary bg-light border"
-  }, [_c("p", {
-    staticClass: "mb-1 fw-bold"
-  }, [_vm._v("📋 Criterios de Fidelización:")]), _vm._v(" "), _c("ul", {
-    staticClass: "mb-2"
-  }, [_c("li", [_c("strong", [_vm._v("Psicología:")]), _vm._v(" ≥1 mes desde primera atención + ≥4 citas → Fidelizado.")]), _vm._v(" "), _c("li", [_c("strong", [_vm._v("Psiquiatría:")]), _vm._v(" ≥60 días desde primera atención + ≥2 citas → Fidelizado.")]), _vm._v(" "), _c("li", [_c("strong", [_vm._v("Otros:")]), _vm._v(" ≥1 mes desde primera atención + <4 citas → No Fidelizado.")])]), _vm._v(" "), _c("p", {
-    staticClass: "mb-1 fw-bold"
-  }, [_vm._v("⚠ Criterios de Recuperación:")]), _vm._v(" "), _c("ul", {
-    staticClass: "mb-0"
-  }, [_c("li", [_c("strong", [_vm._v("Psicología:")]), _vm._v(" No viene hace ≥3 meses → Estado Inactivo.")]), _vm._v(" "), _c("li", [_c("strong", [_vm._v("Psiquiatría:")]), _vm._v(" No viene hace ≥6 meses → Estado Inactivo.")]), _vm._v(" "), _c("li", [_c("strong", [_vm._v("Otros:")]), _vm._v(" No viene hace ≥3 meses → Estado Inactivo.")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
