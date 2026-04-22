@@ -5942,7 +5942,7 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
                     mapProf[row.profesional][indexDia] = row.total;
                   }
                 });
-                _this.profesionalesCount = uniqueProfs.size + 1;
+                _this.profesionalesCount = uniqueProfs.size;
                 colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
                 dsets = [];
                 cId = 0;

@@ -297,7 +297,7 @@ export default {
                           mapProf[row.profesional][indexDia] = row.total;
                       }
                   });
-                  this.profesionalesCount = uniqueProfs.size + 1;
+                  this.profesionalesCount = uniqueProfs.size;
 
                   const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
                   let dsets = [];

@@ -472,6 +472,7 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
 
 
 
+//Code.
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'HomePacientes',
   data: function data() {
