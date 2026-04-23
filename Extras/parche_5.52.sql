@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS chat_recepcion(
+    id BIGINT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    patient_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    mensaje LONGTEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (patient_id) REFERENCES patients(id)
+);

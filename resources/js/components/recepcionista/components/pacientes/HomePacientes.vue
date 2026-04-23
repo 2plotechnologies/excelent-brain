@@ -192,12 +192,14 @@
 
             <!-- PRÓXIMA CITA -->
             <td class="text-center">
-              <span class="text-xs font-weight-bold text-secondary">Sin cita</span>
+              <span v-if="paciente.proximaCita && paciente.proximaCita.length > 0" class="text-xs font-weight-bold text-secondary"> {{ formatDate(paciente.proximaCita[0].date) }}</span>
+              <span v-else class="text-xs font-weight-bold text-secondary">Sin cita</span>
             </td>
 
             <!-- DEUDA -->
             <td class="text-center">
-              <span class="text-xs font-weight-bold text-dark">S/ 0.00</span>
+              <span v-if="paciente.deudaTotal > 0" class="text-xs font-weight-bold text-danger">S/ {{ paciente.deudaTotal.toFixed(2) }}</span>
+              <span v-else class="text-xs font-weight-bold text-secondary">S/ 0.00</span>
             </td>
 
             <!-- ÚLTIMA VISITA -->
@@ -214,7 +216,7 @@
                 </button>
                 
                 <!-- Quick Chat -->
-                <button class="btn btn-link text-secondary p-0 mb-0" title="Enviar mensaje">
+                <button class="btn btn-link text-secondary p-0 mb-0" data-bs-toggle="modal" data-bs-target="#modalChat" @click="dataPaciente=paciente" title="Enviar mensaje">
                   <i class="far fa-comment-dots text-lg"></i>
                 </button>
 
@@ -328,6 +330,7 @@
 		<ModalVerHobbies :hobbies="hobbies" :id="queId" :misHobbies="misHobbies" ></ModalVerHobbies>
 		<OffVerMembresias :queId="queId" :nombrePaciente="nombrePaciente" :idUser="$attrs.idUser" :profesional="profesionales" :paciente="dataPaciente"></OffVerMembresias>
 		<ModalAcuerdos :paciente="dataPaciente" :idUser="$attrs.idUser"></ModalAcuerdos>
+    <ModalChat :patient="dataPaciente"></ModalChat>
 		
   </main>
 </template>
@@ -353,6 +356,7 @@ import ModalVerFaltas from './reportes/ModalVerFaltas.vue'
 import ModalVerHobbies from './reportes/ModalVerHobbies.vue'
 import OffVerMembresias from './OffVerMembresias.vue';
 import ModalAcuerdos from './ModalAcuerdos.vue';
+import ModalChat from './ModalChat.vue';
 //Code.
 export default {
   name: 'HomePacientes',
@@ -438,14 +442,13 @@ export default {
     }
   },
 
-  components: { Doughnut, Bar, DetallePaciente, ModalEdicionPaciente, ModalRecetas, ModalFaltas, ModalTriaje, ModalVerTriajesViejos, ModalNewPatient, ModalVerEstados, ModalCambiarLike, ModalVerFaltas, ModalVerHobbies, ModalVerReprogramacionesViejos, OffVerMembresias, ModalAcuerdos },
+  components: { Doughnut, Bar, DetallePaciente, ModalEdicionPaciente, ModalRecetas, ModalFaltas, ModalTriaje, ModalVerTriajesViejos, ModalNewPatient, ModalVerEstados, ModalCambiarLike, ModalVerFaltas, ModalVerHobbies, ModalVerReprogramacionesViejos, OffVerMembresias, ModalAcuerdos, ModalChat },
 
   props: {
     profesionales:null
   },
 
   methods: {
-
     async fetchDashboardPacientes() {
         try {
             let res = await this.axios.get('/api/dashboardModuloPacientes');
@@ -612,7 +615,7 @@ export default {
 		this.listarprofesional();
 		this.hobbies.sort();
     this.fetchDashboardPacientes();
-  }
+  },
 }
 </script>
 

@@ -164,6 +164,20 @@ class PatientController extends Controller
 			//$semaforo = DB::table('semaforo')->where('patient_id', $patient->id )->where('activo',1)->orderBy('registro', 'desc')->get();
 			//$patient->semaforo = $semaforo;
 
+			//Obtener proxima cita.
+			$proximaCita = Appointment::where('patient_id', $patient->id)
+			->where('date', '>=', date('Y-m-d'))
+			->orderBy('date', 'asc')->take(1)
+			->get();
+			$patient->proximaCita = $proximaCita;
+
+			//Deuda de paciente (Total).
+			$deudaTotal = DB::table('deudas')
+			->where('patient_id', $patient->id)
+			->where('activo', 1)
+			->sum('monto');
+			$patient->deudaTotal = $deudaTotal;
+
 			$conteo= Appointment::where('patient_id', $patient->id)
 			->where('status', 4)
 			->get();
@@ -205,6 +219,20 @@ class PatientController extends Controller
 			$patient->triajes = $triaje ;
 			$semaforo = DB::table('semaforo')->where('patient_id', $patient->id )->where('activo',1)->orderBy('registro', 'desc')->get();
 			$patient->semaforo = $semaforo;
+
+			//Obtener proxima cita.
+			$proximaCita = Appointment::where('patient_id', $patient->id)
+			->where('date', '>=', date('Y-m-d'))
+			->orderBy('date', 'asc')->take(1)
+			->get();
+			$patient->proximaCita = $proximaCita;
+
+			//Deuda de paciente (Total).
+			$deudaTotal = DB::table('deudas')
+			->where('patient_id', $patient->id)
+			->where('activo', 1)
+			->sum('monto');
+			$patient->deudaTotal = $deudaTotal;
 
 			$conteo= Appointment::where('patient_id', $patient->id)
 			->where('status', 4)

@@ -29,6 +29,7 @@ use App\Http\Controllers\LimboController;
 use App\Http\Controllers\SimpleController;
 use App\Http\Controllers\PaqueteController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ChatRecepcionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -97,6 +98,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/pedirArchivosTriaje', [PatientController::class, 'pedirArchivosTriaje']);
         Route::get('xlsx_recep/{date}', [PatientController::class, 'createXlsx']);
         Route::get('patient/{id}/full-details', [PatientController::class, 'getFullPatientDetails']);
+        Route::get('chat/{patient_id}', [ChatRecepcionController::class, 'getChat']);
+        Route::post('chat', [ChatRecepcionController::class, 'addMessage']);
 
         // Admin-only patient routes
         Route::middleware('role:administrador,recepcionista')->group(function () {
