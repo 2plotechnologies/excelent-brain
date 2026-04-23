@@ -93,10 +93,18 @@
 								<a v-else :href="`/api/pdfEvolution/restricted/${historia.id}?token=${$token}`" class="btn btn-primary btn-circle" title="Generar PDF para evoluciones" target="_blank"> <i class="fas fa-file-pdf"></i> </a>
 								<a v-if="dataUser.profession!='Psicólogo'" :href="`/profesional/recetas/${historia.id}`" class="btn btn-primary btn-circle" title="Generar receta"><i class="fa-solid fa-vial"></i></a>
 								<button 
-                @click="prepararPaciente(historia)" class="btn btn-info btn-circle" title="Agregar triaje" >
-                <i class="fa-solid fa-shield-heart"></i>
-								<!-- data-bs-toggle="modal" data-bs-target="#modalTriaje" -->
-                </button>
+									@click="prepararPaciente(historia)" class="btn btn-info btn-circle" title="Agregar triaje" >
+									<i class="fa-solid fa-shield-heart"></i>
+													<!-- data-bs-toggle="modal" data-bs-target="#modalTriaje" -->
+								</button>
+								<!--Cargar mensajes del chat de recepcionista a profesional.-->
+								<a 
+									class="btn btn-success btn-circle"
+									title="Ver chat"
+									@click="abrirChat(historia)"
+									>
+									<i class="fa-solid fa-comment-dots"></i>
+								</a>
 							</div>
 						</div>
 					</div>
@@ -105,6 +113,7 @@
 		</div>
 
     <modal-triaje v-if="datosPaciente" :dataPatient="datosPaciente" :profesionales="profesionales" ></modal-triaje>
+	<modal-chat :patient="datosPaciente"></modal-chat>
 
 	</main>
 </template>
@@ -123,6 +132,7 @@
 <script>
 import StorieModal from './StorieModal.vue'
 import ModalTriaje from '../../../recepcionista/components/pacientes/ModalTriaje.vue';
+import ModalChat from '../../../recepcionista/components/pacientes/ModalChat.vue';
 
 export default {
 	name: 'home-stories',
@@ -138,7 +148,7 @@ export default {
 		dataUser: Object
 	},
 
-	components: { StorieModal, ModalTriaje },
+	components: { StorieModal, ModalTriaje, ModalChat },
 
 	methods: {
 		prepararPaciente(paciente){
@@ -181,6 +191,15 @@ export default {
 					console.log(err)
 				})
 			}
+		},
+
+		abrirChat(paciente) {
+			this.datosPaciente = paciente;
+
+			this.$nextTick(() => {
+				const modal = new bootstrap.Modal(document.getElementById('modalChat'));
+				modal.show();
+			});
 		},
 
 		lowerCase(text) {

@@ -1,21 +1,22 @@
 <template>
 <main>
     <div id="wrapper" :class="{'recepcion-theme': currentUser.rol === 'recepcionista'}">
-        <side-bar :rolUser="this.currentUser.rol" :idSede="currentUser.idSede"></side-bar>
+        <side-bar 
+        :rolUser="this.currentUser.rol" 
+        :idSede="currentUser.idSede"
+        :nombreUser="currentUser.nombre"
+        :professional="{ 
+            name: datosUsuario 
+                ? datosUsuario.name 
+                : currentUser.rol === 'recepcionista'
+                    ? 'Recepción'
+                    : currentUser.rol, 
+            imagen: datosUsuario ?  `/storage/${datosUsuario.photo}` : '/storage/img_profesionales/0xwP15erQOpeGiNxqgny657k23NpJ4uqr06JdagZ.gif'
+        }"
+        ></side-bar>
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
-                <nav-bar 
-                v-if="currentUser.id" :nombreUser = "currentUser.nombre"
-                :professional="{ 
-                    name: datosUsuario 
-                        ? datosUsuario.name 
-                        : currentUser.rol === 'recepcionista'
-                            ? 'Recepción'
-                            : currentUser.rol, 
-                    imagen: datosUsuario ?  `/storage/${datosUsuario.photo}` : '/storage/img_profesionales/0xwP15erQOpeGiNxqgny657k23NpJ4uqr06JdagZ.gif'
-                }"
-                >
-                </nav-bar>
+                <nav-bar></nav-bar>
                 <!-- Viene profesional-->
                 <div class="container-fluid">
                     <router-view
@@ -62,7 +63,7 @@ export default {
         professional: Object
     },
     
-    components: { NavBar, SideBar }, //bWhats
+    components: { SideBar, NavBar }, //bWhats
 
     methods: {
 			routePathValidation () {

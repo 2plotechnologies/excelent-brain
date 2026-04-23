@@ -932,6 +932,11 @@ class PatientController extends Controller
 			}
 
 			// Additional Data via DB queries or other models
+			if($patient->address) {
+				$patient->departamento = DB::table('ubdepartamento')->where('idDepa', $patient->address->department)->first()->departamento;
+				$patient->provincia = DB::table('ubprovincia')->where('idProv', $patient->address->province)->first()->provincia;
+				$patient->distrito = DB::table('ubdistrito')->where('idDist', $patient->address->district)->first()->distrito;
+			}
 			$patient->triajes = DB::table('triaje')->where('patient_id', $id)->orderBy('id', 'desc')->get();
 			$patient->semaforo_estados = DB::table('semaforo')->where('patient_id', $id)->orderBy('registro', 'desc')->get();
 			$patient->deudas_financieras = DB::table('deudas')->where('patient_id', $id)->orderBy('fecha', 'desc')->get();

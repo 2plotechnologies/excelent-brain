@@ -31,7 +31,7 @@
             class="mb-3 p-3 border rounded"
             >
                 <div class="small text-muted mb-1">
-                    <strong>{{ rec.user?.name || 'Tú' }}</strong>
+                    <strong>{{ rec.user?.nombre || 'Tú' }}</strong>
                     · {{ formatearFecha(rec.created_at) }}
                 </div>
 

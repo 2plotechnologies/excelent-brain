@@ -6,19 +6,12 @@
 		'recepcion-sidebar': rolUser === 'recepcionista',
 		'bg-danger': rolUser === 'interno'}"
 		id="accordionSidebar">
+				<a class="sidebar-brand d-flex align-items-center justify-content-center m-3 rounded p-2" href="#">
+					<img src="/img/logo-empresa-removebg-preview.png" class="img-fluid" style="max-height: 100%; object-fit: contain;">
+				</a>
+
 				<!-- Rol del admin -->
 				<div v-if="rolUser === 'administrador'">
-						<!-- Sidebar - Brand -->
-						<a 
-						class="sidebar-brand d-flex align-items-center justify-content-center" 
-						href="/administrador/home"
-						>
-								<div class="sidebar-brand-icon">
-										<i class="fas fa-user-md"></i>
-								</div>
-								<div class="sidebar-brand-text mx-3">{{ rolUser }}</div>
-						</a>
-
 						<!-- Divider -->
 						<hr class="sidebar-divider my-0">
 
@@ -85,17 +78,6 @@
 
 				<!-- Rol del profesional -->
 				<div v-if="rolUser === 'profesional'">
-						<!-- Sidebar - Brand -->
-						<a 
-						class="sidebar-brand d-flex align-items-center justify-content-center" 
-						href="/profesional/dashboard"
-						>
-								<div class="sidebar-brand-icon">
-										<i class="fas fa-user-md"></i>
-								</div>
-								<div class="sidebar-brand-text mx-3">{{ rolUser }}</div>
-						</a>
-
 						<!-- Nav Item - Dashboard -->
 						<li class="nav-item nav__list active" @click="activeSidebar()">
 								<router-link  to="/profesional/dashboard" class="nav-link">
@@ -183,17 +165,6 @@
 
 				<!-- Rol del interno -->
 				<div v-if="rolUser === 'interno'">
-						<!-- Sidebar - Brand -->
-						<a 
-						class="sidebar-brand d-flex align-items-center justify-content-center" 
-						href="/interno/home"
-						>
-								<div class="sidebar-brand-icon">
-										<i class="fas fa-user-md"></i>
-								</div>
-								<div class="sidebar-brand-text mx-3">{{ rolUser }}</div>
-						</a>
-
 						<!-- Nav Item - Dashboard -->
 						<li class="nav-item nav__list active" @click="activeSidebar()">
 								<router-link  to="/interno/home" class="nav-link">
@@ -242,17 +213,7 @@
 
 				<!-- Rol del recepcionista -->
 				<div v-if="rolUser === 'recepcionista'">
-						<!-- Sidebar - Brand -->
-						<a 
-						class="sidebar-brand d-flex align-items-center justify-content-center" 
-						href="/recepcionista/dashboard"
-						>
-								<div class="sidebar-brand-icon">
-										<i class="fas fa-user-md"></i>
-								</div>
-								<div class="sidebar-brand-text mx-3">{{ rolUser }}</div>
-						</a>
-				
+
 						<!-- Nav Item - Dashboard -->
 						<li class="nav-item nav__list active" @click="activeSidebar()">
 								<router-link  to="/recepcionista/dashboard" class="nav-link">
@@ -369,8 +330,27 @@
 
 				<!-- Sidebar Toggler (Sidebar) -->
 				<div class="text-center d-none d-md-inline">
-						<button class="rounded-circle border-0" id="sidebarToggle" @click="sidebarMenu()"></button>
+					<button class="rounded-circle border-0 p-2 bg-none" @click="sidebarMenu()" style="background: transparent !important;">
+						<i class="fa-solid fa-compress" style="color: white;"></i>
+					</button>
 				</div>
+
+				<!-- Que la informacion del usuario aparezca debajo del toggler, no al final del sidebar. -->
+
+				<div class="sidebar-user-info d-flex align-items-center p-3 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
+					<div class="user-avatar mr-3 rounded-circle d-flex align-items-center justify-content-center bg-primary text-white" style="width: 40px; height: 40px; min-width: 40px; font-weight: bold; overflow: hidden;">
+						<img v-if="professional && professional.imagen && validImage" :src="professional.imagen" @error="validImage = false" class="w-100 h-100" style="object-fit: cover;">
+						<span v-else>{{ userInitials }}</span>
+					</div>
+					<div class="user-details flex-grow-1 overflow-hidden">
+						<div class="font-weight-bold text-white text-truncate" style="font-size: 0.9rem;">{{ displayName }}</div>
+						<div class="small text-white-50 text-capitalize text-truncate" style="font-size: 0.8rem;">{{ rolUser }}</div>
+					</div>
+					<a href="#" @click.prevent="logout" class="text-white-50 ml-2 logout-btn" title="Cerrar Sesión">
+						<i class="fas fa-sign-out-alt" style="font-size: 1.2rem;"></i>
+					</a>
+				</div>
+
 		</ul>
 </template>
 
@@ -380,6 +360,33 @@ export default {
 		props: {
 				rolUser:{
 						type: String
+				},
+				nombreUser: {
+						type: String
+				},
+				professional: {
+						type: Object,
+						default: () => ({})
+				}
+		},
+		data() {
+				return {
+						token: localStorage.getItem('token'),
+						validImage: true
+				}
+		},
+		computed: {
+				displayName() {
+						return this.nombreUser || (this.professional && this.professional.name) || '';
+				},
+				userInitials() {
+						const name = this.displayName;
+						if (!name) return 'U';
+						const parts = name.split(' ');
+						if (parts.length >= 2) {
+								return (parts[0][0] + parts[1][0]).toUpperCase();
+						}
+						return name.substring(0, 2).toUpperCase();
 				}
 		},
 		methods: {
@@ -396,6 +403,16 @@ export default {
 		irPanelBaja(){
 			let sede = this.$attrs.idSede == 1 ? 'eltambo' : 'sancarlos'
 			window.open('https://apps.infocatsoluciones.com/excelentemente/'+sede+'/php/accesoFast.php?token='+process.env.FACTURACION_TOKEN, '_blank');
+		},
+		logout(){
+				window.axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
+				this.axios.post('/api/logout')
+				.then((res) => {
+						localStorage.removeItem('token')
+						this.$router.push('/login')
+				}).catch((err) => {
+					 console.log(err)
+				});
 		}
 		}
 }
@@ -403,4 +420,22 @@ export default {
 <style scoped>
 .sidebar .nav-item .nav-link i{ font-size: 1.2rem!important; }
 .sidebar .nav-item .nav-link span {font-size: 0.9rem!important; }
+.logout-btn:hover {
+	color: #fff !important;
+}
+.sidebar.toggled .sidebar-user-info {
+	padding: 1rem 0 !important;
+	justify-content: center;
+	flex-direction: column;
+}
+.sidebar.toggled .sidebar-user-info .user-details {
+	display: none;
+}
+.sidebar.toggled .sidebar-user-info .logout-btn {
+	margin-left: 0 !important;
+	margin-top: 0.5rem;
+}
+.sidebar.toggled .sidebar-brand img {
+	max-height: 30px !important;
+}
 </style>

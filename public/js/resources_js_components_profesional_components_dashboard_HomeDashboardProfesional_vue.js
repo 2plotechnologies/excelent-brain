@@ -152,7 +152,7 @@ var render = function render() {
     }
   }), _vm._v(" "), _c("h5", {
     staticClass: "m-0 font-weight-bold text-dark"
-  }, [_vm._v("Bienvenida, " + _vm._s(_vm.titulo) + " " + _vm._s(_vm.nombreUser))])]), _vm._v(" "), _c("p", {
+  }, [_vm._v("Bienvenido/a, " + _vm._s(_vm.titulo) + " " + _vm._s(_vm.nombreUser))])]), _vm._v(" "), _c("p", {
     staticClass: "mb-0 text-muted",
     staticStyle: {
       "font-size": "0.95rem",

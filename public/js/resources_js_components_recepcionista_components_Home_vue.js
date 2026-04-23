@@ -31,24 +31,14 @@ __webpack_require__.r(__webpack_exports__);
 var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("main", [_vm._m(0), _vm._v(" "), _c("table-citas", {
+  return _c("main", [_c("table-citas", {
     attrs: {
       nombreUser: _vm.nombreUser,
       idSede: _vm.idSede
     }
   })], 1);
 };
-var staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "d-sm-flex align-items-center justify-content-between mb-4"
-  }, [_c("h1", {
-    staticClass: "h3 mb-0 text-gray-800"
-  }, [_vm._v("Citas")]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex align-items-center"
-  })]);
-}];
+var staticRenderFns = [];
 render._withStripped = true;
 
 

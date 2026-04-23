@@ -173,18 +173,18 @@
                   </div>
 
                   <div class="mb-2">
-                    <small class="text-muted d-block">Edad</small>
+                    <small class="text-muted d-block">Fecha de Nacimiento</small>
                     <strong>{{ paciente.birth_date }}</strong>
                   </div>
 
                   <div class="mb-2">
                     <small class="text-muted d-block">Género</small>
-                    <strong>{{ paciente.gender || '—' }}</strong>
+                    <strong>{{ paciente.gender == 1 ? 'Masculino' : paciente.gender == 2 ? 'Femenino' : 'Otro'}}</strong>
                   </div>
 
                   <div class="mb-2">
                     <small class="text-muted d-block">Estado Civil</small>
-                    <strong>{{ paciente.civil_status || '—' }}</strong>
+                    <strong>{{ paciente.marital_status == 1 ? 'Soltero' : paciente.marital_status == 2 ? 'Casado' : paciente.marital_status == 3 ? 'Divorciado' : paciente.marital_status == 4 ? 'Viudo' : paciente.marital_status == 5 ? 'Conviviente' : '—' }}</strong>
                   </div>
 
                   <div class="mb-2">
@@ -194,7 +194,7 @@
 
                   <div class="mb-2">
                     <small class="text-muted d-block">Grado de Instrucción</small>
-                    <strong>{{ paciente.education || '—' }}</strong>
+                    <strong>{{ paciente.instruction_degree == 1 ? 'Inicial' : paciente.instruction_degree == 2 ? 'Primaria' : paciente.instruction_degree == 3 ? 'Secundaria' : paciente.instruction_degree == 4 ? 'Superior' : paciente.instruction_degree == 5 ? 'Técnico' : paciente.instruction_degree == 6 ? 'Ninguno' : '—' }}</strong>
                   </div>
 
                 </div>
@@ -229,17 +229,17 @@
 
                   <div class="mb-2" v-if="paciente.address">
                     <small class="text-muted d-block">Departamento</small>
-                    <strong>{{ paciente.address.department }}</strong>
+                    <strong>{{ paciente.departamento }}</strong>
                   </div>
 
                   <div class="mb-2" v-if="paciente.address">
                     <small class="text-muted d-block">Provincia</small>
-                    <strong>{{ paciente.address.province }}</strong>
+                    <strong>{{ paciente.provincia }}</strong>
                   </div>
 
                   <div class="mb-2" v-if="paciente.address">
                     <small class="text-muted d-block">Distrito</small>
-                    <strong>{{ paciente.address.district }}</strong>
+                    <strong>{{ paciente.distrito }}</strong>
                   </div>
 
                   <div>

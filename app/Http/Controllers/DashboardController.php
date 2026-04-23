@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Patient;
 use App\Models\Appointment;
 use App\Models\Payment;
+use App\Models\Professional;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -56,12 +57,15 @@ class DashboardController extends Controller
     }
 
     public function dashboardProfesional(){
+        //Obtener el profesional autenticado.
+        $current_profesional = Professional::where('user_id', auth()->user()->id)->first();
+
         //Citas hoy por profesional autenticado.
-        $citasHoy = Appointment::with('patient')->whereDate('date', today())->where('professional_id', auth()->user()->id)->get();
-        $totalCitas = Appointment::whereDate('date', today())->where('professional_id', auth()->user()->id)->count();
-        $totalCitasPendientes = Appointment::whereDate('date', today())->where('professional_id', auth()->user()->id)->where('status', '1')->count();
-        $totalCitasCompletadas = Appointment::whereDate('date', today())->where('professional_id', auth()->user()->id)->where('status', '2')->count();
-        $totalCitasCanceladas = Appointment::whereDate('date', today())->where('professional_id', auth()->user()->id)->where('status', '3')->count();
+        $citasHoy = Appointment::with('patient')->whereDate('date', today())->where('professional_id', $current_profesional->id)->get();
+        $totalCitas = Appointment::whereDate('date', today())->where('professional_id', $current_profesional->id)->count();
+        $totalCitasPendientes = Appointment::whereDate('date', today())->where('professional_id', $current_profesional->id)->where('status', '1')->count();
+        $totalCitasCompletadas = Appointment::whereDate('date', today())->where('professional_id', $current_profesional->id)->where('status', '2')->count();
+        $totalCitasCanceladas = Appointment::whereDate('date', today())->where('professional_id', $current_profesional->id)->where('status', '3')->count();
 
         //Retornar los datos al dashboard en JSON.
         return response()->json([

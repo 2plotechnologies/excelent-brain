@@ -16,7 +16,7 @@
             <div class="card-body py-4">
                 <div class="d-flex align-items-center mb-2">
                     <i class="fas fa-stethoscope text-primary mr-3" style="font-size: 1.5rem;"></i>
-                    <h5 class="m-0 font-weight-bold text-dark">Bienvenida, {{ titulo }} {{ nombreUser }}</h5>
+                    <h5 class="m-0 font-weight-bold text-dark">Bienvenido/a, {{ titulo }} {{ nombreUser }}</h5>
                 </div>
                 <p class="mb-0 text-muted" style="font-size: 0.95rem; margin-left: 2.5rem;">
                     Tienes <span class="font-weight-bold text-dark">{{ dashboardData.totalCitas || 0 }} citas</span> programadas para hoy.

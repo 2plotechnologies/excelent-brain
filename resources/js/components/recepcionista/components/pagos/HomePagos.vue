@@ -1,7 +1,7 @@
 <template>
 	<div>
 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-					<h1 class="h3 mb-0 text-gray-800">Pagos en caja</h1>
+					<div></div>
 					<div class="d-flex align-items-center d-print-none">
 						<select class="form-select mx-1" id="sltSede" v-model="$attrs.idSede" disabled>
 							<option value="1">Sede Principal</option>

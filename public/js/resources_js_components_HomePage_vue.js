@@ -42,8 +42,8 @@ __webpack_require__.r(__webpack_exports__);
     professional: Object
   },
   components: {
-    NavBar: _layout_Nav_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
-    SideBar: _layout_Sidebar_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
+    SideBar: _layout_Sidebar_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
+    NavBar: _layout_Nav_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   //bWhats
 
@@ -129,45 +129,128 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  data: function data() {
-    return {
-      token: localStorage.getItem('token'),
-      name: ''
-    };
-  },
-  methods: {
-    logout: function logout() {
-      var _this = this;
-      window.axios.defaults.headers.common['Authorization'] = "Bearer ".concat(this.token);
-      this.axios.post('/api/logout').then(function (res) {
-        localStorage.removeItem('token');
-        _this.$router.push('/login');
-      })["catch"](function (err) {
-        console.log(err);
-      });
-    },
-    navbarMenu: function navbarMenu() {
-      document.getElementById("accordionSidebar").classList.toggle("toggled");
-    },
-    checkImage: function checkImage(url) {
-      var request = new XMLHttpRequest();
-      request.open('GET', url, true);
-      request.send();
-      request.onload = function () {
-        status = request.status;
-        if (request.status == 200) {
-          return true;
-        } else {
-          return false;
+  computed: {
+    pageInfo: function pageInfo() {
+      var routeName = this.$route.name;
+      var titles = {
+        // Recepcionista
+        'dashboardRecepcionista': {
+          title: 'Dashboard',
+          subtitle: 'Resumen principal'
+        },
+        'pacientesRecepcionista': {
+          title: 'Gestión de Pacientes',
+          subtitle: 'Módulo de pacientes'
+        },
+        'homeRecepcionista': {
+          title: 'Gestión de Citas',
+          subtitle: 'Módulo de citas'
+        },
+        'pagosRecepcionista': {
+          title: 'Gestión de Pagos',
+          subtitle: 'Módulo financiero'
+        },
+        'carteraRecepcionista': {
+          title: 'Cartera de Clientes',
+          subtitle: 'Módulo de adicionales'
+        },
+        'reportesRecepcionista': {
+          title: 'Reportes',
+          subtitle: 'Módulo de reportes'
+        },
+        'reportesRecepcionistaAvanzados': {
+          title: 'Reportes Avanzados',
+          subtitle: 'Módulo de reportes'
+        },
+        'seguimientoRecepcionista': {
+          title: 'Seguimiento',
+          subtitle: 'Módulo de pacientes'
+        },
+        'recordatorios': {
+          title: 'Gestor de Datos',
+          subtitle: 'Módulo de comunicaciones'
+        },
+        'pacientes-sos': {
+          title: 'Pacientes S.O.S.',
+          subtitle: 'Módulo de seguimiento'
+        },
+        'limbo': {
+          title: 'Limbo',
+          subtitle: 'Pacientes en espera'
+        },
+        'paquetesRecepcionista': {
+          title: 'Paquetes',
+          subtitle: 'Gestión de paquetes'
+        },
+        // Profesional
+        'dashboardProfesional': {
+          title: 'Dashboard Profesional',
+          subtitle: 'Resumen principal'
+        },
+        'consultasProfesional': {
+          title: 'Mis Consultas',
+          subtitle: 'Módulo de atención'
+        },
+        'historiasProfesional': {
+          title: 'Historias Clínicas',
+          subtitle: 'Módulo de registros'
+        },
+        'miCarteraProfesional': {
+          title: 'Resumen de Visitas',
+          subtitle: 'Módulo de pacientes'
+        },
+        'recursosProfesional': {
+          title: 'Recursos',
+          subtitle: 'Módulo de apoyo'
+        },
+        'recetas': {
+          title: 'Recetas',
+          subtitle: 'Módulo de prescripciones'
+        },
+        // Admin
+        'HomeAdministrador': {
+          title: 'Panel de Administración',
+          subtitle: 'Resumen general'
+        },
+        'editarPacientesAdmin': {
+          title: 'Pacientes (Admin)',
+          subtitle: 'Módulo de administración'
+        },
+        'preciosServicios': {
+          title: 'Precios de Servicios',
+          subtitle: 'Módulo de administración'
+        },
+        'paquetes': {
+          title: 'Paquetes',
+          subtitle: 'Módulo de administración'
+        },
+        'usuariosSimples': {
+          title: 'Usuarios',
+          subtitle: 'Módulo de administración'
         }
+      };
+      if (titles[routeName]) return titles[routeName];
+
+      // Fallback
+      var pathTitle = this.$route.path.split('/').pop();
+      if (pathTitle && pathTitle.length > 0) {
+        pathTitle = pathTitle.replace(/-/g, ' ');
+        pathTitle = pathTitle.charAt(0).toUpperCase() + pathTitle.slice(1);
+        return {
+          title: pathTitle,
+          subtitle: 'Módulo de ' + pathTitle.toLowerCase()
+        };
+      }
+      return {
+        title: 'Inicio',
+        subtitle: 'Panel principal'
       };
     }
   },
-  props: {
-    idUser: String,
-    rolUser: String,
-    professional: Object,
-    nombreUser: String
+  methods: {
+    navbarMenu: function navbarMenu() {
+      document.getElementById("accordionSidebar").classList.toggle("toggled");
+    }
   }
 });
 
@@ -189,6 +272,35 @@ __webpack_require__.r(__webpack_exports__);
   props: {
     rolUser: {
       type: String
+    },
+    nombreUser: {
+      type: String
+    },
+    professional: {
+      type: Object,
+      "default": function _default() {
+        return {};
+      }
+    }
+  },
+  data: function data() {
+    return {
+      token: localStorage.getItem('token'),
+      validImage: true
+    };
+  },
+  computed: {
+    displayName: function displayName() {
+      return this.nombreUser || this.professional && this.professional.name || '';
+    },
+    userInitials: function userInitials() {
+      var name = this.displayName;
+      if (!name) return 'U';
+      var parts = name.split(' ');
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+      }
+      return name.substring(0, 2).toUpperCase();
     }
   },
   methods: {
@@ -204,6 +316,16 @@ __webpack_require__.r(__webpack_exports__);
     irPanelBaja: function irPanelBaja() {
       var sede = this.$attrs.idSede == 1 ? 'eltambo' : 'sancarlos';
       window.open('https://apps.infocatsoluciones.com/excelentemente/' + sede + '/php/accesoFast.php?token=' + undefined, '_blank');
+    },
+    logout: function logout() {
+      var _this = this;
+      window.axios.defaults.headers.common['Authorization'] = "Bearer ".concat(this.token);
+      this.axios.post('/api/logout').then(function (res) {
+        localStorage.removeItem('token');
+        _this.$router.push('/login');
+      })["catch"](function (err) {
+        console.log(err);
+      });
     }
   }
 });
@@ -235,7 +357,12 @@ var render = function render() {
   }, [_c("side-bar", {
     attrs: {
       rolUser: this.currentUser.rol,
-      idSede: _vm.currentUser.idSede
+      idSede: _vm.currentUser.idSede,
+      nombreUser: _vm.currentUser.nombre,
+      professional: {
+        name: _vm.datosUsuario ? _vm.datosUsuario.name : _vm.currentUser.rol === "recepcionista" ? "Recepción" : _vm.currentUser.rol,
+        imagen: _vm.datosUsuario ? "/storage/".concat(_vm.datosUsuario.photo) : "/storage/img_profesionales/0xwP15erQOpeGiNxqgny657k23NpJ4uqr06JdagZ.gif"
+      }
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "d-flex flex-column",
@@ -246,15 +373,7 @@ var render = function render() {
     attrs: {
       id: "content"
     }
-  }, [_vm.currentUser.id ? _c("nav-bar", {
-    attrs: {
-      nombreUser: _vm.currentUser.nombre,
-      professional: {
-        name: _vm.datosUsuario ? _vm.datosUsuario.name : _vm.currentUser.rol === "recepcionista" ? "Recepción" : _vm.currentUser.rol,
-        imagen: _vm.datosUsuario ? "/storage/".concat(_vm.datosUsuario.photo) : "/storage/img_profesionales/0xwP15erQOpeGiNxqgny657k23NpJ4uqr06JdagZ.gif"
-      }
-    }
-  }) : _vm._e(), _vm._v(" "), _c("div", {
+  }, [_c("nav-bar"), _vm._v(" "), _c("div", {
     staticClass: "container-fluid"
   }, [_vm.currentUser.id ? _c("router-view", {
     attrs: {
@@ -289,12 +408,7 @@ var render = function render() {
     _c = _vm._self._c;
   return _c("nav", {
     staticClass: "navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow"
-  }, [_c("img", {
-    staticClass: "img-fluid",
-    attrs: {
-      src: "/img/logo-reporte.png"
-    }
-  }), _vm._v(" "), _c("button", {
+  }, [_c("button", {
     staticClass: "btn btn-link d-md-none rounded-circle mr-3",
     attrs: {
       id: "sidebarToggleTop"
@@ -306,53 +420,51 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fa fa-bars"
-  })]), _vm._v(" "), _c("ul", {
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "d-none d-sm-inline-block ml-md-3 my-2 my-md-0 mw-100"
+  }, [_c("h1", {
+    staticClass: "h4 mb-0 text-gray-800 font-weight-bold",
+    staticStyle: {
+      "font-size": "1.25rem"
+    }
+  }, [_vm._v(_vm._s(_vm.pageInfo.title))]), _vm._v(" "), _c("span", {
+    staticClass: "text-muted small",
+    staticStyle: {
+      "font-size": "0.8rem"
+    }
+  }, [_vm._v(_vm._s(_vm.pageInfo.subtitle))])]), _vm._v(" "), _vm._m(0)]);
+};
+var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("ul", {
     staticClass: "navbar-nav ml-auto"
   }, [_c("li", {
-    staticClass: "nav-item dropdown"
+    staticClass: "nav-item dropdown no-arrow mx-1"
   }, [_c("a", {
     staticClass: "nav-link dropdown-toggle",
     attrs: {
       href: "#",
+      id: "alertsDropdown",
       role: "button",
       "data-bs-toggle": "dropdown",
       "aria-expanded": "false"
     }
-  }, [_vm.nombreUser ? _c("span", {
-    staticClass: "mr-2 d-none d-lg-inline text-gray-600 small text-capitalize"
   }, [_c("i", {
-    staticClass: "far fa-user-circle"
-  }), _vm._v(" " + _vm._s(_vm.nombreUser))]) : _c("span", {
-    staticClass: "mr-2 d-none d-lg-inline text-gray-600 small text-capitalize"
-  }, [_c("i", {
-    staticClass: "far fa-user-circle"
-  }), _vm._v(" " + _vm._s(_vm.professional.name))]), _vm._v(" "), _vm.checkImage(_vm.professional.imagen) ? _c("img", {
-    staticClass: "img-profile rounded",
-    attrs: {
-      src: _vm.professional.imagen
+    staticClass: "fas fa-bell fa-fw",
+    staticStyle: {
+      color: "#8392ab",
+      "font-size": "1.1rem"
     }
-  }) : _c("img", {
-    attrs: {
-      src: "/img/logoexcel.jpg",
-      width: "50"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "badge badge-danger badge-counter",
+    staticStyle: {
+      right: "0.25rem",
+      top: "1.2rem",
+      transform: "scale(0.7)"
     }
-  })]), _vm._v(" "), _c("ul", {
-    staticClass: "dropdown-menu"
-  }, [_c("li", [_c("a", {
-    staticClass: "dropdown-item",
-    attrs: {
-      href: "#",
-      "data-bs-toggle": "modal",
-      "data-target": "#logoutModal"
-    },
-    on: {
-      click: _vm.logout
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"
-  }), _vm._v(" Salir\n\t\t\t\t\t\t\t\t\t")])])])])])]);
-};
-var staticRenderFns = [];
+  })])])]);
+}];
 render._withStripped = true;
 
 
@@ -384,14 +496,7 @@ var render = function render() {
     attrs: {
       id: "accordionSidebar"
     }
-  }, [_vm.rolUser === "administrador" ? _c("div", [_c("a", {
-    staticClass: "sidebar-brand d-flex align-items-center justify-content-center",
-    attrs: {
-      href: "/administrador/home"
-    }
-  }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "sidebar-brand-text mx-3"
-  }, [_vm._v(_vm._s(_vm.rolUser))])]), _vm._v(" "), _c("hr", {
+  }, [_vm._m(0), _vm._v(" "), _vm.rolUser === "administrador" ? _c("div", [_c("hr", {
     staticClass: "sidebar-divider my-0"
   }), _vm._v(" "), _c("li", {
     staticClass: "nav-item nav__list active",
@@ -509,14 +614,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-file-alt"
-  }), _vm._v(" "), _c("span", [_vm._v("Usuarios")])])], 1)]) : _vm._e(), _vm._v(" "), _vm.rolUser === "profesional" ? _c("div", [_c("a", {
-    staticClass: "sidebar-brand d-flex align-items-center justify-content-center",
-    attrs: {
-      href: "/profesional/dashboard"
-    }
-  }, [_vm._m(1), _vm._v(" "), _c("div", {
-    staticClass: "sidebar-brand-text mx-3"
-  }, [_vm._v(_vm._s(_vm.rolUser))])]), _vm._v(" "), _c("li", {
+  }), _vm._v(" "), _c("span", [_vm._v("Usuarios")])])], 1)]) : _vm._e(), _vm._v(" "), _vm.rolUser === "profesional" ? _c("div", [_c("li", {
     staticClass: "nav-item nav__list active",
     on: {
       click: function click($event) {
@@ -637,14 +735,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fa-solid fa-skull-crossbones"
-  }), _vm._v(" "), _c("span", [_vm._v("Pacientes S.O.S.")])])], 1)]) : _vm._e(), _vm._v(" "), _vm.rolUser === "interno" ? _c("div", [_c("a", {
-    staticClass: "sidebar-brand d-flex align-items-center justify-content-center",
-    attrs: {
-      href: "/interno/home"
-    }
-  }, [_vm._m(2), _vm._v(" "), _c("div", {
-    staticClass: "sidebar-brand-text mx-3"
-  }, [_vm._v(_vm._s(_vm.rolUser))])]), _vm._v(" "), _c("li", {
+  }), _vm._v(" "), _c("span", [_vm._v("Pacientes S.O.S.")])])], 1)]) : _vm._e(), _vm._v(" "), _vm.rolUser === "interno" ? _c("div", [_c("li", {
     staticClass: "nav-item nav__list active",
     on: {
       click: function click($event) {
@@ -690,14 +781,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-user-nurse"
-  }), _vm._v(" "), _c("span", [_vm._v("Triaje")])])], 1)]) : _vm._e(), _vm._v(" "), _vm.rolUser === "recepcionista" ? _c("div", [_c("a", {
-    staticClass: "sidebar-brand d-flex align-items-center justify-content-center",
-    attrs: {
-      href: "/recepcionista/dashboard"
-    }
-  }, [_vm._m(3), _vm._v(" "), _c("div", {
-    staticClass: "sidebar-brand-text mx-3"
-  }, [_vm._v(_vm._s(_vm.rolUser))])]), _vm._v(" "), _c("li", {
+  }), _vm._v(" "), _c("span", [_vm._v("Triaje")])])], 1)]) : _vm._e(), _vm._v(" "), _vm.rolUser === "recepcionista" ? _c("div", [_c("li", {
     staticClass: "nav-item nav__list active",
     on: {
       click: function click($event) {
@@ -879,48 +963,95 @@ var render = function render() {
   }), _vm._v(" "), _c("div", {
     staticClass: "text-center d-none d-md-inline"
   }, [_c("button", {
-    staticClass: "rounded-circle border-0",
-    attrs: {
-      id: "sidebarToggle"
+    staticClass: "rounded-circle border-0 p-2 bg-none",
+    staticStyle: {
+      background: "transparent !important"
     },
     on: {
       click: function click($event) {
         return _vm.sidebarMenu();
       }
     }
-  })])]);
+  }, [_c("i", {
+    staticClass: "fa-solid fa-compress",
+    staticStyle: {
+      color: "white"
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "sidebar-user-info d-flex align-items-center p-3 border-top",
+    staticStyle: {
+      "border-color": "rgba(255,255,255,0.1) !important"
+    }
+  }, [_c("div", {
+    staticClass: "user-avatar mr-3 rounded-circle d-flex align-items-center justify-content-center bg-primary text-white",
+    staticStyle: {
+      width: "40px",
+      height: "40px",
+      "min-width": "40px",
+      "font-weight": "bold",
+      overflow: "hidden"
+    }
+  }, [_vm.professional && _vm.professional.imagen && _vm.validImage ? _c("img", {
+    staticClass: "w-100 h-100",
+    staticStyle: {
+      "object-fit": "cover"
+    },
+    attrs: {
+      src: _vm.professional.imagen
+    },
+    on: {
+      error: function error($event) {
+        _vm.validImage = false;
+      }
+    }
+  }) : _c("span", [_vm._v(_vm._s(_vm.userInitials))])]), _vm._v(" "), _c("div", {
+    staticClass: "user-details flex-grow-1 overflow-hidden"
+  }, [_c("div", {
+    staticClass: "font-weight-bold text-white text-truncate",
+    staticStyle: {
+      "font-size": "0.9rem"
+    }
+  }, [_vm._v(_vm._s(_vm.displayName))]), _vm._v(" "), _c("div", {
+    staticClass: "small text-white-50 text-capitalize text-truncate",
+    staticStyle: {
+      "font-size": "0.8rem"
+    }
+  }, [_vm._v(_vm._s(_vm.rolUser))])]), _vm._v(" "), _c("a", {
+    staticClass: "text-white-50 ml-2 logout-btn",
+    attrs: {
+      href: "#",
+      title: "Cerrar Sesión"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        return _vm.logout.apply(null, arguments);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-sign-out-alt",
+    staticStyle: {
+      "font-size": "1.2rem"
+    }
+  })])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "sidebar-brand-icon"
-  }, [_c("i", {
-    staticClass: "fas fa-user-md"
-  })]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "sidebar-brand-icon"
-  }, [_c("i", {
-    staticClass: "fas fa-user-md"
-  })]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "sidebar-brand-icon"
-  }, [_c("i", {
-    staticClass: "fas fa-user-md"
-  })]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "sidebar-brand-icon"
-  }, [_c("i", {
-    staticClass: "fas fa-user-md"
+  return _c("a", {
+    staticClass: "sidebar-brand d-flex align-items-center justify-content-center m-3 rounded p-2",
+    attrs: {
+      href: "#"
+    }
+  }, [_c("img", {
+    staticClass: "img-fluid",
+    staticStyle: {
+      "max-height": "100%",
+      "object-fit": "contain"
+    },
+    attrs: {
+      src: "/img/logo-empresa-removebg-preview.png"
+    }
   })]);
 }];
 render._withStripped = true;
@@ -979,7 +1110,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.img-profile[data-v-53ef4629] {\r\n    -o-object-fit: contain;\r\n       object-fit: contain;\n}\n.dropdown-toggle[data-v-53ef4629]::after{\r\n\tfont-family: 'Font Awesome 7 Free'!important;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.topbar[data-v-53ef4629] {\r\n    height: 4.375rem;\n}\n.badge-counter[data-v-53ef4629] {\r\n    position: absolute;\r\n    transform: scale(.7);\r\n    transform-origin: top right;\r\n    right: .25rem;\r\n    margin-top: -.25rem;\r\n    padding: .25em .4em;\r\n    border-radius: 50%;\r\n    width: 12px;\r\n    height: 12px;\r\n    border: 2px solid white;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1003,7 +1134,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.sidebar .nav-item .nav-link i[data-v-65bb863c]{ font-size: 1.2rem!important;\n}\n.sidebar .nav-item .nav-link span[data-v-65bb863c] {font-size: 0.9rem!important;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.sidebar .nav-item .nav-link i[data-v-65bb863c]{ font-size: 1.2rem!important;\n}\n.sidebar .nav-item .nav-link span[data-v-65bb863c] {font-size: 0.9rem!important;\n}\n.logout-btn[data-v-65bb863c]:hover {\r\n\tcolor: #fff !important;\n}\n.sidebar.toggled .sidebar-user-info[data-v-65bb863c] {\r\n\tpadding: 1rem 0 !important;\r\n\tjustify-content: center;\r\n\tflex-direction: column;\n}\n.sidebar.toggled .sidebar-user-info .user-details[data-v-65bb863c] {\r\n\tdisplay: none;\n}\n.sidebar.toggled .sidebar-user-info .logout-btn[data-v-65bb863c] {\r\n\tmargin-left: 0 !important;\r\n\tmargin-top: 0.5rem;\n}\n.sidebar.toggled .sidebar-brand img[data-v-65bb863c] {\r\n\tmax-height: 30px !important;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

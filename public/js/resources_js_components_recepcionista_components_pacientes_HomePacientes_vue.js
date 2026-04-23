@@ -2732,15 +2732,15 @@ var render = function render() {
     staticClass: "mb-2"
   }, [_c("small", {
     staticClass: "text-muted d-block"
-  }, [_vm._v("Edad")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.birth_date))])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Fecha de Nacimiento")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.birth_date))])]), _vm._v(" "), _c("div", {
     staticClass: "mb-2"
   }, [_c("small", {
     staticClass: "text-muted d-block"
-  }, [_vm._v("Género")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.gender || "—"))])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Género")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.gender == 1 ? "Masculino" : _vm.paciente.gender == 2 ? "Femenino" : "Otro"))])]), _vm._v(" "), _c("div", {
     staticClass: "mb-2"
   }, [_c("small", {
     staticClass: "text-muted d-block"
-  }, [_vm._v("Estado Civil")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.civil_status || "—"))])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Estado Civil")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.marital_status == 1 ? "Soltero" : _vm.paciente.marital_status == 2 ? "Casado" : _vm.paciente.marital_status == 3 ? "Divorciado" : _vm.paciente.marital_status == 4 ? "Viudo" : _vm.paciente.marital_status == 5 ? "Conviviente" : "—"))])]), _vm._v(" "), _c("div", {
     staticClass: "mb-2"
   }, [_c("small", {
     staticClass: "text-muted d-block"
@@ -2748,7 +2748,7 @@ var render = function render() {
     staticClass: "mb-2"
   }, [_c("small", {
     staticClass: "text-muted d-block"
-  }, [_vm._v("Grado de Instrucción")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.education || "—"))])])])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Grado de Instrucción")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.instruction_degree == 1 ? "Inicial" : _vm.paciente.instruction_degree == 2 ? "Primaria" : _vm.paciente.instruction_degree == 3 ? "Secundaria" : _vm.paciente.instruction_degree == 4 ? "Superior" : _vm.paciente.instruction_degree == 5 ? "Técnico" : _vm.paciente.instruction_degree == 6 ? "Ninguno" : "—"))])])])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card border-0 shadow-sm h-100"
@@ -2774,15 +2774,15 @@ var render = function render() {
     staticClass: "mb-2"
   }, [_c("small", {
     staticClass: "text-muted d-block"
-  }, [_vm._v("Departamento")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.address.department))])]) : _vm._e(), _vm._v(" "), _vm.paciente.address ? _c("div", {
+  }, [_vm._v("Departamento")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.departamento))])]) : _vm._e(), _vm._v(" "), _vm.paciente.address ? _c("div", {
     staticClass: "mb-2"
   }, [_c("small", {
     staticClass: "text-muted d-block"
-  }, [_vm._v("Provincia")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.address.province))])]) : _vm._e(), _vm._v(" "), _vm.paciente.address ? _c("div", {
+  }, [_vm._v("Provincia")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.provincia))])]) : _vm._e(), _vm._v(" "), _vm.paciente.address ? _c("div", {
     staticClass: "mb-2"
   }, [_c("small", {
     staticClass: "text-muted d-block"
-  }, [_vm._v("Distrito")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.address.district))])]) : _vm._e(), _vm._v(" "), _c("div", [_c("small", {
+  }, [_vm._v("Distrito")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.distrito))])]) : _vm._e(), _vm._v(" "), _c("div", [_c("small", {
     staticClass: "text-muted d-block"
   }, [_vm._v("Referencia")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.reference || "—"))])])])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
@@ -4962,7 +4962,7 @@ var render = function render() {
       staticClass: "mb-3 p-3 border rounded"
     }, [_c("div", {
       staticClass: "small text-muted mb-1"
-    }, [_c("strong", [_vm._v(_vm._s(((_rec$user = rec.user) === null || _rec$user === void 0 ? void 0 : _rec$user.name) || "Tú"))]), _vm._v("\n                  · " + _vm._s(_vm.formatearFecha(rec.created_at)) + "\n              ")]), _vm._v(" "), _c("div", [_vm._v("\n                  " + _vm._s(rec.mensaje) + "\n              ")])]);
+    }, [_c("strong", [_vm._v(_vm._s(((_rec$user = rec.user) === null || _rec$user === void 0 ? void 0 : _rec$user.nombre) || "Tú"))]), _vm._v("\n                  · " + _vm._s(_vm.formatearFecha(rec.created_at)) + "\n              ")]), _vm._v(" "), _c("div", [_vm._v("\n                  " + _vm._s(rec.mensaje) + "\n              ")])]);
   }), 0)]), _vm._v(" "), _c("div", {
     staticClass: "modal-footer border-0"
   }, [_c("div", {

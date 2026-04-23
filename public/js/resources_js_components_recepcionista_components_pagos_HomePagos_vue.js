@@ -2442,9 +2442,7 @@ var render = function render() {
     _c = _vm._self._c;
   return _c("div", [_c("div", {
     staticClass: "d-sm-flex align-items-center justify-content-between mb-4"
-  }, [_c("h1", {
-    staticClass: "h3 mb-0 text-gray-800"
-  }, [_vm._v("Pagos en caja")]), _vm._v(" "), _c("div", {
+  }, [_c("div"), _vm._v(" "), _c("div", {
     staticClass: "d-flex align-items-center d-print-none"
   }, [_c("select", {
     directives: [{

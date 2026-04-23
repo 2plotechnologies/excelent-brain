@@ -1,12 +1,16 @@
 <template>
-   <div id="wrapper" class="recepcion-theme">
-        <side-bar :rolUser="rol"></side-bar>
+    <div id="wrapper" class="recepcion-theme">
+        <side-bar 
+        :rolUser="rolUser"
+        :nombreUser="currentUser.name"
+        :professional="{ name: currentUser.name }"
+        ></side-bar>
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
-                <nav-bar v-if="rolUser" :rolUser="rol"></nav-bar>
+                <nav-bar></nav-bar>
                 <div class="container-fluid">
                     {{this.currentUser.name}}
-                    <router-view  :rolUser="rol"></router-view>
+                    <router-view :rolUser="rolUser"></router-view>
                 </div>
             </div>
         </div>
@@ -26,7 +30,7 @@ export default{
            token: localStorage.getItem('token'),
         }
     },
-    components: { NavBar, SideBar },
+    components: { SideBar, NavBar },
     props:{
         rolUser: String
     },
