@@ -195,7 +195,7 @@
             <div class="col-lg-6">
               <div class="input-group">
                 <span class="input-group-text bg-transparent"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
-                <input v-model="crmBuscador" class="form-control border-start-0 ps-0" placeholder="Buscar por nombre, DNI o celular..." autocomplete="off">
+                <input v-model="crmBuscador" class="form-control border-start-0 ps-0" placeholder="Buscar por nombre, DNI o celular..." autocomplete="off" @keyup.enter="buscarPacientesCRM">
               </div>
             </div>
             <div class="col-lg-2">
@@ -501,6 +501,8 @@ export default {
       crmFiltroEstado: 'todos',
       crmFiltroServicio: 'todos',
       crmFiltroProfesional: 'todos',
+      buscadorTimeout: null,
+      crmBuscadorTimeout: null,
       
       pacienteCRMSeleccionado: null,
       modalCRMInstance: null,
@@ -598,6 +600,33 @@ export default {
         this.filtroEtiqueta = 'todos';
       }
     },
+    buscador(valor) {
+      clearTimeout(this.buscadorTimeout);
+      this.buscadorTimeout = setTimeout(() => {
+        const texto = (valor || '').trim();
+        if (texto === '') {
+          this.cargarSeguimiento();
+          return;
+        }
+        this.buscarCrmOriginal();
+      }, 350);
+    },
+    crmBuscador(valor) {
+      if (this.tabActiva !== 'crmSeguimiento') return;
+      clearTimeout(this.crmBuscadorTimeout);
+      this.crmBuscadorTimeout = setTimeout(() => {
+        const texto = (valor || '').trim();
+        if (texto === '') {
+          this.cargarPacientesCRM();
+          return;
+        }
+        this.buscarPacientesCRM();
+      }, 350);
+    }
+  },
+  beforeUnmount() {
+    clearTimeout(this.buscadorTimeout);
+    clearTimeout(this.crmBuscadorTimeout);
   },
   methods: {
     async cargarSeguimiento() {
