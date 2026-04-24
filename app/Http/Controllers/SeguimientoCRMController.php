@@ -24,7 +24,7 @@ class SeguimientoCRMController extends Controller
                   ->orWhere('dni', 'LIKE', "%{$search}%")
                   ->orWhere('phone', 'LIKE', "%{$search}%");
             });
-            $patients = $query->orderBy("created_at", "desc")->limit(50)->get();
+            $patients = $query->orderBy("created_at", "desc")->get();
         } else {
             //Pacientes con citas (Obtener los ultimos 10)
             $patients = $query->orderBy("created_at", "desc")->limit(10)->get();
