@@ -30,6 +30,7 @@ use App\Http\Controllers\SimpleController;
 use App\Http\Controllers\PaqueteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ChatRecepcionController;
+use App\Http\Controllers\SeguimientoCRMController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -306,4 +307,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboardProfesional', [DashboardController::class, 'dashboardProfesional']);
     Route::get('/dashboardModuloPacientes', [DashboardController::class, 'dashboardModuloPacientes']);
     Route::get('/dashboardModuloCitas', [DashboardController::class, 'dashboardModuloCitas']);
+
+    //CRM
+    Route::get('/seguimientosCRM', [SeguimientoCRMController::class, 'index']);
+    Route::get('/seguimientosCRM/{patient_id}', [SeguimientoCRMController::class, 'show']);
+    Route::post('/seguimientosCRM', [SeguimientoCRMController::class, 'store']);
+    Route::put('/seguimientosCRM/{id}', [SeguimientoCRMController::class, 'update']);
+    Route::delete('/seguimientosCRM/{id}', [SeguimientoCRMController::class, 'destroy']);
 });

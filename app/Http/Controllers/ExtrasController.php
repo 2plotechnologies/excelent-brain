@@ -1510,14 +1510,34 @@ class ExtrasController extends Controller
 	}
 
 
-	public function seguimientoCrm(){
+	public function seguimientoCrm(Request $request){
 		$hoy = Carbon::now()->startOfDay();
 
 		$pacientes = [];
 		$citasQuery = Appointment::where('status', 2)
 			->whereDate('date', '<=', $hoy->toDateString());
 
-		$patientIds = $citasQuery->distinct()->pluck('patient_id');
+        $search = $request->query('search');
+
+        if ($search) {
+            $words = explode(' ', trim($search));
+            $matchingQuery = Patient::query();
+            foreach ($words as $word) {
+                $matchingQuery->where(function($q) use ($word) {
+                    $q->where('name', 'LIKE', "%{$word}%")
+                      ->orWhere('nombres', 'LIKE', "%{$word}%")
+                      ->orWhere('dni', 'LIKE', "%{$word}%")
+                      ->orWhere('phone', 'LIKE', "%{$word}%");
+                });
+            }
+            $matchingPatients = $matchingQuery->pluck('id');
+            $patientIds = $citasQuery->whereIn('patient_id', $matchingPatients)->distinct()->pluck('patient_id');
+        } else {
+            // Default to processing all to correctly assign Fidelizacion/Recuperacion labels, 
+            // but we can limit the final result array to 10 if needed.
+            // For now, let's restore the original query that grabs all distinct patient_ids.
+            $patientIds = $citasQuery->distinct()->pluck('patient_id');
+        }
 
 		foreach ($patientIds->chunk(500) as $chunk) {
 			$citas = Appointment::with(['patient:id,name,nombres,vivo,activo', 'professional:id,nombre,name,profession'])
