@@ -546,32 +546,121 @@
       <!-- TRIAJE -->
       <div class="tab-pane fade" id="triaje" role="tabpanel">
         <div class="row">
-          <div class="col-md-6 mb-3">
-            <div class="card border h-100">
-              <div class="card-body p-4">
-                <h5 class="card-title font-weight-bold mb-4">Triajes</h5>
-                <ul class="list-group list-group-flush" v-if="paciente.triajes && paciente.triajes.length > 0">
-                  <li class="list-group-item px-0" v-for="tr in paciente.triajes.slice(0, 5)" :key="tr.id">
-                    <strong>{{ formatDate(tr.fecha || tr.created_at) }}</strong>
-                    <p class="mb-0 small text-muted mt-1"><strong>Motivo:</strong> {{ tr.motivo }}</p>
-                    <p class="mb-0 small text-muted"><strong>Síntomas:</strong> {{ tr.sintomatologia }}</p>
-                  </li>
-                </ul>
-                <p v-else class="text-muted small">Sin registros de triaje.</p>
+          <div class="col-12 mb-4">
+            <h5 class="card-title font-weight-bold mb-3"><i class="fas fa-clipboard-check text-primary me-2"></i> Registro de Triajes</h5>
+            
+            <div v-if="paciente.triajes && paciente.triajes.length > 0">
+              <div class="card border-0 shadow-sm mb-3 rounded-lg" v-for="tr in paciente.triajes" :key="tr.id" style="background-color: #fcfcfc;">
+                <div class="card-body p-4">
+                  <!-- HEADER -->
+                  <div class="d-flex mb-4">
+                    <div class="rounded-circle bg-light text-info border d-flex justify-content-center align-items-center me-3" style="width: 45px; height: 45px; min-width: 45px;">
+                      <i class="fas fa-thermometer-half fs-5"></i>
+                    </div>
+                    <div>
+                      <h6 class="font-weight-bold mb-1 text-dark">Triaje {{ getTriajeReferencia(tr.referencia) }}</h6>
+                      <div class="small text-muted">
+                        <span>{{ formatDateWithTime(tr.fecha || tr.created_at) }}</span>
+                        <span v-if="tr.responsable" class="mx-1">&middot;</span>
+                        <span v-if="tr.responsable">Int. {{ tr.responsable }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- BODY COLUMNS -->
+                  <div class="row mb-3">
+                    <!-- SIGNOS VITALES -->
+                    <div class="col-md-4 mb-3 mb-md-0">
+                      <h6 class="small text-muted font-weight-bold text-uppercase mb-3" style="letter-spacing: 0.5px;">Signos Vitales</h6>
+                      <div class="d-flex flex-column gap-2 small">
+                        <div class="d-flex align-items-center" v-if="tr.pa">
+                          <i class="far fa-heart text-danger me-2" style="width: 16px;"></i> 
+                          <span class="text-muted me-1">PA:</span> <strong class="text-dark">{{ tr.pa }}</strong>
+                        </div>
+                        <div class="d-flex align-items-center" v-if="tr.fc">
+                          <span class="text-muted fw-bold me-2" style="width: 16px;">FC</span> 
+                          <span class="text-muted me-1">FC:</span> <strong class="text-dark">{{ tr.fc }} <span class="fw-normal text-muted">bpm</span></strong>
+                        </div>
+                        <div class="d-flex align-items-center" v-if="tr.fr">
+                          <span class="text-muted fw-bold me-2" style="width: 16px;">FR</span> 
+                          <span class="text-muted me-1">FR:</span> <strong class="text-dark">{{ tr.fr }} <span class="fw-normal text-muted">rpm</span></strong>
+                        </div>
+                        <div class="d-flex align-items-center" v-if="tr.t">
+                          <i class="fas fa-temperature-low text-info me-2" style="width: 16px;"></i> 
+                          <span class="text-muted me-1">Temp:</span> <strong class="text-dark">{{ tr.t }} <span class="fw-normal text-muted">°C</span></strong>
+                        </div>
+                        <div class="d-flex align-items-center" v-if="tr.saturacion">
+                          <i class="fas fa-wind text-primary me-2" style="width: 16px;"></i> 
+                          <span class="text-muted me-1">SpO2:</span> <strong class="text-dark">{{ tr.saturacion }} <span class="fw-normal text-muted">%</span></strong>
+                        </div>
+                        <div class="d-flex align-items-center" v-if="tr.peso">
+                          <span class="text-muted fw-bold me-2" style="width: 16px;">P.</span> 
+                          <span class="text-muted me-1">Peso:</span> <strong class="text-dark">{{ tr.peso }}</strong>
+                        </div>
+                        <div class="d-flex align-items-center" v-if="tr.talla">
+                          <span class="text-muted fw-bold me-2" style="width: 16px;">T.</span> 
+                          <span class="text-muted me-1">Talla:</span> <strong class="text-dark">{{ tr.talla }}</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- EVALUACION -->
+                    <div class="col-md-4 mb-3 mb-md-0">
+                      <h6 class="small text-muted font-weight-bold text-uppercase mb-3" style="letter-spacing: 0.5px;">Evaluación y Pruebas</h6>
+                      <div class="d-flex flex-column gap-2 small">
+                        <div v-if="tr.prioridad">
+                          <span class="text-muted d-block mb-1">Prioridad:</span>
+                          <span class="badge" :class="getPrioridadClass(tr.prioridad)">{{ getPrioridadText(tr.prioridad) }}</span>
+                        </div>
+                        <div v-if="tr.pruebas" class="mt-2">
+                          <span class="text-muted d-block mb-1">Pruebas Aplicadas:</span>
+                          <strong class="text-dark">{{ tr.pruebas }}</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- CLINICA -->
+                    <div class="col-md-4">
+                      <h6 class="small text-muted font-weight-bold text-uppercase mb-3" style="letter-spacing: 0.5px;">Clínica</h6>
+                      <div class="d-flex flex-column gap-2 small">
+                        <div v-if="tr.sintomatologia">
+                          <span class="text-muted me-1">Sintomatología:</span>
+                          <span class="text-dark">{{ tr.sintomatologia }}</span>
+                        </div>
+                        <div v-if="tr.antecedentes">
+                          <span class="text-muted me-1">Antecedentes:</span>
+                          <span class="text-dark">{{ tr.antecedentes }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- OBSERVACIONES & MOTIVO -->
+                  <div class="mt-4">
+                    <p class="small text-dark mb-3" v-if="tr.motivo">
+                      <span class="text-muted me-1">Motivo:</span> {{ tr.motivo }}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
+            <div v-else class="alert alert-light text-center border py-5 mb-4">
+              <i class="fas fa-clipboard text-muted mb-3 fs-1 d-block"></i>
+              <h6 class="text-muted">No existen registros de triaje para este paciente.</h6>
+            </div>
           </div>
-          <div class="col-md-6 mb-3">
-             <div class="card border h-100">
+          
+          <div class="col-12">
+            <h5 class="card-title font-weight-bold mb-3 mt-2"><i class="fas fa-traffic-light text-warning me-2"></i> Seguridad / Semáforo</h5>
+            <div class="card border">
               <div class="card-body p-4">
-                <h5 class="card-title font-weight-bold mb-4">Seguridad / Semáforo</h5>
                 <ul class="list-group list-group-flush" v-if="paciente.semaforo_estados && paciente.semaforo_estados.length > 0">
                   <li class="list-group-item px-0" v-for="sem in paciente.semaforo_estados.slice(0, 5)" :key="sem.id">
                     <strong>{{ formatDate(sem.registro) }}</strong>
                     <p class="mb-0 small mt-1">Código: {{ sem.codigo }} - <span class="text-muted">{{ sem.observaciones }}</span></p>
                   </li>
                 </ul>
-                <p v-else class="text-muted small">Sin registros en el semáforo.</p>
+                <p v-else class="text-muted small mb-0">Sin registros en el semáforo.</p>
               </div>
             </div>
           </div>
@@ -871,6 +960,48 @@ export default {
       if(s==4) return 'bg-info';
       if(s==5) return 'bg-danger';
       return 'bg-secondary';
+    },
+    getTriajeReferencia(ref) {
+      if(ref == 1) return 'Psicológico';
+      if(ref == 2) return 'Psiquiátrico';
+      if(ref == 3) return 'Psicológico y Psiquiátrico';
+      return '';
+    },
+    getPrioridadText(p) {
+      if(p == 1) return 'I - Urgencia inmediata (Psiq)';
+      if(p == 2) return 'II - Urgencia moderada (Psiq)';
+      if(p == 3) return 'III - Riesgo alto (Psic)';
+      if(p == 4) return 'IV - Riesgo medio (Psic)';
+      if(p == 5) return 'V - Riesgo bajo (Psic)';
+      return 'No definida';
+    },
+    getPrioridadClass(p) {
+      if(p == 1) return 'bg-danger text-white rounded-pill px-2';
+      if(p == 2) return 'bg-warning text-dark rounded-pill px-2';
+      if(p == 3) return 'bg-danger text-white rounded-pill px-2';
+      if(p == 4) return 'bg-warning text-dark rounded-pill px-2';
+      if(p == 5) return 'bg-success text-white rounded-pill px-2';
+      return 'bg-secondary text-white rounded-pill px-2';
+    },
+    formatDateWithTime(dateStr) {
+      if(!dateStr) return '';
+      let d;
+      if (typeof dateStr === 'string' && !dateStr.includes('T') && dateStr.includes(' ')) {
+        d = new Date(dateStr.replace(' ', 'T'));
+      } else {
+        d = new Date(dateStr);
+      }
+      if (isNaN(d.getTime())) return dateStr;
+      const day = d.getDate().toString().padStart(2, '0');
+      const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+      const month = monthNames[d.getMonth()];
+      const year = d.getFullYear();
+      let hours = d.getHours();
+      const minutes = d.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; 
+      return `${day} ${month} ${year} - ${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
     }
   },
   mounted() {

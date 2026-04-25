@@ -7,7 +7,11 @@
 					<div class="card-body"><i class="fas fa-mobile-alt"></i> Recordatorios</div>
 				</div>
 			</div>
-
+			<div class="col-sm-3" @click="cargarDatos('interesados')">
+				<div class="card mb-0 py-0 border-left-success cursor" :class="{'active': activoInteresado}">
+					<div class="card-body"><i class="fa-regular fa-circle-user"></i> Seguimiento</div>
+				</div>
+			</div>
 			<div class="col-sm-3" @click="cargarDatos('deudas')">
 				<div class="card mb-0 py-0 border-left-warning cursor" :class="{'active': activoDeudas}">
 					<div class="card-body"><i class="fas fa-money-bill-wave-alt"></i> Deudas</div>
@@ -164,7 +168,161 @@
 				</div>
 			</div>
 		</section>
+		<section v-if="tipo=='interesados'">
+			<div class="card px-1 my-4 p-2">
+				<div class="card-body">
+					<div class="card-body">
+						<p class="lead">Listado de interesados</p>
+						<div class="d-flex justify-content-between">
+							<div class="input-group mb-3 col-sm-4">
+								<span class="input-group-text" id="basic-addon1">Fecha:</span>
+								<input type="date" class="form-control" v-model="fechaInteresados" id="fechInteresados" @change="cargarDatos('interesados')">
+							</div>
+							<div class="ms-2">
+								<select class="form-select" v-model="filtroDoc">
+									<option value="-1">Todos los profesionales</option>
+									<option v-for="doctor in doctores" :value="doctor.id">{{ doctor.nombre }}</option>
+								</select>
+							</div>
+							<div class="d-grid d-flex mb-2">
+								<button class="btn btn-outline-success" @click="cargarDatos('interesados')"><i class="fas fa-redo-alt"></i> Actualizar </button>
+								<button class="btn btn-outline-primary mx-2" data-bs-toggle="modal" data-bs-target="#nuevoInteresado"><i class="fa-regular fa-circle-user"></i> Nuevo seguimiento</button>
+							</div>
+						</div>
 
+						<label for=""><strong>Lista de interesados pendientes</strong></label>
+						<table class="table table-hover" v-if="interesados.length>0">
+							<thead>
+								<tr>
+									<th>N°</th>
+									<th>Nombre</th>
+									<th>Celular</th>
+									<th>Profesional</th>
+									<th>Origen</th>
+									<th>Motivo</th>
+									<th>Usuario</th>
+									<th>Referencia</th>
+									<th>Fecha y Hora</th>
+									<th>Est.</th>
+									<th>@</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for="(interesado, index) in interesados" :class="{'todos':interesado.atendido==0, 'con':interesado.atendido==1, 'sin':interesado.atendido==2}" v-show="(filtro=='todos' || filtro==1 && interesado.respuesta !='' || filtro==2 && interesado.respuesta=='') && (interesado.idProfesional == filtroDoc || filtroDoc==-1) ">
+									<td>{{ index+1 }}</td>
+									<td class="text-capitalize">{{ interesado.nombre }}</td>
+									<td>{{ interesado.celular }}</td>
+									<td>{{ interesado.nomProf }}</td>
+									<td>
+										<span v-if="interesado.origen=='1'">Sist. recepción</span>
+										<span v-if="interesado.origen=='2'">Cartera de clientes</span>
+										<span v-if="interesado.origen=='3'">Cita anulada</span>
+									</td>
+									<td class="text-capitalize">
+										<span>{{ interesado.motivo }}</span>
+										<span v-if="interesado.atendido>0"><br><i class="fas fa-user-alt"></i> {{ interesado.respuesta }}</span>
+									</td>
+									<td>{{ interesado.usuNombre }}</td>
+									<td>
+										<span>{{referencias[interesado.referencia]}}</span>
+								
+									</td>
+									<td>{{ fechaLatam(interesado.fecha) }} {{ horaLatam(interesado.fecha) }}</td>
+									<td>
+										<span class="puntero" :title="interesado.nomSeguimiento" data-bs-target="#modalCambiarSeguimiento" data-bs-toggle="modal" @click="queId= interesado.idPaciente; idRegistro = interesado.id"> {{ interesado.icono }} </span>
+										<!-- <span v-if="interesado.idSeguimiento==1" :class="interesado.color" ><span :title="interesado.nomSeguimiento"><i class="fa-regular fa-circle"></i></span></span>
+										<span v-else :class="interesado.color" ><span :title="interesado.nomSeguimiento"><i class="fas fa-circle"></i></span></span> -->
+										<!-- <span class="text-muted" v-if="interesado.atendido=='0'"><span title="Recién creado"><i class="far fa-circle"></i></span></span>
+										<span class="text-success" v-if="interesado.atendido=='1'"><span title="Cliente respondió"><i class="fas fa-check"></i></span></span>
+										<span class="text-danger" v-if="interesado.atendido=='2'"><span title="Cliente no respondió"><i class="far fa-times-circle"></i></span></span> -->
+									</td>
+									<td>
+										<button class="btn btn-outline-primary btn-sm " v-if="interesado.atendido=='0'" @click="responderInteresado(interesado)" data-bs-target="#modalResponderInteresado" data-bs-toggle="modal"><i class="far fa-comment-dots"></i></button>
+										<!-- <button class="btn btn-outline-danger btn-sm border-0" @click="borrarInteresado(interesado.id, index)"><i class="fa-solid fa-xmark"></i></button> -->
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<p v-else class="my2">No hay registros</p>
+
+
+						<label class="mt-3"><strong>Lista de interesados por fecha</strong></label>
+
+
+						<div class=" d-flex ">
+
+							<div class="btn-group d-none" role="group" aria-label="Basic radio toggle button group">
+								<input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+								<label class="btn btn-outline-primary" for="btnradio1" @click="filtro='todos'">Todos</label>
+
+								<input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+								<label class="btn btn-outline-primary" for="btnradio2" @click="filtro='1'"><i class="fas fa-check"></i> Con respuestas</label>
+
+								<input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+								<label class="btn btn-outline-primary" for="btnradio3" @click="filtro='2'"><i class="far fa-times-circle"></i> Sin respuestas</label>
+							</div>
+							
+						</div>
+						<table class="table table-hover" v-if="anteriores.length>0">
+							<thead>
+								<tr>
+									<th>N°</th>
+									<th>Nombre</th>
+									<th>Celular</th>
+									<th>Profesional</th>
+									<th>Origen</th>
+									<th>Motivo</th>
+									<th>Usuario</th>
+									<th>Referencia</th>
+									<th>Fecha y Hora</th>
+									<th>Est.</th>
+									<th>@</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for="(interesado, index) in anteriores" v-show="(interesado.idProfesional == filtroDoc || filtroDoc==-1) ">
+									<td>{{ index+1 }}</td>
+									<td class="text-capitalize">{{ interesado.nombre }}</td>
+									<td>{{ interesado.celular }}</td>
+									<td>{{ interesado.nomProf }}</td>
+									<td>
+										<span v-if="interesado.origen=='1'">Manual</span>
+										<span v-if="interesado.origen=='2'">Cartera de clientes</span>
+										<span v-if="interesado.origen=='3'">Cita anulada</span>
+									</td>
+									<td class="text-capitalize">
+										<span>{{ interesado.motivo }}</span>
+										<span v-if="interesado.atendido>0"><br><i class="fas fa-user-alt"></i> {{ interesado.respuesta }}</span>
+									</td>
+									<td>{{ interesado.usuNombre }}</td>
+									<td>
+										<span v-if="interesado.referencia=='1'">Ninguno</span>
+										<span v-if="interesado.referencia=='2'">Recomendación</span>
+										<span v-if="interesado.referencia=='3'">Publicidad de internet</span>
+										<span v-if="interesado.referencia=='4'">Publicidad Escrita</span>
+										<span v-if="interesado.referencia=='5'">Publicidad de TV/Radio</span>
+										<span v-if="interesado.referencia=='6'">Referido</span>
+										<span v-if="interesado.referencia=='7'"> </span> <!-- Sistema recepcion -->
+									</td>
+									<td>{{ fechaLatam(interesado.fecha) }} {{ horaLatam(interesado.fecha) }}</td>
+									<td>
+										<span v-if="interesado.idSeguimiento==1" :class="interesado.color" ><span :title="interesado.nomSeguimiento"><i class="fa-regular fa-circle"></i></span></span>
+										<span v-else :class="interesado.color" ><span :title="interesado.nomSeguimiento"><i class="fas fa-circle"></i></span></span>
+									</td>
+									<td>
+										<button class="btn btn-outline-primary btn-sm " v-if="interesado.atendido=='0'" @click="responderInteresado(interesado, index)" data-bs-target="#modalResponderInteresado" data-bs-toggle="modal"><i class="far fa-comment-dots"></i></button>
+										<!-- <button class="btn btn-outline-danger btn-sm border-0" @click="borrarInteresado(interesado.id, index)"><i class="fa-solid fa-xmark"></i></button> -->
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<p v-else class="my2">No hay registros</p>
+
+					
+					</div>
+				</div>
+			</div>
+		</section>
 		<section v-if="tipo=='deudas'">
 			<div class="card px-1 my-4 p-2">
 				<div class="card-body">
@@ -256,7 +414,9 @@
 
 		<ModalNuevoAviso :usuario="idUsuario"></ModalNuevoAviso>
 		<ModalEditarAviso :queAviso="queAviso" :usuario="idUsuario"></ModalEditarAviso>
+		<ModalNuevoInteresado :usuario="idUsuario" @actualizarInteresados="cargarDatos('interesados')"></ModalNuevoInteresado>
 		<ModalEditarPaciente v-if="data" :dataPatient="data"></ModalEditarPaciente>
+		<ModalResponderInteresado :queInteresado="queInteresado"></ModalResponderInteresado>
 		<ModalPagarDeuda :deuda="queDeuda" :usuario="idUsuario"></ModalPagarDeuda>
 		<ModalCambiarSeguimiento :seguimientos="seguimientos" :idPaciente="queId" :idUsuario="$attrs.idUser" :idRegistro="idRegistro" @cambiar="actualizar()"></ModalCambiarSeguimiento>
 		<ModalCambiarDeudas :seguimientos="seguimientos" :idPaciente="queId" :idUsuario="$attrs.idUser" :idRegistro="idRegistro" @cambiar="actualizar()"></ModalCambiarDeudas>
@@ -267,7 +427,9 @@
 <script>
 import ModalNuevoAviso from './ModalNuevoAviso.vue'
 import ModalEditarAviso from './ModalEditarAviso.vue'
+import ModalNuevoInteresado from './ModalNuevoInteresado.vue'
 import ModalEditarPaciente from '../pacientes/ModalEditPatient.vue'
+import ModalResponderInteresado from './ModalResponderInteresado.vue'
 import ModalPagarDeuda from './ModalPagarDeuda.vue'
 import ModalCambiarSeguimiento from '../adicionales/ModalCambiarSeguimiento.vue'
 import ModalCambiarDeudas from './ModalCambiarDeudas.vue'
@@ -275,7 +437,7 @@ import ModalCambiarDeudas from './ModalCambiarDeudas.vue'
 import moment from 'moment';
 
 export default {
-	components:{ ModalNuevoAviso, ModalEditarAviso, ModalEditarPaciente, ModalPagarDeuda, ModalCambiarSeguimiento, ModalCambiarDeudas },
+	components:{ ModalNuevoAviso, ModalEditarAviso, ModalNuevoInteresado, ModalEditarPaciente, ModalResponderInteresado, ModalPagarDeuda, ModalCambiarSeguimiento, ModalCambiarDeudas },
 	name: 'HomeRecordatorios',
 	data() {
 		return {
@@ -310,7 +472,11 @@ export default {
 						await this.axios.get(`/api/listarAvisos/${this.fechaAviso}`)
 						.then(response => {this.avisos = response.data.avisos; this.avisosAnteriores = response.data.anteriores})
 						break;
-
+					case 'interesados':
+						this.activoInteresado = true;
+						await this.axios.get(`/api/listarInteresados/${this.fechaInteresados}`)
+						.then(response => {this.interesados = response.data.interesados; this.anteriores = response.data.anteriores} )
+						break;
 					case 'deudas':
 						this.activoDeudas = true;
 						await this.axios.get(`/api/listarDeudas/`+this.nFecha)
@@ -345,12 +511,24 @@ export default {
 				case 'cumpleaños': this.cargarDatos('cumpleaños'); break;
 			}
 		},
-
-		actualizar(){ this.queId=null, this.cargarDatos() },
+		async borrarInteresado(id, index){
+			if(confirm(`¿Desea eliminar el registro de ${this.interesados[index].nombre}?`)){
+				await this.axios.get(`/api/borrarInteresados/${id}`)
+				.then(response =>{
+					this.cargarDatos('interesados')
+					if(response.data) this.$swal('Se actualizó exitosamente')
+					else this.$swal({icon:'error',title: 'Hubo un error interno'})
+				});
+			}
+		},
 		fechaFrom(fecha){
 			moment.locale('es')
 			return moment(fecha, 'YYYY-MM-DD').fromNow(true);
 		},
+		responderInteresado(interesado){
+			this.queInteresado = interesado;
+		},
+		actualizar(){ this.queId=null, this.cargarDatos() },
 		async listarProfesionales() {
 			await this.axios.get('/api/profesional')
 				.then(response => {

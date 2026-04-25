@@ -1,153 +1,148 @@
 <template>
 <!-- Modal -->
 <div class="modal fade" id="modalTriaje" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Ficha de ingreso - Triaje</h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title text-primary fw-bold d-flex align-items-center gap-2" id="exampleModalLabel">
+          <i class="fas fa-clipboard-check text-primary fs-4"></i> Nuevo Triaje
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-				<p class="mb-0"><strong>Datos de Afiliación del Paciente</strong></p>
-				<div class="form-group row">
-					<div class="col-sm-6">
-						<label for="name">Dni</label>
-						<input type="text" class="form-control" name="dni" id="dni" v-model="dataPatient.dni" placeholder="Dni del paciente" readonly>
+      <div class="modal-body bg-light-custom pt-4 px-4">
+				
+        <h6 class="section-title text-primary mb-3"><i class="fas fa-user text-secondary me-2"></i> Datos de Afiliación</h6>
+        
+        <div class="row g-3 mb-4">
+					<div class="col-md-3">
+						<label for="dni" class="form-label">DNI</label>
+						<input type="text" class="form-control bg-white" name="dni" id="dni" v-model="dataPatient.dni" placeholder="Número de DNI" readonly>
 					</div>
-					<div class="col-sm-6">
-						<label for="name">Celular</label>
-						<input type="text" class="form-control" name="phone" id="phone" v-model="dataPatient.phone" placeholder="Celular del paciente">
+					<div class="col-md-9">
+						<label for="apellidos_nombres" class="form-label">Apellidos y Nombres</label>
+						<input type="text" class="form-control bg-white" name="apellidos" id="apellidos_nombres" v-model="fullName" placeholder="Nombre completo del paciente">
 					</div>
-				</div>
-				<div class="form-group row">
-					<div class="col-sm-12">
-						<label for="name">Apellidos y Nombres</label>
-						<input type="text" class="form-control" name="apellidos" id="apellidos_nombres" v-model="fullName" placeholder="Apellidos y Nombres">
+					<div class="col-md-3">
+						<label for="phone" class="form-label">Celular</label>
+						<input type="text" class="form-control bg-white" name="phone" id="phone" v-model="dataPatient.phone" placeholder="Ej. 987654321">
 					</div>
-				</div>
-				<div class="form-group row">
-					<div class="col-sm-6">
-						<label for="name">Género</label>
-						<select class="form-select" id="sexo" v-model="dataPatient.gender">
-							<option value="">Elija el un género</option>
+					<div class="col-md-3">
+						<label for="sexo" class="form-label">Género</label>
+						<select class="form-select bg-white" id="sexo" v-model="dataPatient.gender">
+							<option value="">Seleccione...</option>
 							<option value="0">Femenino</option>
 							<option value="1">Masculino</option>
 							<option value="3">LGTB+</option>
 						</select>
 					</div>
-					<div class="col-sm-6">
-						<label for="name">Fecha Nacimiento <span></span></label>
-						<input type="date" class="form-control" name="phone" id="phone" v-model="dataPatient.birth_date" placeholder="Telefono del paciente">
+					<div class="col-md-3">
+						<label for="birth_date" class="form-label">Fecha Nacimiento</label>
+						<input type="date" class="form-control bg-white" name="birth_date" id="birth_date" v-model="dataPatient.birth_date">
+					</div>
+					<div class="col-md-3">
+						<label for="ocupacion" class="form-label">Ocupación</label>
+						<input type="text" class="form-control bg-white" name="ocupacion" id="ocupacion" v-model="dataPatient.occupation" placeholder="Ej. Estudiante">
 					</div>
 				</div>
-				<div class="form-group row">
-					<div class="col-sm-6">
-						<label for="name">Ocupación</label>
-						<input type="text" class="form-control" name="ocupacion" id="ocupacion" v-model="dataPatient.occupation" placeholder="Ocupación del paciente">
-					</div>
-					<div class="col-sm-6">
-						<label for="name">Fecha de atención</label>
-						<input type="datetime-local" class="form-control" name="fecha" id="fecha" v-model="consulta.fecha" placeholder="Fecha de atención">
-					</div>
-				</div>
-				<hr>
-				<p class="mb-0"><strong>Datos de Contacto del Triaje</strong></p>
-				<div class="form-group row">
-					<div class="col-sm-2">
-						<label for="">F.C.</label>
-						<input type="text" class="form-control" name="fc" id="fc" v-model="consulta.fc" autocomplete="off">
-					</div>
-					<div class="col-sm-2">
-						<label for="">F.R.</label>
-						<input type="text" class="form-control" name="fr" id="fr" v-model="consulta.fr" autocomplete="off">
-					</div>
-					<div class="col-sm-2">
-						<label for="">PA</label>
-						<input type="text" class="form-control" name="pa" id="pa" v-model="consulta.pa" autocomplete="off">
-					</div>
-					<div class="col-sm-2">
-						<label for="">T</label>
-						<input type="text" class="form-control" name="t" id="t" v-model="consulta.t" autocomplete="off">
-					</div>
-					<div class="col-sm-2">
-						<label for="">Saturación</label>
-						<input type="number" class="form-control" name="talla" id="talla" v-model="consulta.saturacion" autocomplete="off">
-					</div>
-				</div>
-				<div class="form-group row">
-					<div class="col-sm-3">
-						<label for="">Peso</label>
-						<input type="text" class="form-control" name="peso" id="peso" v-model="consulta.peso" autocomplete="off">
-					</div>
-					<div class="col-sm-3">
-						<label for="">Talla</label>
-						<input type="text" class="form-control" name="talla" id="talla" v-model="consulta.talla" autocomplete="off">
-					</div>
-				</div>
-				<div class="form-group row">
-					<div class="col-sm-12">
-						<label for="name">Personal responsable</label>
-						<input type="text" class="form-control" name="responsable" id="responsable" v-model="consulta.responsable" placeholder="Nombres del Personal Responsable" autocomplete="off">
-					</div>
-				</div>
-				<div class="form-group row">
-					<div class="col-sm-12">
-						<label for="name">Motivo de la consulta</label>
-						<textarea class="form-control" id="Motivo" name="Motivo" rows="3" v-model="consulta.motivo" ></textarea>
-					</div>
-				</div>
+
+				<h6 class="section-title text-primary mb-3"><i class="fas fa-notes-medical text-secondary me-2"></i> Signos Vitales y Medidas</h6>
 				
-				<div class="form-group row">
-					<div class="col-sm-12">
-						<label for="name">SINTOMATOLOGÍA</label>
-						<textarea class="form-control" id="sintomatologia" name="sintomatologia" rows="3" v-model="consulta.sintomatologia" ></textarea>
+				<div class="row g-3 mb-4">
+					<div class="col-md-3">
+						<label for="pa" class="form-label">Presión Arterial</label>
+						<input type="text" class="form-control bg-white" name="pa" id="pa" v-model="consulta.pa" placeholder="120/80" autocomplete="off">
+					</div>
+					<div class="col-md-3">
+						<label for="fc" class="form-label">Frec. Cardíaca</label>
+						<input type="text" class="form-control bg-white" name="fc" id="fc" v-model="consulta.fc" placeholder="72 bpm" autocomplete="off">
+					</div>
+					<div class="col-md-3">
+						<label for="t" class="form-label">Temperatura</label>
+						<input type="text" class="form-control bg-white" name="t" id="t" v-model="consulta.t" placeholder="36.5 °C" autocomplete="off">
+					</div>
+					<div class="col-md-3">
+						<label for="peso" class="form-label">Peso</label>
+						<input type="text" class="form-control bg-white" name="peso" id="peso" v-model="consulta.peso" placeholder="kg" autocomplete="off">
+					</div>
+					<div class="col-md-4">
+						<label for="fr" class="form-label">Frec. Respiratoria</label>
+						<input type="text" class="form-control bg-white" name="fr" id="fr" v-model="consulta.fr" placeholder="16 rpm" autocomplete="off">
+					</div>
+					<div class="col-md-4">
+						<label for="saturacion" class="form-label">Saturación (SpO2)</label>
+						<input type="number" class="form-control bg-white" name="saturacion" id="saturacion" v-model="consulta.saturacion" placeholder="%" autocomplete="off">
+					</div>
+					<div class="col-md-4">
+						<label for="talla" class="form-label">Talla</label>
+						<input type="text" class="form-control bg-white" name="talla" id="talla" v-model="consulta.talla" placeholder="cm/m" autocomplete="off">
 					</div>
 				</div>
-				<div class="form-group row">
-					<div class="col-sm-12">
-						<label for="name">ANTECEDENTES</label>
-						<textarea class="form-control" id="antecedentes" name="antecedentes" rows="3" v-model="consulta.antecedentes" ></textarea>
+
+				<h6 class="section-title text-primary mb-3"><i class="fas fa-stethoscope text-secondary me-2"></i> Evaluación Clínica</h6>
+
+				<div class="row g-3 mb-4">
+					<div class="col-md-12">
+						<label for="Motivo" class="form-label">Motivo de la consulta</label>
+						<textarea class="form-control bg-white" id="Motivo" name="Motivo" rows="2" v-model="consulta.motivo" placeholder="Describa el motivo de consulta"></textarea>
+					</div>
+					<div class="col-md-12">
+						<label for="sintomatologia" class="form-label">Sintomatología</label>
+						<textarea class="form-control bg-white" id="sintomatologia" name="sintomatologia" rows="2" v-model="consulta.sintomatologia" placeholder="Describa los síntomas que presenta el paciente"></textarea>
+					</div>
+					<div class="col-md-12">
+						<label for="antecedentes" class="form-label">Antecedentes</label>
+						<textarea class="form-control bg-white" id="antecedentes" name="antecedentes" rows="2" v-model="consulta.antecedentes" placeholder="Antecedentes médicos o psicológicos relevantes"></textarea>
+					</div>
+					<div class="col-md-12">
+						<label for="pruebas" class="form-label">Tipos de pruebas aplicadas</label>
+						<textarea class="form-control bg-white" id="pruebas" name="pruebas" rows="2" v-model="consulta.pruebas" placeholder="Mencione si se aplicó alguna prueba o instrumento"></textarea>
 					</div>
 				</div>
-				<div class="form-group row">
-					<div class="col-sm-12">
-						<label for="name">Tipos de pruebas aplicadas</label>
-						<textarea class="form-control" id="pruebas" name="pruebas" rows="3" v-model="consulta.pruebas" ></textarea>
+
+				<h6 class="section-title text-primary mb-3"><i class="fas fa-clipboard-list text-secondary me-2"></i> Detalles de Atención</h6>
+
+				<div class="row g-3">
+					<div class="col-md-4">
+						<label for="fecha" class="form-label">Fecha de atención</label>
+						<input type="datetime-local" class="form-control bg-white" name="fecha" id="fecha" v-model="consulta.fecha">
 					</div>
-				</div>
-				<div class="form-group row">
-					<div class="col-sm-4">
-						<label for="name">Prioridad</label>
-						<select class="form-select" id="prioridad" v-model="consulta.prioridad">
-							<option value="1">I</option> // Urgencia inmediata (psiquiatra)
-							<option value="2">II</option> // Urgencia moderada (psiquiatría)
-							<option value="3">III</option> // Paciente con riesgo psicosocial alto (psicología)
-							<option value="4">IV</option> // Paciente con riesgo psicosocial medio (psicología)
-							<option value="5">V</option> // Paciente con riesgo psicosocial bajo (psicología)
+					<div class="col-md-8">
+						<label for="responsable" class="form-label">Personal responsable</label>
+						<input type="text" class="form-control bg-white" name="responsable" id="responsable" v-model="consulta.responsable" placeholder="Nombres del Personal Responsable" autocomplete="off">
+					</div>
+					<div class="col-md-4">
+						<label for="especialista" class="form-label">Especialista Asignado</label>
+						<select class="form-select bg-white" id="especialista" v-model="consulta.especialista">
+							<option v-for="profesional in profesionales" :value="profesional.id" :key="profesional.id">{{profesional.name}}</option>
 						</select>
 					</div>
-					<div class="col-sm-4">
-						<label for="name">Especialista</label>
-						<select class="form-select" id="especialista" v-model="consulta.especialista">
-							<option v-for="profesional in profesionales" :value="profesional.id">{{profesional.name}}</option>
+					<div class="col-md-4">
+						<label for="prioridad" class="form-label">Prioridad</label>
+						<select class="form-select bg-white" id="prioridad" v-model="consulta.prioridad">
+							<option value="1">I - Urgencia inmediata (Psiq)</option>
+							<option value="2">II - Urgencia moderada (Psiq)</option>
+							<option value="3">III - Riesgo alto (Psic)</option>
+							<option value="4">IV - Riesgo medio (Psic)</option>
+							<option value="5">V - Riesgo bajo (Psic)</option>
 						</select>
 					</div>
-					<div class="col-sm-4">
-						<label for="name">Referencia</label>
-						<select class="form-select" id="referencia" v-model="consulta.referencia">
+					<div class="col-md-4">
+						<label for="referencia" class="form-label">Referencia</label>
+						<select class="form-select bg-white" id="referencia" v-model="consulta.referencia">
 							<option value="1">PSICOLOGÍA</option>
 							<option value="2">PSIQUIATRÍA</option>
 							<option value="3">AMBOS</option>
-							
 						</select>
 					</div>
 				</div>
+
       </div>
 			
-      <div class="modal-footer border-0">
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="insertarTriaje()">Guardar</button>
+      <div class="modal-footer border-top-0 pt-0 bg-light-custom pb-4 pe-4">
+				<button type="button" class="btn btn-light custom-btn-cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary custom-btn-save" data-bs-dismiss="modal" @click="insertarTriaje()">
+					<i class="fas fa-save me-1"></i> Registrar Triaje
+				</button>
       </div>
     </div>
   </div>
@@ -234,3 +229,75 @@ export default {
 	
 }
 </script>
+<style scoped>
+.modal-content {
+	border-radius: 12px;
+	overflow: hidden;
+}
+.bg-light-custom {
+	background-color: #f8fafc;
+}
+.section-title {
+	font-size: 0.95rem;
+	font-weight: 600;
+	margin-top: 1rem;
+	border-bottom: 2px solid #e2e8f0;
+	padding-bottom: 0.5rem;
+	display: flex;
+	align-items: center;
+}
+.form-label {
+	font-size: 0.85rem;
+	font-weight: 500;
+	color: #475569;
+	margin-bottom: 0.3rem;
+}
+.form-control, .form-select {
+	border: 1px solid #cbd5e1;
+	border-radius: 6px;
+	padding: 0.5rem 0.75rem;
+	font-size: 0.9rem;
+	color: #334155;
+	box-shadow: none;
+	transition: all 0.2s;
+}
+.form-control:focus, .form-select:focus {
+	border-color: #3b82f6;
+	box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
+}
+.form-control::placeholder {
+	color: #94a3b8;
+}
+.form-control:read-only {
+	background-color: #f1f5f9 !important;
+	color: #64748b;
+}
+.custom-btn-cancel {
+	background-color: #ffffff;
+	border: 1px solid #cbd5e1;
+	color: #475569;
+	font-weight: 500;
+	padding: 0.5rem 1.25rem;
+	border-radius: 6px;
+	transition: all 0.2s;
+}
+.custom-btn-cancel:hover {
+	background-color: #f1f5f9;
+}
+.custom-btn-save {
+	background-color: #0d6efd;
+	border-color: #0d6efd;
+	color: #ffffff;
+	font-weight: 500;
+	padding: 0.5rem 1.25rem;
+	border-radius: 6px;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	transition: all 0.2s;
+}
+.custom-btn-save:hover {
+	background-color: #0b5ed7;
+	border-color: #0a58ca;
+}
+</style>

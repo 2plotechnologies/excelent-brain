@@ -51,6 +51,8 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
       crmFiltroEstado: 'todos',
       crmFiltroServicio: 'todos',
       crmFiltroProfesional: 'todos',
+      buscadorTimeout: null,
+      crmBuscadorTimeout: null,
       pacienteCRMSeleccionado: null,
       modalCRMInstance: null,
       editandoSeguimiento: null,
@@ -152,25 +154,54 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
       } else {
         this.filtroEtiqueta = 'todos';
       }
+    },
+    buscador: function buscador(valor) {
+      var _this3 = this;
+      clearTimeout(this.buscadorTimeout);
+      this.buscadorTimeout = setTimeout(function () {
+        var texto = (valor || '').trim();
+        if (texto === '') {
+          _this3.cargarSeguimiento();
+          return;
+        }
+        _this3.buscarCrmOriginal();
+      }, 350);
+    },
+    crmBuscador: function crmBuscador(valor) {
+      var _this4 = this;
+      if (this.tabActiva !== 'crmSeguimiento') return;
+      clearTimeout(this.crmBuscadorTimeout);
+      this.crmBuscadorTimeout = setTimeout(function () {
+        var texto = (valor || '').trim();
+        if (texto === '') {
+          _this4.cargarPacientesCRM();
+          return;
+        }
+        _this4.buscarPacientesCRM();
+      }, 350);
     }
+  },
+  beforeUnmount: function beforeUnmount() {
+    clearTimeout(this.buscadorTimeout);
+    clearTimeout(this.crmBuscadorTimeout);
   },
   methods: {
     cargarSeguimiento: function cargarSeguimiento() {
-      var _this3 = this;
+      var _this5 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var _yield$_this3$axios$g, data;
+        var _yield$_this5$axios$g, data;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              _this3.cargando = true;
+              _this5.cargando = true;
               _context.prev = 1;
               _context.next = 4;
-              return _this3.axios.get('/api/seguimiento-crm');
+              return _this5.axios.get('/api/seguimiento-crm');
             case 4:
-              _yield$_this3$axios$g = _context.sent;
-              data = _yield$_this3$axios$g.data;
-              _this3.pacientes = data.pacientes || [];
-              _this3.resumen = data.resumen || _this3.resumen;
+              _yield$_this5$axios$g = _context.sent;
+              data = _yield$_this5$axios$g.data;
+              _this5.pacientes = data.pacientes || [];
+              _this5.resumen = data.resumen || _this5.resumen;
               _context.next = 13;
               break;
             case 10:
@@ -179,7 +210,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
               console.error('Error cargando seguimiento:', _context.t0);
             case 13:
               _context.prev = 13;
-              _this3.cargando = false;
+              _this5.cargando = false;
               return _context.finish(13);
             case 16:
             case "end":
@@ -189,27 +220,27 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
       }))();
     },
     buscarCrmOriginal: function buscarCrmOriginal() {
-      var _this4 = this;
+      var _this6 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var _yield$_this4$axios$g, data;
+        var _yield$_this6$axios$g, data;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              if (!(!_this4.buscador || _this4.buscador.trim() === '')) {
+              if (!(!_this6.buscador || _this6.buscador.trim() === '')) {
                 _context2.next = 3;
                 break;
               }
-              _this4.cargarSeguimiento();
+              _this6.cargarSeguimiento();
               return _context2.abrupt("return");
             case 3:
-              _this4.cargando = true;
+              _this6.cargando = true;
               _context2.prev = 4;
               _context2.next = 7;
-              return _this4.axios.get("/api/seguimiento-crm?search=".concat(encodeURIComponent(_this4.buscador)));
+              return _this6.axios.get("/api/seguimiento-crm?search=".concat(encodeURIComponent(_this6.buscador)));
             case 7:
-              _yield$_this4$axios$g = _context2.sent;
-              data = _yield$_this4$axios$g.data;
-              _this4.pacientes = data.pacientes || [];
+              _yield$_this6$axios$g = _context2.sent;
+              data = _yield$_this6$axios$g.data;
+              _this6.pacientes = data.pacientes || [];
               _context2.next = 15;
               break;
             case 12:
@@ -218,7 +249,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
               console.error('Error buscando seguimiento:', _context2.t0);
             case 15:
               _context2.prev = 15;
-              _this4.cargando = false;
+              _this6.cargando = false;
               return _context2.finish(15);
             case 18:
             case "end":
@@ -228,20 +259,20 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
       }))();
     },
     cargarPacientesCRM: function cargarPacientesCRM() {
-      var _this5 = this;
+      var _this7 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var _yield$_this5$axios$g, data;
+        var _yield$_this7$axios$g, data;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              _this5.cargandoCRM = true;
+              _this7.cargandoCRM = true;
               _context3.prev = 1;
               _context3.next = 4;
-              return _this5.axios.get('/api/seguimientosCRM');
+              return _this7.axios.get('/api/seguimientosCRM');
             case 4:
-              _yield$_this5$axios$g = _context3.sent;
-              data = _yield$_this5$axios$g.data;
-              _this5.pacientesCRM = data || [];
+              _yield$_this7$axios$g = _context3.sent;
+              data = _yield$_this7$axios$g.data;
+              _this7.pacientesCRM = data || [];
               _context3.next = 12;
               break;
             case 9:
@@ -250,7 +281,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
               console.error('Error cargando pacientes CRM:', _context3.t0);
             case 12:
               _context3.prev = 12;
-              _this5.cargandoCRM = false;
+              _this7.cargandoCRM = false;
               return _context3.finish(12);
             case 15:
             case "end":
@@ -260,27 +291,27 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
       }))();
     },
     buscarPacientesCRM: function buscarPacientesCRM() {
-      var _this6 = this;
+      var _this8 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var _yield$_this6$axios$g, data;
+        var _yield$_this8$axios$g, data;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
-              if (!(!_this6.crmBuscador || _this6.crmBuscador.trim() === '')) {
+              if (!(!_this8.crmBuscador || _this8.crmBuscador.trim() === '')) {
                 _context4.next = 3;
                 break;
               }
-              _this6.cargarPacientesCRM();
+              _this8.cargarPacientesCRM();
               return _context4.abrupt("return");
             case 3:
-              _this6.cargandoCRM = true;
+              _this8.cargandoCRM = true;
               _context4.prev = 4;
               _context4.next = 7;
-              return _this6.axios.get("/api/seguimientosCRM?search=".concat(encodeURIComponent(_this6.crmBuscador)));
+              return _this8.axios.get("/api/seguimientosCRM?search=".concat(encodeURIComponent(_this8.crmBuscador)));
             case 7:
-              _yield$_this6$axios$g = _context4.sent;
-              data = _yield$_this6$axios$g.data;
-              _this6.pacientesCRM = data || [];
+              _yield$_this8$axios$g = _context4.sent;
+              data = _yield$_this8$axios$g.data;
+              _this8.pacientesCRM = data || [];
               _context4.next = 15;
               break;
             case 12:
@@ -289,7 +320,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
               console.error('Error buscando pacientes CRM:', _context4.t0);
             case 15:
               _context4.prev = 15;
-              _this6.cargandoCRM = false;
+              _this8.cargandoCRM = false;
               return _context4.finish(15);
             case 18:
             case "end":
@@ -367,50 +398,50 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
       this.editandoSeguimiento = null;
     },
     guardarSeguimiento: function guardarSeguimiento() {
-      var _this7 = this;
+      var _this9 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var response, savedSeguimiento, index, latestSeg;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
-              _this7.guardandoSeguimiento = true;
+              _this9.guardandoSeguimiento = true;
               _context5.prev = 1;
-              if (!_this7.seguimientoForm.id) {
+              if (!_this9.seguimientoForm.id) {
                 _context5.next = 8;
                 break;
               }
               _context5.next = 5;
-              return _this7.axios.put("/api/seguimientosCRM/".concat(_this7.seguimientoForm.id), _this7.seguimientoForm);
+              return _this9.axios.put("/api/seguimientosCRM/".concat(_this9.seguimientoForm.id), _this9.seguimientoForm);
             case 5:
               response = _context5.sent;
               _context5.next = 11;
               break;
             case 8:
               _context5.next = 10;
-              return _this7.axios.post('/api/seguimientosCRM', _this7.seguimientoForm);
+              return _this9.axios.post('/api/seguimientosCRM', _this9.seguimientoForm);
             case 10:
               response = _context5.sent;
             case 11:
               if (response.data.success) {
                 savedSeguimiento = response.data.seguimiento;
-                index = _this7.pacienteCRMSeleccionado.seguimientos.findIndex(function (s) {
+                index = _this9.pacienteCRMSeleccionado.seguimientos.findIndex(function (s) {
                   return s.numero_seguimiento === savedSeguimiento.numero_seguimiento;
                 });
                 if (index !== -1) {
-                  _this7.pacienteCRMSeleccionado.seguimientos.splice(index, 1, savedSeguimiento);
+                  _this9.pacienteCRMSeleccionado.seguimientos.splice(index, 1, savedSeguimiento);
                 } else {
-                  _this7.pacienteCRMSeleccionado.seguimientos.push(savedSeguimiento);
+                  _this9.pacienteCRMSeleccionado.seguimientos.push(savedSeguimiento);
                 }
-                latestSeg = _this7.pacienteCRMSeleccionado.seguimientos.reduce(function (prev, current) {
+                latestSeg = _this9.pacienteCRMSeleccionado.seguimientos.reduce(function (prev, current) {
                   return prev.numero_seguimiento > current.numero_seguimiento ? prev : current;
                 });
                 if (latestSeg) {
-                  if (latestSeg.respuesta === "Interesado") _this7.pacienteCRMSeleccionado.estado = "Activo";else if (latestSeg.respuesta === "No Responde" || latestSeg.respuesta === "Fx. Economico") _this7.pacienteCRMSeleccionado.estado = "Pausa";else if (latestSeg.respuesta) _this7.pacienteCRMSeleccionado.estado = "Perdido";
+                  if (latestSeg.respuesta === "Interesado") _this9.pacienteCRMSeleccionado.estado = "Activo";else if (latestSeg.respuesta === "No Responde" || latestSeg.respuesta === "Fx. Economico") _this9.pacienteCRMSeleccionado.estado = "Pausa";else if (latestSeg.respuesta) _this9.pacienteCRMSeleccionado.estado = "Perdido";
                 }
-                _this7.editandoSeguimiento = null;
-                _this7.guardandoSeguimiento = false;
+                _this9.editandoSeguimiento = null;
+                _this9.guardandoSeguimiento = false;
                 //Reload page.
-                _this7.$swal({
+                _this9.$swal({
                   icon: 'success',
                   title: response.data.message || 'Guardado exitosamente',
                   showConfirmButton: false,
@@ -425,13 +456,13 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
               _context5.prev = 14;
               _context5.t0 = _context5["catch"](1);
               console.error('Error guardando seguimiento:', _context5.t0);
-              _this7.$swal({
+              _this9.$swal({
                 icon: 'error',
                 title: 'Ocurrió un error al guardar'
               });
             case 18:
               _context5.prev = 18;
-              _this7.guardandoSeguimiento = false;
+              _this9.guardandoSeguimiento = false;
               return _context5.finish(18);
             case 21:
             case "end":
@@ -707,6 +738,10 @@ var render = function render() {
       value: _vm.crmBuscador
     },
     on: {
+      keyup: function keyup($event) {
+        if (!$event.type.indexOf("key") && _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")) return null;
+        return _vm.buscarPacientesCRM.apply(null, arguments);
+      },
       input: function input($event) {
         if ($event.target.composing) return;
         _vm.crmBuscador = $event.target.value;
@@ -1448,7 +1483,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.crm-table th[data-v-b4a9e972] {\n  font-weight: 600;\n  letter-spacing: 0.5px;\n}\n.crm-table td[data-v-b4a9e972] {\n  vertical-align: middle;\n}\n.puntero[data-v-b4a9e972] { cursor: pointer;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.crm-table th[data-v-b4a9e972] {\r\n  font-weight: 600;\r\n  letter-spacing: 0.5px;\n}\n.crm-table td[data-v-b4a9e972] {\r\n  vertical-align: middle;\n}\n.puntero[data-v-b4a9e972] { cursor: pointer;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
