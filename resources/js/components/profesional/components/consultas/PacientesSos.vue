@@ -49,7 +49,7 @@
 						<div class="patient-meta-row">
 							<span class="meta-item">{{ calculateAge(paciente.birth_date) }} años</span>
 							<span class="meta-divider">•</span>
-							<span class="meta-item">{{ paciente.gender == 1 ? 'Masculino' : 'Femenino' }}</span>
+							<span class="meta-item" style="font-size: .75rem !important;">{{ paciente.gender == 1 ? 'Masculino' : 'Femenino' }}</span>
 							<span class="meta-divider">•</span>
 							<span class="meta-item">DNI: {{ paciente.dni }}</span>
 						</div>
@@ -314,13 +314,13 @@ export default {
 }
 
 .summary-label {
-	font-size: 0.875rem;
+	font-size: .75rem;
 	font-weight: 500;
 	margin-bottom: 0.5rem;
 }
 
 .summary-value {
-	font-size: 2.5rem;
+	font-size: 1.5rem;
 	font-weight: 700;
 	line-height: 1;
 }
@@ -384,7 +384,7 @@ export default {
 }
 
 .patient-name {
-	font-size: 1.125rem;
+	font-size: .75rem;
 	font-weight: 700;
 	color: #1e293b;
 	margin: 0;
@@ -393,7 +393,7 @@ export default {
 .risk-badge {
 	padding: 0.25rem 0.75rem;
 	border-radius: 1rem;
-	font-size: 0.75rem;
+	font-size: 10px;
 	font-weight: 700;
 }
 
@@ -422,12 +422,12 @@ export default {
 	color: #ef4444;
 	font-weight: 600;
 	margin-right: 0.5rem;
-	font-size: 0.9rem;
+	font-size: .75rem;
 }
 
 .motivo-text {
 	color: #ef4444;
-	font-size: 0.95rem;
+	font-size: .75rem;
 }
 
 .footer-info-row {
@@ -440,7 +440,7 @@ export default {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	font-size: 0.8rem;
+	font-size: .75rem;
 	color: #64748b;
 }
 

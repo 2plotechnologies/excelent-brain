@@ -327,32 +327,7 @@ var render = function render() {
       "max-height": "400px",
       "overflow-y": "auto"
     }
-  }, [_vm.dashboardData.sos && _vm.dashboardData.sos.length > 0 ? _c("div", {
-    staticClass: "mb-4"
-  }, [_c("h6", {
-    staticClass: "text-danger font-weight-bold border-bottom pb-2 mb-3"
-  }, [_vm._v("Alertas SOS")]), _vm._v(" "), _c("ul", {
-    staticClass: "list-group list-group-flush"
-  }, _vm._l(_vm.dashboardData.sos, function (sos, i) {
-    return _c("li", {
-      key: "sos-" + i,
-      staticClass: "list-group-item px-0"
-    }, [_c("div", {
-      staticClass: "d-flex w-100 justify-content-between"
-    }, [_c("h6", {
-      staticClass: "mb-1 text-dark font-weight-bold"
-    }, [_vm._v(_vm._s(sos.nombres) + " " + _vm._s(sos.name))]), _vm._v(" "), _c("small", {
-      staticClass: "text-muted"
-    }, [_vm._v(_vm._s(sos.registro))])]), _vm._v(" "), _c("p", {
-      staticClass: "mb-1 text-danger small"
-    }, [_c("i", {
-      staticClass: "fas fa-ban mr-1"
-    }), _vm._v(_vm._s(sos.comentarios || "Riesgo inminente detectado.") + "\n                                        ")]), _vm._v(" "), _c("small", {
-      staticClass: "text-muted"
-    }, [_c("i", {
-      staticClass: "fas fa-phone mr-1"
-    }), _vm._v(" " + _vm._s(sos.phone))])]);
-  }), 0)]) : _vm._e(), _vm._v(" "), _vm.dashboardData.deudas && _vm.dashboardData.deudas.length > 0 ? _c("div", [_c("h6", {
+  }, [_vm.dashboardData.deudas && _vm.dashboardData.deudas.length > 0 ? _c("div", [_c("h6", {
     staticClass: "text-warning font-weight-bold border-bottom pb-2 mb-3"
   }, [_vm._v("Alertas Deudas Recientes")]), _vm._v(" "), _c("ul", {
     staticClass: "list-group list-group-flush"

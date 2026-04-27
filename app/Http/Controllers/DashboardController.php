@@ -103,11 +103,11 @@ class DashboardController extends Controller
         //Tasa de retencion.
         $tasaRetencion = $activos / $totalPacientes * 100;
 
-        //Estados de citas (Pendientes, Completadas, Canceladas, reprogramadas).
-        $pendientes = Appointment::where('status', '1')->count();
-        $completadas = Appointment::where('status', '2')->count();
-        $canceladas = Appointment::where('status', '3')->count();
-        $reprogramadas = Appointment::where('status', '4')->count();
+        //Estados de citas (Pendientes, Completadas, Canceladas, reprogramadas) Solo del mes actual.
+        $pendientes = Appointment::where('status', '1')->where('date', '>=', now()->startOfMonth())->count();
+        $completadas = Appointment::where('status', '2')->where('date', '>=', now()->startOfMonth())->count();
+        $canceladas = Appointment::where('status', '3')->where('date', '>=', now()->startOfMonth())->count();
+        $reprogramadas = Appointment::where('status', '4')->where('date', '>=', now()->startOfMonth())->count();
 
         //Tipos de atencion (Tabla precio_clasificacion, obtener cantdades de medical_evolutions).
         //Ejemplo Psicologia: 100(Total de registros con esa clasificacion en medical_evolutions).
@@ -115,6 +115,7 @@ class DashboardController extends Controller
             ->join('medical_evolutions as me', 'pc.id', '=', 'me.type')
             ->select('pc.clasificacion as descripcion', DB::raw('count(*) as total'))
             ->groupBy('pc.clasificacion')
+            ->where('me.date', '>=', now()->startOfMonth())
             ->get();
        
 

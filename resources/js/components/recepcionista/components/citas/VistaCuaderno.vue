@@ -55,7 +55,10 @@
 					</div>
 				</div>
 				<!-- Columnas de doctores locales -->
-				<div class="doctors-body-container d-flex flex-grow-1" style="overflow-x: auto; position: relative;" ref="bodyScroll" @scroll="syncScrollX">
+				<div class="doctors-body-container d-flex flex-grow-1"
+					style="overflow-x: auto; overflow-y: hidden; position: relative;"
+					ref="bodyScroll"
+					@scroll="syncScrollX">
 					<!-- Malla de fondo (grid lines) -->
 					<div class="grid-lines-container" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0;">
 						<div class="grid-line border-bottom" v-for="hora in horasGrid" :key="'gl-'+hora"></div>

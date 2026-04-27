@@ -1,0 +1,11 @@
+:root {
+    --bs-body-font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+    font-family: inherit;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}

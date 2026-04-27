@@ -126,9 +126,9 @@
         <div class="row mb-4">
             <div class="col-md-6 mb-3 mb-md-0">
                 <div class="card h-100 border-0 shadow-sm" style="border-radius:10px;">
-                    <div class="card-body" style="overflow: scroll;">
+                    <div class="card-body" style="overflow: hidden;">
                         <h6 class="font-weight-bold text-dark mb-4">Tipos de Atención</h6>
-                        <div style="position: relative; height: 250px; width: 100%;" v-if="tiposDataLoaded">
+                        <div style="position: relative; height: 100%; width: 100%;" v-if="tiposDataLoaded">
                             <Doughnut :chart-data="donutObj" :chart-options="pieOptions" />
                         </div>
                     </div>
@@ -136,10 +136,10 @@
             </div>
             <div class="col-md-6">
                 <div class="card h-100 border-0 shadow-sm" style="border-radius:10px;">
-                    <div class="card-body" style="overflow: scroll;">
+                    <div class="card-body" style="overflow: hidden;">
                         <h6 class="font-weight-bold text-dark mb-4">Estados de Pacientes</h6>
                         <div 
-                          :style="{ height: (barObj.labels.length * 50) + 'px', position: 'relative', width: '100%' }"
+                          :style="{ height: '100%', position: 'relative', width: '100%' }"
                           v-if="dashData.completadas !== undefined"
                         >
                             <Bar :chart-data="barObj" :chart-options="barOptions" />

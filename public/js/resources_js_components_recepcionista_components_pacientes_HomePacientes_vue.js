@@ -4177,14 +4177,14 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "card-body",
     staticStyle: {
-      overflow: "scroll"
+      overflow: "hidden"
     }
   }, [_c("h6", {
     staticClass: "font-weight-bold text-dark mb-4"
   }, [_vm._v("Tipos de Atención")]), _vm._v(" "), _vm.tiposDataLoaded ? _c("div", {
     staticStyle: {
       position: "relative",
-      height: "250px",
+      height: "100%",
       width: "100%"
     }
   }, [_c("Doughnut", {
@@ -4202,13 +4202,13 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "card-body",
     staticStyle: {
-      overflow: "scroll"
+      overflow: "hidden"
     }
   }, [_c("h6", {
     staticClass: "font-weight-bold text-dark mb-4"
   }, [_vm._v("Estados de Pacientes")]), _vm._v(" "), _vm.dashData.completadas !== undefined ? _c("div", {
     style: {
-      height: _vm.barObj.labels.length * 50 + "px",
+      height: "100%",
       position: "relative",
       width: "100%"
     }

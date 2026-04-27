@@ -2442,7 +2442,7 @@ var render = function render() {
     _c = _vm._self._c;
   return _c("div", [_c("div", {
     staticClass: "d-sm-flex align-items-center justify-content-between mb-4"
-  }, [_c("div"), _vm._v(" "), _c("div", {
+  }, [_c("div", {
     staticClass: "d-flex align-items-center d-print-none"
   }, [_c("select", {
     directives: [{
@@ -2496,31 +2496,60 @@ var render = function render() {
         _vm.fecha = $event.target.value;
       }
     }
-  })])]), _vm._v(" "), _c("div", {
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "m-4 d-print-none"
+  }, [_c("button", {
+    staticClass: "btn btn-outline-success",
+    on: {
+      click: function click($event) {
+        return _vm.exportar();
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-file-excel"
+  }), _vm._v(" Exportar a Excel")]), _vm._v(" "), _vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm.consultarFecha() ? _c("button", {
+    staticClass: "btn btn-outline-secondary",
+    on: {
+      click: function click($event) {
+        return _vm.verTicketCierre();
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-print"
+  }), _vm._v(" Ticket de cierre")]) : _vm._e(), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-outline-secondary border-0",
+    on: {
+      click: function click($event) {
+        return _vm.actualizar();
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-sync"
+  }), _vm._v(" Actualizar")])])]), _vm._v(" "), _c("div", {
     staticClass: "row mb-3 mt-3 d-print-none"
   }, [_c("div", {
     staticClass: "col-md-3 mb-2"
   }, [_c("div", {
     staticClass: "card border-0 shadow-sm rounded p-3 h-100"
-  }, [_vm._m(0), _vm._v(" "), _c("h4", {
+  }, [_vm._m(2), _vm._v(" "), _c("h4", {
     staticClass: "mb-0 text-success fw-bold"
   }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.totalIngresosStats).toFixed(2)))])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-3 mb-2"
   }, [_c("div", {
     staticClass: "card border-0 shadow-sm rounded p-3 h-100"
-  }, [_vm._m(1), _vm._v(" "), _c("h4", {
+  }, [_vm._m(3), _vm._v(" "), _c("h4", {
     staticClass: "mb-0 text-danger fw-bold"
   }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.totalEgresosStats).toFixed(2)))])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-3 mb-2"
   }, [_c("div", {
     staticClass: "card border-0 shadow-sm rounded p-3 h-100"
-  }, [_vm._m(2), _vm._v(" "), _c("h4", {
+  }, [_vm._m(4), _vm._v(" "), _c("h4", {
     staticClass: "mb-0 text-primary fw-bold"
   }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.netoDiaStats).toFixed(2)))])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-3 mb-2"
   }, [_c("div", {
     staticClass: "card border-0 shadow-sm rounded p-3 h-100 pb-2"
-  }, [_vm._m(3), _vm._v(" "), _c("h4", {
+  }, [_vm._m(5), _vm._v(" "), _c("h4", {
     staticClass: "mb-0 text-dark fw-bold"
   }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.totalCitasCobradas).toFixed(2)))]), _vm._v(" "), _c("div", {
     staticClass: "text-muted mt-1",
@@ -2547,35 +2576,6 @@ var render = function render() {
   }), 0), _vm._v(" "), _c("div", {
     staticClass: "card px-1 pt-2"
   }, [_c("div", {
-    staticClass: "m-4 d-print-none"
-  }, [_c("button", {
-    staticClass: "btn btn-outline-success",
-    on: {
-      click: function click($event) {
-        return _vm.exportar();
-      }
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-file-excel"
-  }), _vm._v(" Exportar a Excel")]), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm.consultarFecha() ? _c("button", {
-    staticClass: "btn btn-outline-secondary",
-    on: {
-      click: function click($event) {
-        return _vm.verTicketCierre();
-      }
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-print"
-  }), _vm._v(" Ticket de cierre")]) : _vm._e(), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-outline-secondary border-0",
-    on: {
-      click: function click($event) {
-        return _vm.actualizar();
-      }
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-sync"
-  }), _vm._v(" Actualizar")])]), _vm._v(" "), _c("div", {
     staticClass: "table-responsive"
   }, [_c("table", {
     staticClass: "table-pagos mt-1",
@@ -3146,6 +3146,30 @@ var render = function render() {
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn btn-outline-secondary ms-auto",
+    attrs: {
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#pagoExtras"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-plus"
+  }), _vm._v(" Ingresos extras")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn btn-outline-danger",
+    attrs: {
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#egresosExtras"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-minus"
+  }), _vm._v(" Egresos extras")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
   return _c("div", {
     staticClass: "text-muted small mb-1"
   }, [_c("i", {
@@ -3175,30 +3199,6 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "far fa-calendar-check text-secondary me-1"
   }), _vm._v(" Citas Cobradas")]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("button", {
-    staticClass: "btn btn-outline-secondary ms-auto",
-    attrs: {
-      "data-bs-toggle": "modal",
-      "data-bs-target": "#pagoExtras"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-plus"
-  }), _vm._v(" Ingresos extras")]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("button", {
-    staticClass: "btn btn-outline-danger",
-    attrs: {
-      "data-bs-toggle": "modal",
-      "data-bs-target": "#egresosExtras"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-minus"
-  }), _vm._v(" Egresos extras")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;

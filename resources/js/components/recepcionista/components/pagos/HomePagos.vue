@@ -1,13 +1,22 @@
 <template>
 	<div>
 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-					<div></div>
 					<div class="d-flex align-items-center d-print-none">
 						<select class="form-select mx-1" id="sltSede" v-model="$attrs.idSede" disabled>
 							<option value="1">Sede Principal</option>
 							<option value="2">Sede San Carlos</option>
 						</select>
 						<input type="date" class="form-control" @change="selectDate" v-model="fecha">
+					</div>
+					<div class="m-4 d-print-none">
+						<button class="btn btn-outline-success" @click="exportar()"><i class="fas fa-file-excel"></i> Exportar a Excel</button>
+						<!--<button class="btn btn-outline-primary" @click="membresias()" data-bs-target="#modalMembresias" data-bs-toggle="modal"><i class="fa-solid fa-arrow-up-right-dots"></i> Ingresar paquete</button>-->
+						<button data-bs-toggle="modal" data-bs-target="#pagoExtras" class="btn btn-outline-secondary ms-auto"><i class="fas fa-plus"></i> Ingresos extras</button>
+						<button data-bs-toggle="modal" data-bs-target="#egresosExtras" class="btn btn-outline-danger"><i class="fas fa-minus"></i> Egresos extras</button>
+						<button class="btn btn-outline-secondary " v-if="consultarFecha()" @click="verTicketCierre()"> <i class="fas fa-print"></i> Ticket de cierre</button>
+						<button class="btn btn-outline-secondary border-0" @click="actualizar()"> <i class="fas fa-sync"></i> Actualizar</button>
+						
+						
 					</div>
 	</div>
 	<div class="row mb-3 mt-3 d-print-none">
@@ -49,17 +58,6 @@
 	</div>
 
 	<div class="card px-1 pt-2 ">
-		<div class="m-4 d-print-none">
-			<button class="btn btn-outline-success" @click="exportar()"><i class="fas fa-file-excel"></i> Exportar a Excel</button>
-			<!--<button class="btn btn-outline-primary" @click="membresias()" data-bs-target="#modalMembresias" data-bs-toggle="modal"><i class="fa-solid fa-arrow-up-right-dots"></i> Ingresar paquete</button>-->
-			<button data-bs-toggle="modal" data-bs-target="#pagoExtras" class="btn btn-outline-secondary ms-auto"><i class="fas fa-plus"></i> Ingresos extras</button>
-			<button data-bs-toggle="modal" data-bs-target="#egresosExtras" class="btn btn-outline-danger"><i class="fas fa-minus"></i> Egresos extras</button>
-			<button class="btn btn-outline-secondary " v-if="consultarFecha()" @click="verTicketCierre()"> <i class="fas fa-print"></i> Ticket de cierre</button>
-			<button class="btn btn-outline-secondary border-0" @click="actualizar()"> <i class="fas fa-sync"></i> Actualizar</button>
-			
-			
-		</div>
-
 		<div class="table-responsive">
 			<table class="table-pagos mt-1" id="table_export">
 				<thead>
@@ -881,4 +879,4 @@ export default{
 .dropdown-item:hover i {
     color: #3498db;
 }
-</style>
+</style>

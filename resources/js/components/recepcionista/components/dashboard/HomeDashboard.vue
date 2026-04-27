@@ -222,23 +222,6 @@
                         <div v-if="dashboardData.totalAlertas > 0">
                             
                             <div class="alertas-container pr-2" style="max-height: 400px; overflow-y: auto;">
-                                <!-- SOS ALERTS -->
-                                <div v-if="dashboardData.sos && dashboardData.sos.length > 0" class="mb-4">
-                                    <h6 class="text-danger font-weight-bold border-bottom pb-2 mb-3">Alertas SOS</h6>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item px-0" v-for="(sos, i) in dashboardData.sos" :key="'sos-'+i">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <h6 class="mb-1 text-dark font-weight-bold">{{ sos.nombres }} {{ sos.name }}</h6>
-                                                <small class="text-muted">{{ sos.registro }}</small>
-                                            </div>
-                                            <p class="mb-1 text-danger small">
-                                                <i class="fas fa-ban mr-1"></i>{{ sos.comentarios || 'Riesgo inminente detectado.' }}
-                                            </p>
-                                            <small class="text-muted"><i class="fas fa-phone mr-1"></i> {{ sos.phone }}</small>
-                                        </li>
-                                    </ul>
-                                </div>
-
                                 <!-- DEUDAS ALERTS -->
                                 <div v-if="dashboardData.deudas && dashboardData.deudas.length > 0">
                                     <h6 class="text-warning font-weight-bold border-bottom pb-2 mb-3">Alertas Deudas Recientes</h6>
