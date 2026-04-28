@@ -6,15 +6,28 @@
         <h1 class="h3 mb-0 text-gray-800 fw-bold d-flex align-items-center">
           <i class="fas fa-box-open text-primary me-2"></i> Paquetes & Sesiones
         </h1>
-        <div class="deudas-badge" v-if="metricas.vencidas > 0">
-          <i class="fas fa-user-times me-1"></i> Deudas
-          <span class="badge bg-danger ms-1 rounded-pill">{{ metricas.vencidas }}</span>
+        <div class="module-tabs">
+          <button
+            class="btn btn-sm module-tab-btn"
+            :class="{ active: vistaActiva === 'paquetes' }"
+            @click="vistaActiva = 'paquetes'"
+          >
+            <i class="fas fa-box-open me-1"></i> Paquetes
+          </button>
+          <button
+            class="btn btn-sm module-tab-btn"
+            :class="{ active: vistaActiva === 'deudas' }"
+            @click="vistaActiva = 'deudas'"
+          >
+            <i class="fas fa-user-times me-1"></i> Deudas
+            <span class="badge bg-danger ms-1 rounded-pill">{{ metricas.vencidas }}</span>
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Buscador y Acciones -->
-    <div class="d-flex justify-content-between mb-4 flex-wrap gap-2">
+    <div class="d-flex justify-content-between mb-4 flex-wrap gap-2" v-if="vistaActiva === 'paquetes'">
       <div class="search-box">
         <i class="fas fa-search search-icon"></i>
         <input 
@@ -31,7 +44,7 @@
     </div>
 
     <!-- Tarjetas de Métricas -->
-    <div class="row g-3 mb-4 metricas-row">
+    <div class="row g-3 mb-4 metricas-row" v-if="vistaActiva === 'paquetes'">
       <div class="col-md-3">
         <div class="card shadow-sm border-0 h-100 summary-card act-card">
           <div class="card-body">
@@ -67,7 +80,7 @@
     </div>
 
     <!-- Botones de Filtro -->
-    <div class="filters-area mb-4">
+    <div class="filters-area mb-4" v-if="vistaActiva === 'paquetes'">
       <div class="d-flex align-items-center mb-2">
         <span class="filter-label text-muted">Estado:</span>
         <div class="d-flex gap-2 ms-3 flex-wrap">
@@ -88,7 +101,7 @@
     </div>
 
     <!-- LOADING -->
-    <div v-if="loading" class="text-center py-5">
+    <div v-if="loading && vistaActiva === 'paquetes'" class="text-center py-5">
       <div class="text-muted fs-5">
         <i class="fas fa-spinner fa-spin fa-2x mb-3"></i><br>
         Cargando paquetes...
@@ -96,14 +109,14 @@
     </div>
 
     <!-- SIN RESULTADOS -->
-    <div v-else-if="paquetesFiltrados.length === 0" class="text-center py-5">
+    <div v-else-if="paquetesFiltrados.length === 0 && vistaActiva === 'paquetes'" class="text-center py-5">
       <div class="text-muted fs-5">
         <i class="fas fa-inbox fa-3x mb-3 text-light"></i><br>
         No se encontraron paquetes.
       </div>
     </div>
 
-    <div class="package-list" v-if="!loading && paquetesFiltrados.length > 0">
+    <div class="package-list" v-if="vistaActiva === 'paquetes' && !loading && paquetesFiltrados.length > 0">
       <div 
         v-for="paquete in paquetesFiltrados" 
         :key="paquete.id" 
@@ -238,6 +251,73 @@
       </div>
     </div>
 
+    <div v-if="vistaActiva === 'deudas'" class="debts-view">
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="debt-summary-card">
+            <p class="mb-1">Total Deudores</p>
+            <h3 class="mb-0 text-danger fw-bold">{{ deudaResumen.totalDeudores }}</h3>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="debt-summary-card">
+            <p class="mb-1">Deuda Total</p>
+            <h3 class="mb-0 text-danger fw-bold">S/ {{ deudaResumen.totalDeuda.toFixed(2) }}</h3>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="debt-summary-card">
+            <p class="mb-1">Cobrado Total</p>
+            <h3 class="mb-0 text-success fw-bold">S/ {{ deudaResumen.totalCobrado.toFixed(2) }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="deudasPendientes.length === 0" class="text-center py-5 text-muted fs-5">
+        <i class="fas fa-check-circle fa-3x mb-3 text-success"></i><br>
+        No hay deudas pendientes por cobrar.
+      </div>
+
+      <div v-else class="debt-list">
+        <div v-for="deuda in deudasPendientes" :key="`deuda-${deuda.id}`" class="debt-card mb-3">
+          <div class="d-flex gap-3 align-items-start mb-2">
+            <div class="debt-icon">
+              <i class="fas fa-user-times"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                <h5 class="mb-0 fw-bold text-dark">{{ deuda.patient_name }} {{ deuda.patient_nombres }}</h5>
+                <span class="badge bg-success-subtle text-success rounded-pill">Activo</span>
+                <span class="badge bg-primary-subtle text-primary rounded-pill">{{ getTipoBadge(deuda.idClasificacion) }}</span>
+              </div>
+              <p class="mb-2 text-muted debt-meta">{{ deuda.paquete_nombre }} · {{ deuda.professional || 'Sin profesional asignado' }}</p>
+              <div class="d-flex justify-content-between align-items-end mb-1">
+                <p class="mb-0 text-muted debt-progress-label">Pago: S/ {{ parseFloat(deuda.pagado || 0).toFixed(2) }} de S/ {{ parseFloat(deuda.monto || 0).toFixed(2) }}</p>
+                <span class="fw-semibold text-dark">{{ calcularProgresoPago(deuda) }}%</span>
+              </div>
+              <div class="debt-progress">
+                <div class="debt-progress-paid" :style="{ width: calcularProgresoPago(deuda) + '%' }"></div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-4 flex-wrap">
+                  <p class="mb-0 debt-amount"><i class="fas fa-dollar-sign me-1"></i> Debe: S/ {{ parseFloat(deuda.debe || 0).toFixed(2) }}</p>
+                  <p class="mb-0 text-muted">Cuota: S/ {{ calcularCuotaPromedio(deuda).toFixed(2) }}</p>
+                </div>
+                <button
+                  class="btn btn-primary rounded-pill debt-action-btn"
+                  data-bs-toggle="modal"
+                  data-bs-target="#modalPagarCuota"
+                  @click="paqueteSeleccionado = deuda"
+                >
+                  <i class="far fa-credit-card me-1"></i> Registrar Pago
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal Pagar Cuota -->
     <div class="modal fade" id="modalPagarCuota" tabindex="-1" aria-labelledby="modalPagarCuotaLabel" aria-hidden="true" v-if="paqueteSeleccionado">
       <div class="modal-dialog modal-lg">
@@ -316,7 +396,7 @@
     <ModalMembresias :idUsuario="idUsuario" vista="buscar" @membresiaGuardada="cargarPaquetes(1)"></ModalMembresias>
 
     <!-- Paginación -->
-    <div class="d-flex justify-content-center mt-4" v-if="pagination.last_page > 1">
+    <div class="d-flex justify-content-center mt-4" v-if="vistaActiva === 'paquetes' && pagination.last_page > 1">
       <nav aria-label="Page navigation">
         <ul class="pagination shadow-sm">
           <li class="page-item" :class="{'disabled': pagination.current_page === 1}">
@@ -356,6 +436,7 @@ export default {
         vencidas: 0,
         totales: 0
       },
+      vistaActiva: 'paquetes',
       pagination: {
         current_page: 1,
         last_page: 1,
@@ -384,6 +465,17 @@ export default {
         pagesArray.push(page);
       }
       return pagesArray;
+    },
+    deudasPendientes() {
+      return this.paquetesFiltrados.filter((paquete) => parseFloat(paquete.debe || 0) > 0);
+    },
+    deudaResumen() {
+      return this.deudasPendientes.reduce((acc, deuda) => {
+        acc.totalDeudores += 1;
+        acc.totalDeuda += parseFloat(deuda.debe || 0);
+        acc.totalCobrado += parseFloat(deuda.pagado || 0);
+        return acc;
+      }, { totalDeudores: 0, totalDeuda: 0, totalCobrado: 0 });
     }
   },
   mounted() {
@@ -507,6 +599,19 @@ export default {
       const today = new Date().toISOString().slice(0, 10);
       return fecha < today;
     },
+    calcularProgresoPago(paquete) {
+      const total = parseFloat(paquete.monto || 0);
+      const pagado = parseFloat(paquete.pagado || 0);
+      if (total <= 0) return 0;
+      const porcentaje = (pagado / total) * 100;
+      return Math.min(100, Math.max(0, Math.round(porcentaje)));
+    },
+    calcularCuotaPromedio(paquete) {
+      const cuotas = parseInt(paquete.total_cuotas || 0);
+      const deuda = parseFloat(paquete.debe || 0);
+      if (cuotas <= 0) return deuda;
+      return deuda / cuotas;
+    },
     async procesarPago(cuota) {
       if(!confirm('¿Seguro que deseas registrar el pago de S/ ' + parseFloat(cuota.monto).toFixed(2) + '?')) return;
       
@@ -551,17 +656,28 @@ export default {
   border-radius: 12px;
 }
 
-/* Identifiers */
-.deudas-badge {
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  padding: 0.35rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  color: #64748b;
+/* Header tabs */
+.module-tabs {
   display: flex;
-  align-items: center;
-  font-weight: 500;
+  gap: 0.5rem;
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 0.25rem;
+}
+.module-tab-btn {
+  border: none;
+  color: #64748b;
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+}
+.module-tab-btn.active {
+  background: #1d4ed8;
+  color: #fff;
+}
+.module-tab-btn.active .badge {
+  background: #fff !important;
+  color: #dc2626;
 }
 
 /* Search Box */
@@ -740,5 +856,62 @@ export default {
 }
 .history-item:last-child {
   border-bottom: none !important;
+}
+
+/* Deudas */
+.debt-summary-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.2rem 1.4rem;
+}
+.debt-summary-card p {
+  color: #64748b;
+  font-size: 1.05rem;
+}
+.debt-card {
+  border: 1px solid #fecaca;
+  border-radius: 18px;
+  background: #fff;
+  padding: 1.8rem;
+}
+.debt-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 16px;
+  background: #fee2e2;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+.debt-meta {
+  font-size: 1.05rem;
+}
+.debt-progress-label {
+  font-size: 1.05rem;
+}
+.debt-progress {
+  width: 100%;
+  height: 12px;
+  border-radius: 999px;
+  background: #f97316;
+  overflow: hidden;
+}
+.debt-progress-paid {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 999px 0 0 999px;
+}
+.debt-amount {
+  color: #ef4444;
+  font-weight: 700;
+  font-size: 1.85rem;
+}
+.debt-action-btn {
+  padding: 0.55rem 1.2rem;
+  font-weight: 600;
+  font-size: 1.05rem;
 }
 </style>
