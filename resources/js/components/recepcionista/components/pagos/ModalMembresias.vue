@@ -1,213 +1,229 @@
 <template>
 	<!-- Modal -->
-	<div class="modal fade" id="modalMembresias" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered ">
-			<div class="modal-content">
-				<div class="modal-header border-0 pb-0">
-					<h1 class="modal-title fs-5" id="exampleModalLabel">Paquetes</h1>
+	<div class="modal fade" id="modalMembresias" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-lg">
+			<div class="modal-content border-0 shadow">
+				<div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+					<h5 class="modal-title fw-bold d-flex align-items-center" style="color: #1e293b;">
+						<i class="fa-solid fa-cube text-primary me-2"></i> Nuevo Paquete
+					</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<div class="modal-body">
-					<section v-show="vista == 'buscar'">
-						<label for=""><i class="fas fa-search"></i> Filtre al paciente por DNI o Nombres</label>
-						<input type="text" class="form-control" v-model="txtBusqueda" @change="activaResultados = false"
-							@keyup.enter="searchHistoria()">
-						<div class="mt-3" v-if="pacientes.length > 0">
-							<p class="mb-1">Pacientes encontrados:</p>
-							<ol class="list-group list-group-flush">
-								<li class="list-group-item list-group-item-action puntero" v-for="(paciente, index) in pacientes"
-									@click="cambiarVista('membresia', index)">
-									<div class="d-flex w-100 justify-content-between ">
-										<div class="fw-bold text-capitalize">
-											<span>{{ paciente.name }} {{ paciente.nombres }} <span
-													class="badge text-bg-secondary">{{ paciente.etiqueta }}</span></span>
-										</div>
-										<button class="btn btn-sm" title="Agregar Membresía"><i class="fa-solid fa-angles-right"></i></button>
+				<div class="modal-body px-4 pb-4">
+					
+					<!-- Paciente -->
+					<div class="mb-4 mt-2">
+						<label class="form-label text-secondary small fw-medium mb-1">Paciente <span class="text-danger">*</span></label>
+						<div class="position-relative" v-if="!pacienteElegido.id">
+							<div class="input-group">
+								<span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+								<input type="text" class="form-control border-start-0 ps-0" placeholder="Buscar por nombre o DNI..." v-model="txtBusqueda" @keyup.enter="searchHistoria()" @input="activaResultados = false; pacientes = []">
+							</div>
+							<div class="list-group position-absolute w-100 mt-1 shadow z-3" v-if="pacientes.length > 0" style="max-height: 250px; overflow-y: auto;">
+								<button type="button" class="list-group-item list-group-item-action py-2" v-for="(paciente, index) in pacientes" @click="seleccionarPaciente(index)">
+									<div class="d-flex justify-content-between align-items-center mb-1">
+										<span class="fw-medium text-capitalize text-dark">{{ paciente.name }} {{ paciente.nombres }}</span>
+										<span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill fw-normal">{{ paciente.etiqueta }}</span>
 									</div>
-									<p class="mb-1">{{ paciente.dni }}</p>
-									<small><i class="fa-solid fa-mobile-screen"></i> {{ paciente.phone }} </small>
-								</li>
-							</ol>
+									<div class="small text-muted">{{ paciente.dni }} • <i class="fa-solid fa-mobile-screen ms-1"></i> {{ paciente.phone }}</div>
+								</button>
+							</div>
+							<div class="mt-2 text-muted small" v-if="activaResultados && pacientes.length === 0">No se encontraron resultados para "{{ txtBusqueda }}"</div>
 						</div>
-						<div class="mt-3" v-else-if="activaResultados">
-							<p>No se encontraron resultados para {{ txtBusqueda }}</p>
+						<div class="card border-primary border-opacity-50 bg-primary bg-opacity-10" v-else>
+							<div class="card-body py-2 px-3 d-flex justify-content-between align-items-center">
+								<div>
+									<div class="fw-bold text-primary text-capitalize">{{ pacienteElegido.name }} {{ pacienteElegido.nombres }}</div>
+									<div class="small text-primary text-opacity-75">{{ pacienteElegido.dni }} • <i class="fa-solid fa-mobile-screen ms-1"></i> {{ pacienteElegido.phone }}</div>
+								</div>
+								<button class="btn btn-sm btn-link text-primary text-decoration-none fw-medium" @click="limpiarPaciente()">Cambiar</button>
+							</div>
 						</div>
-					</section>
-					<section v-show="vista == 'membresia'">
-						<p><a href="#!" @click="cambiarVista('buscar', -1)"><i class="fa-solid fa-angles-left"></i> Volver</a></p>
-						<p class="mb-0 text-capitalize"><strong>Paciente</strong> {{ pacienteElegido.name }} {{ pacienteElegido.nombres }}</p>
-						<p class="mb-0"><strong>D.N.I</strong> {{ pacienteElegido.dni }}</p>
-						<p class="mb-0"><strong>Celular</strong> {{ pacienteElegido.phone }}</p>
-						<p class="mb-0"><strong>Última atención</strong> {{ pacienteElegido.etiqueta == '' ? 'Sin registro' :
-							pacienteElegido.etiqueta }}</p>
-						<label class="mt-3" for="">Tipo de paquete</label>
-						<select name="" class="form-select" id="sltMembresia" v-model="membresia.tipo" @change="calcularFechas()">
+					</div>
+
+					<!-- Tipo de Paquete -->
+					<div class="mb-4">
+						<label class="form-label text-secondary small fw-medium mb-1">Especialidad del Paquete <span class="text-danger">*</span></label>
+						<select class="form-select" id="sltMembresia" v-model="membresia.tipo" @change="calcularFechas()">
 							<option v-for="precio in precios" :value="precio.id">{{ precio.descripcion }}</option>
 						</select>
-						<p class="mb-0 mt-2"><i class="fa-regular fa-hourglass"></i> Cantidad de sesiones: {{ cantSesiones }}</p>
-						<p class="mb-2"><i class="fa-regular fa-calendar-xmark"></i> Membresía caduca en {{ cantMeses }} mes{{cantMeses == 1 ? '' : 'es'}}</p>
-
-
-						<ul class="nav nav-tabs mt-3 d-none" id="myTab" role="tablist">
-							<li class="nav-item" role="presentation">
-								<button class="nav-link active" id="pagos-tab" data-bs-toggle="tab" data-bs-target="#pagos-tab-pane"
-									type="button" role="tab" aria-controls="pagos-tab-pane" aria-selected="true"><i
-										class="far fa-calendar-check"></i> Pagos</button>
-							</li>
-							<li class="nav-item" role="presentation">
-								<button class="nav-link" id="membresia-tab" data-bs-toggle="tab" data-bs-target="#membresia-tab-pane"
-									type="button" role="tab" aria-controls="membresia-tab-pane" aria-selected="false"><i
-										class="far fa-calendar-alt"></i> Sesiones</button>
-							</li>
-						</ul>
-
-						<div class="tab-content" id="tabContenedor">
-							<div class="tab-pane fade show active" id="pagos-tab-pane" role="tabpanel" aria-labelledby="pagos-tab"
-								tabindex="0">
-								<!-- Inicio de tab de Pagos -->
-								<div class="row pt-3">
-									<div class="col-6">
-										<label class="mt-2 " for="">N° Cuotas</label>
-										<input type="number" class="form-control" v-model="membresia.cuotas" @change="calcularFechas()" min="0" max="5">
+						
+						<!-- Card estilo imagen cuando se selecciona -->
+						<div class="row mt-3" v-if="membresia.tipo">
+							<div class="col-md-4">
+								<div class="card border-primary shadow-sm h-100" style="background-color: #f0f7ff;">
+									<div class="card-body text-center py-3 d-flex flex-column justify-content-center">
+										<div class="text-primary fw-medium mb-1">{{ descripcionPaqueteElegido }}</div>
+										<div class="small text-muted" v-if="cantSesiones">S/ {{ (mostrarPrecio / cantSesiones).toFixed(2) }}/sesión</div>
 									</div>
-									<div class="col-6">
-										<label clas="mb-0 mt-2">¿Tiene descuento?</label>
-										<div class="form-check">
-											<input class="form-check-input" type="checkbox" value="" id="HayDescto" v-model="membresia.conDescuento" @change="membresia.descuento = 0">
-											<label class="form-check-label">
-													<span v-if="!membresia.conDescuento">No</span>
-													<span v-else>Si</span>
+								</div>
+							</div>
+							<div class="col-md-4" v-if="cantSesiones">
+								<div class="card border-primary shadow-sm h-100" style="background-color: #f0f7ff;">
+									<div class="card-body text-center py-3 d-flex flex-column justify-content-center">
+										<div class="text-primary fw-bold fs-5 mb-0">{{ cantSesiones }}</div>
+										<div class="small text-muted mt-1">S/ {{ mostrarPrecio }} en total</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Profesional -->
+					<div class="mb-4">
+						<label class="form-label text-secondary small fw-medium mb-1">Profesional <span class="text-danger">*</span></label>
+						<select class="form-select" id="sltDoctor" v-model="doctorSeleccionado" @change="listarhorario()">
+							<option value="-1">Seleccione un profesional</option>
+							<option v-for="doctor in doctores" :value="doctor.id">{{ doctor.nombre }}</option>
+						</select>
+					</div>
+
+					<!-- Precio y Cuotas -->
+					<div class="card border-0 mb-4" style="background-color: #f8f9fa; border-radius: 1rem;">
+						<div class="card-body p-4">
+							<h6 class="fw-bold mb-4 d-flex align-items-center" style="color: #2b3b5a;">
+								<i class="fa-solid fa-dollar-sign text-primary me-2"></i> Precio y Cuotas
+							</h6>
+							
+							<div class="row g-3">
+								<div class="col-md-6">
+									<label class="form-label small text-muted mb-1">Precio Regular</label>
+									<div class="input-group">
+										<span class="input-group-text bg-white text-muted border-end-0">S/</span>
+										<input type="text" class="form-control border-start-0 bg-white text-muted" readonly :value="mostrarPrecio">
+									</div>
+								</div>
+								<div class="col-md-6">
+									<label class="form-label small text-muted mb-1">Descuento (S/)</label>
+									<input type="number" class="form-control bg-white" v-model="membresia.descuento" @change="calcularFechas()" min="0">
+								</div>
+								
+								<div class="col-md-6">
+									<label class="form-label small text-muted mb-1">Nro. de Cuotas</label>
+									<select class="form-select bg-white" v-model="membresia.cuotas" @change="calcularFechas()">
+										<option v-for="n in 5" :value="n">{{ n }} cuota{{ n > 1 ? 's' : '' }}</option>
+									</select>
+								</div>
+								<div class="col-md-6" v-if="membresia.cuotas > 0 && fechas.length > 0">
+									<label class="form-label small text-muted mb-1">1ra Cuota (S/) — editable</label>
+									<input type="number" class="form-control bg-white" v-model="fechas[0].monto" @keyup="balancearMontos(0)">
+								</div>
+							</div>
+
+							<div class="mt-4" v-if="fechas.length > 0">
+								<label class="form-label small fw-medium mb-3 d-flex align-items-center text-secondary">
+									<i class="fa-regular fa-calendar me-2"></i> Fechas de vencimiento de cuotas
+								</label>
+								<div class="row g-3">
+									<div class="col-md-6" v-for="(fecha, index) in fechas" :key="index">
+										<div class="d-flex justify-content-between align-items-end mb-1">
+											<label class="small text-muted mb-0">
+												Cuota {{ index + 1 }} <span v-if="index === 0 && membresia.cuotas > 1" class="text-black-50">(editable)</span>
 											</label>
+											<div class="form-check form-check-inline mb-0 me-0" title="¿Paga?">
+												<input class="form-check-input" type="checkbox" v-model="fecha.pago" :id="'pago' + index">
+												<label class="form-check-label small" :for="'pago' + index" style="font-size: 0.75rem;">¿Pagado?</label>
+											</div>
 										</div>
-									</div>
-									<div class="col-6" v-if="membresia.conDescuento">
-										<label for="mt-2">Descuento</label>
-										<input type="number" class="form-control" v-model="membresia.descuento" @change="calcularFechas()" max="50">
-									</div>
-								</div>
-
-
-									<!-- <div class="d-grid col-8 ms-auto">
-									<button class="btn btn-outline-primary float-end mt-3" @click="calcularFechas()"><i class="fa-regular fa-handshake"></i> Calcular montos y fechas</button>
-								</div> -->
-
-									<table class="table table-hover table-borderless " v-show="fechas.length > 0">
-										<thead>
-											<tr>
-												<th class="pb-1">Fecha de pago</th>
-												<th class="pb-1">Monto</th>
-												<th class="pb-1">¿Paga?</th>
-											</tr>
-										</thead>
-										<tbody id="tbodyFechas">
-												<tr v-for="(fecha, index) in fechas">
-														<td> <input type="date" class="form-control" v-model="fecha.dia"> </td>
-														<td>
-																<!-- Si es una sola cuota, muestra el monto como texto -->
-																<span v-if="membresia.cuotas==1">{{ parseFloat(fecha.monto).toFixed(2) }}</span>
-																
-																<!-- Para la primera y segunda cuota (cuando hay más de 2), permite edición -->
-																<input type="number" class="form-control inputPartidos" 
-																		v-if="membresia.cuotas>1 " 
-																		@keyup="balancearMontos(index)" 
-																		:readonly="index > 0" 
-																		v-model="fecha.monto">
-														</td>
-														<td>
-																<div class="form-check">
-																		<input class="form-check-input" type="checkbox" value="" :id="'flexPago' + index"
-																				v-model="fecha.pago">
-																		<label class="form-check-label" :for="'flexPago' + index">
-																				<span v-if="fecha.pago">Si</span>
-																				<span v-else>No</span>
-																		</label>
-																</div>
-														</td>
-												</tr>
-										</tbody>
-										<tfoot>
-											<tr v-if="membresia.conDescuento">
-												<th>Sub Total</th>
-												<th>S/ {{ subTotal }}</th>
-											</tr>
-											<tr v-if="membresia.conDescuento">
-												<th>Descuento</th>
-												<th>S/ {{ parseFloat( membresia.descuento).toFixed(2) }}</th>
-											</tr>
-											<tr>
-												<th>Total a pagar</th>
-												<th>S/ {{ parseFloat(subTotal - membresia.descuento).toFixed(2) }}</th>
-											</tr>
-										</tfoot>
-									</table>
-								<!-- Fin de tab de Pagos -->
-							</div>
-							<div class="tab-pane fade py-3" id="membresia-tab-pane" role="tabpanel" aria-labelledby="membresia-tab"
-								tabindex="0">
-								<div class="row" v-show="sesionesAcumuladas.length < cantSesiones">
-									<div class="col-12">
-										<p><i class="fas fa-exclamation-circle"></i> Rellene los datos indispensables para autorrelenar las citas</p>
-										<label class="mb-0 mt-2 " for="">Profesional</label>
-										<div class="input-group">
-											<select class="form-select" id="sltDoctor" v-model="doctorSeleccionado" @change="listarhorario()">
-												<option v-for="doctor in doctores" :value="doctor.id">{{ doctor.nombre }}</option>
-											</select>
+										<div class="position-relative">
+											<input type="date" class="form-control bg-white" v-model="fecha.dia">
 										</div>
-									</div>
-									<div class="col-6">
-										<label class="mb-0 mt-2 " for="">Seleccionar fecha</label>
-										<div class="input-group">
-											<input type="date" class="form-control" v-model="nuevaFecha.fecha" @change="listarhorario()">
-										</div>
-									</div>
-									<div class="col-6">
-										<div class="form-group">
-											<label class="mb-0 mt-2">Horario</label>
-											<select class="form-select" name="sltProfesionalHorarioID" id="sltProfesionalHorarioID" v-model="idHorario">
-												<option value="" disabled selected>Selecciona un horario</option>
-												<option v-for="hora in horarios" :key="hora.id" v-if="hora" :value="hora.id">
-													{{ horaLatam1(hora.check_time) }} - {{ horaLatam2(hora.departure_date) }}
-												</option>
-											</select>
-										</div>
-									</div>
-									<div class="col-12 text-end">
-										<button class="btn btn-sm btn-outline-success" @click="agregarUnaCita()"><i class="far fa-arrow-alt-circle-down"></i> Agregar cita</button>
-									</div>
-								</div>
-								<div class="row ">
-									<div class="col-12">
-										<label for="">Sesiones programadas ({{sesionesAcumuladas.length}} de {{cantSesiones}})</label>
-									</div>
-									<div class="col-12" v-show="sesionesAcumuladas.length>0">
-										<table class="table table-hover table-bordered">
-											<thead>
-												<tr>
-													<th>N°</th>
-													<th>Profesional</th>
-													<th>Fecha y Hora</th>
-												</tr>
-											</thead>
-											<tbody>
-												<tr v-for="(sesion, index) in sesionesAcumuladas">
-													<td>{{ index+1 }}</td>
-													<td><button class="btn btn-outline-danger border-0" @click="borrarSesionAcumulada(index)"><i class="fas fa-times"></i></button> {{ sesion.doctor }}</td>
-													<td>{{ fechaLatam(sesion.fecha) }} <br>{{ sesion.hora }}</td>
-												</tr>
-											</tbody>
-										</table>
 									</div>
 								</div>
 							</div>
+
+							<!-- Summary -->
+							<div class="bg-white rounded-3 p-3 mt-4 border shadow-sm">
+								<div class="d-flex justify-content-between mb-2 small">
+									<span class="text-muted">Precio regular ({{ cantSesiones }} sesiones)</span>
+									<span class="fw-medium text-dark">S/ {{ parseFloat(mostrarPrecio).toFixed(2) }}</span>
+								</div>
+								<div class="d-flex justify-content-between mb-2 small text-success" v-if="membresia.descuento > 0">
+									<span>Descuento</span>
+									<span>-S/ {{ parseFloat(membresia.descuento).toFixed(2) }}</span>
+								</div>
+								<hr class="my-2 border-secondary border-opacity-25">
+								<div class="d-flex justify-content-between mb-1 fw-bold text-dark">
+									<span>Total Paquete</span>
+									<span>S/ {{ parseFloat(mostrarPrecio - membresia.descuento).toFixed(2) }}</span>
+								</div>
+								<div class="d-flex justify-content-between small text-muted" v-if="membresia.cuotas > 1">
+									<span>Cuota estimada</span>
+									<span>S/ {{ (parseFloat(mostrarPrecio - membresia.descuento) / membresia.cuotas).toFixed(2) }} × {{ membresia.cuotas }}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Programación de Sesiones -->
+					<div class="mt-4 border-top pt-4">
+						<h6 class="fw-bold mb-3 d-flex align-items-center text-secondary">
+							<i class="fa-solid fa-clipboard-list me-2"></i> Programación de Sesiones
+						</h6>
+						<div class="row g-3" v-show="sesionesAcumuladas.length < cantSesiones">
+							<div class="col-12">
+								<div class="alert alert-info py-2 small mb-0 d-flex align-items-center">
+									<i class="fas fa-info-circle me-2"></i> Rellene los datos indispensables para autorrellenar las citas.
+								</div>
+							</div>
+							<div class="col-md-6">
+								<label class="form-label small text-muted mb-1">Seleccionar fecha</label>
+								<input type="date" class="form-control" v-model="nuevaFecha.fecha" @change="listarhorario()">
+							</div>
+							<div class="col-md-6">
+								<label class="form-label small text-muted mb-1">Horario</label>
+								<select class="form-select" id="sltProfesionalHorarioID" v-model="idHorario">
+									<option value="" disabled selected>Selecciona un horario</option>
+									<option v-for="hora in horarios" :key="hora.id" :value="hora.id">
+										{{ horaLatam1(hora.check_time) }} - {{ horaLatam2(hora.departure_date) }}
+									</option>
+								</select>
+							</div>
+							<div class="col-12 text-end mt-2">
+								<button class="btn btn-sm btn-outline-success" @click="agregarUnaCita()">
+									<i class="far fa-arrow-alt-circle-down me-1"></i> Agregar cita
+								</button>
+							</div>
 						</div>
 
-						<label for="">Comentarios adicionales:</label>
-						<textarea class="form-control mb-3" id="txtComentarios" v-model="comentarios" row="2"></textarea>
-
-						<div class="d-flex justify-content-end">
-							<button class="btn btn-outline-primary" data-bs-dismiss="modal" @click="guardar()"><i class="fa-regular fa-floppy-disk"></i> Guardar membresía</button>
+						<div class="mt-3" v-if="sesionesAcumuladas.length > 0">
+							<label class="form-label small text-muted fw-medium">Sesiones programadas ({{sesionesAcumuladas.length}} de {{cantSesiones}})</label>
+							<div class="table-responsive">
+								<table class="table table-sm table-hover align-middle border">
+									<thead class="table-light text-muted small">
+										<tr>
+											<th class="fw-medium px-3">N°</th>
+											<th class="fw-medium">Profesional</th>
+											<th class="fw-medium">Fecha y Hora</th>
+											<th class="fw-medium text-end px-3">Acción</th>
+										</tr>
+									</thead>
+									<tbody class="small">
+										<tr v-for="(sesion, index) in sesionesAcumuladas">
+											<td class="px-3">{{ index + 1 }}</td>
+											<td>{{ sesion.doctor }}</td>
+											<td>{{ fechaLatam(sesion.fecha) }} <br><span class="text-muted">{{ sesion.hora }}</span></td>
+											<td class="text-end px-3">
+												<button class="btn btn-sm btn-light text-danger border-0" @click="borrarSesionAcumulada(index)"><i class="fas fa-times"></i></button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 						</div>
-					</section>
+					</div>
+
+					<div class="mt-4">
+						<label class="form-label text-secondary small fw-medium mb-1">Comentarios adicionales</label>
+						<textarea class="form-control" id="txtComentarios" v-model="comentarios" rows="2" placeholder="Opcional..."></textarea>
+					</div>
+
+				</div>
+				<div class="modal-footer border-top-0 pt-0 px-4 pb-4">
+					<button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-primary px-4" @click="guardar()">
+						<i class="fa-solid fa-cube me-2"></i> Crear Paquete
+					</button>
 				</div>
 
 			</div>
@@ -260,6 +276,18 @@ export default {
 				this.calcularFechas();
 			}
 		},
+		seleccionarPaciente(index) {
+			this.indexGlobal = index;
+			this.pacienteElegido = this.pacientes[index];
+			this.pacientes = [];
+			this.txtBusqueda = '';
+			this.activaResultados = false;
+			this.calcularFechas();
+		},
+		limpiarPaciente() {
+			this.pacienteElegido = {};
+			this.indexGlobal = null;
+		},
 		async preciosMembresias() {
 			const servidor = await fetch('/api/preciosMembresias')
 			this.precios = await servidor.json();
@@ -288,11 +316,7 @@ export default {
 					total: precioBase,
 					pago: false
 				})
-				if(this.membresia.cuotas>1){ //this.membresia.tipo==71 &&
-					const firstTr = document.querySelector('#tbodyFechas tr:first-child');
-					const firstInput = firstTr.querySelector('.inputPartidos:first-child');
-					firstInput.readOnly = false;
-				}
+				// Original code modified the readonly attr of inputs via DOM. We handle it via Vue bindings now.
 				hoy = moment(hoy).add(1, 'month')
 			}
 			this.membresia.fin = this.membresia.tipo==47 ?  moment().add(1,'year').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD')
@@ -308,7 +332,6 @@ export default {
 					
 					this.fechas.forEach((fecha, index) => {
 							if (index > 0) { // Balanceamos desde la segunda cuota
-									console.log('aplicar desde segunda', fecha, montoRestante);
 									fecha.monto = montoRestante.toFixed(2);
 							}
 					});
@@ -330,6 +353,10 @@ export default {
 			this.sesionesAcumuladas.splice(index,1)
 		},
 		async guardar() {
+			if(!this.pacienteElegido.id) {
+				alertify.notify('<i class="fa-solid fa-bomb"></i> Seleccione un paciente', 'danger', 10);
+				return false;
+			}
 			if (this.membresia.cuotas <= 0){
 				alertify.notify('<i class="fa-solid fa-bomb"></i> El número de cuotas mínimo debe ser 1', 'danger', 10);
 				return false;
@@ -370,7 +397,7 @@ export default {
 			
 			const respuesta = await servidor.json();
 			if (respuesta.mensaje) {
-				this.pacienteElegido = []
+				this.pacienteElegido = {}
 				this.fechas = []
 				this.$swal({
 					title: 'Se guardó la membresía',
@@ -443,6 +470,10 @@ export default {
 		notifica(){ console.info('notificado');}
 	},
 	computed: {
+		descripcionPaqueteElegido() {
+			const paquete = this.precios.find(x => x.id == this.membresia.tipo);
+			return paquete ? paquete.descripcion : '';
+		},
 		mostrarPrecio() { 
 			const nuevos = this.precios.find(x => x.id == this.membresia.tipo)
 			return nuevos ? parseFloat(nuevos.nuevos).toFixed(2) : 0;
@@ -476,4 +507,4 @@ export default {
 	}
 }
 </script>
-<style></style>
+<style></style>

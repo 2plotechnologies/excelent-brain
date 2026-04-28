@@ -1432,6 +1432,18 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         this.calcularFechas();
       }
     },
+    seleccionarPaciente: function seleccionarPaciente(index) {
+      this.indexGlobal = index;
+      this.pacienteElegido = this.pacientes[index];
+      this.pacientes = [];
+      this.txtBusqueda = '';
+      this.activaResultados = false;
+      this.calcularFechas();
+    },
+    limpiarPaciente: function limpiarPaciente() {
+      this.pacienteElegido = {};
+      this.indexGlobal = null;
+    },
     preciosMembresias: function preciosMembresias() {
       var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
@@ -1479,12 +1491,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           total: precioBase,
           pago: false
         });
-        if (this.membresia.cuotas > 1) {
-          //this.membresia.tipo==71 &&
-          var firstTr = document.querySelector('#tbodyFechas tr:first-child');
-          var firstInput = firstTr.querySelector('.inputPartidos:first-child');
-          firstInput.readOnly = false;
-        }
+        // Original code modified the readonly attr of inputs via DOM. We handle it via Vue bindings now.
         hoy = moment__WEBPACK_IMPORTED_MODULE_0___default()(hoy).add(1, 'month');
       }
       this.membresia.fin = this.membresia.tipo == 47 ? moment__WEBPACK_IMPORTED_MODULE_0___default()().add(1, 'year').format('YYYY-MM-DD') : moment__WEBPACK_IMPORTED_MODULE_0___default()().format('YYYY-MM-DD');
@@ -1500,7 +1507,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           this.fechas.forEach(function (fecha, index) {
             if (index > 0) {
               // Balanceamos desde la segunda cuota
-              console.log('aplicar desde segunda', fecha, montoRestante);
               fecha.monto = montoRestante.toFixed(2);
             }
           });
@@ -1527,29 +1533,36 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              if (!(_this3.membresia.cuotas <= 0)) {
+              if (_this3.pacienteElegido.id) {
                 _context3.next = 3;
+                break;
+              }
+              alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> Seleccione un paciente', 'danger', 10);
+              return _context3.abrupt("return", false);
+            case 3:
+              if (!(_this3.membresia.cuotas <= 0)) {
+                _context3.next = 6;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> El número de cuotas mínimo debe ser 1', 'danger', 10);
               return _context3.abrupt("return", false);
-            case 3:
+            case 6:
               if (_this3.membresia.fin) {
-                _context3.next = 6;
+                _context3.next = 9;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> Ingrese el último día de la memebresía', 'danger', 10);
               return _context3.abrupt("return", false);
-            case 6:
+            case 9:
               if (!(_this3.membresia.descuento > 0 && _this3.comentarios == '')) {
-                _context3.next = 11;
+                _context3.next = 14;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> Debe agregar un motivo por el descuento', 'danger', 10);
               return _context3.abrupt("return", false);
-            case 11:
+            case 14:
               _this3.comentarios = _this3.membresia.descuento > 0 ? 'Descuento por: S/ ' + _this3.membresia.descuento + ' ' + _this3.comentarios : _this3.comentarios;
-            case 12:
+            case 15:
               mem = document.getElementById("sltMembresia");
               datos = new FormData();
               datos.append('idPaciente', _this3.pacienteElegido.id);
@@ -1564,7 +1577,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               datos.append('meses', _this3.cantMeses);
               datos.append('num_sesion', 0);
               datos.append('descuento', _this3.membresia.descuento);
-              _context3.next = 28;
+              _context3.next = 31;
               return fetch('/api/guardarMembresia', {
                 method: 'POST',
                 body: datos,
@@ -1572,14 +1585,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   'Authorization': 'Bearer ' + localStorage.getItem('token')
                 }
               });
-            case 28:
-              servidor = _context3.sent;
-              _context3.next = 31;
-              return servidor.json();
             case 31:
+              servidor = _context3.sent;
+              _context3.next = 34;
+              return servidor.json();
+            case 34:
               respuesta = _context3.sent;
               if (respuesta.mensaje) {
-                _this3.pacienteElegido = [];
+                _this3.pacienteElegido = {};
                 _this3.fechas = [];
                 _this3.$swal({
                   title: 'Se guardó la membresía',
@@ -1590,7 +1603,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-regular fa-calendar-check"></i> Membresía guardada', 'success', 10);
                 _this3.$emit('membresiaGuardada');
               } else alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-regular fa-bomb"></i> Hubo un error guardando', 'danger', 10);
-            case 33:
+            case 36:
             case "end":
               return _context3.stop();
           }
@@ -1683,10 +1696,17 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     }
   },
   computed: {
-    mostrarPrecio: function mostrarPrecio() {
+    descripcionPaqueteElegido: function descripcionPaqueteElegido() {
       var _this7 = this;
-      var nuevos = this.precios.find(function (x) {
+      var paquete = this.precios.find(function (x) {
         return x.id == _this7.membresia.tipo;
+      });
+      return paquete ? paquete.descripcion : '';
+    },
+    mostrarPrecio: function mostrarPrecio() {
+      var _this8 = this;
+      var nuevos = this.precios.find(function (x) {
+        return x.id == _this8.membresia.tipo;
       });
       return nuevos ? parseFloat(nuevos.nuevos).toFixed(2) : 0;
     },
@@ -1705,16 +1725,16 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       return moment__WEBPACK_IMPORTED_MODULE_0___default()(this.membresia.fin).fromNow();
     },
     cantSesiones: function cantSesiones() {
-      var _this8 = this;
+      var _this9 = this;
       var precio = this.precios.find(function (x) {
-        return x.id == _this8.membresia.tipo;
+        return x.id == _this9.membresia.tipo;
       });
       return precio ? precio.sesiones : '';
     },
     cantMeses: function cantMeses() {
-      var _this9 = this;
+      var _this10 = this;
       var precio = this.precios.find(function (x) {
-        return x.id == _this9.membresia.tipo;
+        return x.id == _this10.membresia.tipo;
       });
       return precio ? precio.meses : 0;
     }
@@ -4055,108 +4075,98 @@ var render = function render() {
     attrs: {
       id: "modalMembresias",
       tabindex: "-1",
-      "aria-labelledby": "exampleModalLabel",
       "aria-hidden": "true"
     }
   }, [_c("div", {
-    staticClass: "modal-dialog modal-dialog-centered"
+    staticClass: "modal-dialog modal-dialog-centered modal-lg"
   }, [_c("div", {
-    staticClass: "modal-content"
+    staticClass: "modal-content border-0 shadow"
   }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
-  }, [_c("section", {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: _vm.vista == "buscar",
-      expression: "vista == 'buscar'"
-    }]
-  }, [_vm._m(1), _vm._v(" "), _c("input", {
+    staticClass: "modal-body px-4 pb-4"
+  }, [_c("div", {
+    staticClass: "mb-4 mt-2"
+  }, [_vm._m(1), _vm._v(" "), !_vm.pacienteElegido.id ? _c("div", {
+    staticClass: "position-relative"
+  }, [_c("div", {
+    staticClass: "input-group"
+  }, [_vm._m(2), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.txtBusqueda,
       expression: "txtBusqueda"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control border-start-0 ps-0",
     attrs: {
-      type: "text"
+      type: "text",
+      placeholder: "Buscar por nombre o DNI..."
     },
     domProps: {
       value: _vm.txtBusqueda
     },
     on: {
-      change: function change($event) {
-        _vm.activaResultados = false;
-      },
       keyup: function keyup($event) {
         if (!$event.type.indexOf("key") && _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")) return null;
         return _vm.searchHistoria();
       },
-      input: function input($event) {
+      input: [function ($event) {
         if ($event.target.composing) return;
         _vm.txtBusqueda = $event.target.value;
-      }
+      }, function ($event) {
+        _vm.activaResultados = false;
+        _vm.pacientes = [];
+      }]
     }
-  }), _vm._v(" "), _vm.pacientes.length > 0 ? _c("div", {
-    staticClass: "mt-3"
-  }, [_c("p", {
-    staticClass: "mb-1"
-  }, [_vm._v("Pacientes encontrados:")]), _vm._v(" "), _c("ol", {
-    staticClass: "list-group list-group-flush"
+  })]), _vm._v(" "), _vm.pacientes.length > 0 ? _c("div", {
+    staticClass: "list-group position-absolute w-100 mt-1 shadow z-3",
+    staticStyle: {
+      "max-height": "250px",
+      "overflow-y": "auto"
+    }
   }, _vm._l(_vm.pacientes, function (paciente, index) {
-    return _c("li", {
-      staticClass: "list-group-item list-group-item-action puntero",
+    return _c("button", {
+      staticClass: "list-group-item list-group-item-action py-2",
+      attrs: {
+        type: "button"
+      },
       on: {
         click: function click($event) {
-          return _vm.cambiarVista("membresia", index);
+          return _vm.seleccionarPaciente(index);
         }
       }
     }, [_c("div", {
-      staticClass: "d-flex w-100 justify-content-between"
-    }, [_c("div", {
-      staticClass: "fw-bold text-capitalize"
-    }, [_c("span", [_vm._v(_vm._s(paciente.name) + " " + _vm._s(paciente.nombres) + " "), _c("span", {
-      staticClass: "badge text-bg-secondary"
-    }, [_vm._v(_vm._s(paciente.etiqueta))])])]), _vm._v(" "), _vm._m(2, true)]), _vm._v(" "), _c("p", {
-      staticClass: "mb-1"
-    }, [_vm._v(_vm._s(paciente.dni))]), _vm._v(" "), _c("small", [_c("i", {
-      staticClass: "fa-solid fa-mobile-screen"
-    }), _vm._v(" " + _vm._s(paciente.phone) + " ")])]);
-  }), 0)]) : _vm.activaResultados ? _c("div", {
-    staticClass: "mt-3"
-  }, [_c("p", [_vm._v("No se encontraron resultados para " + _vm._s(_vm.txtBusqueda))])]) : _vm._e()]), _vm._v(" "), _c("section", {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: _vm.vista == "membresia",
-      expression: "vista == 'membresia'"
-    }]
-  }, [_c("p", [_c("a", {
-    attrs: {
-      href: "#!"
-    },
+      staticClass: "d-flex justify-content-between align-items-center mb-1"
+    }, [_c("span", {
+      staticClass: "fw-medium text-capitalize text-dark"
+    }, [_vm._v(_vm._s(paciente.name) + " " + _vm._s(paciente.nombres))]), _vm._v(" "), _c("span", {
+      staticClass: "badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill fw-normal"
+    }, [_vm._v(_vm._s(paciente.etiqueta))])]), _vm._v(" "), _c("div", {
+      staticClass: "small text-muted"
+    }, [_vm._v(_vm._s(paciente.dni) + " • "), _c("i", {
+      staticClass: "fa-solid fa-mobile-screen ms-1"
+    }), _vm._v(" " + _vm._s(paciente.phone))])]);
+  }), 0) : _vm._e(), _vm._v(" "), _vm.activaResultados && _vm.pacientes.length === 0 ? _c("div", {
+    staticClass: "mt-2 text-muted small"
+  }, [_vm._v('No se encontraron resultados para "' + _vm._s(_vm.txtBusqueda) + '"')]) : _vm._e()]) : _c("div", {
+    staticClass: "card border-primary border-opacity-50 bg-primary bg-opacity-10"
+  }, [_c("div", {
+    staticClass: "card-body py-2 px-3 d-flex justify-content-between align-items-center"
+  }, [_c("div", [_c("div", {
+    staticClass: "fw-bold text-primary text-capitalize"
+  }, [_vm._v(_vm._s(_vm.pacienteElegido.name) + " " + _vm._s(_vm.pacienteElegido.nombres))]), _vm._v(" "), _c("div", {
+    staticClass: "small text-primary text-opacity-75"
+  }, [_vm._v(_vm._s(_vm.pacienteElegido.dni) + " • "), _c("i", {
+    staticClass: "fa-solid fa-mobile-screen ms-1"
+  }), _vm._v(" " + _vm._s(_vm.pacienteElegido.phone))])]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm btn-link text-primary text-decoration-none fw-medium",
     on: {
       click: function click($event) {
-        return _vm.cambiarVista("buscar", -1);
+        return _vm.limpiarPaciente();
       }
     }
-  }, [_c("i", {
-    staticClass: "fa-solid fa-angles-left"
-  }), _vm._v(" Volver")])]), _vm._v(" "), _c("p", {
-    staticClass: "mb-0 text-capitalize"
-  }, [_c("strong", [_vm._v("Paciente")]), _vm._v(" " + _vm._s(_vm.pacienteElegido.name) + " " + _vm._s(_vm.pacienteElegido.nombres))]), _vm._v(" "), _c("p", {
-    staticClass: "mb-0"
-  }, [_c("strong", [_vm._v("D.N.I")]), _vm._v(" " + _vm._s(_vm.pacienteElegido.dni))]), _vm._v(" "), _c("p", {
-    staticClass: "mb-0"
-  }, [_c("strong", [_vm._v("Celular")]), _vm._v(" " + _vm._s(_vm.pacienteElegido.phone))]), _vm._v(" "), _c("p", {
-    staticClass: "mb-0"
-  }, [_c("strong", [_vm._v("Última atención")]), _vm._v(" " + _vm._s(_vm.pacienteElegido.etiqueta == "" ? "Sin registro" : _vm.pacienteElegido.etiqueta))]), _vm._v(" "), _c("label", {
-    staticClass: "mt-3",
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Tipo de paquete")]), _vm._v(" "), _c("select", {
+  }, [_vm._v("Cambiar")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-4"
+  }, [_vm._m(3), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -4165,7 +4175,6 @@ var render = function render() {
     }],
     staticClass: "form-select",
     attrs: {
-      name: "",
       id: "sltMembresia"
     },
     on: {
@@ -4187,262 +4196,37 @@ var render = function render() {
         value: precio.id
       }
     }, [_vm._v(_vm._s(precio.descripcion))]);
-  }), 0), _vm._v(" "), _c("p", {
-    staticClass: "mb-0 mt-2"
-  }, [_c("i", {
-    staticClass: "fa-regular fa-hourglass"
-  }), _vm._v(" Cantidad de sesiones: " + _vm._s(_vm.cantSesiones))]), _vm._v(" "), _c("p", {
-    staticClass: "mb-2"
-  }, [_c("i", {
-    staticClass: "fa-regular fa-calendar-xmark"
-  }), _vm._v(" Membresía caduca en " + _vm._s(_vm.cantMeses) + " mes" + _vm._s(_vm.cantMeses == 1 ? "" : "es"))]), _vm._v(" "), _vm._m(3), _vm._v(" "), _c("div", {
-    staticClass: "tab-content",
-    attrs: {
-      id: "tabContenedor"
+  }), 0), _vm._v(" "), _vm.membresia.tipo ? _c("div", {
+    staticClass: "row mt-3"
+  }, [_c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "card border-primary shadow-sm h-100",
+    staticStyle: {
+      "background-color": "#f0f7ff"
     }
   }, [_c("div", {
-    staticClass: "tab-pane fade show active",
-    attrs: {
-      id: "pagos-tab-pane",
-      role: "tabpanel",
-      "aria-labelledby": "pagos-tab",
-      tabindex: "0"
+    staticClass: "card-body text-center py-3 d-flex flex-column justify-content-center"
+  }, [_c("div", {
+    staticClass: "text-primary fw-medium mb-1"
+  }, [_vm._v(_vm._s(_vm.descripcionPaqueteElegido))]), _vm._v(" "), _vm.cantSesiones ? _c("div", {
+    staticClass: "small text-muted"
+  }, [_vm._v("S/ " + _vm._s((_vm.mostrarPrecio / _vm.cantSesiones).toFixed(2)) + "/sesión")]) : _vm._e()])])]), _vm._v(" "), _vm.cantSesiones ? _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "card border-primary shadow-sm h-100",
+    staticStyle: {
+      "background-color": "#f0f7ff"
     }
   }, [_c("div", {
-    staticClass: "row pt-3"
+    staticClass: "card-body text-center py-3 d-flex flex-column justify-content-center"
   }, [_c("div", {
-    staticClass: "col-6"
-  }, [_c("label", {
-    staticClass: "mt-2",
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("N° Cuotas")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.membresia.cuotas,
-      expression: "membresia.cuotas"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "number",
-      min: "0",
-      max: "5"
-    },
-    domProps: {
-      value: _vm.membresia.cuotas
-    },
-    on: {
-      change: function change($event) {
-        return _vm.calcularFechas();
-      },
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.membresia, "cuotas", $event.target.value);
-      }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-6"
-  }, [_c("label", {
-    attrs: {
-      clas: "mb-0 mt-2"
-    }
-  }, [_vm._v("¿Tiene descuento?")]), _vm._v(" "), _c("div", {
-    staticClass: "form-check"
-  }, [_c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.membresia.conDescuento,
-      expression: "membresia.conDescuento"
-    }],
-    staticClass: "form-check-input",
-    attrs: {
-      type: "checkbox",
-      value: "",
-      id: "HayDescto"
-    },
-    domProps: {
-      checked: Array.isArray(_vm.membresia.conDescuento) ? _vm._i(_vm.membresia.conDescuento, "") > -1 : _vm.membresia.conDescuento
-    },
-    on: {
-      change: [function ($event) {
-        var $$a = _vm.membresia.conDescuento,
-          $$el = $event.target,
-          $$c = $$el.checked ? true : false;
-        if (Array.isArray($$a)) {
-          var $$v = "",
-            $$i = _vm._i($$a, $$v);
-          if ($$el.checked) {
-            $$i < 0 && _vm.$set(_vm.membresia, "conDescuento", $$a.concat([$$v]));
-          } else {
-            $$i > -1 && _vm.$set(_vm.membresia, "conDescuento", $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
-          }
-        } else {
-          _vm.$set(_vm.membresia, "conDescuento", $$c);
-        }
-      }, function ($event) {
-        _vm.membresia.descuento = 0;
-      }]
-    }
-  }), _vm._v(" "), _c("label", {
-    staticClass: "form-check-label"
-  }, [!_vm.membresia.conDescuento ? _c("span", [_vm._v("No")]) : _c("span", [_vm._v("Si")])])])]), _vm._v(" "), _vm.membresia.conDescuento ? _c("div", {
-    staticClass: "col-6"
-  }, [_c("label", {
-    attrs: {
-      "for": "mt-2"
-    }
-  }, [_vm._v("Descuento")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.membresia.descuento,
-      expression: "membresia.descuento"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "number",
-      max: "50"
-    },
-    domProps: {
-      value: _vm.membresia.descuento
-    },
-    on: {
-      change: function change($event) {
-        return _vm.calcularFechas();
-      },
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.membresia, "descuento", $event.target.value);
-      }
-    }
-  })]) : _vm._e()]), _vm._v(" "), _c("table", {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: _vm.fechas.length > 0,
-      expression: "fechas.length > 0"
-    }],
-    staticClass: "table table-hover table-borderless"
-  }, [_vm._m(4), _vm._v(" "), _c("tbody", {
-    attrs: {
-      id: "tbodyFechas"
-    }
-  }, _vm._l(_vm.fechas, function (fecha, index) {
-    return _c("tr", [_c("td", [_c("input", {
-      directives: [{
-        name: "model",
-        rawName: "v-model",
-        value: fecha.dia,
-        expression: "fecha.dia"
-      }],
-      staticClass: "form-control",
-      attrs: {
-        type: "date"
-      },
-      domProps: {
-        value: fecha.dia
-      },
-      on: {
-        input: function input($event) {
-          if ($event.target.composing) return;
-          _vm.$set(fecha, "dia", $event.target.value);
-        }
-      }
-    })]), _vm._v(" "), _c("td", [_vm.membresia.cuotas == 1 ? _c("span", [_vm._v(_vm._s(parseFloat(fecha.monto).toFixed(2)))]) : _vm._e(), _vm._v(" "), _vm.membresia.cuotas > 1 ? _c("input", {
-      directives: [{
-        name: "model",
-        rawName: "v-model",
-        value: fecha.monto,
-        expression: "fecha.monto"
-      }],
-      staticClass: "form-control inputPartidos",
-      attrs: {
-        type: "number",
-        readonly: index > 0
-      },
-      domProps: {
-        value: fecha.monto
-      },
-      on: {
-        keyup: function keyup($event) {
-          return _vm.balancearMontos(index);
-        },
-        input: function input($event) {
-          if ($event.target.composing) return;
-          _vm.$set(fecha, "monto", $event.target.value);
-        }
-      }
-    }) : _vm._e()]), _vm._v(" "), _c("td", [_c("div", {
-      staticClass: "form-check"
-    }, [_c("input", {
-      directives: [{
-        name: "model",
-        rawName: "v-model",
-        value: fecha.pago,
-        expression: "fecha.pago"
-      }],
-      staticClass: "form-check-input",
-      attrs: {
-        type: "checkbox",
-        value: "",
-        id: "flexPago" + index
-      },
-      domProps: {
-        checked: Array.isArray(fecha.pago) ? _vm._i(fecha.pago, "") > -1 : fecha.pago
-      },
-      on: {
-        change: function change($event) {
-          var $$a = fecha.pago,
-            $$el = $event.target,
-            $$c = $$el.checked ? true : false;
-          if (Array.isArray($$a)) {
-            var $$v = "",
-              $$i = _vm._i($$a, $$v);
-            if ($$el.checked) {
-              $$i < 0 && _vm.$set(fecha, "pago", $$a.concat([$$v]));
-            } else {
-              $$i > -1 && _vm.$set(fecha, "pago", $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
-            }
-          } else {
-            _vm.$set(fecha, "pago", $$c);
-          }
-        }
-      }
-    }), _vm._v(" "), _c("label", {
-      staticClass: "form-check-label",
-      attrs: {
-        "for": "flexPago" + index
-      }
-    }, [fecha.pago ? _c("span", [_vm._v("Si")]) : _c("span", [_vm._v("No")])])])])]);
-  }), 0), _vm._v(" "), _c("tfoot", [_vm.membresia.conDescuento ? _c("tr", [_c("th", [_vm._v("Sub Total")]), _vm._v(" "), _c("th", [_vm._v("S/ " + _vm._s(_vm.subTotal))])]) : _vm._e(), _vm._v(" "), _vm.membresia.conDescuento ? _c("tr", [_c("th", [_vm._v("Descuento")]), _vm._v(" "), _c("th", [_vm._v("S/ " + _vm._s(parseFloat(_vm.membresia.descuento).toFixed(2)))])]) : _vm._e(), _vm._v(" "), _c("tr", [_c("th", [_vm._v("Total a pagar")]), _vm._v(" "), _c("th", [_vm._v("S/ " + _vm._s(parseFloat(_vm.subTotal - _vm.membresia.descuento).toFixed(2)))])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "tab-pane fade py-3",
-    attrs: {
-      id: "membresia-tab-pane",
-      role: "tabpanel",
-      "aria-labelledby": "membresia-tab",
-      tabindex: "0"
-    }
-  }, [_c("div", {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: _vm.sesionesAcumuladas.length < _vm.cantSesiones,
-      expression: "sesionesAcumuladas.length < cantSesiones"
-    }],
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-12"
-  }, [_vm._m(5), _vm._v(" "), _c("label", {
-    staticClass: "mb-0 mt-2",
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Profesional")]), _vm._v(" "), _c("div", {
-    staticClass: "input-group"
-  }, [_c("select", {
+    staticClass: "text-primary fw-bold fs-5 mb-0"
+  }, [_vm._v(_vm._s(_vm.cantSesiones))]), _vm._v(" "), _c("div", {
+    staticClass: "small text-muted mt-1"
+  }, [_vm._v("S/ " + _vm._s(_vm.mostrarPrecio) + " en total")])])])]) : _vm._e()]) : _vm._e()]), _vm._v(" "), _c("div", {
+    staticClass: "mb-4"
+  }, [_vm._m(4), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -4466,22 +4250,243 @@ var render = function render() {
         return _vm.listarhorario();
       }]
     }
-  }, _vm._l(_vm.doctores, function (doctor) {
+  }, [_c("option", {
+    attrs: {
+      value: "-1"
+    }
+  }, [_vm._v("Seleccione un profesional")]), _vm._v(" "), _vm._l(_vm.doctores, function (doctor) {
     return _c("option", {
       domProps: {
         value: doctor.id
       }
     }, [_vm._v(_vm._s(doctor.nombre))]);
-  }), 0)])]), _vm._v(" "), _c("div", {
-    staticClass: "col-6"
-  }, [_c("label", {
-    staticClass: "mb-0 mt-2",
-    attrs: {
-      "for": ""
+  })], 2)]), _vm._v(" "), _c("div", {
+    staticClass: "card border-0 mb-4",
+    staticStyle: {
+      "background-color": "#f8f9fa",
+      "border-radius": "1rem"
     }
-  }, [_vm._v("Seleccionar fecha")]), _vm._v(" "), _c("div", {
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_vm._m(5), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
+  }, [_c("div", {
+    staticClass: "col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label small text-muted mb-1"
+  }, [_vm._v("Precio Regular")]), _vm._v(" "), _c("div", {
     staticClass: "input-group"
-  }, [_c("input", {
+  }, [_c("span", {
+    staticClass: "input-group-text bg-white text-muted border-end-0"
+  }, [_vm._v("S/")]), _vm._v(" "), _c("input", {
+    staticClass: "form-control border-start-0 bg-white text-muted",
+    attrs: {
+      type: "text",
+      readonly: ""
+    },
+    domProps: {
+      value: _vm.mostrarPrecio
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label small text-muted mb-1"
+  }, [_vm._v("Descuento (S/)")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.membresia.descuento,
+      expression: "membresia.descuento"
+    }],
+    staticClass: "form-control bg-white",
+    attrs: {
+      type: "number",
+      min: "0"
+    },
+    domProps: {
+      value: _vm.membresia.descuento
+    },
+    on: {
+      change: function change($event) {
+        return _vm.calcularFechas();
+      },
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.membresia, "descuento", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label small text-muted mb-1"
+  }, [_vm._v("Nro. de Cuotas")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.membresia.cuotas,
+      expression: "membresia.cuotas"
+    }],
+    staticClass: "form-select bg-white",
+    on: {
+      change: [function ($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.membresia, "cuotas", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }, function ($event) {
+        return _vm.calcularFechas();
+      }]
+    }
+  }, _vm._l(5, function (n) {
+    return _c("option", {
+      domProps: {
+        value: n
+      }
+    }, [_vm._v(_vm._s(n) + " cuota" + _vm._s(n > 1 ? "s" : ""))]);
+  }), 0)]), _vm._v(" "), _vm.membresia.cuotas > 0 && _vm.fechas.length > 0 ? _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label small text-muted mb-1"
+  }, [_vm._v("1ra Cuota (S/) — editable")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.fechas[0].monto,
+      expression: "fechas[0].monto"
+    }],
+    staticClass: "form-control bg-white",
+    attrs: {
+      type: "number"
+    },
+    domProps: {
+      value: _vm.fechas[0].monto
+    },
+    on: {
+      keyup: function keyup($event) {
+        return _vm.balancearMontos(0);
+      },
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.fechas[0], "monto", $event.target.value);
+      }
+    }
+  })]) : _vm._e()]), _vm._v(" "), _vm.fechas.length > 0 ? _c("div", {
+    staticClass: "mt-4"
+  }, [_vm._m(6), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
+  }, _vm._l(_vm.fechas, function (fecha, index) {
+    return _c("div", {
+      key: index,
+      staticClass: "col-md-6"
+    }, [_c("div", {
+      staticClass: "d-flex justify-content-between align-items-end mb-1"
+    }, [_c("label", {
+      staticClass: "small text-muted mb-0"
+    }, [_vm._v("\n\t\t\t\t\t\t\t\t\t\t\tCuota " + _vm._s(index + 1) + " "), index === 0 && _vm.membresia.cuotas > 1 ? _c("span", {
+      staticClass: "text-black-50"
+    }, [_vm._v("(editable)")]) : _vm._e()]), _vm._v(" "), _c("div", {
+      staticClass: "form-check form-check-inline mb-0 me-0",
+      attrs: {
+        title: "¿Paga?"
+      }
+    }, [_c("input", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: fecha.pago,
+        expression: "fecha.pago"
+      }],
+      staticClass: "form-check-input",
+      attrs: {
+        type: "checkbox",
+        id: "pago" + index
+      },
+      domProps: {
+        checked: Array.isArray(fecha.pago) ? _vm._i(fecha.pago, null) > -1 : fecha.pago
+      },
+      on: {
+        change: function change($event) {
+          var $$a = fecha.pago,
+            $$el = $event.target,
+            $$c = $$el.checked ? true : false;
+          if (Array.isArray($$a)) {
+            var $$v = null,
+              $$i = _vm._i($$a, $$v);
+            if ($$el.checked) {
+              $$i < 0 && _vm.$set(fecha, "pago", $$a.concat([$$v]));
+            } else {
+              $$i > -1 && _vm.$set(fecha, "pago", $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
+            }
+          } else {
+            _vm.$set(fecha, "pago", $$c);
+          }
+        }
+      }
+    }), _vm._v(" "), _c("label", {
+      staticClass: "form-check-label small",
+      staticStyle: {
+        "font-size": "0.75rem"
+      },
+      attrs: {
+        "for": "pago" + index
+      }
+    }, [_vm._v("¿Pagado?")])])]), _vm._v(" "), _c("div", {
+      staticClass: "position-relative"
+    }, [_c("input", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: fecha.dia,
+        expression: "fecha.dia"
+      }],
+      staticClass: "form-control bg-white",
+      attrs: {
+        type: "date"
+      },
+      domProps: {
+        value: fecha.dia
+      },
+      on: {
+        input: function input($event) {
+          if ($event.target.composing) return;
+          _vm.$set(fecha, "dia", $event.target.value);
+        }
+      }
+    })])]);
+  }), 0)]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "bg-white rounded-3 p-3 mt-4 border shadow-sm"
+  }, [_c("div", {
+    staticClass: "d-flex justify-content-between mb-2 small"
+  }, [_c("span", {
+    staticClass: "text-muted"
+  }, [_vm._v("Precio regular (" + _vm._s(_vm.cantSesiones) + " sesiones)")]), _vm._v(" "), _c("span", {
+    staticClass: "fw-medium text-dark"
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.mostrarPrecio).toFixed(2)))])]), _vm._v(" "), _vm.membresia.descuento > 0 ? _c("div", {
+    staticClass: "d-flex justify-content-between mb-2 small text-success"
+  }, [_c("span", [_vm._v("Descuento")]), _vm._v(" "), _c("span", [_vm._v("-S/ " + _vm._s(parseFloat(_vm.membresia.descuento).toFixed(2)))])]) : _vm._e(), _vm._v(" "), _c("hr", {
+    staticClass: "my-2 border-secondary border-opacity-25"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-between mb-1 fw-bold text-dark"
+  }, [_c("span", [_vm._v("Total Paquete")]), _vm._v(" "), _c("span", [_vm._v("S/ " + _vm._s(parseFloat(_vm.mostrarPrecio - _vm.membresia.descuento).toFixed(2)))])]), _vm._v(" "), _vm.membresia.cuotas > 1 ? _c("div", {
+    staticClass: "d-flex justify-content-between small text-muted"
+  }, [_c("span", [_vm._v("Cuota estimada")]), _vm._v(" "), _c("span", [_vm._v("S/ " + _vm._s((parseFloat(_vm.mostrarPrecio - _vm.membresia.descuento) / _vm.membresia.cuotas).toFixed(2)) + " × " + _vm._s(_vm.membresia.cuotas))])]) : _vm._e()])])]), _vm._v(" "), _c("div", {
+    staticClass: "mt-4 border-top pt-4"
+  }, [_vm._m(7), _vm._v(" "), _c("div", {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.sesionesAcumuladas.length < _vm.cantSesiones,
+      expression: "sesionesAcumuladas.length < cantSesiones"
+    }],
+    staticClass: "row g-3"
+  }, [_vm._m(8), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label small text-muted mb-1"
+  }, [_vm._v("Seleccionar fecha")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -4504,12 +4509,10 @@ var render = function render() {
         _vm.$set(_vm.nuevaFecha, "fecha", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "col-6"
-  }, [_c("div", {
-    staticClass: "form-group"
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
   }, [_c("label", {
-    staticClass: "mb-0 mt-2"
+    staticClass: "form-label small text-muted mb-1"
   }, [_vm._v("Horario")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
@@ -4519,7 +4522,6 @@ var render = function render() {
     }],
     staticClass: "form-select",
     attrs: {
-      name: "sltProfesionalHorarioID",
       id: "sltProfesionalHorarioID"
     },
     on: {
@@ -4540,14 +4542,14 @@ var render = function render() {
       selected: ""
     }
   }, [_vm._v("Selecciona un horario")]), _vm._v(" "), _vm._l(_vm.horarios, function (hora) {
-    return hora ? _c("option", {
+    return _c("option", {
       key: hora.id,
       domProps: {
         value: hora.id
       }
-    }, [_vm._v("\n\t\t\t\t\t\t\t\t\t\t\t\t" + _vm._s(_vm.horaLatam1(hora.check_time)) + " - " + _vm._s(_vm.horaLatam2(hora.departure_date)) + "\n\t\t\t\t\t\t\t\t\t\t\t")]) : _vm._e();
-  })], 2)])]), _vm._v(" "), _c("div", {
-    staticClass: "col-12 text-end"
+    }, [_vm._v("\n\t\t\t\t\t\t\t\t\t" + _vm._s(_vm.horaLatam1(hora.check_time)) + " - " + _vm._s(_vm.horaLatam2(hora.departure_date)) + "\n\t\t\t\t\t\t\t\t")]);
+  })], 2)]), _vm._v(" "), _c("div", {
+    staticClass: "col-12 text-end mt-2"
   }, [_c("button", {
     staticClass: "btn btn-sm btn-outline-success",
     on: {
@@ -4556,28 +4558,26 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "far fa-arrow-alt-circle-down"
-  }), _vm._v(" Agregar cita")])])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col-12"
+    staticClass: "far fa-arrow-alt-circle-down me-1"
+  }), _vm._v(" Agregar cita\n\t\t\t\t\t\t\t")])])]), _vm._v(" "), _vm.sesionesAcumuladas.length > 0 ? _c("div", {
+    staticClass: "mt-3"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Sesiones programadas (" + _vm._s(_vm.sesionesAcumuladas.length) + " de " + _vm._s(_vm.cantSesiones) + ")")])]), _vm._v(" "), _c("div", {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: _vm.sesionesAcumuladas.length > 0,
-      expression: "sesionesAcumuladas.length>0"
-    }],
-    staticClass: "col-12"
+    staticClass: "form-label small text-muted fw-medium"
+  }, [_vm._v("Sesiones programadas (" + _vm._s(_vm.sesionesAcumuladas.length) + " de " + _vm._s(_vm.cantSesiones) + ")")]), _vm._v(" "), _c("div", {
+    staticClass: "table-responsive"
   }, [_c("table", {
-    staticClass: "table table-hover table-bordered"
-  }, [_vm._m(6), _vm._v(" "), _c("tbody", _vm._l(_vm.sesionesAcumuladas, function (sesion, index) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", [_c("button", {
-      staticClass: "btn btn-outline-danger border-0",
+    staticClass: "table table-sm table-hover align-middle border"
+  }, [_vm._m(9), _vm._v(" "), _c("tbody", {
+    staticClass: "small"
+  }, _vm._l(_vm.sesionesAcumuladas, function (sesion, index) {
+    return _c("tr", [_c("td", {
+      staticClass: "px-3"
+    }, [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(sesion.doctor))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.fechaLatam(sesion.fecha)) + " "), _c("br"), _c("span", {
+      staticClass: "text-muted"
+    }, [_vm._v(_vm._s(sesion.hora))])]), _vm._v(" "), _c("td", {
+      staticClass: "text-end px-3"
+    }, [_c("button", {
+      staticClass: "btn btn-sm btn-light text-danger border-0",
       on: {
         click: function click($event) {
           return _vm.borrarSesionAcumulada(index);
@@ -4585,22 +4585,23 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fas fa-times"
-    })]), _vm._v(" " + _vm._s(sesion.doctor))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.fechaLatam(sesion.fecha)) + " "), _c("br"), _vm._v(_vm._s(sesion.hora))])]);
-  }), 0)])])])])]), _vm._v(" "), _c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Comentarios adicionales:")]), _vm._v(" "), _c("textarea", {
+    })])])]);
+  }), 0)])])]) : _vm._e()]), _vm._v(" "), _c("div", {
+    staticClass: "mt-4"
+  }, [_c("label", {
+    staticClass: "form-label text-secondary small fw-medium mb-1"
+  }, [_vm._v("Comentarios adicionales")]), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.comentarios,
       expression: "comentarios"
     }],
-    staticClass: "form-control mb-3",
+    staticClass: "form-control",
     attrs: {
       id: "txtComentarios",
-      row: "2"
+      rows: "2",
+      placeholder: "Opcional..."
     },
     domProps: {
       value: _vm.comentarios
@@ -4611,12 +4612,18 @@ var render = function render() {
         _vm.comentarios = $event.target.value;
       }
     }
-  }), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-end"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer border-top-0 pt-0 px-4 pb-4"
   }, [_c("button", {
-    staticClass: "btn btn-outline-primary",
+    staticClass: "btn btn-light px-4",
     attrs: {
+      type: "button",
       "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Cancelar")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary px-4",
+    attrs: {
+      type: "button"
     },
     on: {
       click: function click($event) {
@@ -4624,20 +4631,22 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "fa-regular fa-floppy-disk"
-  }), _vm._v(" Guardar membresía")])])])])])])]);
+    staticClass: "fa-solid fa-cube me-2"
+  }), _vm._v(" Crear Paquete\n\t\t\t\t")])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header border-0 pb-0"
-  }, [_c("h1", {
-    staticClass: "modal-title fs-5",
-    attrs: {
-      id: "exampleModalLabel"
+    staticClass: "modal-header border-bottom-0 pb-0 pt-4 px-4"
+  }, [_c("h5", {
+    staticClass: "modal-title fw-bold d-flex align-items-center",
+    staticStyle: {
+      color: "#1e293b"
     }
-  }, [_vm._v("Paquetes")]), _vm._v(" "), _c("button", {
+  }, [_c("i", {
+    staticClass: "fa-solid fa-cube text-primary me-2"
+  }), _vm._v(" Nuevo Paquete\n\t\t\t\t")]), _vm._v(" "), _c("button", {
     staticClass: "btn-close",
     attrs: {
       type: "button",
@@ -4649,89 +4658,85 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-search"
-  }), _vm._v(" Filtre al paciente por DNI o Nombres")]);
+    staticClass: "form-label text-secondary small fw-medium mb-1"
+  }, [_vm._v("Paciente "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("button", {
-    staticClass: "btn btn-sm",
-    attrs: {
-      title: "Agregar Membresía"
-    }
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-end-0"
   }, [_c("i", {
-    staticClass: "fa-solid fa-angles-right"
+    staticClass: "fas fa-search text-muted"
   })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("ul", {
-    staticClass: "nav nav-tabs mt-3 d-none",
-    attrs: {
-      id: "myTab",
-      role: "tablist"
-    }
-  }, [_c("li", {
-    staticClass: "nav-item",
-    attrs: {
-      role: "presentation"
-    }
-  }, [_c("button", {
-    staticClass: "nav-link active",
-    attrs: {
-      id: "pagos-tab",
-      "data-bs-toggle": "tab",
-      "data-bs-target": "#pagos-tab-pane",
-      type: "button",
-      role: "tab",
-      "aria-controls": "pagos-tab-pane",
-      "aria-selected": "true"
+  return _c("label", {
+    staticClass: "form-label text-secondary small fw-medium mb-1"
+  }, [_vm._v("Especialidad del Paquete "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label text-secondary small fw-medium mb-1"
+  }, [_vm._v("Profesional "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "fw-bold mb-4 d-flex align-items-center",
+    staticStyle: {
+      color: "#2b3b5a"
     }
   }, [_c("i", {
-    staticClass: "far fa-calendar-check"
-  }), _vm._v(" Pagos")])]), _vm._v(" "), _c("li", {
-    staticClass: "nav-item",
-    attrs: {
-      role: "presentation"
-    }
-  }, [_c("button", {
-    staticClass: "nav-link",
-    attrs: {
-      id: "membresia-tab",
-      "data-bs-toggle": "tab",
-      "data-bs-target": "#membresia-tab-pane",
-      type: "button",
-      role: "tab",
-      "aria-controls": "membresia-tab-pane",
-      "aria-selected": "false"
-    }
+    staticClass: "fa-solid fa-dollar-sign text-primary me-2"
+  }), _vm._v(" Precio y Cuotas\n\t\t\t\t\t\t")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label small fw-medium mb-3 d-flex align-items-center text-secondary"
   }, [_c("i", {
-    staticClass: "far fa-calendar-alt"
-  }), _vm._v(" Sesiones")])])]);
+    staticClass: "fa-regular fa-calendar me-2"
+  }), _vm._v(" Fechas de vencimiento de cuotas\n\t\t\t\t\t\t\t")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", {
-    staticClass: "pb-1"
-  }, [_vm._v("Fecha de pago")]), _vm._v(" "), _c("th", {
-    staticClass: "pb-1"
-  }, [_vm._v("Monto")]), _vm._v(" "), _c("th", {
-    staticClass: "pb-1"
-  }, [_vm._v("¿Paga?")])])]);
+  return _c("h6", {
+    staticClass: "fw-bold mb-3 d-flex align-items-center text-secondary"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-clipboard-list me-2"
+  }), _vm._v(" Programación de Sesiones\n\t\t\t\t\t")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("p", [_c("i", {
-    staticClass: "fas fa-exclamation-circle"
-  }), _vm._v(" Rellene los datos indispensables para autorrelenar las citas")]);
+  return _c("div", {
+    staticClass: "col-12"
+  }, [_c("div", {
+    staticClass: "alert alert-info py-2 small mb-0 d-flex align-items-center"
+  }, [_c("i", {
+    staticClass: "fas fa-info-circle me-2"
+  }), _vm._v(" Rellene los datos indispensables para autorrellenar las citas.\n\t\t\t\t\t\t\t")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("N°")]), _vm._v(" "), _c("th", [_vm._v("Profesional")]), _vm._v(" "), _c("th", [_vm._v("Fecha y Hora")])])]);
+  return _c("thead", {
+    staticClass: "table-light text-muted small"
+  }, [_c("tr", [_c("th", {
+    staticClass: "fw-medium px-3"
+  }, [_vm._v("N°")]), _vm._v(" "), _c("th", {
+    staticClass: "fw-medium"
+  }, [_vm._v("Profesional")]), _vm._v(" "), _c("th", {
+    staticClass: "fw-medium"
+  }, [_vm._v("Fecha y Hora")]), _vm._v(" "), _c("th", {
+    staticClass: "fw-medium text-end px-3"
+  }, [_vm._v("Acción")])])]);
 }];
 render._withStripped = true;
 
