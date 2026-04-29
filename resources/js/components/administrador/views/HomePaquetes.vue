@@ -251,7 +251,7 @@
       </div>
     </div>
 
-    <div v-if="vistaActiva === 'deudas'" class="debts-view">
+    <div v-else-if="vistaActiva === 'deudas'" class="debts-view" :key="'deudas'">
       <div class="row g-3 mb-4">
         <div class="col-md-4">
           <div class="debt-summary-card">
@@ -319,14 +319,14 @@
     </div>
 
     <!-- Modal Pagar Cuota -->
-    <div class="modal fade" id="modalPagarCuota" tabindex="-1" aria-labelledby="modalPagarCuotaLabel" aria-hidden="true" v-if="paqueteSeleccionado">
+    <div class="modal fade" id="modalPagarCuota" tabindex="-1" aria-labelledby="modalPagarCuotaLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content border-0 shadow">
           <div class="modal-header bg-primary text-white">
             <h5 class="modal-title" id="modalPagarCuotaLabel"><i class="fas fa-file-invoice-dollar me-2"></i> Pagar Cuotas de Membresía</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body p-4">
+          <div class="modal-body p-4" v-if="paqueteSeleccionado">
             
             <div class="row mb-4">
               <div class="col-md-6 border-end">
@@ -396,7 +396,7 @@
     <ModalMembresias :idUsuario="idUsuario" vista="buscar" @membresiaGuardada="cargarPaquetes(1)"></ModalMembresias>
 
     <!-- Paginación -->
-    <div class="d-flex justify-content-center mt-4" v-if="vistaActiva === 'paquetes' && pagination.last_page > 1">
+    <div class="d-flex justify-content-center mt-4" v-if="vistaActiva === 'paquetes' && pagination.last_page > 1" :key="'paquetes'">
       <nav aria-label="Page navigation">
         <ul class="pagination shadow-sm">
           <li class="page-item" :class="{'disabled': pagination.current_page === 1}">
@@ -467,6 +467,7 @@ export default {
       return pagesArray;
     },
     deudasPendientes() {
+      //if (this.vistaActiva !== 'deudas') return [];
       return this.paquetesFiltrados.filter((paquete) => parseFloat(paquete.debe || 0) > 0);
     },
     deudaResumen() {
@@ -907,7 +908,7 @@ export default {
 .debt-amount {
   color: #ef4444;
   font-weight: 700;
-  font-size: 1.85rem;
+  font-size: 16px;
 }
 .debt-action-btn {
   padding: 0.55rem 1.2rem;

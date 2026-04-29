@@ -4139,10 +4139,12 @@ var render = function render() {
     }, [_c("span", {
       staticClass: "fw-medium text-capitalize text-dark"
     }, [_vm._v(_vm._s(paciente.name) + " " + _vm._s(paciente.nombres))]), _vm._v(" "), _c("span", {
-      staticClass: "badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill fw-normal"
+      staticClass: "badge bg-secondary bg-opacity-10 text-white border border-secondary border-opacity-25 rounded-pill fw-normal"
     }, [_vm._v(_vm._s(paciente.etiqueta))])]), _vm._v(" "), _c("div", {
       staticClass: "small text-muted"
-    }, [_vm._v(_vm._s(paciente.dni) + " • "), _c("i", {
+    }, [_c("i", {
+      staticClass: "fa-solid fa-id-card ms-1"
+    }), _vm._v(" " + _vm._s(paciente.dni) + " • "), _c("i", {
       staticClass: "fa-solid fa-mobile-screen ms-1"
     }), _vm._v(" " + _vm._s(paciente.phone))])]);
   }), 0) : _vm._e(), _vm._v(" "), _vm.activaResultados && _vm.pacientes.length === 0 ? _c("div", {
@@ -4152,13 +4154,15 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "card-body py-2 px-3 d-flex justify-content-between align-items-center"
   }, [_c("div", [_c("div", {
-    staticClass: "fw-bold text-primary text-capitalize"
+    staticClass: "fw-bold text-capitalize text-white"
   }, [_vm._v(_vm._s(_vm.pacienteElegido.name) + " " + _vm._s(_vm.pacienteElegido.nombres))]), _vm._v(" "), _c("div", {
-    staticClass: "small text-primary text-opacity-75"
-  }, [_vm._v(_vm._s(_vm.pacienteElegido.dni) + " • "), _c("i", {
+    staticClass: "small text-opacity-75 text-white"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-id-card ms-1"
+  }), _vm._v(" " + _vm._s(_vm.pacienteElegido.dni) + " • "), _c("i", {
     staticClass: "fa-solid fa-mobile-screen ms-1"
   }), _vm._v(" " + _vm._s(_vm.pacienteElegido.phone))])]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-sm btn-link text-primary text-decoration-none fw-medium",
+    staticClass: "btn btn-sm btn-link text-white text-decoration-none fw-medium",
     on: {
       click: function click($event) {
         return _vm.limpiarPaciente();

@@ -1,8 +1,40 @@
 <template>
-  <div class="card">
-    <div class="container-fluid pt-2">
+  <div class="card border-0 shadow-none bg-transparent">
+    <div class="container-fluid pt-2 px-0">
+			
+			<!-- Cabecera de controles -->
+			<div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center mb-4 gap-3 bg-white p-3 rounded shadow-sm border">
+					<!-- Buscador global -->
+					<div class="input-group" style="max-width: 500px;">
+							<span class="input-group-text bg-transparent border-end-0"><i class="fas fa-search text-muted"></i></span>
+							<input type="text" class="form-control border-start-0 ps-0 bg-transparent" placeholder="Buscar cita por paciente, DNI o celular..." id="searchInputAppointment" @keyup.enter="ejecutarBusqueda()" autocomplete="off">
+					</div>
+					
+					<!-- Botones de vista/acciones -->
+					<div class="d-flex flex-wrap gap-2">
+							<button class="btn btn-light border d-flex align-items-center gap-2" @click="irATab('dashboard-tab')">
+									<i class="fas fa-chart-pie text-secondary"></i> Dashboard
+							</button>
+							<button class="btn btn-light border d-flex align-items-center gap-2" @click="irATab('home-tab')">
+									<i class="fas fa-users text-secondary"></i> Buscar paciente
+							</button>
+							<button class="btn btn-light border d-flex align-items-center gap-2" @click="irATab('book-tab')">
+									<i class="fa-regular fa-calendar-days text-secondary"></i> Calendario
+							</button>
+							<router-link to="/recepcionista/paquetes" class="btn btn-light border d-flex align-items-center gap-2 text-decoration-none text-dark">
+									<i class="fas fa-box text-secondary"></i> Paquetes
+							</router-link>
+							<button class="btn btn-light border d-flex align-items-center gap-2" @click="mostrarReportes()">
+									<i class="fas fa-chart-bar text-secondary"></i> Reportes
+							</button>
+							<button class="btn btn-primary d-flex align-items-center gap-2" @click="irATab('book-tab')">
+									<i class="fas fa-plus"></i> Nueva Cita
+							</button>
+					</div>
+			</div>
 
-			<ul class="nav nav-tabs justify-content-center" id="myTab" role="tablist">
+
+			<ul class="nav nav-tabs justify-content-center d-none" id="myTab" role="tablist">
 				
 				<li class="nav-item d-none" role="presentation">
 					<button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#calendario-tab" type="button" role="tab" aria-controls="calendario-tab" aria-selected="false"><i class="fa-regular fa-calendar-days"></i> Vista calendario</button>
@@ -27,15 +59,8 @@
 				<!-- Fin Tab Dashboard -->
 				<!-- Inicio de primera tab -->
 				<div class="tab-pane fade " id="inicio-tab" role="tabpanel" aria-labelledby="inicio-tab" tabindex="0">
-					<div class="d-sm-flex align-items-center justify-content-around mt-4 px-3" style="gap: 10px;">
-							<div class="d-none d-sm-inline-block form-inline w-75">
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<button class="btn btn-success" type="submit" @click="searchHistoria()"> <i class="fas fa-search fa-sm"></i> </button>
-									</div>
-									<input type="text" class="form-control bg-white shadow-sm border-0 small" placeholder="Nombre, D.N.I." aria-label="Search" aria-describedby="basic-addon2" id="searchInputAppointment" @keyup.enter="searchHistoria()" autocomplete="off">
-								</div>
-							</div>
+					<div class="d-sm-flex align-items-center justify-content-between mt-4 px-3" style="gap: 10px;">
+							<h5 class="mb-0 text-secondary fw-bold"><i class="fas fa-search me-2"></i> Resultados de Búsqueda</h5>
 
 							<div class="d-flex justify-content-start" style="flex-shrink: 0;">
 									<input 
@@ -320,6 +345,26 @@ export default {
 			.then(res =>{
 				this.recetas = res.data;
 			})
+		},
+
+		ejecutarBusqueda() {
+			this.searchHistoria();
+			this.irATab('home-tab');
+		},
+
+		irATab(tabId) {
+			let tabEl = document.getElementById(tabId);
+			if(tabEl) {
+				tabEl.click();
+			}
+		},
+
+		mostrarReportes() {
+			this.$swal({
+				title: 'Próximamente',
+				text: 'El módulo de reportes estará disponible pronto.',
+				icon: 'info'
+			});
 		},
 
     async eliminar(id){

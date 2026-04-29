@@ -912,12 +912,15 @@ class PatientController extends Controller
 				'address', 
 				'relative', 
 				'prescriptions',
+				'prescriptions.kairos',
+				'prescriptions.professional',
 				'initial_psychological_history',
 				'initial_psychiatric_history',
 				'appointments' => function ($q) {
 					$q->orderBy('date', 'desc');
 				},
 				'appointments.professional',
+				'appointments.medical_exams',
 				'medical_evolutions' => function ($q) {
 					$q->orderBy('date', 'desc');
 				},

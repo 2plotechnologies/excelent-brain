@@ -8745,6 +8745,23 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         _this2.recetas = res.data;
       });
     },
+    ejecutarBusqueda: function ejecutarBusqueda() {
+      this.searchHistoria();
+      this.irATab('home-tab');
+    },
+    irATab: function irATab(tabId) {
+      var tabEl = document.getElementById(tabId);
+      if (tabEl) {
+        tabEl.click();
+      }
+    },
+    mostrarReportes: function mostrarReportes() {
+      this.$swal({
+        title: 'Próximamente',
+        text: 'El módulo de reportes estará disponible pronto.',
+        icon: 'info'
+      });
+    },
     eliminar: function eliminar(id) {
       var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
@@ -9551,7 +9568,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       this.tooltipData = null;
     },
     crearCitaEnSlot: function crearCitaEnSlot(doctor, horaLibre) {
-      // Buscar el indice en el array para compatibilidad con el v-for de la logica original
+      // Buscar el indice en el array para compatibilidad con el v-for de la logica original.
       var hIndex = doctor.horarios.findIndex(function (h) {
         return h.id == horaLibre.id;
       });
@@ -9567,13 +9584,13 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       });
     },
     bgPorSemaforo: function bgPorSemaforo(horaOcup) {
-      if (!horaOcup.patient || !horaOcup.patient.ultimoSemaforo) return 'bg-white';
+      if (!horaOcup.patient || !horaOcup.patient.ultimoSemaforo) return 'bg-transparent';
       var cod = horaOcup.patient.ultimoSemaforo.codigo;
-      if ([1].includes(cod)) return 'bg-white';
+      if ([1].includes(cod)) return 'bg-transparent';
       if ([2, 3, 4].includes(cod)) return 'bg-success text-white';
       if ([5, 6, 7].includes(cod)) return 'bg-warning text-dark';
       if ([8, 9, 10].includes(cod)) return 'bg-danger text-white';
-      return 'bg-white';
+      return 'bg-transparent'; //hacer transparente por defecto.
     },
     distribuirAperturaModal: function distribuirAperturaModal(data, tModalId, indexG) {
       this.cita = data;
@@ -9699,6 +9716,11 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     });
     this.listarProfesionales();
     this.listarPrecios();
+    this.$nextTick(function () {
+      if (_this9.$refs.bodyScroll && _this9.$refs.headerScroll) {
+        _this9.$refs.headerScroll.scrollLeft = _this9.$refs.bodyScroll.scrollLeft;
+      }
+    });
   }
 });
 
@@ -11784,7 +11806,6 @@ var render = function render() {
       id: "modalEstado",
       tabindex: "-1",
       role: "dialog",
-      "aria-labelledby": "exampleModalLabel",
       "aria-hidden": "true"
     }
   }, [_c("div", {
@@ -11793,29 +11814,46 @@ var render = function render() {
       role: "document"
     }
   }, [_c("div", {
-    staticClass: "modal-content"
-  }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
-  }, [_c("label", {
-    attrs: {
-      "for": ""
+    staticClass: "modal-content border-0 shadow-lg",
+    staticStyle: {
+      "border-radius": "20px",
+      overflow: "hidden"
     }
-  }, [_vm._v("Código de cita: #" + _vm._s(_vm.dataCit.id))]), _vm._v(" "), _c("form", {
+  }, [_c("div", {
+    staticClass: "modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center"
+  }, [_vm._m(0), _vm._v(" "), _c("div", [_c("h5", {
+    staticClass: "modal-title font-weight-bold text-dark mb-1"
+  }, [_vm._v("Estado de Cita")]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex gap-2 mt-1"
+  }, [_vm.dataCit ? _c("span", {
+    staticClass: "badge-status status-badge-secondary"
+  }, [_c("i", {
+    staticClass: "fas fa-hashtag mr-1"
+  }), _vm._v(" " + _vm._s(_vm.dataCit.id) + "\n                ")]) : _vm._e()])])]), _vm._v(" "), _vm._m(1)]), _vm._v(" "), _vm.dataCit ? _c("div", {
+    staticClass: "modal-body px-4 pt-4"
+  }, [_c("form", {
     attrs: {
       action: ""
+    },
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+      }
     }
+  }, [_c("div", {
+    staticClass: "form-group mb-3"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Nuevo estado:")]), _vm._v(" "), _c("select", {
+    staticClass: "section-label d-block mb-1"
+  }, [_vm._v("Nuevo estado")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.dataCit.status,
       expression: "dataCit.status"
     }],
-    staticClass: "form-select status-appointment",
+    staticClass: "form-select custom-select status-appointment",
     attrs: {
       name: "status",
       id: "status"
@@ -11843,22 +11881,21 @@ var render = function render() {
     attrs: {
       value: "3"
     }
-  }, [_vm._v("Anular cita")])]), _vm._v(" "), _vm.dataCit.status == 3 ? _c("div", {
-    staticClass: "mt-2"
+  }, [_vm._v("Anular cita")])])]), _vm._v(" "), _vm.dataCit.status == 3 ? _c("div", {
+    staticClass: "form-group mb-3"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Motivo")]), _vm._v(" "), _c("input", {
+    staticClass: "section-label d-block mb-1"
+  }, [_vm._v("Motivo de anulación")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.motivo,
       expression: "motivo"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input",
     attrs: {
-      type: "text"
+      type: "text",
+      placeholder: "Especifique el motivo..."
     },
     domProps: {
       value: _vm.motivo
@@ -11869,10 +11906,10 @@ var render = function render() {
         _vm.motivo = $event.target.value;
       }
     }
-  })]) : _vm._e()])]), _vm._v(" "), _c("div", {
-    staticClass: "modal-footer border-0 d-flex justify-content-end"
+  })]) : _vm._e()])]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer border-0 px-4 pb-4 pt-2 d-flex justify-content-center"
   }, [_c("button", {
-    staticClass: "btn btn-outline-primary",
+    staticClass: "btn btn-action btn-primary w-100",
     attrs: {
       type: "button"
     },
@@ -11882,32 +11919,31 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-redo"
-  }), _vm._v(" Actualizar")])])])])]);
+    staticClass: "fas fa-redo-alt mr-2"
+  }), _vm._v(" Actualizar Estado\n          ")])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header border-0"
-  }, [_c("h5", {
-    staticClass: "modal-title",
-    attrs: {
-      id: "exampleModalLabel"
-    }
-  }, [_vm._v("Estado de la cita ")]), _vm._v(" "), _c("button", {
-    staticClass: "close",
+    staticClass: "icon-header-container mr-3"
+  }, [_c("i", {
+    staticClass: "fas fa-info-circle text-primary h4 mb-0"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn-close-custom",
     attrs: {
       type: "button",
       id: "cerrModalEstado",
       "data-bs-dismiss": "modal",
       "aria-label": "Close"
     }
-  }, [_c("span", {
-    attrs: {
-      "aria-hidden": "true"
-    }
-  }, [_vm._v("×")])])]);
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })]);
 }];
 render._withStripped = true;
 
@@ -15466,10 +15502,10 @@ render._withStripped = true;
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=template&id=09aca1d1":
-/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=template&id=09aca1d1 ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=template&id=09aca1d1&scoped=true":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=template&id=09aca1d1&scoped=true ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -15487,21 +15523,46 @@ var render = function render() {
     attrs: {
       id: "modalTiemposEspera",
       tabindex: "-1",
-      "aria-labelledby": "modalEvolution",
       "aria-hidden": "true"
     }
   }, [_c("div", {
     staticClass: "modal-dialog modal-dialog-centered"
   }, [_c("div", {
-    staticClass: "modal-content"
-  }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
-  }, [_c("p", [_vm._v("Seleccione uno para asignar horario")]), _vm._v(" "), _vm.cita ? _c("div", {
+    staticClass: "modal-content border-0 shadow-lg",
+    staticStyle: {
+      "border-radius": "20px",
+      overflow: "hidden"
+    }
+  }, [_c("div", {
+    staticClass: "modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center"
+  }, [_vm._m(0), _vm._v(" "), _c("div", [_c("h5", {
+    staticClass: "modal-title font-weight-bold text-dark mb-1"
+  }, [_vm._v("Tiempos de Espera")]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex gap-2 mt-1"
+  }, [_vm.cita ? _c("span", {
+    staticClass: "badge-status status-badge-info"
+  }, [_c("i", {
+    staticClass: "fas fa-calendar-check mr-1"
+  }), _vm._v(" Asignación de Horarios\n                ")]) : _vm._e()])])]), _vm._v(" "), _vm._m(1)]), _vm._v(" "), _vm.cita ? _c("div", {
+    staticClass: "modal-body px-4 pt-4"
+  }, [_c("p", {
+    staticClass: "text-muted small mb-4"
+  }, [_vm._v("Seleccione una opción para registrar la hora actual en el sistema.")]), _vm._v(" "), _c("div", {
+    staticClass: "time-control-container p-3 mb-4"
+  }, [_c("div", {
     staticClass: "row"
   }, [_c("div", {
-    staticClass: "col"
-  }, [_vm._m(1), _vm._v(" "), ((_vm$cita$entrance = _vm.cita.entrance) === null || _vm$cita$entrance === void 0 ? void 0 : _vm$cita$entrance.length) > 0 ? _c("p", [_vm._v("Registrado " + _vm._s(_vm.horaLatam(_vm.cita.entrance)))]) : _c("button", {
-    staticClass: "btn btn-outline-primary",
+    staticClass: "col-6 border-right"
+  }, [_c("div", {
+    staticClass: "text-center px-2"
+  }, [_vm._m(2), _vm._v(" "), _c("label", {
+    staticClass: "section-label d-block mb-1"
+  }, [_vm._v("Hora de llegada")]), _vm._v(" "), ((_vm$cita$entrance = _vm.cita.entrance) === null || _vm$cita$entrance === void 0 ? void 0 : _vm$cita$entrance.length) > 0 ? _c("div", [_c("div", {
+    staticClass: "time-value text-dark mb-1 font-weight-bold"
+  }, [_vm._v(_vm._s(_vm.horaLatam(_vm.cita.entrance)))]), _vm._v(" "), _vm._m(3)]) : _c("button", {
+    staticClass: "btn btn-action btn-outline-primary btn-sm w-100",
     attrs: {
       "data-bs-dismiss": "modal"
     },
@@ -15511,13 +15572,27 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "fa-solid fa-stopwatch"
-  }), _vm._v(" Asignar hora")]), _vm._v(" "), _c("p", [_c("small", [_c("span", {
-    staticClass: "text-capitalize"
-  }, [_vm._v(_vm._s(_vm.calcularFaltante))]), _vm._v(" para su cita")])])]), _vm._v(" "), _c("div", {
-    staticClass: "col"
-  }, [_vm._m(2), _vm._v(" "), ((_vm$cita$attention = _vm.cita.attention) === null || _vm$cita$attention === void 0 ? void 0 : _vm$cita$attention.length) > 0 ? _c("p", [_vm._v("Registrado " + _vm._s(_vm.horaLatam(_vm.cita.attention)))]) : _c("button", {
-    staticClass: "btn btn-outline-primary",
+    staticClass: "fa-solid fa-clock mr-1"
+  }), _vm._v(" Asignar\n                  ")]), _vm._v(" "), _c("div", {
+    staticClass: "mt-3"
+  }, [_c("small", {
+    staticClass: "text-muted d-block",
+    staticStyle: {
+      "font-size": "0.7rem",
+      "line-height": "1.1"
+    }
+  }, [_vm._v("\n                      Faltan "), _c("span", {
+    staticClass: "font-weight-bold text-capitalize text-dark"
+  }, [_vm._v(_vm._s(_vm.calcularFaltante))]), _vm._v(" para su cita\n                    ")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-6"
+  }, [_c("div", {
+    staticClass: "text-center px-2"
+  }, [_vm._m(4), _vm._v(" "), _c("label", {
+    staticClass: "section-label d-block mb-1"
+  }, [_vm._v("Hora de atención")]), _vm._v(" "), ((_vm$cita$attention = _vm.cita.attention) === null || _vm$cita$attention === void 0 ? void 0 : _vm$cita$attention.length) > 0 ? _c("div", [_c("div", {
+    staticClass: "time-value text-dark mb-1 font-weight-bold"
+  }, [_vm._v(_vm._s(_vm.horaLatam(_vm.cita.attention)))]), _vm._v(" "), _vm._m(5)]) : _c("button", {
+    staticClass: "btn btn-action btn-outline-info btn-sm w-100",
     attrs: {
       "data-bs-dismiss": "modal"
     },
@@ -15527,21 +15602,22 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "fa-solid fa-stopwatch"
-  }), _vm._v(" Asignar hora")])])]) : _vm._e()])])])]);
+    staticClass: "fa-solid fa-clock mr-1"
+  }), _vm._v(" Asignar\n                  ")])])])])])]) : _vm._e()])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header border-0"
-  }, [_c("h5", {
-    staticClass: "modal-title",
-    attrs: {
-      id: "infoModalLabel"
-    }
-  }, [_vm._v("Tiempos de espera")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-danger btn-sm",
+    staticClass: "icon-header-container mr-3"
+  }, [_c("i", {
+    staticClass: "fas fa-stopwatch text-info h4 mb-0"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn-close-custom",
     attrs: {
       type: "button",
       "data-bs-dismiss": "modal",
@@ -15549,27 +15625,39 @@ var staticRenderFns = [function () {
     }
   }, [_c("i", {
     staticClass: "fas fa-times"
-  })])]);
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("label", {
-    attrs: {
-      "for": ""
-    }
+  return _c("div", {
+    staticClass: "time-icon mb-2"
   }, [_c("i", {
-    staticClass: "fa-solid fa-location-dot"
-  }), _vm._v(" Hora de llegada")]);
+    staticClass: "fa-solid fa-location-dot text-primary h5"
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("label", {
-    attrs: {
-      "for": ""
-    }
+  return _c("span", {
+    staticClass: "badge status-badge-success badge-status"
   }, [_c("i", {
-    staticClass: "fa-solid fa-feather-pointed"
-  }), _vm._v(" Hora de atención")]);
+    staticClass: "fas fa-check"
+  }), _vm._v(" Registrado")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "time-icon mb-2"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-stethoscope text-info h5"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "badge status-badge-success badge-status"
+  }, [_c("i", {
+    staticClass: "fas fa-check"
+  }), _vm._v(" Registrado")]);
 }];
 render._withStripped = true;
 
@@ -15765,39 +15853,88 @@ var render = function render() {
       role: "document"
     }
   }, [_c("div", {
-    staticClass: "modal-content modal-sm"
-  }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
+    staticClass: "modal-content border-0 shadow-lg",
+    staticStyle: {
+      "border-radius": "20px",
+      overflow: "hidden"
+    }
+  }, [_c("div", {
+    staticClass: "modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center"
+  }, [_vm._m(0), _vm._v(" "), _c("div", [_c("h5", {
+    staticClass: "modal-title font-weight-bold text-dark mb-1",
+    attrs: {
+      id: "exampleModalLabel"
+    }
+  }, [_vm._v("Pago de Cita")]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex gap-2 mt-1"
+  }, [_vm.dataCita ? _c("span", {
+    staticClass: "badge-status status-badge-info"
+  }, [_c("i", {
+    staticClass: "fas fa-receipt mr-1"
+  }), _vm._v(" #" + _vm._s(_vm.dataCita.id) + "\n                ")]) : _vm._e()])])]), _vm._v(" "), _vm._m(1)]), _vm._v(" "), _vm.dataCita ? _c("div", {
+    staticClass: "modal-body px-4 pt-4"
   }, [_c("form", {
     attrs: {
       action: ""
+    },
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+      }
     }
   }, [_c("div", {
-    staticClass: "form-group row"
+    staticClass: "patient-card p-3 mb-4"
   }, [_c("div", {
-    staticClass: "col-sm-12"
-  }, [_vm._m(1), _vm._v(" "), _c("p", {
-    staticClass: "lead text-capitalize mb-2 fw-bold"
-  }, [_c("span", [_vm._v(_vm._s(((_vm$dataCita$patient$ = (_vm$dataCita$patient = _vm.dataCita.patient) === null || _vm$dataCita$patient === void 0 ? void 0 : _vm$dataCita$patient.name) !== null && _vm$dataCita$patient$ !== void 0 ? _vm$dataCita$patient$ : "").toLowerCase()) + " " + _vm._s(((_vm$dataCita$patient$2 = (_vm$dataCita$patient2 = _vm.dataCita.patient) === null || _vm$dataCita$patient2 === void 0 ? void 0 : _vm$dataCita$patient2.nombres) !== null && _vm$dataCita$patient$2 !== void 0 ? _vm$dataCita$patient$2 : "").toLowerCase()))])]), _vm._v(" "), _c("p", {
-    staticClass: "lead mb-0"
-  }, [_c("small", [_vm._v("Precio a cobrar: S/")]), _vm._v(" " + _vm._s(parseFloat(_vm.dataCita.payment.price).toFixed(2)))]), _vm._v(" "), _vm.dataCita.payment.rebaja > 0 ? _c("p", {
-    staticClass: "lead mb-0"
-  }, [_c("small", [_vm._v("Rebajado: S/")]), _vm._v(" " + _vm._s(parseFloat(_vm.dataCita.payment.rebaja).toFixed(2)))]) : _vm._e(), _vm._v(" "), _vm.dataCita.payment.adelanto > 0 ? _c("p", {
-    staticClass: "lead mb-0"
-  }, [_c("small", [_vm._v("Adelanto: ")]), _vm._v(" S/ " + _vm._s(parseFloat(_vm.dataCita.payment.adelanto).toFixed(2)))]) : _vm._e(), _vm._v(" "), _vm.dataCita.payment.razonAdelanto ? _c("p", {
-    staticClass: "mb-0"
-  }, [_c("small", [_vm._v("Obs. o Fecha: " + _vm._s(_vm.dataCita.payment.razonAdelanto))])]) : _vm._e()]), _vm._v(" "), _vm.dataCita.byDoctor == 1 ? _c("div", [_c("label", {
-    attrs: {
-      "for": ""
+    staticClass: "d-flex align-items-center mb-2"
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
+    staticClass: "overflow-hidden"
+  }, [_c("div", {
+    staticClass: "patient-name font-weight-bold text-capitalize text-truncate"
+  }, [_vm._v(_vm._s(((_vm$dataCita$patient$ = (_vm$dataCita$patient = _vm.dataCita.patient) === null || _vm$dataCita$patient === void 0 ? void 0 : _vm$dataCita$patient.name) !== null && _vm$dataCita$patient$ !== void 0 ? _vm$dataCita$patient$ : "").toLowerCase()) + " " + _vm._s(((_vm$dataCita$patient$2 = (_vm$dataCita$patient2 = _vm.dataCita.patient) === null || _vm$dataCita$patient2 === void 0 ? void 0 : _vm$dataCita$patient2.nombres) !== null && _vm$dataCita$patient$2 !== void 0 ? _vm$dataCita$patient$2 : "").toLowerCase()))]), _vm._v(" "), _c("div", {
+    staticClass: "patient-dni text-muted small text-truncate"
+  }, [_vm._v("Cuenta de la persona")])])]), _vm._v(" "), _c("hr", {
+    staticClass: "my-2",
+    staticStyle: {
+      opacity: "0.1"
     }
-  }, [_vm._v("Aplicar rebaja (S/)\n\t\t\t\t\t\t\t\t"), _c("br"), _c("small", [_vm._v("Máximo: S/ " + _vm._s(_vm.maximo.toFixed(2)))])]), _vm._v(" "), _c("input", {
+  }), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mt-2"
+  }, [_c("span", {
+    staticClass: "text-muted small font-weight-bold text-uppercase"
+  }, [_vm._v("Precio a cobrar")]), _vm._v(" "), _c("span", {
+    staticClass: "font-weight-bold text-dark"
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.dataCita.payment.price).toFixed(2)))])]), _vm._v(" "), _vm.dataCita.payment.rebaja > 0 ? _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mt-1"
+  }, [_c("span", {
+    staticClass: "text-muted small font-weight-bold text-uppercase"
+  }, [_vm._v("Rebajado")]), _vm._v(" "), _c("span", {
+    staticClass: "font-weight-bold text-success"
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.dataCita.payment.rebaja).toFixed(2)))])]) : _vm._e(), _vm._v(" "), _vm.dataCita.payment.adelanto > 0 ? _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mt-1"
+  }, [_c("span", {
+    staticClass: "text-muted small font-weight-bold text-uppercase"
+  }, [_vm._v("Adelanto")]), _vm._v(" "), _c("span", {
+    staticClass: "font-weight-bold text-warning"
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.dataCita.payment.adelanto).toFixed(2)))])]) : _vm._e(), _vm._v(" "), _vm.dataCita.payment.razonAdelanto ? _c("div", {
+    staticClass: "text-muted small mt-2"
+  }, [_c("i", {
+    staticClass: "fas fa-info-circle mr-1"
+  }), _vm._v(" Obs. o Fecha: " + _vm._s(_vm.dataCita.payment.razonAdelanto) + "\n              ")]) : _vm._e()]), _vm._v(" "), _vm.dataCita.byDoctor == 1 ? _c("div", {
+    staticClass: "form-group mb-3"
+  }, [_c("label", {
+    staticClass: "section-label d-block mb-1"
+  }, [_vm._v("Aplicar rebaja (S/)")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group"
+  }, [_vm._m(3), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.caso.rebaja,
       expression: "caso.rebaja"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input",
     attrs: {
       type: "number",
       min: "0",
@@ -15816,13 +15953,12 @@ var render = function render() {
         _vm.$set(_vm.caso, "rebaja", $event.target.value);
       }
     }
-  })]) : _vm._e(), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-12 mt-2"
+  })]), _vm._v(" "), _c("small", {
+    staticClass: "text-muted mt-1 d-block"
+  }, [_vm._v("Máximo: S/ " + _vm._s(_vm.maximo.toFixed(2)))])]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "form-group mb-3"
   }, [_c("label", {
-    staticClass: "mt-2 mb-0",
-    attrs: {
-      "for": ""
-    }
+    staticClass: "section-label d-block mb-1"
   }, [_vm._v("Estado de pago")]), _vm._v(" "), _vm.caso.pago == 1 || _vm.caso.pago == 3 ? _c("select", {
     directives: [{
       name: "model",
@@ -15830,7 +15966,7 @@ var render = function render() {
       value: _vm.caso.pago,
       expression: "caso.pago"
     }],
-    staticClass: "form-select",
+    staticClass: "form-select custom-select",
     attrs: {
       name: "pay_status",
       id: "pay_status"
@@ -15860,21 +15996,24 @@ var render = function render() {
     attrs: {
       value: "2"
     }
-  }, [_vm._v("Pagado")])]) : _c("p", [_c("span", [_vm._v("Pagado")])])]), _vm._v(" "), _vm.caso.pago == 3 ? _c("div", {
-    staticClass: "col-sm-12"
+  }, [_vm._v("Pagado")])]) : _c("div", {
+    staticClass: "p-2 bg-light rounded text-success font-weight-bold"
+  }, [_c("i", {
+    staticClass: "fas fa-check-circle mr-1"
+  }), _vm._v(" Pagado\n                ")])]), _vm._v(" "), _vm.caso.pago == 3 ? _c("div", {
+    staticClass: "form-group mb-3"
   }, [_c("label", {
-    staticClass: "mt-2 mb-0",
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Monto de adelanto")]), _vm._v(" "), _c("input", {
+    staticClass: "section-label d-block mb-1"
+  }, [_vm._v("Monto de adelanto")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group"
+  }, [_vm._m(4), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.caso.monto_adelanto,
       expression: "caso.monto_adelanto"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input",
     attrs: {
       type: "text"
     },
@@ -15887,13 +16026,10 @@ var render = function render() {
         _vm.$set(_vm.caso, "monto_adelanto", $event.target.value);
       }
     }
-  })]) : _vm._e(), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-12"
+  })])]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "form-group mb-3"
   }, [_c("label", {
-    staticClass: "mt-2 mb-0",
-    attrs: {
-      "for": ""
-    }
+    staticClass: "section-label d-block mb-1"
   }, [_vm._v("Método de pago")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
@@ -15901,7 +16037,7 @@ var render = function render() {
       value: _vm.caso.moneda,
       expression: "caso.moneda"
     }],
-    staticClass: "form-select",
+    staticClass: "form-select custom-select",
     attrs: {
       id: "pay_type",
       required: "",
@@ -15920,16 +16056,15 @@ var render = function render() {
     }
   }, _vm._l(_vm.monedas, function (moneda) {
     return _c("option", {
+      key: moneda.id,
       domProps: {
         value: moneda.id
       }
     }, [_vm._v(_vm._s(moneda.tipo))]);
   }), 0)]), _vm._v(" "), _vm.caso.moneda != 1 ? _c("div", {
-    staticClass: "col-sm-12"
+    staticClass: "form-group mb-3"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
+    staticClass: "section-label d-block mb-1"
   }, [_vm._v("N° Comprobante de pago")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
@@ -15937,7 +16072,7 @@ var render = function render() {
       value: _vm.caso.comprobante,
       expression: "caso.comprobante"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input",
     attrs: {
       type: "text"
     },
@@ -15950,12 +16085,10 @@ var render = function render() {
         _vm.$set(_vm.caso, "comprobante", $event.target.value);
       }
     }
-  })]) : _vm._e()]), _vm._v(" "), _c("div", {
-    staticClass: "form-group"
+  })]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "form-group mb-3"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
+    staticClass: "section-label d-block mb-1"
   }, [_vm._v("Observación")]), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
@@ -15963,12 +16096,13 @@ var render = function render() {
       value: _vm.dataCita.payment.observation,
       expression: "dataCita.payment.observation"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input",
     attrs: {
       name: "observation",
       id: "observation",
       cols: "10",
-      rows: "2"
+      rows: "2",
+      placeholder: "Opcional..."
     },
     domProps: {
       value: _vm.dataCita.payment.observation
@@ -15979,10 +16113,12 @@ var render = function render() {
         _vm.$set(_vm.dataCita.payment, "observation", $event.target.value);
       }
     }
-  }), _vm._v(" "), _c("small", [_vm._v(_vm._s(_vm.pedirObservaciones))])])])]), _vm._v(" "), _c("div", {
-    staticClass: "modal-footer border-0"
+  }), _vm._v(" "), _c("small", {
+    staticClass: "text-muted mt-1 d-block"
+  }, [_vm._v(_vm._s(_vm.pedirObservaciones))])])])]) : _vm._e(), _vm._v(" "), _vm.dataCita ? _c("div", {
+    staticClass: "modal-footer border-0 px-4 pb-4 pt-2 d-flex justify-content-center gap-2"
   }, [_vm.dataCita.payment.pay_status == 1 ? _c("button", {
-    staticClass: "btn btn-outline-primary",
+    staticClass: "btn btn-action btn-primary w-100 mb-2",
     attrs: {
       type: "button"
     },
@@ -15992,44 +16128,65 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-save"
-  }), _vm._v(" Guardar pago")]) : _vm._e(), _vm._v(" "), _vm.dataCita.payment.pay_status != 1 ? _c("a", {
-    staticClass: "btn btn-outline-success",
+    staticClass: "fas fa-save mr-2"
+  }), _vm._v(" Guardar pago\n          ")]) : _vm._e(), _vm._v(" "), _vm.dataCita.payment.pay_status != 1 ? _c("a", {
+    staticClass: "btn btn-action btn-success w-100",
     attrs: {
       target: "_blank",
       href: "/api/pdfCupon/".concat(_vm.dataCita.id, "?token=").concat(_vm.token)
     }
-  }, [_vm._v("Cupón")]) : _vm._e()])])])]);
+  }, [_c("i", {
+    staticClass: "fas fa-file-invoice-dollar mr-2"
+  }), _vm._v(" Ver Cupón\n          ")]) : _vm._e()]) : _vm._e()])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header border-0"
-  }, [_c("h5", {
-    staticClass: "modal-title",
-    attrs: {
-      id: "exampleModalLabel"
-    }
-  }, [_vm._v("Pago de cita")]), _vm._v(" "), _c("button", {
-    staticClass: "btn-sm btn btn-danger",
+    staticClass: "icon-header-container mr-3"
+  }, [_c("i", {
+    staticClass: "fas fa-hand-holding-usd text-primary h4 mb-0"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn-close-custom",
     attrs: {
       type: "button",
       id: "cerrModal",
       "data-bs-dismiss": "modal",
       "aria-label": "Close"
     }
-  }, [_c("span", {
-    attrs: {
-      "aria-hidden": "true"
-    }
-  }, [_vm._v("×")])])]);
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("p", {
-    staticClass: "mb-0"
-  }, [_c("small", [_vm._v("Cuenta de la persona:")])]);
+  return _c("div", {
+    staticClass: "patient-avatar mr-3"
+  }, [_c("i", {
+    staticClass: "fas fa-user text-primary"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-prepend"
+  }, [_c("span", {
+    staticClass: "input-group-text bg-light border-0"
+  }, [_c("i", {
+    staticClass: "fas fa-minus-circle text-muted"
+  })])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "input-group-prepend"
+  }, [_c("span", {
+    staticClass: "input-group-text bg-light border-0"
+  }, [_vm._v("S/")])]);
 }];
 render._withStripped = true;
 
@@ -16506,10 +16663,85 @@ var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "card"
+    staticClass: "card border-0 shadow-none bg-transparent"
   }, [_c("div", {
-    staticClass: "container-fluid pt-2"
-  }, [_vm._m(0), _vm._v(" "), _c("div", {
+    staticClass: "container-fluid pt-2 px-0"
+  }, [_c("div", {
+    staticClass: "d-flex flex-column flex-xl-row justify-content-between align-items-xl-center mb-4 gap-3 bg-white p-3 rounded shadow-sm border"
+  }, [_c("div", {
+    staticClass: "input-group",
+    staticStyle: {
+      "max-width": "500px"
+    }
+  }, [_vm._m(0), _vm._v(" "), _c("input", {
+    staticClass: "form-control border-start-0 ps-0 bg-transparent",
+    attrs: {
+      type: "text",
+      placeholder: "Buscar cita por paciente, DNI o celular...",
+      id: "searchInputAppointment",
+      autocomplete: "off"
+    },
+    on: {
+      keyup: function keyup($event) {
+        if (!$event.type.indexOf("key") && _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")) return null;
+        return _vm.ejecutarBusqueda();
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex flex-wrap gap-2"
+  }, [_c("button", {
+    staticClass: "btn btn-light border d-flex align-items-center gap-2",
+    on: {
+      click: function click($event) {
+        return _vm.irATab("dashboard-tab");
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-chart-pie text-secondary"
+  }), _vm._v(" Dashboard\n\t\t\t\t\t\t\t")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-light border d-flex align-items-center gap-2",
+    on: {
+      click: function click($event) {
+        return _vm.irATab("home-tab");
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-users text-secondary"
+  }), _vm._v(" Buscar paciente\n\t\t\t\t\t\t\t")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-light border d-flex align-items-center gap-2",
+    on: {
+      click: function click($event) {
+        return _vm.irATab("book-tab");
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fa-regular fa-calendar-days text-secondary"
+  }), _vm._v(" Calendario\n\t\t\t\t\t\t\t")]), _vm._v(" "), _c("router-link", {
+    staticClass: "btn btn-light border d-flex align-items-center gap-2 text-decoration-none text-dark",
+    attrs: {
+      to: "/recepcionista/paquetes"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-box text-secondary"
+  }), _vm._v(" Paquetes\n\t\t\t\t\t\t\t")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-light border d-flex align-items-center gap-2",
+    on: {
+      click: function click($event) {
+        return _vm.mostrarReportes();
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-chart-bar text-secondary"
+  }), _vm._v(" Reportes\n\t\t\t\t\t\t\t")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary d-flex align-items-center gap-2",
+    on: {
+      click: function click($event) {
+        return _vm.irATab("book-tab");
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-plus"
+  }), _vm._v(" Nueva Cita\n\t\t\t\t\t\t\t")])], 1)]), _vm._v(" "), _vm._m(1), _vm._v(" "), _c("div", {
     staticClass: "tab-content",
     attrs: {
       id: "myTabContent"
@@ -16533,45 +16765,11 @@ var render = function render() {
       tabindex: "0"
     }
   }, [_c("div", {
-    staticClass: "d-sm-flex align-items-center justify-content-around mt-4 px-3",
+    staticClass: "d-sm-flex align-items-center justify-content-between mt-4 px-3",
     staticStyle: {
       gap: "10px"
     }
-  }, [_c("div", {
-    staticClass: "d-none d-sm-inline-block form-inline w-75"
-  }, [_c("div", {
-    staticClass: "input-group"
-  }, [_c("div", {
-    staticClass: "input-group-prepend"
-  }, [_c("button", {
-    staticClass: "btn btn-success",
-    attrs: {
-      type: "submit"
-    },
-    on: {
-      click: function click($event) {
-        return _vm.searchHistoria();
-      }
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-search fa-sm"
-  })])]), _vm._v(" "), _c("input", {
-    staticClass: "form-control bg-white shadow-sm border-0 small",
-    attrs: {
-      type: "text",
-      placeholder: "Nombre, D.N.I.",
-      "aria-label": "Search",
-      "aria-describedby": "basic-addon2",
-      id: "searchInputAppointment",
-      autocomplete: "off"
-    },
-    on: {
-      keyup: function keyup($event) {
-        if (!$event.type.indexOf("key") && _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")) return null;
-        return _vm.searchHistoria();
-      }
-    }
-  })])]), _vm._v(" "), _c("div", {
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
     staticClass: "d-flex justify-content-start",
     staticStyle: {
       "flex-shrink": "0"
@@ -16611,7 +16809,7 @@ var render = function render() {
     staticClass: "fas fa-sync-alt"
   })])])]), _vm._v(" "), _c("table", {
     staticClass: "table table-striped w-100 mt-4"
-  }, [_vm._m(1), _vm._v(" "), _c("tbody", _vm._l(_vm.citas, function (qCita, index) {
+  }, [_vm._m(3), _vm._v(" "), _c("tbody", _vm._l(_vm.citas, function (qCita, index) {
     return _c("tr", {
       key: qCita.id
     }, [_c("td", {
@@ -16860,8 +17058,16 @@ var render = function render() {
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-transparent border-end-0"
+  }, [_c("i", {
+    staticClass: "fas fa-search text-muted"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
   return _c("ul", {
-    staticClass: "nav nav-tabs justify-content-center",
+    staticClass: "nav nav-tabs justify-content-center d-none",
     attrs: {
       id: "myTab",
       role: "tablist"
@@ -16939,6 +17145,14 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fas fa-search"
   }), _vm._v(" Búsqueda del paciente")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h5", {
+    staticClass: "mb-0 text-secondary fw-bold"
+  }, [_c("i", {
+    staticClass: "fas fa-search me-2"
+  }), _vm._v(" Resultados de Búsqueda")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -17115,8 +17329,80 @@ var render = function render() {
   }, [_c("i", {
     staticClass: "fas fa-sync"
   }), _vm._v(" Actualizar")])]), _vm._v(" "), _c("div", {
-    staticClass: "col-auto ms-auto"
-  }, [_c("router-link", {
+    staticClass: "col-auto ms-auto d-flex align-items-center gap-3"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center text-muted small font-weight-bold",
+    staticStyle: {
+      gap: "15px"
+    }
+  }, [_c("span", {
+    staticClass: "d-flex align-items-center gap-1"
+  }, [_c("svg", {
+    staticClass: "text-warning",
+    attrs: {
+      xmlns: "http://www.w3.org/2000/svg",
+      width: "16",
+      height: "16",
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "currentColor",
+      "stroke-width": "2",
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round"
+    }
+  }, [_c("circle", {
+    attrs: {
+      cx: "12",
+      cy: "12",
+      r: "10"
+    }
+  }), _c("polyline", {
+    attrs: {
+      points: "12 6 12 12 16 14"
+    }
+  })]), _vm._v("\n\t\t\t\t\t\tEn espera\n\t\t\t\t\t")]), _vm._v(" "), _c("span", {
+    staticClass: "d-flex align-items-center gap-1"
+  }, [_c("svg", {
+    staticClass: "text-info",
+    attrs: {
+      xmlns: "http://www.w3.org/2000/svg",
+      width: "16",
+      height: "16",
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "currentColor",
+      "stroke-width": "2",
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round"
+    }
+  }, [_c("path", {
+    attrs: {
+      d: "M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"
+    }
+  })]), _vm._v("\n\t\t\t\t\t\tEn atención\n\t\t\t\t\t")]), _vm._v(" "), _c("span", {
+    staticClass: "d-flex align-items-center gap-1"
+  }, [_c("svg", {
+    staticClass: "text-success",
+    attrs: {
+      xmlns: "http://www.w3.org/2000/svg",
+      width: "16",
+      height: "16",
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "currentColor",
+      "stroke-width": "2",
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round"
+    }
+  }, [_c("path", {
+    attrs: {
+      d: "M22 11.08V12a10 10 0 1 1-5.93-9.14"
+    }
+  }), _c("polyline", {
+    attrs: {
+      points: "22 4 12 14.01 9 11.01"
+    }
+  })]), _vm._v("\n\t\t\t\t\t\tAtendido\n\t\t\t\t\t")])]), _vm._v(" "), _c("router-link", {
     staticClass: "btn btn-primary font-weight-bold shadow-sm",
     attrs: {
       to: "/recepcionista/paquetes"
@@ -17124,8 +17410,10 @@ var render = function render() {
   }, [_c("i", {
     staticClass: "fas fa-box-open"
   }), _vm._v(" Paquetes")])], 1)]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex mb-3 gap-2 flex-wrap"
-  }, [_c("button", {
+    staticClass: "d-flex mb-3 gap-2 flex-wrap align-items-center"
+  }, [_c("span", {
+    staticClass: "text-muted small font-weight-bold me-1"
+  }, [_vm._v("Filtrar:")]), _vm._v(" "), _c("button", {
     staticClass: "btn btn-sm rounded-pill font-weight-bold",
     "class": _vm.filtroActual == "Todos" ? "btn-primary" : "btn-light text-muted border",
     on: {
@@ -17145,12 +17433,23 @@ var render = function render() {
       }
     }, [_vm._v(_vm._s(prof))]);
   })], 2), _vm._v(" "), _c("div", {
-    staticClass: "calendar-wrapper bg-white shadow-sm rounded border"
+    staticClass: "calendar-wrapper bg-white shadow-sm border",
+    staticStyle: {
+      "border-radius": "8px"
+    }
   }, [_c("div", {
-    staticClass: "calendar-header d-flex border-bottom bg-light"
+    staticClass: "calendar-header d-flex border-bottom bg-light",
+    staticStyle: {
+      "border-top-left-radius": "8px",
+      "border-top-right-radius": "8px"
+    }
   }, [_vm._m(0), _vm._v(" "), _c("div", {
     ref: "headerScroll",
-    staticClass: "doctors-header-container d-flex flex-grow-1 overflow-hidden"
+    staticClass: "doctors-header-container d-flex flex-grow-1",
+    staticStyle: {
+      "overflow-x": "auto",
+      "overflow-y": "hidden"
+    }
   }, [_vm._l(_vm.doctoresFiltrados, function (doctor) {
     return _c("div", {
       key: "h-" + doctor.id,
@@ -17193,14 +17492,15 @@ var render = function render() {
   }, _vm._l(_vm.horasGrid, function (hora) {
     return _c("div", {
       key: "lbl-" + hora,
-      staticClass: "time-slot-label text-center border-bottom text-muted small position-relative"
+      staticClass: "time-slot-label text-center text-muted small position-relative"
     }, [_c("span", {
       staticStyle: {
         position: "absolute",
         top: "-10px",
         right: "8px",
         background: "white",
-        padding: "0 4px"
+        padding: "0 4px",
+        "z-index": "2"
       }
     }, [_vm._v(_vm._s(hora) + ":00")])]);
   }), 0), _vm._v(" "), _c("div", {
@@ -17409,7 +17709,8 @@ var staticRenderFns = [function () {
   return _c("div", {
     staticClass: "time-axis-header text-center py-3 border-right text-muted font-weight-bold",
     staticStyle: {
-      "min-width": "60px"
+      "min-width": "60px",
+      "border-top-left-radius": "8px"
     }
   }, [_c("i", {
     staticClass: "far fa-clock"
@@ -19748,6 +20049,30 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.wizard-stepper {\r\n\tbackground-co
 
 /***/ }),
 
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=style&index=0&id=09aca1d1&scoped=true&lang=css":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=style&index=0&id=09aca1d1&scoped=true&lang=css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\r\n/* Main Layout */\n.modal-content[data-v-09aca1d1] {\r\n  background: #ffffff;\n}\r\n\r\n/* Header */\n.icon-header-container[data-v-09aca1d1] {\r\n  background: #e7f5ff;\r\n  width: 44px;\r\n  height: 44px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  border-radius: 12px;\n}\n.btn-close-custom[data-v-09aca1d1] {\r\n  background: #f8f9fa;\r\n  border: none;\r\n  width: 32px;\r\n  height: 32px;\r\n  border-radius: 50%;\r\n  color: #adb5bd;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  transition: all 0.2s;\r\n  cursor: pointer;\n}\n.btn-close-custom[data-v-09aca1d1]:hover { background: #e9ecef; color: #495057;\n}\r\n\r\n/* Badges */\n.badge-status[data-v-09aca1d1] {\r\n  padding: 4px 12px;\r\n  border-radius: 50px;\r\n  font-size: 0.7rem;\r\n  font-weight: 700;\r\n  text-transform: uppercase;\n}\n.status-badge-info[data-v-09aca1d1] { background: #e7f5ff; color: #1971c2; border: 1px solid #d0ebff;\n}\n.status-badge-success[data-v-09aca1d1] { background: #e7fcf3; color: #0ca678; border: 1px solid #c3fae8;\n}\r\n\r\n/* Sections */\n.section-label[data-v-09aca1d1] {\r\n  font-size: 0.7rem;\r\n  font-weight: 800;\r\n  color: #adb5bd;\r\n  letter-spacing: 1px;\r\n  text-transform: uppercase;\n}\n.time-control-container[data-v-09aca1d1] {\r\n  background: #f8f9fc;\r\n  border-radius: 16px;\r\n  border: 1px solid #f1f3f9;\n}\n.time-icon[data-v-09aca1d1] {\r\n  width: 40px;\r\n  height: 40px;\r\n  margin: 0 auto;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  background: #fff;\r\n  border-radius: 50%;\r\n  box-shadow: 0 2px 4px rgba(0,0,0,0.02);\n}\r\n\r\n/* Action Buttons */\n.btn-action[data-v-09aca1d1] {\r\n  border-radius: 12px;\r\n  padding: 8px 16px;\r\n  font-weight: 700;\r\n  font-size: 0.8rem;\r\n  transition: all 0.2s;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\n}\n.btn-action[data-v-09aca1d1]:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05);\n}\n.border-right[data-v-09aca1d1] { border-right: 1px solid #e9ecef!important;\n}\n.gap-2[data-v-09aca1d1] { gap: 0.5rem;\n}\n.mr-1[data-v-09aca1d1] { margin-right: 0.25rem;\n}\n.mr-3[data-v-09aca1d1] { margin-right: 0.75rem;\n}\r\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ReprogModal.vue?vue&type=style&index=0&id=2214c88a&scoped=true&lang=css":
 /*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ReprogModal.vue?vue&type=style&index=0&id=2214c88a&scoped=true&lang=css ***!
@@ -19861,7 +20186,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.calendar-wrapper[data-v-992bc26a] { display: flex; flex-direction: column; overflow: hidden;\n}\n.doctor-header[data-v-992bc26a] { min-width: 250px; flex: 1;\n}\n.doctor-column[data-v-992bc26a] { min-width: 250px; flex: 1;\n}\n.time-slot-label[data-v-992bc26a] { height: 90px;\n} /* 60 minutos * 1.5px/min = 90px */\n.grid-line[data-v-992bc26a] { height: 90px; box-sizing: border-box;\n}\n.free-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; opacity: 0; cursor: pointer; transition: opacity 0.2s; background: rgba(28, 200, 138, 0.1); border-radius: 4px; box-sizing: border-box;}\n.free-slot[data-v-992bc26a]:hover { opacity: 1; border: 1px dashed #1cc88a;\n}\n.booked-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; cursor: pointer; transition: transform 0.1s; border-radius: 6px; overflow: hidden; background-color: #f8f9fc;}\n.booked-slot[data-v-992bc26a]:hover { transform: scale(1.02); z-index: 10!important;\n}\n.booked-content[data-v-992bc26a] { padding: 4px; border-radius: 4px;\n}\n.doctors-header-container[data-v-992bc26a]::-webkit-scrollbar { display: none;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.calendar-wrapper[data-v-992bc26a] { display: flex; flex-direction: column; border-radius: 8px; overflow: hidden; transform: translateZ(0);\n}\n.doctor-header[data-v-992bc26a],\n.doctor-column[data-v-992bc26a] {\n\tmin-width: 250px;\n\tmax-width: 250px;\n\tflex: 0 0 250px;\n}\n.time-slot-label[data-v-992bc26a] { height: 90px;\n} /* 60 minutos * 1.5px/min = 90px */\n.grid-line[data-v-992bc26a] { height: 90px; box-sizing: border-box;\n}\n.free-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; opacity: 0; cursor: pointer; transition: opacity 0.2s; background: rgba(28, 200, 138, 0.1); border-radius: 4px; box-sizing: border-box;}\n.free-slot[data-v-992bc26a]:hover { opacity: 1; border: 1px dashed #1cc88a;\n}\n.booked-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; cursor: pointer; transition: transform 0.1s; border-radius: 6px; overflow: hidden; background-color: rgba(248, 249, 252, 0.7);}\n.booked-slot[data-v-992bc26a]:hover { transform: scale(1.02); z-index: 10!important;\n}\n.booked-content[data-v-992bc26a] { padding: 4px; border-radius: 4px;\n}\n.doctors-header-container[data-v-992bc26a]::-webkit-scrollbar { display: none;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -59469,6 +59794,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=style&index=0&id=09aca1d1&scoped=true&lang=css":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=style&index=0&id=09aca1d1&scoped=true&lang=css ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalTiemposEspera_vue_vue_type_style_index_0_id_09aca1d1_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalTiemposEspera.vue?vue&type=style&index=0&id=09aca1d1&scoped=true&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=style&index=0&id=09aca1d1&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalTiemposEspera_vue_vue_type_style_index_0_id_09aca1d1_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalTiemposEspera_vue_vue_type_style_index_0_id_09aca1d1_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ReprogModal.vue?vue&type=style&index=0&id=2214c88a&scoped=true&lang=css":
 /*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ReprogModal.vue?vue&type=style&index=0&id=2214c88a&scoped=true&lang=css ***!
@@ -60723,23 +61078,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ModalTiemposEspera_vue_vue_type_template_id_09aca1d1__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalTiemposEspera.vue?vue&type=template&id=09aca1d1 */ "./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=template&id=09aca1d1");
+/* harmony import */ var _ModalTiemposEspera_vue_vue_type_template_id_09aca1d1_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalTiemposEspera.vue?vue&type=template&id=09aca1d1&scoped=true */ "./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=template&id=09aca1d1&scoped=true");
 /* harmony import */ var _ModalTiemposEspera_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModalTiemposEspera.vue?vue&type=script&lang=js */ "./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _ModalTiemposEspera_vue_vue_type_style_index_0_id_09aca1d1_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalTiemposEspera.vue?vue&type=style&index=0&id=09aca1d1&scoped=true&lang=css */ "./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=style&index=0&id=09aca1d1&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _ModalTiemposEspera_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _ModalTiemposEspera_vue_vue_type_template_id_09aca1d1__WEBPACK_IMPORTED_MODULE_0__.render,
-  _ModalTiemposEspera_vue_vue_type_template_id_09aca1d1__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _ModalTiemposEspera_vue_vue_type_template_id_09aca1d1_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _ModalTiemposEspera_vue_vue_type_template_id_09aca1d1_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "09aca1d1",
   null
   
 )
@@ -61544,19 +61901,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=template&id=09aca1d1":
-/*!*********************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=template&id=09aca1d1 ***!
-  \*********************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=template&id=09aca1d1&scoped=true":
+/*!*********************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=template&id=09aca1d1&scoped=true ***!
+  \*********************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalTiemposEspera_vue_vue_type_template_id_09aca1d1__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalTiemposEspera_vue_vue_type_template_id_09aca1d1__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalTiemposEspera_vue_vue_type_template_id_09aca1d1_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalTiemposEspera_vue_vue_type_template_id_09aca1d1_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalTiemposEspera_vue_vue_type_template_id_09aca1d1__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalTiemposEspera.vue?vue&type=template&id=09aca1d1 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=template&id=09aca1d1");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalTiemposEspera_vue_vue_type_template_id_09aca1d1_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalTiemposEspera.vue?vue&type=template&id=09aca1d1&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=template&id=09aca1d1&scoped=true");
 
 
 /***/ }),
@@ -61728,6 +62085,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNuevaCita_vue_vue_type_style_index_0_id_33da45b8_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalNuevaCita.vue?vue&type=style&index=0&id=33da45b8&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalNuevaCita.vue?vue&type=style&index=0&id=33da45b8&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=style&index=0&id=09aca1d1&scoped=true&lang=css":
+/*!***********************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=style&index=0&id=09aca1d1&scoped=true&lang=css ***!
+  \***********************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalTiemposEspera_vue_vue_type_style_index_0_id_09aca1d1_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalTiemposEspera.vue?vue&type=style&index=0&id=09aca1d1&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalTiemposEspera.vue?vue&type=style&index=0&id=09aca1d1&scoped=true&lang=css");
 
 
 /***/ }),

@@ -227,9 +227,20 @@ export default {
             this.dataSearchExam = this.exams.filter(el => el.name.match(expReg))
         },
         
-        print () {
-            this.exam.medical_exams = this.selected
-            window.open('/api/pdf_exam/'+[JSON.stringify(this.exam).split('/').join('-')]+'?token='+localStorage.getItem('token'))
+        async print () {
+            this.exam.medical_exams = this.selected;
+            if(this.selected.length === 0) {
+                this.$swal('Agregue al menos un examen para continuar');
+                return;
+            }
+            try {
+                await this.axios.post('/api/medicalExam', this.exam);
+                this.$swal('Órdenes de exámenes guardadas con éxito');
+                window.open('/api/pdf_exam/'+[JSON.stringify(this.exam).split('/').join('-')]+'?token='+localStorage.getItem('token'));
+            } catch (err) {
+                console.error(err);
+                this.$swal('Error al guardar las órdenes');
+            }
         },
         
         deleteSelected(key){

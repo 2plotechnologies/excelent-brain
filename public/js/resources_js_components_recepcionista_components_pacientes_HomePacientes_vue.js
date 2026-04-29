@@ -246,7 +246,9 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     return {
       paciente: {},
       loading: true,
-      timelineActivity: []
+      timelineActivity: [],
+      activePill: 'recetas',
+      ciesData: []
     };
   },
   computed: {
@@ -297,6 +299,24 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       return combined.sort(function (a, b) {
         return b.dateStamp - a.dateStamp;
       });
+    },
+    allMedicalExams: function allMedicalExams() {
+      var exams = [];
+      if (this.paciente.appointments) {
+        this.paciente.appointments.forEach(function (app) {
+          if (app.medical_exams && app.medical_exams.length > 0) {
+            app.medical_exams.forEach(function (exam) {
+              exams.push({
+                appointmentId: app.id,
+                date: app.date,
+                doctor: app.professional ? app.professional.name : '--',
+                exam: exam
+              });
+            });
+          }
+        });
+      }
+      return exams;
     }
   },
   methods: {
@@ -413,6 +433,29 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       if (s == 5) return 'bg-danger';
       return 'bg-secondary';
     },
+    getHobbies: function getHobbies(hobbiesStr) {
+      if (!hobbiesStr) return [];
+      try {
+        return JSON.parse(hobbiesStr);
+      } catch (e) {
+        return [];
+      }
+    },
+    getEstadoNombre: function getEstadoNombre(codigo) {
+      var estados = {
+        1: 'Neutro',
+        2: 'Cumplidor',
+        3: 'Promotor',
+        4: 'Wow',
+        5: 'Reprogramador',
+        6: 'Exigente',
+        7: 'Deudor',
+        8: 'Insatisfecho',
+        9: 'Riesgo',
+        10: 'Problemático'
+      };
+      return estados[codigo] || 'Desconocido';
+    },
     getTriajeReferencia: function getTriajeReferencia(ref) {
       if (ref == 1) return 'Psicológico';
       if (ref == 2) return 'Psiquiátrico';
@@ -454,10 +497,43 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       hours = hours % 12;
       hours = hours ? hours : 12;
       return "".concat(day, " ").concat(month, " ").concat(year, " - ").concat(hours.toString().padStart(2, '0'), ":").concat(minutes, " ").concat(ampm);
+    },
+    getCieNames: function getCieNames(diagnosticString) {
+      var _this3 = this;
+      if (!diagnosticString) return 'Evaluación médica general';
+      try {
+        var parsed = JSON.parse(diagnosticString);
+        if (Array.isArray(parsed) && this.ciesData && this.ciesData.length > 0) {
+          var names = parsed.map(function (code) {
+            var found = _this3.ciesData.find(function (c) {
+              return c.id == code;
+            });
+            return found ? "".concat(found.code, " - ").concat(found.description) : code;
+          });
+          return names.join(', ');
+        }
+        return diagnosticString;
+      } catch (e) {
+        return diagnosticString;
+      }
+    },
+    getExamPdfUrl: function getExamPdfUrl(examData) {
+      var examObj = {
+        appointment: examData.appointmentId.toString(),
+        name_patient: "".concat(this.paciente.name, " ").concat(this.paciente.nombres || '').trim(),
+        attention_date: examData.date.substring(0, 10),
+        medical_exams: [examData.exam]
+      };
+      var jsonStr = JSON.stringify(examObj).split('/').join('-');
+      return "/api/pdf_exam/".concat(jsonStr, "?token=").concat(this.$token);
     }
   },
   mounted: function mounted() {
+    var _this4 = this;
     this.fetchPatientDetails();
+    this.axios.get('/api/cies/a').then(function (res) {
+      _this4.ciesData = res.data;
+    });
   },
   watch: {
     pacienteId: function pacienteId() {
@@ -2661,9 +2737,9 @@ var render = function render() {
       type: "button",
       role: "tab"
     }
-  }, [_vm._v("Historial Clínico "), _vm.paciente.medical_evolutions ? _c("span", [_vm._v("(" + _vm._s(_vm.paciente.medical_evolutions.length) + ")")]) : _vm._e()])]), _vm._v(" "), _vm._m(3), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7)]), _vm._v(" "), _vm.loading ? _c("div", {
+  }, [_vm._v("Historial Clínico "), _vm.paciente.medical_evolutions ? _c("span", [_vm._v("(" + _vm._s(_vm.paciente.medical_evolutions.length) + ")")]) : _vm._e()])]), _vm._v(" "), _vm._m(3), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7), _vm._v(" "), _vm._m(8)]), _vm._v(" "), _vm.loading ? _c("div", {
     staticClass: "text-center my-5"
-  }, [_vm._m(8), _vm._v(" "), _c("p", {
+  }, [_vm._m(9), _vm._v(" "), _c("p", {
     staticClass: "mt-2 text-muted"
   }, [_vm._v("Cargando información completa del paciente...")])]) : _c("div", {
     staticClass: "tab-content px-2",
@@ -2684,7 +2760,7 @@ var render = function render() {
     staticClass: "card shadow-sm border rounded-lg mb-3"
   }, [_c("div", {
     staticClass: "card-body"
-  }, [_vm._m(9), _vm._v(" "), _vm.proximaCita ? _c("div", [_c("h5", {
+  }, [_vm._m(10), _vm._v(" "), _vm.proximaCita ? _c("div", [_c("h5", {
     staticClass: "mb-1 text-dark"
   }, [_vm._v(_vm._s(_vm.formatDateTime(_vm.proximaCita.date, _vm.proximaCita.hora)))]), _vm._v(" "), _vm.proximaCita.professional ? _c("p", {
     staticClass: "small text-muted mb-0"
@@ -2694,7 +2770,7 @@ var render = function render() {
     staticClass: "card shadow-sm border rounded-lg mb-3"
   }, [_c("div", {
     staticClass: "card-body"
-  }, [_vm._m(10), _vm._v(" "), _vm.ultimaEvolucion ? _c("div", [_c("p", {
+  }, [_vm._m(11), _vm._v(" "), _vm.ultimaEvolucion ? _c("div", [_c("p", {
     staticClass: "small text-muted mb-1"
   }, [_vm._v(_vm._s(_vm.formatDate(_vm.ultimaEvolucion.date)) + " - Dr. " + _vm._s(_vm.ultimaEvolucion.professional ? _vm.ultimaEvolucion.professional.name : ""))]), _vm._v(" "), _c("p", {
     staticClass: "small mb-0"
@@ -2706,7 +2782,7 @@ var render = function render() {
     staticClass: "card shadow-sm border rounded-lg h-100"
   }, [_c("div", {
     staticClass: "card-body p-4"
-  }, [_vm._m(11), _vm._v(" "), _c("div", {
+  }, [_vm._m(12), _vm._v(" "), _c("div", {
     staticClass: "timeline ms-3 mt-3 content-timeline"
   }, [_vm._l(_vm.timelineActivity.slice(0, 5), function (item, index) {
     return _c("div", {
@@ -2762,7 +2838,7 @@ var render = function render() {
     staticClass: "card border-0 shadow-sm h-100"
   }, [_c("div", {
     staticClass: "card-body"
-  }, [_vm._m(12), _vm._v(" "), _c("div", {
+  }, [_vm._m(13), _vm._v(" "), _c("div", {
     staticClass: "mb-2"
   }, [_c("small", {
     staticClass: "text-muted d-block"
@@ -2796,7 +2872,7 @@ var render = function render() {
     staticClass: "card border-0 shadow-sm h-100"
   }, [_c("div", {
     staticClass: "card-body"
-  }, [_vm._m(13), _vm._v(" "), _c("div", {
+  }, [_vm._m(14), _vm._v(" "), _c("div", {
     staticClass: "mb-2"
   }, [_c("small", {
     staticClass: "text-muted d-block"
@@ -2832,7 +2908,7 @@ var render = function render() {
     staticClass: "card border-0 shadow-sm h-100"
   }, [_c("div", {
     staticClass: "card-body"
-  }, [_vm._m(14), _vm._v(" "), _vm.paciente.relative && _vm.paciente.relative.length ? _c("div", _vm._l(_vm.paciente.relative, function (rel) {
+  }, [_vm._m(15), _vm._v(" "), _vm.paciente.relative && _vm.paciente.relative.length ? _c("div", _vm._l(_vm.paciente.relative, function (rel) {
     return _c("div", {
       directives: [{
         name: "show",
@@ -2862,7 +2938,7 @@ var render = function render() {
     staticClass: "card border-0 shadow-sm h-100"
   }, [_c("div", {
     staticClass: "card-body"
-  }, [_vm._m(15), _vm._v(" "), _c("div", {
+  }, [_vm._m(16), _vm._v(" "), _c("div", {
     staticClass: "mb-2"
   }, [_c("small", {
     staticClass: "text-muted d-block"
@@ -2872,7 +2948,39 @@ var render = function render() {
     staticClass: "text-muted d-block"
   }, [_vm._v("Última Visita")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.last_visit || "—"))])]), _vm._v(" "), _c("div", [_c("small", {
     staticClass: "text-muted d-block"
-  }, [_vm._v("Total de Evoluciones")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.evolutions_count || 0) + " registros")])])])])])])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Total de Evoluciones")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.paciente.evolutions_count || 0) + " registros")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-12"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm h-100 bg-light"
+  }, [_c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-md-6 mb-3 mb-md-0"
+  }, [_vm._m(17), _vm._v(" "), _vm.paciente.semaforo_estados && _vm.paciente.semaforo_estados.length > 0 ? _c("div", {
+    staticClass: "d-flex flex-wrap gap-2"
+  }, _vm._l(_vm.paciente.semaforo_estados.slice(0, 5), function (sem) {
+    return _c("span", {
+      key: sem.id,
+      staticClass: "badge border bg-white text-dark shadow-sm px-3 py-2"
+    }, [_c("i", {
+      staticClass: "fas fa-tag text-warning me-1"
+    }), _vm._v(" " + _vm._s(_vm.getEstadoNombre(sem.codigo)) + "\n                      ")]);
+  }), 0) : _c("div", [_c("small", {
+    staticClass: "text-muted"
+  }, [_vm._v("No hay etiquetas de comportamiento registradas.")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_vm._m(18), _vm._v(" "), _vm.getHobbies(_vm.paciente.hobbies).length > 0 ? _c("div", {
+    staticClass: "d-flex flex-wrap gap-2"
+  }, _vm._l(_vm.getHobbies(_vm.paciente.hobbies), function (hobbie, index) {
+    return _c("span", {
+      key: index,
+      staticClass: "badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-3 py-2"
+    }, [_vm._v("\n                        " + _vm._s(hobbie) + "\n                      ")]);
+  }), 0) : _c("div", [_c("small", {
+    staticClass: "text-muted"
+  }, [_vm._v("No hay hobbies registrados.")])])])])])])])])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
     attrs: {
       id: "citas",
@@ -2892,7 +3000,7 @@ var render = function render() {
     staticClass: "table-responsive"
   }, [_c("table", {
     staticClass: "table table-hover table-sm"
-  }, [_vm._m(16), _vm._v(" "), _c("tbody", [_vm._l((_vm.paciente.appointments || []).slice(0, 10), function (cita) {
+  }, [_vm._m(19), _vm._v(" "), _c("tbody", [_vm._l((_vm.paciente.appointments || []).slice(0, 10), function (cita) {
     return _c("tr", {
       key: cita.id
     }, [_c("td", [_vm._v(_vm._s(_vm.formatDate(cita.date)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(cita.professional ? cita.professional.name : "N/A"))]), _vm._v(" "), _c("td", [_c("span", {
@@ -2916,7 +3024,7 @@ var render = function render() {
     staticClass: "table-responsive"
   }, [_c("table", {
     staticClass: "table table-hover table-sm"
-  }, [_vm._m(17), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.membresias, function (mem) {
+  }, [_vm._m(20), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.membresias, function (mem) {
     return _c("tr", {
       key: mem.id
     }, [_c("td", [_vm._v(_vm._s(_vm.formatDate(mem.inicio)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.formatDate(mem.fin)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(mem.precio ? mem.precio.descripcion : "N/A"))]), _vm._v(" "), _c("td", [_c("span", {
@@ -2974,27 +3082,27 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(18), _vm._v(" "), _c("p", {
+  }, [_vm._m(21), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychological_history.illness))])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(19), _vm._v(" "), _c("p", {
+  }, [_vm._m(22), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychological_history.antecedent))])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(20), _vm._v(" "), _c("p", {
+  }, [_vm._m(23), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychological_history.dynamic))])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(21), _vm._v(" "), _c("p", {
+  }, [_vm._m(24), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychological_history.attitude))])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(22), _vm._v(" "), _c("div", {
+  }, [_vm._m(25), _vm._v(" "), _c("div", {
     staticClass: "p-2 rounded bg-white border border-light small text-dark mt-1 shadow-sm"
   }, [_vm._v("\n                  " + _vm._s(_vm.paciente.initial_psychological_history.dx) + "\n                ")])]), _vm._v(" "), _c("div", {
     staticClass: "mb-0 bg-light p-3 border rounded"
-  }, [_vm._m(23), _vm._v(" "), _c("p", {
+  }, [_vm._m(26), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark",
     staticStyle: {
       "white-space": "pre-wrap"
@@ -3036,19 +3144,19 @@ var render = function render() {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-md-6 mb-3"
-  }, [_vm._m(24), _vm._v(" "), _c("p", {
+  }, [_vm._m(27), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.general_antecedent))])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 mb-3"
-  }, [_vm._m(25), _vm._v(" "), _c("p", {
+  }, [_vm._m(28), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.main_signs_symptoms))])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 mb-3"
-  }, [_vm._m(26), _vm._v(" "), _c("p", {
+  }, [_vm._m(29), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.illness))])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 mb-3"
-  }, [_vm._m(27), _vm._v(" "), _c("p", {
+  }, [_vm._m(30), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.apc))])]), _vm._v(" "), _c("div", {
     staticClass: "col-12 mt-2"
@@ -3104,22 +3212,22 @@ var render = function render() {
     staticClass: "small text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.insight))])])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 mb-3"
-  }, [_vm._m(28), _vm._v(" "), _c("p", {
+  }, [_vm._m(31), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.diagnostic_problems))])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 mb-3"
-  }, [_vm._m(29), _vm._v(" "), _c("div", {
+  }, [_vm._m(32), _vm._v(" "), _c("div", {
     staticClass: "p-2 rounded bg-white border border-light small text-dark shadow-sm"
   }, [_vm._v("\n                     " + _vm._s(_vm.paciente.initial_psychiatric_history.diagnostic) + "\n                  ")])]), _vm._v(" "), _c("div", {
     staticClass: "col-12 mt-2"
   }, [_c("div", {
     staticClass: "bg-light p-3 border rounded text-dark"
-  }, [_vm._m(30), _vm._v(" "), _c("p", {
+  }, [_vm._m(33), _vm._v(" "), _c("p", {
     staticClass: "small mb-0",
     staticStyle: {
       "white-space": "pre-wrap"
     }
-  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.plan))])])])])])])]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm._m(31), _vm._v(" "), _c("div", {
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.plan))])])])])])])]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm._m(34), _vm._v(" "), _c("div", {
     staticClass: "card border"
   }, [_c("div", {
     staticClass: "card-body p-0"
@@ -3133,7 +3241,7 @@ var render = function render() {
       staticClass: "d-flex justify-content-between align-items-start mb-2"
     }, [_c("div", {
       staticClass: "d-flex align-items-center"
-    }, [_vm._m(32, true), _vm._v(" "), _c("div", [_c("h6", {
+    }, [_vm._m(35, true), _vm._v(" "), _c("div", [_c("h6", {
       staticClass: "mb-0 font-weight-bold text-dark"
     }, [_vm._v(_vm._s(evo.professional ? evo.professional.name : "Profesional Médico"))]), _vm._v(" "), _c("small", {
       staticClass: "text-muted"
@@ -3141,14 +3249,14 @@ var render = function render() {
       staticClass: "far fa-clock me-1"
     }), _vm._v(" " + _vm._s(_vm.formatDateTime(evo.date, evo.hora)))])])])]), _vm._v(" "), _c("div", {
       staticClass: "mt-3 ms-2 ms-sm-5 ps-sm-2"
-    }, [_vm._m(33, true), _vm._v(" "), _c("p", {
+    }, [_vm._m(36, true), _vm._v(" "), _c("p", {
       staticClass: "small text-muted mb-3",
       staticStyle: {
         "white-space": "pre-wrap"
       }
     }, [_vm._v(_vm._s(evo.content || evo.descripcion))]), _vm._v(" "), evo.plan ? _c("div", {
       staticClass: "p-3 bg-light rounded text-dark small border-start border-warning border-3 mb-3"
-    }, [_vm._m(34, true), _c("br"), _vm._v(" "), _c("span", {
+    }, [_vm._m(37, true), _c("br"), _vm._v(" "), _c("span", {
       staticStyle: {
         "white-space": "pre-wrap"
       }
@@ -3164,8 +3272,23 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "row"
   }, [_c("div", {
+    staticClass: "col-12 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2"
+  }, [_vm._m(38), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary btn-sm rounded-pill shadow-sm px-3",
+    attrs: {
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#modalTriaje"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.$emit("abrirTriaje", _vm.paciente);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-lungs me-1"
+  }), _vm._v(" Nuevo Triaje\n          ")])]), _vm._v(" "), _c("div", {
     staticClass: "col-12 mb-4"
-  }, [_vm._m(35), _vm._v(" "), _vm.paciente.triajes && _vm.paciente.triajes.length > 0 ? _c("div", _vm._l(_vm.paciente.triajes, function (tr) {
+  }, [_vm.paciente.triajes && _vm.paciente.triajes.length > 0 ? _c("div", _vm._l(_vm.paciente.triajes, function (tr) {
     return _c("div", {
       key: tr.id,
       staticClass: "card border-0 shadow-sm mb-3 rounded-lg",
@@ -3176,7 +3299,7 @@ var render = function render() {
       staticClass: "card-body p-4"
     }, [_c("div", {
       staticClass: "d-flex mb-4"
-    }, [_vm._m(36, true), _vm._v(" "), _c("div", [_c("h6", {
+    }, [_vm._m(39, true), _vm._v(" "), _c("div", [_c("h6", {
       staticClass: "font-weight-bold mb-1 text-dark"
     }, [_vm._v("Triaje " + _vm._s(_vm.getTriajeReferencia(tr.referencia)))]), _vm._v(" "), _c("div", {
       staticClass: "small text-muted"
@@ -3330,7 +3453,7 @@ var render = function render() {
     staticClass: "text-muted"
   }, [_vm._v("No existen registros de triaje para este paciente.")])])]), _vm._v(" "), _c("div", {
     staticClass: "col-12"
-  }, [_vm._m(37), _vm._v(" "), _c("div", {
+  }, [_vm._m(40), _vm._v(" "), _c("div", {
     staticClass: "card border"
   }, [_c("div", {
     staticClass: "card-body p-4"
@@ -3353,42 +3476,194 @@ var render = function render() {
       id: "recetas",
       role: "tabpanel"
     }
-  }, [_c("div", {
-    staticClass: "card border"
-  }, [_c("div", {
-    staticClass: "card-body p-4"
-  }, [_c("h5", {
-    staticClass: "card-title font-weight-bold mb-4"
-  }, [_vm._v("Recetas y Órdenes")]), _vm._v(" "), _c("div", {
-    staticClass: "table-responsive"
-  }, [_c("table", {
-    staticClass: "table table-hover table-sm"
-  }, [_vm._m(38), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.prescriptions, function (receta) {
-    return _c("tr", {
-      key: receta.id
-    }, [_c("td", {
-      staticStyle: {
-        width: "15%"
+  }, [_c("ul", {
+    staticClass: "nav nav-pills mb-4",
+    attrs: {
+      id: "recetasOrdenesTabs",
+      role: "tablist"
+    }
+  }, [_c("li", {
+    staticClass: "nav-item me-2",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link rounded-pill px-4 small border shadow-sm",
+    "class": _vm.activePill === "recetas" ? "bg-primary text-white active" : "bg-white text-dark",
+    staticStyle: {
+      "font-weight": "500"
+    },
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activePill = "recetas";
       }
-    }, [_vm._v(_vm._s(_vm.formatDate(receta.created_at)))]), _vm._v(" "), _c("td", [_c("span", {
-      staticClass: "small"
-    }, [_vm._v("Receta generada (ID: " + _vm._s(receta.id) + ")")]), _vm._v(" "), _c("span", {
-      staticClass: "text-muted mx-2"
-    }, [_vm._v("|")]), _vm._v(" "), _c("a", {
-      staticClass: "text-primary small",
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-link me-1"
+  }), _vm._v(" Recetas Médicas\n          ")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link rounded-pill px-4 small border shadow-sm",
+    "class": _vm.activePill === "ordenes" ? "bg-primary text-white active" : "bg-white text-muted",
+    staticStyle: {
+      "font-weight": "500"
+    },
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activePill = "ordenes";
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-file-invoice me-1"
+  }), _vm._v(" Órdenes Médicas\n          ")])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-content",
+    attrs: {
+      id: "pills-tabContent"
+    }
+  }, [_c("div", {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.activePill === "recetas",
+      expression: "activePill === 'recetas'"
+    }]
+  }, [_vm._m(41), _vm._v(" "), _vm.paciente.prescriptions && _vm.paciente.prescriptions.length > 0 ? _c("div", _vm._l(_vm.paciente.prescriptions, function (receta) {
+    return _c("div", {
+      key: receta.id,
+      staticClass: "card border border-light shadow-sm mb-4",
+      staticStyle: {
+        "border-radius": "12px",
+        overflow: "hidden"
+      }
+    }, [_c("div", {
+      staticClass: "card-body p-4 bg-white"
+    }, [_c("div", {
+      staticClass: "d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2"
+    }, [_c("div", {
+      staticClass: "d-flex align-items-center"
+    }, [_vm._m(42, true), _vm._v(" "), _c("div", [_c("h6", {
+      staticClass: "mb-0 font-weight-bold text-dark fs-5"
+    }, [_vm._v("Receta Médica")]), _vm._v(" "), _c("div", {
+      staticClass: "small text-muted mt-1"
+    }, [_vm._v("\n                        " + _vm._s(_vm.formatDate(receta.created_at)) + " · " + _vm._s(receta.professional ? receta.professional.name : "Dr.") + " "), receta.professional && (receta.professional.cmp || receta.professional.rne) ? _c("span", [_vm._v("- CMP " + _vm._s(receta.professional.cmp || "--") + " / RNE " + _vm._s(receta.professional.rne || "--"))]) : _vm._e()])])]), _vm._v(" "), _c("div", {
+      staticClass: "d-flex align-items-center gap-2"
+    }, [_c("span", {
+      staticClass: "badge bg-success bg-opacity-10 rounded-pill px-3 py-1 border border-success border-opacity-25",
+      staticStyle: {
+        "font-weight": "500"
+      }
+    }, [_vm._v("Vigente")]), _vm._v(" "), _c("a", {
+      staticClass: "btn btn-light btn-sm rounded text-muted shadow-sm border",
       attrs: {
         href: "/api/pdf/".concat(receta.id, "?token=").concat(_vm.$token),
         target: "_blank"
       }
     }, [_c("i", {
       staticClass: "fas fa-print"
-    }), _vm._v(" Imprimir Receta")])])]);
-  }), _vm._v(" "), !_vm.paciente.prescriptions || _vm.paciente.prescriptions.length == 0 ? _c("tr", [_c("td", {
-    staticClass: "text-center text-muted",
-    attrs: {
-      colspan: "2"
-    }
-  }, [_vm._v("No tiene recetas registradas")])]) : _vm._e()], 2)])])])])]), _vm._v(" "), _c("div", {
+    })]), _vm._v(" "), _c("a", {
+      staticClass: "btn btn-light btn-sm rounded text-muted shadow-sm border",
+      attrs: {
+        href: "/api/pdf/".concat(receta.id, "?token=").concat(_vm.$token),
+        download: "",
+        target: "_blank"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-download"
+    })])])]), _vm._v(" "), _c("div", {
+      staticClass: "text-muted small mb-3"
+    }, [_vm._v("\n                  Diagnóstico: "), _vm.paciente.initial_psychiatric_history && _vm.paciente.initial_psychiatric_history.diagnostic ? _c("span", [_vm._v(_vm._s(_vm.getCieNames(_vm.paciente.initial_psychiatric_history.diagnostic)))]) : _c("span", [_vm._v("Evaluación médica general")])]), _vm._v(" "), receta.kairos && receta.kairos.length > 0 ? _c("div", {
+      staticClass: "d-flex flex-column gap-2 mb-3"
+    }, _vm._l(receta.kairos, function (med) {
+      return _c("div", {
+        key: med.id,
+        staticClass: "p-3 rounded",
+        staticStyle: {
+          "background-color": "#fcfcfc",
+          border: "1px solid #f0f0f0"
+        }
+      }, [_c("div", {
+        staticClass: "d-flex align-items-center mb-1"
+      }, [_c("strong", {
+        staticClass: "text-dark me-2"
+      }, [_vm._v(_vm._s(med.nombre))]), _vm._v(" "), _c("span", {
+        staticClass: "badge bg-warning bg-opacity-10 rounded-pill px-2 border border-warning border-opacity-25",
+        staticStyle: {
+          "font-size": "0.75rem"
+        }
+      }, [_vm._v(_vm._s(med.concentracion || med.presentacion || "Dosis"))])]), _vm._v(" "), _c("div", {
+        staticClass: "small text-muted mb-2"
+      }, [_vm._v("\n                      " + _vm._s(med.pivot.amount || "") + " "), med.pivot.indications ? _c("span", [_vm._v("- " + _vm._s(med.pivot.indications))]) : _vm._e()]), _vm._v(" "), med.pivot.way ? _c("div", {
+        staticClass: "small text-primary fst-italic",
+        staticStyle: {
+          color: "#0d6efd"
+        }
+      }, [_c("i", {
+        staticClass: "fas fa-exclamation-triangle text-warning me-1"
+      }), _vm._v("\n                      " + _vm._s(med.pivot.way) + "\n                    ")]) : _vm._e()]);
+    }), 0) : _c("div", {
+      staticClass: "p-3 rounded mb-3 text-muted small",
+      staticStyle: {
+        "background-color": "#fcfcfc",
+        border: "1px solid #f0f0f0"
+      }
+    }, [_vm._v("\n                  Medicamentos no especificados en la receta digital.\n                ")]), _vm._v(" "), _c("div", {
+      staticClass: "small text-muted mt-2"
+    }, [_vm._v("\n                  Válida hasta: "), _c("strong", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(_vm.formatDate(receta.effective_date)))])])])]);
+  }), 0) : _c("div", {
+    staticClass: "alert alert-light border text-center p-5"
+  }, [_c("i", {
+    staticClass: "fas fa-capsules text-muted mb-3 fs-1"
+  }), _vm._v(" "), _c("h6", {
+    staticClass: "text-muted"
+  }, [_vm._v("No hay recetas registradas")])])]), _vm._v(" "), _c("div", {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.activePill === "ordenes",
+      expression: "activePill === 'ordenes'"
+    }]
+  }, [_vm._m(43), _vm._v(" "), _vm.allMedicalExams && _vm.allMedicalExams.length > 0 ? _c("div", [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-hover align-middle"
+  }, [_vm._m(44), _vm._v(" "), _c("tbody", _vm._l(_vm.allMedicalExams, function (examData, idx) {
+    return _c("tr", {
+      key: idx
+    }, [_c("td", [_vm._v(_vm._s(_vm.formatDate(examData.date)))]), _vm._v(" "), _c("td", {
+      staticClass: "fw-bold"
+    }, [_vm._v(_vm._s(examData.exam.name))]), _vm._v(" "), _c("td", [_c("span", {
+      staticClass: "badge bg-light text-dark border"
+    }, [_vm._v(_vm._s(examData.exam.type === 1 ? "Laboratorio" : examData.exam.type === 2 ? "Imagenología" : "Otros"))])]), _vm._v(" "), _c("td", {
+      staticClass: "text-muted small"
+    }, [_vm._v(_vm._s(examData.doctor))]), _vm._v(" "), _c("td", {
+      staticClass: "text-end"
+    }, [_c("a", {
+      staticClass: "btn btn-sm btn-light border text-primary",
+      attrs: {
+        href: _vm.getExamPdfUrl(examData),
+        target: "_blank"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-print"
+    })])])]);
+  }), 0)])])]) : _c("div", {
+    staticClass: "alert alert-light border text-center p-5"
+  }, [_c("i", {
+    staticClass: "fas fa-file-medical text-muted mb-3 fs-1"
+  }), _vm._v(" "), _c("h6", {
+    staticClass: "text-muted"
+  }, [_vm._v("No hay órdenes de exámenes registradas")])])])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
     attrs: {
       id: "pruebas",
@@ -3396,7 +3671,7 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "row"
-  }, [_vm._m(39), _vm._v(" "), _vm._l(_vm.allTests, function (t, index) {
+  }, [_vm._m(45), _vm._v(" "), _vm._l(_vm.allTests, function (t, index) {
     return _c("div", {
       key: t.testName + "_" + (t.id || index),
       staticClass: "col-md-6 col-lg-4 mb-4"
@@ -3418,11 +3693,11 @@ var render = function render() {
       staticClass: "card-body bg-light position-relative"
     }, [_c("div", {
       staticClass: "mb-3"
-    }, [_vm._m(40, true), _vm._v(" "), _c("strong", {
+    }, [_vm._m(46, true), _vm._v(" "), _c("strong", {
       staticClass: "text-dark"
     }, [_vm._v(_vm._s(_vm.formatDate(t.created_at || t.fecha)))])]), _vm._v(" "), t.score || t.total || t.result ? _c("div", {
       staticClass: "mb-0"
-    }, [_vm._m(41, true), _vm._v(" "), _c("span", {
+    }, [_vm._m(47, true), _vm._v(" "), _c("span", {
       staticClass: "badge bg-success rounded-pill px-3 py-2",
       staticStyle: {
         "font-size": "0.9rem"
@@ -3434,10 +3709,10 @@ var render = function render() {
         right: "-15px",
         "font-size": "5rem"
       }
-    })]), _vm._v(" "), _vm._m(42, true)])]);
+    })]), _vm._v(" "), _vm._m(48, true)])]);
   }), _vm._v(" "), _vm.allTests.length === 0 ? _c("div", {
     staticClass: "col-12"
-  }, [_vm._m(43)]) : _vm._e()], 2)]), _vm._v(" "), _c("div", {
+  }, [_vm._m(49)]) : _vm._e()], 2)]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
     attrs: {
       id: "documentos",
@@ -3451,7 +3726,7 @@ var render = function render() {
     staticClass: "card-title font-weight-bold mb-4"
   }, [_vm._v("Archivos y Documentos")]), _vm._v(" "), _c("table", {
     staticClass: "table table-sm table-hover align-middle"
-  }, [_vm._m(44), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.archivos_list || [], function (doc) {
+  }, [_vm._m(50), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.archivos_list || [], function (doc) {
     return _c("tr", {
       key: doc.id
     }, [_c("td", {
@@ -3490,7 +3765,7 @@ var render = function render() {
     staticClass: "card-title font-weight-bold mb-4"
   }, [_vm._v("Deudas y Cuentas")]), _vm._v(" "), _c("table", {
     staticClass: "table table-sm table-hover"
-  }, [_vm._m(45), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.deudas_financieras || [], function (deuda) {
+  }, [_vm._m(51), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.deudas_financieras || [], function (deuda) {
     return _c("tr", {
       key: deuda.id
     }, [_c("td", {
@@ -3510,7 +3785,7 @@ var render = function render() {
     attrs: {
       colspan: "4"
     }
-  }, [_vm._v("No presenta deudas")])]) : _vm._e()], 2)])])])])])]);
+  }, [_vm._v("No presenta deudas")])]) : _vm._e()], 2)])])])]), _vm._v(" "), _vm._m(52)])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -3649,6 +3924,24 @@ var staticRenderFns = [function () {
   }, [_c("button", {
     staticClass: "nav-link font-weight-bold small text-muted",
     attrs: {
+      id: "convenios-tab",
+      "data-bs-toggle": "tab",
+      "data-bs-target": "#convenios",
+      type: "button",
+      role: "tab"
+    }
+  }, [_vm._v("Convenios")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    attrs: {
       id: "finanzas-tab",
       "data-bs-toggle": "tab",
       "data-bs-target": "#finanzas",
@@ -3725,6 +4018,22 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fas fa-calendar text-primary me-2"
   }), _vm._v("\n                  Información de Registro\n                ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "fw-bold mb-3 text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-tags text-primary me-2"
+  }), _vm._v("\n                      Etiquetas de Comportamiento\n                    ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "fw-bold mb-3 text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-heart text-danger me-2"
+  }), _vm._v("\n                      Hobbies e Intereses\n                    ")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -3875,7 +4184,7 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("h5", {
-    staticClass: "card-title font-weight-bold mb-3"
+    staticClass: "card-title font-weight-bold mb-0"
   }, [_c("i", {
     staticClass: "fas fa-clipboard-check text-primary me-2"
   }), _vm._v(" Registro de Triajes")]);
@@ -3903,7 +4212,60 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("Fecha")]), _vm._v(" "), _c("th", [_vm._v("Detalles")])])]);
+  return _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mb-4"
+  }, [_c("h5", {
+    staticClass: "mb-0 font-weight-bold d-flex align-items-center text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-link text-warning me-2",
+    staticStyle: {
+      transform: "rotate(45deg)"
+    }
+  }), _vm._v(" Recetas Médicas\n            ")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary rounded-pill px-3 shadow-sm btn-sm"
+  }, [_c("i", {
+    staticClass: "fas fa-plus me-1"
+  }), _vm._v(" Nueva Receta\n            ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm",
+    staticStyle: {
+      width: "45px",
+      height: "45px",
+      "background-color": "#fff4e6",
+      color: "#ff8c00"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-capsules fs-5"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mb-4"
+  }, [_c("h5", {
+    staticClass: "mb-0 font-weight-bold d-flex align-items-center text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-file-invoice text-primary me-2"
+  }), _vm._v(" Órdenes Médicas\n            ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", {
+    staticClass: "bg-light"
+  }, [_c("tr", [_c("th", {
+    staticClass: "border-0 rounded-start"
+  }, [_vm._v("Fecha")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0"
+  }, [_vm._v("Examen")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0"
+  }, [_vm._v("Tipo")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0"
+  }, [_vm._v("Doctor")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 rounded-end text-end"
+  }, [_vm._v("Acciones")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -3979,6 +4341,48 @@ var staticRenderFns = [function () {
   }, [_vm._v("Monto")]), _vm._v(" "), _c("th", {
     staticClass: "p-2 border-bottom-0 text-muted"
   }, [_vm._v("Estado")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "tab-pane fade",
+    attrs: {
+      id: "convenios",
+      role: "tabpanel"
+    }
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm",
+    staticStyle: {
+      "border-radius": "12px",
+      "background-color": "#fcfcfc"
+    }
+  }, [_c("div", {
+    staticClass: "card-body p-5 text-center"
+  }, [_c("div", {
+    staticClass: "mb-4"
+  }, [_c("i", {
+    staticClass: "fas fa-handshake text-primary opacity-50",
+    staticStyle: {
+      "font-size": "5rem"
+    }
+  })]), _vm._v(" "), _c("h4", {
+    staticClass: "font-weight-bold text-dark mb-3"
+  }, [_vm._v("Convenios, Alianzas y Club")]), _vm._v(" "), _c("p", {
+    staticClass: "text-muted mx-auto",
+    staticStyle: {
+      "max-width": "500px",
+      "font-size": "1.1rem"
+    }
+  }, [_vm._v("\n              Esta sección está en desarrollo. Próximamente podrá gestionar aquí todos los acuerdos institucionales, beneficios de alianzas estratégicas y membresías de Club.\n           ")]), _vm._v(" "), _c("div", {
+    staticClass: "mt-4"
+  }, [_c("span", {
+    staticClass: "badge bg-warning text-dark px-4 py-2 rounded-pill shadow-sm",
+    staticStyle: {
+      "font-size": "1rem"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-tools me-2"
+  }), _vm._v(" Próximamente")])])])])]);
 }];
 render._withStripped = true;
 
@@ -4327,7 +4731,7 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fa-solid fa-handshake-angle me-2 text-primary"
-    }), _vm._v(" Acuerdos\n                      ")])]), _vm._v(" "), paciente.vivo == 1 ? _c("li", [_c("a", {
+    }), _vm._v(" Notas de recepción\n                      ")])]), _vm._v(" "), paciente.vivo == 1 ? _c("li", [_c("a", {
       staticClass: "dropdown-item",
       attrs: {
         href: "#",
@@ -4473,6 +4877,9 @@ var render = function render() {
       },
       editarPaciente: function editarPaciente($event) {
         _vm.dataPaciente = $event;
+      },
+      abrirTriaje: function abrirTriaje($event) {
+        return _vm.dataProps($event);
       }
     }
   }), _vm._v(" "), _c("ModalEdicionPaciente", {
@@ -4784,7 +5191,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fa-solid fa-plus"
-  }), _vm._v(" Agregar acuerdo")])])])])])]), _vm._v(" "), _c("p", [_vm._v("Acuerdos asociados")]), _vm._v(" "), _c("table", {
+  }), _vm._v(" Agregar acuerdo")])])])])])]), _vm._v(" "), _c("p", [_vm._v("Notas de recepción asociadas")]), _vm._v(" "), _c("table", {
     staticClass: "table table-hover table-sm"
   }, [_vm._m(2), _vm._v(" "), _c("tbody", _vm._l(_vm.paciente.acuerdos, function (acuerdo, index) {
     return _c("tr", [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(acuerdo.titulo))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.fechaLatam(acuerdo.fecha)))]), _vm._v(" "), _c("td", [acuerdo.ruta ? _c("a", {
@@ -4808,7 +5215,7 @@ var staticRenderFns = [function () {
     attrs: {
       id: "exampleModalLabel"
     }
-  }, [_vm._v("Acuerdos")]), _vm._v(" "), _c("button", {
+  }, [_vm._v("Notas de recepción")]), _vm._v(" "), _c("button", {
     staticClass: "btn-close",
     attrs: {
       type: "button",
@@ -7203,10 +7610,10 @@ render._withStripped = true;
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=template&id=b4749752":
-/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=template&id=b4749752 ***!
-  \****************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=template&id=b4749752&scoped=true":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=template&id=b4749752&scoped=true ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -7222,47 +7629,72 @@ var render = function render() {
     attrs: {
       id: "recetasModal",
       tabindex: "-1",
-      "aria-labelledby": "modalEvolution",
       "aria-hidden": "true"
     }
   }, [_c("div", {
-    staticClass: "modal-dialog modal-lg"
+    staticClass: "modal-dialog modal-lg modal-dialog-centered"
   }, [_c("div", {
-    staticClass: "modal-content"
-  }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
+    staticClass: "modal-content border-0 shadow-lg",
+    staticStyle: {
+      "border-radius": "20px",
+      overflow: "hidden"
+    }
+  }, [_c("div", {
+    staticClass: "modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center"
+  }, [_vm._m(0), _vm._v(" "), _c("div", [_c("h5", {
+    staticClass: "modal-title font-weight-bold text-dark mb-1"
+  }, [_vm._v("Recetas Médicas")]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex gap-2 mt-1"
+  }, [_vm.dataPatient ? _c("span", {
+    staticClass: "badge-status status-badge-success"
+  }, [_c("i", {
+    staticClass: "fas fa-user-injured mr-1"
+  }), _vm._v(" " + _vm._s(_vm.dataPatient.name) + " " + _vm._s(_vm.dataPatient.nombres) + "\n              ")]) : _vm._e()])])]), _vm._v(" "), _vm._m(1)]), _vm._v(" "), _c("div", {
+    staticClass: "modal-body px-4 py-4"
+  }, [_c("div", {
+    staticClass: "table-container"
   }, [_c("table", {
-    staticClass: "table table-striped"
-  }, [_vm._m(1), _vm._v(" "), _c("tbody", [_vm._l(_vm.dataPatient.prescriptions, function (prescription, index) {
-    return _vm.dataPatient ? _c("tr", {
+    staticClass: "table table-hover custom-table mb-0"
+  }, [_vm._m(2), _vm._v(" "), _c("tbody", [_vm._l(_vm.dataPatient.prescriptions, function (prescription, index) {
+    return _vm.dataPatient && _vm.dataPatient.prescriptions && _vm.dataPatient.prescriptions.length > 0 ? _c("tr", {
       key: index
-    }, [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(prescription ? prescription.attention_date : "..."))]), _vm._v(" "), _c("td", [prescription ? _c("a", {
-      staticClass: "btn btn-success",
+    }, [_c("td", {
+      staticClass: "align-middle font-weight-bold text-dark"
+    }, [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle text-dark"
+    }, [_c("i", {
+      staticClass: "far fa-calendar-alt text-muted mr-2"
+    }), _vm._v(_vm._s(prescription ? prescription.attention_date : "...") + "\n                ")]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle text-right"
+    }, [prescription ? _c("a", {
+      staticClass: "btn btn-action btn-sm btn-outline-success",
       attrs: {
         href: "/api/pdf/".concat(prescription.id, "?token=").concat(_vm.$token),
         target: "_blank"
       }
     }, [_c("i", {
-      staticClass: "fa-solid fa-file-pdf"
-    }), _vm._v(" Ver PDF")]) : _vm._e()])]) : _vm._e();
-  }), _vm._v(" "), _vm.dataPatient.prescriptions.length == 0 ? _c("tr", [_c("td", {
-    attrs: {
-      colspan: "4"
-    }
-  }, [_vm._v("No hay recetas")])]) : _vm._e()], 2)])])])])]);
+      staticClass: "fa-solid fa-file-pdf mr-1"
+    }), _vm._v(" Ver Receta\n                  ")]) : _vm._e()])]) : _vm._e();
+  }), _vm._v(" "), !_vm.dataPatient || !_vm.dataPatient.prescriptions || _vm.dataPatient.prescriptions.length === 0 ? _c("tr", [_vm._m(3)]) : _vm._e()], 2)])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header bg-success text-white"
-  }, [_c("h5", {
-    staticClass: "modal-title",
-    attrs: {
-      id: "infoModalLabel"
+    staticClass: "icon-header-container mr-3",
+    staticStyle: {
+      background: "#ebfbee"
     }
-  }, [_vm._v("Ver recetas")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-danger",
+  }, [_c("i", {
+    staticClass: "fas fa-file-prescription text-success h4 mb-0"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn-close-custom",
     attrs: {
       type: "button",
       "data-bs-dismiss": "modal",
@@ -7270,11 +7702,40 @@ var staticRenderFns = [function () {
     }
   }, [_c("i", {
     staticClass: "fas fa-times"
-  })])]);
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("#")]), _vm._v(" "), _c("th", [_vm._v("Fecha")]), _vm._v(" "), _c("th", [_vm._v("Ver Receta")])])]);
+  return _c("thead", [_c("tr", [_c("th", {
+    staticClass: "border-top-0 text-uppercase text-muted small font-weight-bold"
+  }, [_vm._v("#")]), _vm._v(" "), _c("th", {
+    staticClass: "border-top-0 text-uppercase text-muted small font-weight-bold"
+  }, [_vm._v("Fecha de Atención")]), _vm._v(" "), _c("th", {
+    staticClass: "border-top-0 text-uppercase text-muted small font-weight-bold text-right"
+  }, [_vm._v("Acción")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("td", {
+    staticClass: "text-center py-5",
+    attrs: {
+      colspan: "3"
+    }
+  }, [_c("div", {
+    staticClass: "empty-state"
+  }, [_c("div", {
+    staticClass: "empty-state-icon mb-3"
+  }, [_c("i", {
+    staticClass: "fas fa-folder-open text-muted",
+    staticStyle: {
+      "font-size": "3rem",
+      opacity: "0.5"
+    }
+  })]), _vm._v(" "), _c("h6", {
+    staticClass: "font-weight-bold text-dark mb-1"
+  }, [_vm._v("No hay recetas")]), _vm._v(" "), _c("p", {
+    staticClass: "text-muted small mb-0"
+  }, [_vm._v("Este paciente aún no tiene recetas médicas registradas.")])])]);
 }];
 render._withStripped = true;
 
@@ -9215,6 +9676,29 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.ajs-message{border-radius: 5px!impo
 
 /***/ }),
 
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=style&index=0&id=b4749752&scoped=true&lang=css":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=style&index=0&id=b4749752&scoped=true&lang=css ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\r\n/* Main Layout */\n.modal-content[data-v-b4749752] {\r\n  background: #ffffff;\n}\r\n\r\n/* Header */\n.icon-header-container[data-v-b4749752] {\r\n  width: 44px;\r\n  height: 44px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  border-radius: 12px;\n}\n.btn-close-custom[data-v-b4749752] {\r\n  background: #f8f9fa;\r\n  border: none;\r\n  width: 32px;\r\n  height: 32px;\r\n  border-radius: 50%;\r\n  color: #adb5bd;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  transition: all 0.2s;\r\n  cursor: pointer;\n}\n.btn-close-custom[data-v-b4749752]:hover { background: #e9ecef; color: #495057;\n}\r\n\r\n/* Badges */\n.badge-status[data-v-b4749752] {\r\n  padding: 4px 12px;\r\n  border-radius: 50px;\r\n  font-size: 0.7rem;\r\n  font-weight: 700;\r\n  text-transform: uppercase;\n}\n.status-badge-success[data-v-b4749752] { background: #e7fcf3; color: #0ca678; border: 1px solid #c3fae8;\n}\r\n\r\n/* Table Container */\n.table-container[data-v-b4749752] {\r\n  background: #f8f9fc;\r\n  border-radius: 16px;\r\n  border: 1px solid #f1f3f9;\r\n  padding: 12px;\r\n  overflow: hidden;\n}\n.custom-table th[data-v-b4749752] {\r\n  border-bottom: 2px solid #e9ecef;\n}\n.custom-table td[data-v-b4749752] {\r\n  border-bottom: 1px solid #f1f3f9;\r\n  vertical-align: middle;\n}\n.custom-table tr:last-child td[data-v-b4749752] {\r\n  border-bottom: none;\n}\r\n\r\n/* Empty State */\n.empty-state[data-v-b4749752] {\r\n  display: flex;\r\n  flex-direction: column;\r\n  align-items: center;\r\n  justify-content: center;\n}\r\n\r\n/* Action Buttons */\n.btn-action[data-v-b4749752] {\r\n  border-radius: 12px;\r\n  padding: 6px 14px;\r\n  font-weight: 700;\r\n  font-size: 0.8rem;\r\n  transition: all 0.2s;\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\n}\n.btn-action[data-v-b4749752]:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05);\n}\n.gap-2[data-v-b4749752] { gap: 0.5rem;\n}\n.mr-1[data-v-b4749752] { margin-right: 0.25rem;\n}\n.mr-2[data-v-b4749752] { margin-right: 0.5rem;\n}\n.mr-3[data-v-b4749752] { margin-right: 0.75rem;\n}\r\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalTriaje.vue?vue&type=style&index=0&id=085f439b&scoped=true&lang=css":
 /*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalTriaje.vue?vue&type=style&index=0&id=085f439b&scoped=true&lang=css ***!
@@ -9397,6 +9881,35 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNewPatient_vue_vue_type_style_index_0_id_163c320f_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=style&index=0&id=b4749752&scoped=true&lang=css":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=style&index=0&id=b4749752&scoped=true&lang=css ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalRecetas_vue_vue_type_style_index_0_id_b4749752_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalRecetas.vue?vue&type=style&index=0&id=b4749752&scoped=true&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=style&index=0&id=b4749752&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalRecetas_vue_vue_type_style_index_0_id_b4749752_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalRecetas_vue_vue_type_style_index_0_id_b4749752_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -10015,23 +10528,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ModalRecetas_vue_vue_type_template_id_b4749752__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalRecetas.vue?vue&type=template&id=b4749752 */ "./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=template&id=b4749752");
+/* harmony import */ var _ModalRecetas_vue_vue_type_template_id_b4749752_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalRecetas.vue?vue&type=template&id=b4749752&scoped=true */ "./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=template&id=b4749752&scoped=true");
 /* harmony import */ var _ModalRecetas_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModalRecetas.vue?vue&type=script&lang=js */ "./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _ModalRecetas_vue_vue_type_style_index_0_id_b4749752_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalRecetas.vue?vue&type=style&index=0&id=b4749752&scoped=true&lang=css */ "./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=style&index=0&id=b4749752&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _ModalRecetas_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _ModalRecetas_vue_vue_type_template_id_b4749752__WEBPACK_IMPORTED_MODULE_0__.render,
-  _ModalRecetas_vue_vue_type_template_id_b4749752__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _ModalRecetas_vue_vue_type_template_id_b4749752_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _ModalRecetas_vue_vue_type_template_id_b4749752_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "b4749752",
   null
   
 )
@@ -10776,18 +11291,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=template&id=b4749752":
-/*!*******************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=template&id=b4749752 ***!
-  \*******************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=template&id=b4749752&scoped=true":
+/*!*******************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=template&id=b4749752&scoped=true ***!
+  \*******************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalRecetas_vue_vue_type_template_id_b4749752__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalRecetas_vue_vue_type_template_id_b4749752__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalRecetas_vue_vue_type_template_id_b4749752_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalRecetas_vue_vue_type_template_id_b4749752_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalRecetas_vue_vue_type_template_id_b4749752__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalRecetas.vue?vue&type=template&id=b4749752 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=template&id=b4749752");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalRecetas_vue_vue_type_template_id_b4749752_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalRecetas.vue?vue&type=template&id=b4749752&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=template&id=b4749752&scoped=true");
 
 
 /***/ }),
@@ -10948,6 +11463,18 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNewPatient_vue_vue_type_style_index_0_id_163c320f_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalNewPatient.vue?vue&type=style&index=0&id=163c320f&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=0&id=163c320f&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=style&index=0&id=b4749752&scoped=true&lang=css":
+/*!*********************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=style&index=0&id=b4749752&scoped=true&lang=css ***!
+  \*********************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalRecetas_vue_vue_type_style_index_0_id_b4749752_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalRecetas.vue?vue&type=style&index=0&id=b4749752&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalRecetas.vue?vue&type=style&index=0&id=b4749752&scoped=true&lang=css");
 
 
 /***/ }),

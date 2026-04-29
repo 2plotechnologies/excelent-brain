@@ -23,9 +23,9 @@
 								<button type="button" class="list-group-item list-group-item-action py-2" v-for="(paciente, index) in pacientes" @click="seleccionarPaciente(index)">
 									<div class="d-flex justify-content-between align-items-center mb-1">
 										<span class="fw-medium text-capitalize text-dark">{{ paciente.name }} {{ paciente.nombres }}</span>
-										<span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill fw-normal">{{ paciente.etiqueta }}</span>
+										<span class="badge bg-secondary bg-opacity-10 text-white border border-secondary border-opacity-25 rounded-pill fw-normal">{{ paciente.etiqueta }}</span>
 									</div>
-									<div class="small text-muted">{{ paciente.dni }} • <i class="fa-solid fa-mobile-screen ms-1"></i> {{ paciente.phone }}</div>
+									<div class="small text-muted"><i class="fa-solid fa-id-card ms-1"></i> {{ paciente.dni }} • <i class="fa-solid fa-mobile-screen ms-1"></i> {{ paciente.phone }}</div>
 								</button>
 							</div>
 							<div class="mt-2 text-muted small" v-if="activaResultados && pacientes.length === 0">No se encontraron resultados para "{{ txtBusqueda }}"</div>
@@ -33,10 +33,10 @@
 						<div class="card border-primary border-opacity-50 bg-primary bg-opacity-10" v-else>
 							<div class="card-body py-2 px-3 d-flex justify-content-between align-items-center">
 								<div>
-									<div class="fw-bold text-primary text-capitalize">{{ pacienteElegido.name }} {{ pacienteElegido.nombres }}</div>
-									<div class="small text-primary text-opacity-75">{{ pacienteElegido.dni }} • <i class="fa-solid fa-mobile-screen ms-1"></i> {{ pacienteElegido.phone }}</div>
+									<div class="fw-bold text-capitalize text-white">{{ pacienteElegido.name }} {{ pacienteElegido.nombres }}</div>
+									<div class="small text-opacity-75 text-white"><i class="fa-solid fa-id-card ms-1"></i> {{ pacienteElegido.dni }} • <i class="fa-solid fa-mobile-screen ms-1"></i> {{ pacienteElegido.phone }}</div>
 								</div>
-								<button class="btn btn-sm btn-link text-primary text-decoration-none fw-medium" @click="limpiarPaciente()">Cambiar</button>
+								<button class="btn btn-sm btn-link text-white text-decoration-none fw-medium" @click="limpiarPaciente()">Cambiar</button>
 							</div>
 						</div>
 					</div>
@@ -507,4 +507,4 @@ export default {
 	}
 }
 </script>
-<style></style>
+<style></style>

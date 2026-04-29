@@ -1,32 +1,73 @@
 <template>
-	<!-- Modal de recetas -->
-	<div class="modal fade" id="modalTiemposEspera" tabindex="-1" aria-labelledby="modalEvolution" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header border-0">
-						<h5 class="modal-title" id="infoModalLabel">Tiempos de espera</h5>
-						<button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-times"></i></button>
-					</div>
+	<div class="modal fade" id="modalTiemposEspera" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between">
+          <div class="d-flex align-items-center">
+            <div class="icon-header-container mr-3">
+              <i class="fas fa-stopwatch text-info h4 mb-0"></i>
+            </div>
+            <div>
+              <h5 class="modal-title font-weight-bold text-dark mb-1">Tiempos de Espera</h5>
+              <div class="d-flex gap-2 mt-1">
+                <span class="badge-status status-badge-info" v-if="cita">
+                  <i class="fas fa-calendar-check mr-1"></i> Asignación de Horarios
+                </span>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
 
-					<div class="modal-body">
-						<p>Seleccione uno para asignar horario</p>
-						<div class="row" v-if="cita">
-							<div class="col">
-								<label for=""><i class="fa-solid fa-location-dot"></i> Hora de llegada</label>
-								<p v-if="cita.entrance?.length>0">Registrado {{ horaLatam(cita.entrance) }}</p>
-								<button v-else class="btn btn-outline-primary" @click="registrar('llegada')" data-bs-dismiss="modal"><i class="fa-solid fa-stopwatch"></i> Asignar hora</button>
-								<p><small><span class="text-capitalize">{{calcularFaltante}}</span> para su cita</small></p>
-							</div>
-							<div class="col">
-								<label for=""><i class="fa-solid fa-feather-pointed"></i> Hora de atención</label>
-								<p v-if="cita.attention?.length>0">Registrado {{ horaLatam(cita.attention) }}</p>
-								<button v-else class="btn btn-outline-primary" @click="registrar('atención')" data-bs-dismiss="modal"><i class="fa-solid fa-stopwatch"></i> Asignar hora</button>
-							</div>
-						</div>
-					</div>
+				<div class="modal-body px-4 pt-4" v-if="cita">
+					<p class="text-muted small mb-4">Seleccione una opción para registrar la hora actual en el sistema.</p>
+          
+          <div class="time-control-container p-3 mb-4">
+            <div class="row">
+              <div class="col-6 border-right">
+                <div class="text-center px-2">
+                  <div class="time-icon mb-2"><i class="fa-solid fa-location-dot text-primary h5"></i></div>
+                  <label class="section-label d-block mb-1">Hora de llegada</label>
+                  
+                  <div v-if="cita.entrance?.length>0">
+                    <div class="time-value text-dark mb-1 font-weight-bold">{{ horaLatam(cita.entrance) }}</div>
+                    <span class="badge status-badge-success badge-status"><i class="fas fa-check"></i> Registrado</span>
+                  </div>
+                  <button v-else class="btn btn-action btn-outline-primary btn-sm w-100" @click="registrar('llegada')" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-clock mr-1"></i> Asignar
+                  </button>
+                  
+                  <div class="mt-3">
+                    <small class="text-muted d-block" style="font-size: 0.7rem; line-height: 1.1;">
+                      Faltan <span class="font-weight-bold text-capitalize text-dark">{{calcularFaltante}}</span> para su cita
+                    </small>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-6">
+                <div class="text-center px-2">
+                  <div class="time-icon mb-2"><i class="fa-solid fa-stethoscope text-info h5"></i></div>
+                  <label class="section-label d-block mb-1">Hora de atención</label>
+                  
+                  <div v-if="cita.attention?.length>0">
+                    <div class="time-value text-dark mb-1 font-weight-bold">{{ horaLatam(cita.attention) }}</div>
+                    <span class="badge status-badge-success badge-status"><i class="fas fa-check"></i> Registrado</span>
+                  </div>
+                  <button v-else class="btn btn-action btn-outline-info btn-sm w-100" @click="registrar('atención')" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-clock mr-1"></i> Asignar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
 				</div>
 			</div>
 		</div>
+	</div>
 </template>
 
 <script>
@@ -78,3 +119,89 @@ export default{
 	}
 }
 </script>
+
+<style scoped>
+/* Main Layout */
+.modal-content {
+  background: #ffffff;
+}
+
+/* Header */
+.icon-header-container {
+  background: #e7f5ff;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+.btn-close-custom {
+  background: #f8f9fa;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #adb5bd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.btn-close-custom:hover { background: #e9ecef; color: #495057; }
+
+/* Badges */
+.badge-status {
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.status-badge-info { background: #e7f5ff; color: #1971c2; border: 1px solid #d0ebff; }
+.status-badge-success { background: #e7fcf3; color: #0ca678; border: 1px solid #c3fae8; }
+
+/* Sections */
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #adb5bd;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.time-control-container {
+  background: #f8f9fc;
+  border-radius: 16px;
+  border: 1px solid #f1f3f9;
+}
+.time-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+/* Action Buttons */
+.btn-action {
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-action:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+.border-right { border-right: 1px solid #e9ecef!important; }
+.gap-2 { gap: 0.5rem; }
+.mr-1 { margin-right: 0.25rem; }
+.mr-3 { margin-right: 0.75rem; }
+</style>

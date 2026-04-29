@@ -34,6 +34,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         vencidas: 0,
         totales: 0
       },
+      vistaActiva: 'paquetes',
       pagination: {
         current_page: 1,
         last_page: 1,
@@ -62,6 +63,24 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         pagesArray.push(page);
       }
       return pagesArray;
+    },
+    deudasPendientes: function deudasPendientes() {
+      //if (this.vistaActiva !== 'deudas') return [];
+      return this.paquetesFiltrados.filter(function (paquete) {
+        return parseFloat(paquete.debe || 0) > 0;
+      });
+    },
+    deudaResumen: function deudaResumen() {
+      return this.deudasPendientes.reduce(function (acc, deuda) {
+        acc.totalDeudores += 1;
+        acc.totalDeuda += parseFloat(deuda.debe || 0);
+        acc.totalCobrado += parseFloat(deuda.pagado || 0);
+        return acc;
+      }, {
+        totalDeudores: 0,
+        totalDeuda: 0,
+        totalCobrado: 0
+      });
     }
   },
   mounted: function mounted() {
@@ -258,6 +277,19 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       if (!fecha) return false;
       var today = new Date().toISOString().slice(0, 10);
       return fecha < today;
+    },
+    calcularProgresoPago: function calcularProgresoPago(paquete) {
+      var total = parseFloat(paquete.monto || 0);
+      var pagado = parseFloat(paquete.pagado || 0);
+      if (total <= 0) return 0;
+      var porcentaje = pagado / total * 100;
+      return Math.min(100, Math.max(0, Math.round(porcentaje)));
+    },
+    calcularCuotaPromedio: function calcularCuotaPromedio(paquete) {
+      var cuotas = parseInt(paquete.total_cuotas || 0);
+      var deuda = parseFloat(paquete.debe || 0);
+      if (cuotas <= 0) return deuda;
+      return deuda / cuotas;
     },
     procesarPago: function procesarPago(cuota) {
       var _this4 = this;
@@ -755,13 +787,35 @@ var render = function render() {
     staticClass: "d-flex justify-content-between align-items-center mb-4 mt-2 header-section"
   }, [_c("div", {
     staticClass: "d-flex align-items-center gap-3"
-  }, [_vm._m(0), _vm._v(" "), _vm.metricas.vencidas > 0 ? _c("div", {
-    staticClass: "deudas-badge"
+  }, [_vm._m(0), _vm._v(" "), _c("div", {
+    staticClass: "module-tabs"
+  }, [_c("button", {
+    staticClass: "btn btn-sm module-tab-btn",
+    "class": {
+      active: _vm.vistaActiva === "paquetes"
+    },
+    on: {
+      click: function click($event) {
+        _vm.vistaActiva = "paquetes";
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-box-open me-1"
+  }), _vm._v(" Paquetes\n        ")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm module-tab-btn",
+    "class": {
+      active: _vm.vistaActiva === "deudas"
+    },
+    on: {
+      click: function click($event) {
+        _vm.vistaActiva = "deudas";
+      }
+    }
   }, [_c("i", {
     staticClass: "fas fa-user-times me-1"
-  }), _vm._v(" Deudas\n        "), _c("span", {
+  }), _vm._v(" Deudas\n          "), _c("span", {
     staticClass: "badge bg-danger ms-1 rounded-pill"
-  }, [_vm._v(_vm._s(_vm.metricas.vencidas))])]) : _vm._e()])]), _vm._v(" "), _c("div", {
+  }, [_vm._v(_vm._s(_vm.metricas.vencidas))])])])])]), _vm._v(" "), _vm.vistaActiva === "paquetes" ? _c("div", {
     staticClass: "d-flex justify-content-between mb-4 flex-wrap gap-2"
   }, [_c("div", {
     staticClass: "search-box"
@@ -788,7 +842,7 @@ var render = function render() {
         _vm.busqueda = $event.target.value;
       }, _vm.filtrarPaquetes]
     }
-  })]), _vm._v(" "), _vm._m(1)]), _vm._v(" "), _c("div", {
+  })]), _vm._v(" "), _vm._m(1)]) : _vm._e(), _vm._v(" "), _vm.vistaActiva === "paquetes" ? _c("div", {
     staticClass: "row g-3 mb-4 metricas-row"
   }, [_c("div", {
     staticClass: "col-md-3"
@@ -830,7 +884,7 @@ var render = function render() {
     staticClass: "text-muted text-uppercase mb-1 small fw-bold"
   }, [_vm._v("Total Paquetes")]), _vm._v(" "), _c("h2", {
     staticClass: "mb-0 text-dark fw-bold"
-  }, [_vm._v(_vm._s(_vm.metricas.totales))])])])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v(_vm._s(_vm.metricas.totales))])])])])]) : _vm._e(), _vm._v(" "), _vm.vistaActiva === "paquetes" ? _c("div", {
     staticClass: "filters-area mb-4"
   }, [_c("div", {
     staticClass: "d-flex align-items-center mb-2"
@@ -914,11 +968,11 @@ var render = function render() {
         return _vm.setFiltroTipo(0);
       }
     }
-  }, [_vm._v("Membresía Ext.")])])])]), _vm._v(" "), _vm.loading ? _c("div", {
+  }, [_vm._v("Membresía Ext.")])])])]) : _vm._e(), _vm._v(" "), _vm.loading && _vm.vistaActiva === "paquetes" ? _c("div", {
     staticClass: "text-center py-5"
-  }, [_vm._m(2)]) : _vm.paquetesFiltrados.length === 0 ? _c("div", {
+  }, [_vm._m(2)]) : _vm.paquetesFiltrados.length === 0 && _vm.vistaActiva === "paquetes" ? _c("div", {
     staticClass: "text-center py-5"
-  }, [_vm._m(3)]) : _vm._e(), _vm._v(" "), !_vm.loading && _vm.paquetesFiltrados.length > 0 ? _c("div", {
+  }, [_vm._m(3)]) : _vm._e(), _vm._v(" "), _vm.vistaActiva === "paquetes" && !_vm.loading && _vm.paquetesFiltrados.length > 0 ? _c("div", {
     staticClass: "package-list"
   }, _vm._l(_vm.paquetesFiltrados, function (paquete) {
     return _c("div", {
@@ -1095,7 +1149,97 @@ var render = function render() {
         staticClass: "fas fa-link me-1"
       }), _vm._v(" Enlace disponible")]) : _vm._e()])]);
     }), 0)]) : _vm._e()])]);
-  }), 0) : _vm._e(), _vm._v(" "), _vm.paqueteSeleccionado ? _c("div", {
+  }), 0) : _vm.vistaActiva === "deudas" ? _c("div", {
+    key: "deudas",
+    staticClass: "debts-view"
+  }, [_c("div", {
+    staticClass: "row g-3 mb-4"
+  }, [_c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "debt-summary-card"
+  }, [_c("p", {
+    staticClass: "mb-1"
+  }, [_vm._v("Total Deudores")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 text-danger fw-bold"
+  }, [_vm._v(_vm._s(_vm.deudaResumen.totalDeudores))])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "debt-summary-card"
+  }, [_c("p", {
+    staticClass: "mb-1"
+  }, [_vm._v("Deuda Total")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 text-danger fw-bold"
+  }, [_vm._v("S/ " + _vm._s(_vm.deudaResumen.totalDeuda.toFixed(2)))])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "debt-summary-card"
+  }, [_c("p", {
+    staticClass: "mb-1"
+  }, [_vm._v("Cobrado Total")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 text-success fw-bold"
+  }, [_vm._v("S/ " + _vm._s(_vm.deudaResumen.totalCobrado.toFixed(2)))])])])]), _vm._v(" "), _vm.deudasPendientes.length === 0 ? _c("div", {
+    staticClass: "text-center py-5 text-muted fs-5"
+  }, [_c("i", {
+    staticClass: "fas fa-check-circle fa-3x mb-3 text-success"
+  }), _c("br"), _vm._v("\n      No hay deudas pendientes por cobrar.\n    ")]) : _c("div", {
+    staticClass: "debt-list"
+  }, _vm._l(_vm.deudasPendientes, function (deuda) {
+    return _c("div", {
+      key: "deuda-".concat(deuda.id),
+      staticClass: "debt-card mb-3"
+    }, [_c("div", {
+      staticClass: "d-flex gap-3 align-items-start mb-2"
+    }, [_vm._m(6, true), _vm._v(" "), _c("div", {
+      staticClass: "flex-grow-1"
+    }, [_c("div", {
+      staticClass: "d-flex align-items-center gap-2 flex-wrap mb-1"
+    }, [_c("h5", {
+      staticClass: "mb-0 fw-bold text-dark"
+    }, [_vm._v(_vm._s(deuda.patient_name) + " " + _vm._s(deuda.patient_nombres))]), _vm._v(" "), _c("span", {
+      staticClass: "badge bg-success-subtle text-success rounded-pill"
+    }, [_vm._v("Activo")]), _vm._v(" "), _c("span", {
+      staticClass: "badge bg-primary-subtle text-primary rounded-pill"
+    }, [_vm._v(_vm._s(_vm.getTipoBadge(deuda.idClasificacion)))])]), _vm._v(" "), _c("p", {
+      staticClass: "mb-2 text-muted debt-meta"
+    }, [_vm._v(_vm._s(deuda.paquete_nombre) + " · " + _vm._s(deuda.professional || "Sin profesional asignado"))]), _vm._v(" "), _c("div", {
+      staticClass: "d-flex justify-content-between align-items-end mb-1"
+    }, [_c("p", {
+      staticClass: "mb-0 text-muted debt-progress-label"
+    }, [_vm._v("Pago: S/ " + _vm._s(parseFloat(deuda.pagado || 0).toFixed(2)) + " de S/ " + _vm._s(parseFloat(deuda.monto || 0).toFixed(2)))]), _vm._v(" "), _c("span", {
+      staticClass: "fw-semibold text-dark"
+    }, [_vm._v(_vm._s(_vm.calcularProgresoPago(deuda)) + "%")])]), _vm._v(" "), _c("div", {
+      staticClass: "debt-progress"
+    }, [_c("div", {
+      staticClass: "debt-progress-paid",
+      style: {
+        width: _vm.calcularProgresoPago(deuda) + "%"
+      }
+    })]), _vm._v(" "), _c("div", {
+      staticClass: "d-flex justify-content-between align-items-center mt-3 flex-wrap gap-3"
+    }, [_c("div", {
+      staticClass: "d-flex align-items-center gap-4 flex-wrap"
+    }, [_c("p", {
+      staticClass: "mb-0 debt-amount"
+    }, [_c("i", {
+      staticClass: "fas fa-dollar-sign me-1"
+    }), _vm._v(" Debe: S/ " + _vm._s(parseFloat(deuda.debe || 0).toFixed(2)))]), _vm._v(" "), _c("p", {
+      staticClass: "mb-0 text-muted"
+    }, [_vm._v("Cuota: S/ " + _vm._s(_vm.calcularCuotaPromedio(deuda).toFixed(2)))])]), _vm._v(" "), _c("button", {
+      staticClass: "btn btn-primary rounded-pill debt-action-btn",
+      attrs: {
+        "data-bs-toggle": "modal",
+        "data-bs-target": "#modalPagarCuota"
+      },
+      on: {
+        click: function click($event) {
+          _vm.paqueteSeleccionado = deuda;
+        }
+      }
+    }, [_c("i", {
+      staticClass: "far fa-credit-card me-1"
+    }), _vm._v(" Registrar Pago\n              ")])])])])]);
+  }), 0)]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "modal fade",
     attrs: {
       id: "modalPagarCuota",
@@ -1107,7 +1251,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-lg"
   }, [_c("div", {
     staticClass: "modal-content border-0 shadow"
-  }, [_vm._m(6), _vm._v(" "), _c("div", {
+  }, [_vm._m(7), _vm._v(" "), _vm.paqueteSeleccionado ? _c("div", {
     staticClass: "modal-body p-4"
   }, [_c("div", {
     staticClass: "row mb-4"
@@ -1117,7 +1261,7 @@ var render = function render() {
     staticClass: "text-uppercase text-muted small fw-bold mb-1"
   }, [_vm._v("Paciente")]), _vm._v(" "), _c("div", {
     staticClass: "d-flex align-items-center"
-  }, [_vm._m(7), _vm._v(" "), _c("h6", {
+  }, [_vm._m(8), _vm._v(" "), _c("h6", {
     staticClass: "mb-0 fw-bold"
   }, [_vm._v(_vm._s(_vm.paqueteSeleccionado.patient_name) + " " + _vm._s(_vm.paqueteSeleccionado.patient_nombres))])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 ps-4"
@@ -1131,7 +1275,7 @@ var render = function render() {
     staticClass: "table-responsive bg-white rounded border"
   }, [_c("table", {
     staticClass: "table table-hover mb-0 align-middle"
-  }, [_vm._m(8), _vm._v(" "), _c("tbody", [_vm._l(_vm.paqueteSeleccionado.deudas || [], function (cuota) {
+  }, [_vm._m(9), _vm._v(" "), _c("tbody", [_vm._l(_vm.paqueteSeleccionado.deudas || [], function (cuota) {
     return _c("tr", {
       key: cuota.id,
       "class": {
@@ -1178,7 +1322,7 @@ var render = function render() {
     attrs: {
       colspan: "4"
     }
-  }, [_vm._v("No existen registros de cuotas para este paquete.")])]) : _vm._e()], 2)])])]), _vm._v(" "), _vm._m(9)])])]) : _vm._e(), _vm._v(" "), _c("ModalMembresias", {
+  }, [_vm._v("No existen registros de cuotas para este paquete.")])]) : _vm._e()], 2)])])]) : _vm._e(), _vm._v(" "), _vm._m(10)])])]), _vm._v(" "), _c("ModalMembresias", {
     attrs: {
       idUsuario: _vm.idUsuario,
       vista: "buscar"
@@ -1188,7 +1332,8 @@ var render = function render() {
         return _vm.cargarPaquetes(1);
       }
     }
-  }), _vm._v(" "), _vm.pagination.last_page > 1 ? _c("div", {
+  }), _vm._v(" "), _vm.vistaActiva === "paquetes" && _vm.pagination.last_page > 1 ? _c("div", {
+    key: "paquetes",
     staticClass: "d-flex justify-content-center mt-4"
   }, [_c("nav", {
     attrs: {
@@ -1305,6 +1450,14 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fas fa-list me-2"
   }), _vm._v(" Historial de Citas")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "debt-icon"
+  }, [_c("i", {
+    staticClass: "fas fa-user-times"
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -1446,10 +1599,12 @@ var render = function render() {
     }, [_c("span", {
       staticClass: "fw-medium text-capitalize text-dark"
     }, [_vm._v(_vm._s(paciente.name) + " " + _vm._s(paciente.nombres))]), _vm._v(" "), _c("span", {
-      staticClass: "badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill fw-normal"
+      staticClass: "badge bg-secondary bg-opacity-10 text-white border border-secondary border-opacity-25 rounded-pill fw-normal"
     }, [_vm._v(_vm._s(paciente.etiqueta))])]), _vm._v(" "), _c("div", {
       staticClass: "small text-muted"
-    }, [_vm._v(_vm._s(paciente.dni) + " • "), _c("i", {
+    }, [_c("i", {
+      staticClass: "fa-solid fa-id-card ms-1"
+    }), _vm._v(" " + _vm._s(paciente.dni) + " • "), _c("i", {
       staticClass: "fa-solid fa-mobile-screen ms-1"
     }), _vm._v(" " + _vm._s(paciente.phone))])]);
   }), 0) : _vm._e(), _vm._v(" "), _vm.activaResultados && _vm.pacientes.length === 0 ? _c("div", {
@@ -1459,13 +1614,15 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "card-body py-2 px-3 d-flex justify-content-between align-items-center"
   }, [_c("div", [_c("div", {
-    staticClass: "fw-bold text-primary text-capitalize"
+    staticClass: "fw-bold text-capitalize text-white"
   }, [_vm._v(_vm._s(_vm.pacienteElegido.name) + " " + _vm._s(_vm.pacienteElegido.nombres))]), _vm._v(" "), _c("div", {
-    staticClass: "small text-primary text-opacity-75"
-  }, [_vm._v(_vm._s(_vm.pacienteElegido.dni) + " • "), _c("i", {
+    staticClass: "small text-opacity-75 text-white"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-id-card ms-1"
+  }), _vm._v(" " + _vm._s(_vm.pacienteElegido.dni) + " • "), _c("i", {
     staticClass: "fa-solid fa-mobile-screen ms-1"
   }), _vm._v(" " + _vm._s(_vm.pacienteElegido.phone))])]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-sm btn-link text-primary text-decoration-none fw-medium",
+    staticClass: "btn btn-sm btn-link text-white text-decoration-none fw-medium",
     on: {
       click: function click($event) {
         return _vm.limpiarPaciente();
@@ -2067,7 +2224,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.push([module.id, "@import url(https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap);"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.paquetes-container[data-v-27b789ef] {\r\n  font-family: 'Inter', sans-serif;\r\n  color: #334155;\r\n  background-color: #f8fafc;\r\n  min-height: 100vh;\r\n  padding: 1.5rem;\r\n  border-radius: 12px;\n}\r\n\r\n/* Identifiers */\n.deudas-badge[data-v-27b789ef] {\r\n  background: #f1f5f9;\r\n  border: 1px solid #e2e8f0;\r\n  padding: 0.35rem 0.75rem;\r\n  border-radius: 20px;\r\n  font-size: 0.85rem;\r\n  color: #64748b;\r\n  display: flex;\r\n  align-items: center;\r\n  font-weight: 500;\n}\r\n\r\n/* Search Box */\n.search-box[data-v-27b789ef] {\r\n  position: relative;\r\n  width: 100%;\r\n  max-width: 380px;\n}\n.search-box .search-icon[data-v-27b789ef] {\r\n  position: absolute;\r\n  left: 14px;\r\n  top: 50%;\r\n  transform: translateY(-50%);\r\n  color: #94a3b8;\n}\n.search-box input[data-v-27b789ef] {\r\n  padding-left: 40px;\r\n  border-radius: 8px;\r\n  border: 1px solid #cbd5e1;\r\n  background: #fff;\r\n  transition: all 0.2s;\r\n  box-shadow: 0 1px 2px rgba(0,0,0,0.02);\n}\n.search-box input[data-v-27b789ef]:focus {\r\n  border-color: #3b82f6;\r\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);\r\n  outline: none;\n}\r\n\r\n/* Metric Cards */\n.summary-card[data-v-27b789ef] {\r\n  border-radius: 12px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.summary-card[data-v-27b789ef]:hover {\r\n  transform: translateY(-3px);\r\n  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.03) !important;\n}\r\n\r\n/* Filters */\n.filter-label[data-v-27b789ef] {\r\n  width: 60px;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.btn-filter[data-v-27b789ef] {\r\n  background: transparent;\r\n  color: #64748b;\r\n  border: none;\r\n  font-weight: 500;\r\n  padding: 0.4rem 1rem;\r\n  border-radius: 20px;\r\n  transition: all 0.2s;\n}\n.btn-filter[data-v-27b789ef]:hover {\r\n  background: #f1f5f9;\r\n  color: #0f172a;\n}\n.btn-filter.active[data-v-27b789ef] {\r\n  background: #3b82f6;\r\n  color: white;\r\n  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);\n}\r\n\r\n/* Package List */\n.package-card[data-v-27b789ef] {\r\n  border-radius: 14px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.package-card[data-v-27b789ef]:hover {\r\n  box-shadow: 0 10px 20px -5px rgba(0,0,0,0.06), 0 8px 10px -6px rgba(0,0,0,0.04) !important;\n}\n.border-active[data-v-27b789ef] {\r\n  border-left: 5px solid #f59e0b !important;\n}\n.border-completed[data-v-27b789ef] {\r\n  border-left: 5px solid #3b82f6 !important;\n}\n.package-icon[data-v-27b789ef] {\r\n  width: 48px;\r\n  height: 48px;\r\n  border-radius: 12px;\r\n  background: #eff6ff;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 1.5rem;\n}\n.package-title[data-v-27b789ef] {\r\n  color: #0f172a;\r\n  font-size: 1.15rem;\n}\r\n\r\n/* Badges */\n.status-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  font-weight: 600;\r\n  text-transform: uppercase;\r\n  letter-spacing: 0.03em;\n}\n.status-act[data-v-27b789ef] { background: #dcfce7; color: #166534;\n}\n.status-com[data-v-27b789ef] { background: #dbeafe; color: #1e3a8a;\n}\n.status-pen[data-v-27b789ef] { background: #fef9c3; color: #854d0e;\n}\n.status-can[data-v-27b789ef] { background: #fee2e2; color: #991b1b;\n}\n.status-def[data-v-27b789ef] { background: #f1f5f9; color: #475569;\n}\n.type-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  background: #e0f2fe;\r\n  color: #0369a1;\r\n  font-weight: 600;\n}\r\n\r\n/* Progress bar smoothing */\n.progress-bar[data-v-27b789ef] {\r\n  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);\n}\r\n\r\n/* Buttons */\n.outline-btn[data-v-27b789ef] {\r\n  border: 1px solid #e2e8f0;\r\n  background: white;\r\n  color: #475569;\r\n  font-weight: 500;\r\n  border-radius: 6px;\r\n  transition: all 0.2s;\n}\n.outline-btn[data-v-27b789ef]:hover {\r\n  background: #f8fafc;\r\n  color: #0f172a;\r\n  border-color: #cbd5e1;\n}\n.hover-link[data-v-27b789ef] {\r\n  transition: color 0.2s;\n}\n.hover-link[data-v-27b789ef]:hover {\r\n  color: #0f172a !important;\n}\n.dropdown-toggle-link[data-v-27b789ef] {\r\n  color: #3b82f6;\r\n  font-weight: 500;\n}\n.dropdown-toggle-link[data-v-27b789ef]:hover {\r\n  color: #2563eb;\n}\n.info-meta span[data-v-27b789ef] {\r\n  font-size: 0.875rem;\n}\n.history-list-container[data-v-27b789ef] {\r\n  max-height: 250px;\r\n  overflow-y: auto;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar {\r\n  width: 6px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-track {\r\n  background: #f1f5f9;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb {\r\n  background: #cbd5e1; \r\n  border-radius: 10px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb:hover {\r\n  background: #94a3b8;\n}\n.history-item[data-v-27b789ef]:last-child {\r\n  border-bottom: none !important;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.paquetes-container[data-v-27b789ef] {\r\n  font-family: 'Inter', sans-serif;\r\n  color: #334155;\r\n  background-color: #f8fafc;\r\n  min-height: 100vh;\r\n  padding: 1.5rem;\r\n  border-radius: 12px;\n}\r\n\r\n/* Header tabs */\n.module-tabs[data-v-27b789ef] {\r\n  display: flex;\r\n  gap: 0.5rem;\r\n  background: #f1f5f9;\r\n  border-radius: 999px;\r\n  padding: 0.25rem;\n}\n.module-tab-btn[data-v-27b789ef] {\r\n  border: none;\r\n  color: #64748b;\r\n  border-radius: 999px;\r\n  font-weight: 600;\r\n  padding: 0.35rem 0.85rem;\n}\n.module-tab-btn.active[data-v-27b789ef] {\r\n  background: #1d4ed8;\r\n  color: #fff;\n}\n.module-tab-btn.active .badge[data-v-27b789ef] {\r\n  background: #fff !important;\r\n  color: #dc2626;\n}\r\n\r\n/* Search Box */\n.search-box[data-v-27b789ef] {\r\n  position: relative;\r\n  width: 100%;\r\n  max-width: 380px;\n}\n.search-box .search-icon[data-v-27b789ef] {\r\n  position: absolute;\r\n  left: 14px;\r\n  top: 50%;\r\n  transform: translateY(-50%);\r\n  color: #94a3b8;\n}\n.search-box input[data-v-27b789ef] {\r\n  padding-left: 40px;\r\n  border-radius: 8px;\r\n  border: 1px solid #cbd5e1;\r\n  background: #fff;\r\n  transition: all 0.2s;\r\n  box-shadow: 0 1px 2px rgba(0,0,0,0.02);\n}\n.search-box input[data-v-27b789ef]:focus {\r\n  border-color: #3b82f6;\r\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);\r\n  outline: none;\n}\r\n\r\n/* Metric Cards */\n.summary-card[data-v-27b789ef] {\r\n  border-radius: 12px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.summary-card[data-v-27b789ef]:hover {\r\n  transform: translateY(-3px);\r\n  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.03) !important;\n}\r\n\r\n/* Filters */\n.filter-label[data-v-27b789ef] {\r\n  width: 60px;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.btn-filter[data-v-27b789ef] {\r\n  background: transparent;\r\n  color: #64748b;\r\n  border: none;\r\n  font-weight: 500;\r\n  padding: 0.4rem 1rem;\r\n  border-radius: 20px;\r\n  transition: all 0.2s;\n}\n.btn-filter[data-v-27b789ef]:hover {\r\n  background: #f1f5f9;\r\n  color: #0f172a;\n}\n.btn-filter.active[data-v-27b789ef] {\r\n  background: #3b82f6;\r\n  color: white;\r\n  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);\n}\r\n\r\n/* Package List */\n.package-card[data-v-27b789ef] {\r\n  border-radius: 14px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.package-card[data-v-27b789ef]:hover {\r\n  box-shadow: 0 10px 20px -5px rgba(0,0,0,0.06), 0 8px 10px -6px rgba(0,0,0,0.04) !important;\n}\n.border-active[data-v-27b789ef] {\r\n  border-left: 5px solid #f59e0b !important;\n}\n.border-completed[data-v-27b789ef] {\r\n  border-left: 5px solid #3b82f6 !important;\n}\n.package-icon[data-v-27b789ef] {\r\n  width: 48px;\r\n  height: 48px;\r\n  border-radius: 12px;\r\n  background: #eff6ff;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 1.5rem;\n}\n.package-title[data-v-27b789ef] {\r\n  color: #0f172a;\r\n  font-size: 1.15rem;\n}\r\n\r\n/* Badges */\n.status-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  font-weight: 600;\r\n  text-transform: uppercase;\r\n  letter-spacing: 0.03em;\n}\n.status-act[data-v-27b789ef] { background: #dcfce7; color: #166534;\n}\n.status-com[data-v-27b789ef] { background: #dbeafe; color: #1e3a8a;\n}\n.status-pen[data-v-27b789ef] { background: #fef9c3; color: #854d0e;\n}\n.status-can[data-v-27b789ef] { background: #fee2e2; color: #991b1b;\n}\n.status-def[data-v-27b789ef] { background: #f1f5f9; color: #475569;\n}\n.type-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  background: #e0f2fe;\r\n  color: #0369a1;\r\n  font-weight: 600;\n}\r\n\r\n/* Progress bar smoothing */\n.progress-bar[data-v-27b789ef] {\r\n  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);\n}\r\n\r\n/* Buttons */\n.outline-btn[data-v-27b789ef] {\r\n  border: 1px solid #e2e8f0;\r\n  background: white;\r\n  color: #475569;\r\n  font-weight: 500;\r\n  border-radius: 6px;\r\n  transition: all 0.2s;\n}\n.outline-btn[data-v-27b789ef]:hover {\r\n  background: #f8fafc;\r\n  color: #0f172a;\r\n  border-color: #cbd5e1;\n}\n.hover-link[data-v-27b789ef] {\r\n  transition: color 0.2s;\n}\n.hover-link[data-v-27b789ef]:hover {\r\n  color: #0f172a !important;\n}\n.dropdown-toggle-link[data-v-27b789ef] {\r\n  color: #3b82f6;\r\n  font-weight: 500;\n}\n.dropdown-toggle-link[data-v-27b789ef]:hover {\r\n  color: #2563eb;\n}\n.info-meta span[data-v-27b789ef] {\r\n  font-size: 0.875rem;\n}\n.history-list-container[data-v-27b789ef] {\r\n  max-height: 250px;\r\n  overflow-y: auto;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar {\r\n  width: 6px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-track {\r\n  background: #f1f5f9;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb {\r\n  background: #cbd5e1; \r\n  border-radius: 10px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb:hover {\r\n  background: #94a3b8;\n}\n.history-item[data-v-27b789ef]:last-child {\r\n  border-bottom: none !important;\n}\r\n\r\n/* Deudas */\n.debt-summary-card[data-v-27b789ef] {\r\n  background: #f8fafc;\r\n  border: 1px solid #e2e8f0;\r\n  border-radius: 16px;\r\n  padding: 1.2rem 1.4rem;\n}\n.debt-summary-card p[data-v-27b789ef] {\r\n  color: #64748b;\r\n  font-size: 1.05rem;\n}\n.debt-card[data-v-27b789ef] {\r\n  border: 1px solid #fecaca;\r\n  border-radius: 18px;\r\n  background: #fff;\r\n  padding: 1.8rem;\n}\n.debt-icon[data-v-27b789ef] {\r\n  width: 68px;\r\n  height: 68px;\r\n  border-radius: 16px;\r\n  background: #fee2e2;\r\n  color: #ef4444;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 2rem;\n}\n.debt-meta[data-v-27b789ef] {\r\n  font-size: 1.05rem;\n}\n.debt-progress-label[data-v-27b789ef] {\r\n  font-size: 1.05rem;\n}\n.debt-progress[data-v-27b789ef] {\r\n  width: 100%;\r\n  height: 12px;\r\n  border-radius: 999px;\r\n  background: #f97316;\r\n  overflow: hidden;\n}\n.debt-progress-paid[data-v-27b789ef] {\r\n  height: 100%;\r\n  background: #2563eb;\r\n  border-radius: 999px 0 0 999px;\n}\n.debt-amount[data-v-27b789ef] {\r\n  color: #ef4444;\r\n  font-weight: 700;\r\n  font-size: 16px;\n}\n.debt-action-btn[data-v-27b789ef] {\r\n  padding: 0.55rem 1.2rem;\r\n  font-weight: 600;\r\n  font-size: 1.05rem;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

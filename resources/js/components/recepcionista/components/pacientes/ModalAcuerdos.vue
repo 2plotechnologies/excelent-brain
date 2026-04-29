@@ -3,7 +3,7 @@
 		<div class="modal-dialog modal-dialog-centered modal-lg">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h1 class="modal-title fs-5" id="exampleModalLabel">Acuerdos</h1>
+					<h1 class="modal-title fs-5" id="exampleModalLabel">Notas de recepción</h1>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
@@ -30,7 +30,7 @@
 						</div>
 					</div>
 
-					<p>Acuerdos asociados</p>
+					<p>Notas de recepción asociadas</p>
 					<table class="table table-hover table-sm">
 						<thead>
 							<th>Asunto</th>

@@ -1,32 +1,48 @@
 <template>
-  <div class="modal fade" id="modalEstado" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade" id="modalEstado" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
-      <div class="modal-content">
-        <div class="modal-header border-0">
-          <h5 class="modal-title" id="exampleModalLabel">Estado de la cita </h5>
-          <button type="button" id="cerrModalEstado" class="close" data-bs-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between">
+          <div class="d-flex align-items-center">
+            <div class="icon-header-container mr-3">
+              <i class="fas fa-info-circle text-primary h4 mb-0"></i>
+            </div>
+            <div>
+              <h5 class="modal-title font-weight-bold text-dark mb-1">Estado de Cita</h5>
+              <div class="d-flex gap-2 mt-1">
+                <span class="badge-status status-badge-secondary" v-if="dataCit">
+                  <i class="fas fa-hashtag mr-1"></i> {{ dataCit.id }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <button type="button" id="cerrModalEstado" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+            <i class="fas fa-times"></i>
           </button>
         </div>
         
-        <div class="modal-body">
-					<label for="">Código de cita: #{{ dataCit.id }}</label>
-          <form action="">                                                                      
-							<label for="">Nuevo estado:</label>
-							<select class="form-select status-appointment" name="status" id="status" v-model="dataCit.status">
+        <div class="modal-body px-4 pt-4" v-if="dataCit">
+          <form action="" @submit.prevent>
+            <div class="form-group mb-3">
+							<label class="section-label d-block mb-1">Nuevo estado</label>
+							<select class="form-select custom-select status-appointment" name="status" id="status" v-model="dataCit.status">
 								<option value="1">Sin Confirmar</option>
 								<option value="2">Confirmar cita</option>
 								<option value="3">Anular cita</option>
 							</select>
-							<div class="mt-2" v-if="dataCit.status==3">
-								<label for="">Motivo</label>
-								<input type="text" class="form-control" v-model="motivo">
-							</div>                                                                                           
+            </div>
+            
+            <div class="form-group mb-3" v-if="dataCit.status==3">
+							<label class="section-label d-block mb-1">Motivo de anulación</label>
+							<input type="text" class="form-control custom-input" v-model="motivo" placeholder="Especifique el motivo...">
+            </div>
           </form>
         </div>
 
-        <div class="modal-footer border-0 d-flex justify-content-end">
-          <button  @click="update()" type="button" class="btn btn-outline-primary"><i class="fas fa-redo"></i> Actualizar</button>
+        <div class="modal-footer border-0 px-4 pb-4 pt-2 d-flex justify-content-center">
+          <button @click="update()" type="button" class="btn btn-action btn-primary w-100">
+            <i class="fas fa-redo-alt mr-2"></i> Actualizar Estado
+          </button>
         </div>
       </div>
     </div>

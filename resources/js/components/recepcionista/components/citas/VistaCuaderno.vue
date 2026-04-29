@@ -7,11 +7,30 @@
 			<div class="col-auto"><button class="btn btn-outline-primary mx-1 border-0 font-weight-bold" @click="verHorariosHoy()"><i class="fa-regular fa-clock"></i> Hoy</button></div>
 			<div class="col-auto"><button class="btn btn-outline-primary mx-1 border-0 font-weight-bold" @click="verHorariosMañana()">Mañana <i class="fas fa-chevron-right"></i></button></div>
 			<div class="col-auto"><button class="btn btn-outline-secondary mx-2 border-0" @click="refrescarHorarios()"><i class="fas fa-sync"></i> Actualizar</button></div>
-			<div class="col-auto ms-auto"><router-link to="/recepcionista/paquetes" class="btn btn-primary font-weight-bold shadow-sm"><i class="fas fa-box-open"></i> Paquetes</router-link></div>
+			
+			<div class="col-auto ms-auto d-flex align-items-center gap-3">
+				<!-- Leyendas de estados -->
+				<div class="d-flex align-items-center text-muted small font-weight-bold" style="gap: 15px;">
+					<span class="d-flex align-items-center gap-1">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-warning"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+						En espera
+					</span>
+					<span class="d-flex align-items-center gap-1">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-info"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg>
+						En atención
+					</span>
+					<span class="d-flex align-items-center gap-1">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-success"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+						Atendido
+					</span>
+				</div>
+				<router-link to="/recepcionista/paquetes" class="btn btn-primary font-weight-bold shadow-sm"><i class="fas fa-box-open"></i> Paquetes</router-link>
+			</div>
 		</div>
 
 		<!-- Filtros por profesión (Opcional, si existen en los datos) -->
-		<div class="d-flex mb-3 gap-2 flex-wrap">
+		<div class="d-flex mb-3 gap-2 flex-wrap align-items-center">
+			<span class="text-muted small font-weight-bold me-1">Filtrar:</span>
 			<button class="btn btn-sm rounded-pill font-weight-bold" 
 							:class="filtroActual == 'Todos' ? 'btn-primary' : 'btn-light text-muted border'" 
 							@click="filtroActual = 'Todos'">Todos</button>
@@ -21,15 +40,16 @@
 		</div>
 
 		<!-- Contenedor del Calendario Grid -->
-		<div class="calendar-wrapper bg-white shadow-sm rounded border">
+		<div class="calendar-wrapper bg-white shadow-sm border" style="border-radius: 8px;">
 			
-			<div class="calendar-header d-flex border-bottom bg-light">
+			<div class="calendar-header d-flex border-bottom bg-light" style="border-top-left-radius: 8px; border-top-right-radius: 8px;">
 				<!-- Cabecera Esquina (Eje Y) -->
-				<div class="time-axis-header text-center py-3 border-right text-muted font-weight-bold" style="min-width: 60px;">
+				<div class="time-axis-header text-center py-3 border-right text-muted font-weight-bold" style="min-width: 60px; border-top-left-radius: 8px;">
 					<i class="far fa-clock"></i>
 				</div>
 				<!-- Cabecera Doctores (Eje X scrolleable) -->
-				<div class="doctors-header-container d-flex flex-grow-1 overflow-hidden" ref="headerScroll">
+				<div class="doctors-header-container d-flex flex-grow-1" ref="headerScroll"
+					style="overflow-x: auto; overflow-y: hidden;">
 					<div class="doctor-header text-center py-2 border-right text-dark" v-for="doctor in doctoresFiltrados" :key="'h-'+doctor.id">
 						<div>
 							<span class="badge badge-pill mt-1" :style="'background-color: ' + stringToColor(doctor.name)"> &nbsp; </span>
@@ -50,8 +70,8 @@
 			<div class="calendar-body d-flex" style="height: 600px; overflow-y: auto;" @scroll="syncScroll">
 				<!-- Eje Y Horas -->
 				<div class="time-axis border-right bg-white" style="min-width: 60px;">
-					<div class="time-slot-label text-center border-bottom text-muted small position-relative" v-for="hora in horasGrid" :key="'lbl-'+hora">
-						<span style="position: absolute; top: -10px; right: 8px; background: white; padding: 0 4px;">{{ hora }}:00</span>
+					<div class="time-slot-label text-center text-muted small position-relative" v-for="hora in horasGrid" :key="'lbl-'+hora">
+						<span style="position: absolute; top: -10px; right: 8px; background: white; padding: 0 4px; z-index: 2;">{{ hora }}:00</span>
 					</div>
 				</div>
 				<!-- Columnas de doctores locales -->
@@ -378,7 +398,7 @@
 				this.tooltipData = null;
 			},
 			crearCitaEnSlot(doctor, horaLibre) {
-				// Buscar el indice en el array para compatibilidad con el v-for de la logica original
+				// Buscar el indice en el array para compatibilidad con el v-for de la logica original.
 				let hIndex = doctor.horarios.findIndex(h => h.id == horaLibre.id);
 				let dIndex = this.doctores.findIndex(d => d.id == doctor.id);
 				this.prepararAutomaticos(dIndex, hIndex);
@@ -388,13 +408,13 @@
 				this.indexElegido = this.horasMalas.findIndex(x => x.id == citaMalas.id);
 			},
 			bgPorSemaforo(horaOcup) {
-				if(!horaOcup.patient || !horaOcup.patient.ultimoSemaforo) return 'bg-white';
+				if(!horaOcup.patient || !horaOcup.patient.ultimoSemaforo) return 'bg-transparent';
 				let cod = horaOcup.patient.ultimoSemaforo.codigo;
-				if([1].includes(cod)) return 'bg-white';
+				if([1].includes(cod)) return 'bg-transparent';
 				if([2,3,4].includes(cod)) return 'bg-success text-white';
 				if([5,6,7].includes(cod)) return 'bg-warning text-dark';
 				if([8,9,10].includes(cod)) return 'bg-danger text-white';
-				return 'bg-white';
+				return 'bg-transparent'; //hacer transparente por defecto.
 			},
 			distribuirAperturaModal(data, tModalId, indexG){
 				this.cita = data;
@@ -490,20 +510,30 @@
 			})
 			this.listarProfesionales();
 			this.listarPrecios();
+
+			this.$nextTick(() => {
+				if (this.$refs.bodyScroll && this.$refs.headerScroll) {
+					this.$refs.headerScroll.scrollLeft = this.$refs.bodyScroll.scrollLeft;
+				}
+			});
 		}
 	}
 </script>
 
 <style scoped>
-	.calendar-wrapper { display: flex; flex-direction: column; overflow: hidden; }
-	.doctor-header { min-width: 250px; flex: 1; }
-	.doctor-column { min-width: 250px; flex: 1; }
+	.calendar-wrapper { display: flex; flex-direction: column; border-radius: 8px; overflow: hidden; transform: translateZ(0); }
+	.doctor-header,
+	.doctor-column {
+		min-width: 250px;
+		max-width: 250px;
+		flex: 0 0 250px;
+	}
 	.time-slot-label { height: 90px; } /* 60 minutos * 1.5px/min = 90px */
 	.grid-line { height: 90px; box-sizing: border-box; }
 	.free-slot { position: absolute; width: calc(100% - 10px); left: 5px; opacity: 0; cursor: pointer; transition: opacity 0.2s; background: rgba(28, 200, 138, 0.1); border-radius: 4px; box-sizing: border-box;}
 	.free-slot:hover { opacity: 1; border: 1px dashed #1cc88a; }
 	
-	.booked-slot { position: absolute; width: calc(100% - 10px); left: 5px; cursor: pointer; transition: transform 0.1s; border-radius: 6px; overflow: hidden; background-color: #f8f9fc;}
+	.booked-slot { position: absolute; width: calc(100% - 10px); left: 5px; cursor: pointer; transition: transform 0.1s; border-radius: 6px; overflow: hidden; background-color: rgba(248, 249, 252, 0.7);}
 	.booked-slot:hover { transform: scale(1.02); z-index: 10!important; }
 	.booked-content { padding: 4px; border-radius: 4px; }
 	.doctors-header-container::-webkit-scrollbar { display: none; }

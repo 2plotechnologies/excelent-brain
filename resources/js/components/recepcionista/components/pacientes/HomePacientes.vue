@@ -228,10 +228,10 @@
                   <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" :aria-labelledby="'dropdownMenu' + index">
                     <li><h6 class="dropdown-header">Acciones del Paciente</h6></li>
                     
-                    <!-- Acuerdos -->
+                    <!-- Notas de recepcion -->
                     <li>
                       <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalAcuerdos" @click="dataPaciente = paciente">
-                        <i class="fa-solid fa-handshake-angle me-2 text-primary"></i> Acuerdos
+                        <i class="fa-solid fa-handshake-angle me-2 text-primary"></i> Notas de recepción
                       </a>
                     </li>
 
@@ -315,6 +315,7 @@
       :pacienteId="dataPaciente.id" 
       @volver="vistaActual = 'lista'" 
       @editarPaciente="dataPaciente = $event" 
+      @abrirTriaje="dataProps($event)"
     />
 
 		<ModalEdicionPaciente :dataPatient="dataPaciente"></ModalEdicionPaciente>

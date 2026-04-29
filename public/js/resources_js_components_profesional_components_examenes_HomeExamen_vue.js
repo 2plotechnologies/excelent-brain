@@ -135,8 +135,38 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       });
     },
     print: function print() {
-      this.exam.medical_exams = this.selected;
-      window.open('/api/pdf_exam/' + [JSON.stringify(this.exam).split('/').join('-')] + '?token=' + localStorage.getItem('token'));
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
+            case 0:
+              _this5.exam.medical_exams = _this5.selected;
+              if (!(_this5.selected.length === 0)) {
+                _context3.next = 4;
+                break;
+              }
+              _this5.$swal('Agregue al menos un examen para continuar');
+              return _context3.abrupt("return");
+            case 4:
+              _context3.prev = 4;
+              _context3.next = 7;
+              return _this5.axios.post('/api/medicalExam', _this5.exam);
+            case 7:
+              _this5.$swal('Órdenes de exámenes guardadas con éxito');
+              window.open('/api/pdf_exam/' + [JSON.stringify(_this5.exam).split('/').join('-')] + '?token=' + localStorage.getItem('token'));
+              _context3.next = 15;
+              break;
+            case 11:
+              _context3.prev = 11;
+              _context3.t0 = _context3["catch"](4);
+              console.error(_context3.t0);
+              _this5.$swal('Error al guardar las órdenes');
+            case 15:
+            case "end":
+              return _context3.stop();
+          }
+        }, _callee3, null, [[4, 11]]);
+      }))();
     },
     deleteSelected: function deleteSelected(key) {
       this.selected.splice(key, 1);
@@ -164,14 +194,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   computed: {
     filtro: function filtro() {
-      var _this5 = this;
+      var _this6 = this;
       if (!this.buscar) {
         this.showResults = false;
         return null;
       } else {
         this.showResults = true;
         return this.exams.filter(function (exam) {
-          return exam.name.toLowerCase().includes(_this5.buscar);
+          return exam.name.toLowerCase().includes(_this6.buscar);
         }).slice(0, 5);
       }
     }

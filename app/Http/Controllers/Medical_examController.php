@@ -52,7 +52,7 @@ class Medical_examController extends Controller
 
         $exams = $request->get('medical_exams');
 
-        return $request;
+        // return $request; // removed
 
         foreach($exams as $exam){
             $appointment->medical_exams()->attach($exam['id'],[
@@ -60,10 +60,11 @@ class Medical_examController extends Controller
             ]);
         }
 
-        return redirect()->route('profesional.pdf_exam');
+        // return redirect()->route('profesional.pdf_exam'); // removed
 
         return response()->json([
-            'mensaje' => 'Examen registrado'
+            'mensaje' => 'Examen registrado',
+            'medical_exams' => $exams
         ]);
 
     }

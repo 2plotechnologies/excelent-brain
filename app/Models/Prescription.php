@@ -12,7 +12,7 @@ class Prescription extends Model
     //Relacion muchos a muchos Prescripttions-karios
     public function kairos()
     {
-        return $this->belongsToMany("App\Models\Kairo")->withPivot('amount');
+        return $this->belongsToMany("App\Models\Kairo")->withPivot('amount', 'way', 'indications');
     }
     //Relacion INVERSA uno a uno Patient-Prescription
     public function patient()

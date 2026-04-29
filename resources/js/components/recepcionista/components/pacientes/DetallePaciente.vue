@@ -60,6 +60,9 @@
         <button class="nav-link font-weight-bold small text-muted" id="documentos-tab" data-bs-toggle="tab" data-bs-target="#documentos" type="button" role="tab">Documentos</button>
       </li>
       <li class="nav-item" role="presentation">
+        <button class="nav-link font-weight-bold small text-muted" id="convenios-tab" data-bs-toggle="tab" data-bs-target="#convenios" type="button" role="tab" >Convenios</button>
+      </li>
+      <li class="nav-item" role="presentation">
         <button class="nav-link font-weight-bold small text-muted" id="finanzas-tab" data-bs-toggle="tab" data-bs-target="#finanzas" type="button" role="tab" >Finanzas</button>
       </li>
     </ul>
@@ -317,6 +320,47 @@
               </div>
             </div>
 
+            <!-- ETIQUETAS Y HOBBIES -->
+            <div class="col-md-12">
+              <div class="card border-0 shadow-sm h-100 bg-light">
+                <div class="card-body">
+                  <div class="row">
+                    <!-- ETIQUETAS DE COMPORTAMIENTO -->
+                    <div class="col-md-6 mb-3 mb-md-0">
+                      <h6 class="fw-bold mb-3 text-dark">
+                        <i class="fas fa-tags text-primary me-2"></i>
+                        Etiquetas de Comportamiento
+                      </h6>
+                      <div class="d-flex flex-wrap gap-2" v-if="paciente.semaforo_estados && paciente.semaforo_estados.length > 0">
+                        <span class="badge border bg-white text-dark shadow-sm px-3 py-2" v-for="sem in paciente.semaforo_estados.slice(0, 5)" :key="sem.id">
+                          <i class="fas fa-tag text-warning me-1"></i> {{ getEstadoNombre(sem.codigo) }}
+                        </span>
+                      </div>
+                      <div v-else>
+                        <small class="text-muted">No hay etiquetas de comportamiento registradas.</small>
+                      </div>
+                    </div>
+
+                    <!-- HOBBIES -->
+                    <div class="col-md-6">
+                      <h6 class="fw-bold mb-3 text-dark">
+                        <i class="fas fa-heart text-danger me-2"></i>
+                        Hobbies e Intereses
+                      </h6>
+                      <div class="d-flex flex-wrap gap-2" v-if="getHobbies(paciente.hobbies).length > 0">
+                        <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-3 py-2" v-for="(hobbie, index) in getHobbies(paciente.hobbies)" :key="index">
+                          {{ hobbie }}
+                        </span>
+                      </div>
+                      <div v-else>
+                        <small class="text-muted">No hay hobbies registrados.</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -546,9 +590,14 @@
       <!-- TRIAJE -->
       <div class="tab-pane fade" id="triaje" role="tabpanel">
         <div class="row">
+          <div class="col-12 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="card-title font-weight-bold mb-0"><i class="fas fa-clipboard-check text-primary me-2"></i> Registro de Triajes</h5>
+            <button class="btn btn-primary btn-sm rounded-pill shadow-sm px-3" data-bs-toggle="modal" data-bs-target="#modalTriaje" @click="$emit('abrirTriaje', paciente)">
+              <i class="fa-solid fa-lungs me-1"></i> Nuevo Triaje
+            </button>
+          </div>
+          
           <div class="col-12 mb-4">
-            <h5 class="card-title font-weight-bold mb-3"><i class="fas fa-clipboard-check text-primary me-2"></i> Registro de Triajes</h5>
-            
             <div v-if="paciente.triajes && paciente.triajes.length > 0">
               <div class="card border-0 shadow-sm mb-3 rounded-lg" v-for="tr in paciente.triajes" :key="tr.id" style="background-color: #fcfcfc;">
                 <div class="card-body p-4">
@@ -669,35 +718,135 @@
 
       <!-- RECETAS -->
       <div class="tab-pane fade" id="recetas" role="tabpanel">
-        <div class="card border">
-          <div class="card-body p-4">
-            <h5 class="card-title font-weight-bold mb-4">Recetas y Órdenes</h5>
-            <div class="table-responsive">
-              <table class="table table-hover table-sm">
-                <thead>
-                  <tr>
-                    <th>Fecha</th>
-                    <th>Detalles</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="receta in paciente.prescriptions" :key="receta.id">
-                    <td style="width: 15%">{{ formatDate(receta.created_at) }}</td>
-                    <td>
-                      <!-- Just simple view -->
-                      <span class="small">Receta generada (ID: {{receta.id}})</span> 
-                      <span class="text-muted mx-2">|</span>
-                      <a :href="`/api/pdf/${receta.id}?token=${$token}`" target="_blank" class="text-primary small"><i class="fas fa-print"></i> Imprimir Receta</a>
-                    </td>
-                  </tr>
-                  <tr v-if="!paciente.prescriptions || paciente.prescriptions.length == 0">
-                    <td colspan="2" class="text-center text-muted">No tiene recetas registradas</td>
-                  </tr>
-                </tbody>
-              </table>
+        
+        <!-- Tabs for Recetas and Ordenes -->
+        <ul class="nav nav-pills mb-4" id="recetasOrdenesTabs" role="tablist">
+          <li class="nav-item me-2" role="presentation">
+            <button class="nav-link rounded-pill px-4 small border shadow-sm" type="button" style="font-weight: 500;" @click="activePill = 'recetas'" :class="activePill === 'recetas' ? 'bg-primary text-white active' : 'bg-white text-dark'">
+              <i class="fas fa-link me-1"></i> Recetas Médicas
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4 small border shadow-sm" type="button" style="font-weight: 500;" @click="activePill = 'ordenes'" :class="activePill === 'ordenes' ? 'bg-primary text-white active' : 'bg-white text-muted'">
+              <i class="fas fa-file-invoice me-1"></i> Órdenes Médicas
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="pills-tabContent">
+          <!-- Recetas Médicas Tab -->
+          <div v-show="activePill === 'recetas'">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="mb-0 font-weight-bold d-flex align-items-center text-dark">
+                <i class="fas fa-link text-warning me-2" style="transform: rotate(45deg);"></i> Recetas Médicas
+              </h5>
+              <button class="btn btn-primary rounded-pill px-3 shadow-sm btn-sm">
+                <i class="fas fa-plus me-1"></i> Nueva Receta
+              </button>
+            </div>
+
+            <div v-if="paciente.prescriptions && paciente.prescriptions.length > 0">
+              <div v-for="receta in paciente.prescriptions" :key="receta.id" class="card border border-light shadow-sm mb-4" style="border-radius: 12px; overflow: hidden;">
+                <div class="card-body p-4 bg-white">
+                  <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+                    <div class="d-flex align-items-center">
+                      <div class="rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm" style="width: 45px; height: 45px; background-color: #fff4e6; color: #ff8c00;">
+                        <i class="fas fa-capsules fs-5"></i>
+                      </div>
+                      <div>
+                        <h6 class="mb-0 font-weight-bold text-dark fs-5">Receta Médica</h6>
+                        <div class="small text-muted mt-1">
+                          {{ formatDate(receta.created_at) }} &middot; {{ receta.professional ? receta.professional.name : 'Dr.' }} <span v-if="receta.professional && (receta.professional.cmp || receta.professional.rne)">- CMP {{ receta.professional.cmp || '--' }} / RNE {{ receta.professional.rne || '--' }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="badge bg-success bg-opacity-10 rounded-pill px-3 py-1 border border-success border-opacity-25" style="font-weight: 500;">Vigente</span>
+                      <a :href="`/api/pdf/${receta.id}?token=${$token}`" target="_blank" class="btn btn-light btn-sm rounded text-muted shadow-sm border"><i class="fas fa-print"></i></a>
+                      <a :href="`/api/pdf/${receta.id}?token=${$token}`" download target="_blank" class="btn btn-light btn-sm rounded text-muted shadow-sm border"><i class="fas fa-download"></i></a>
+                    </div>
+                  </div>
+                  
+                  <div class="text-muted small mb-3">
+                    Diagnóstico: <span v-if="paciente.initial_psychiatric_history && paciente.initial_psychiatric_history.diagnostic">{{ getCieNames(paciente.initial_psychiatric_history.diagnostic) }}</span><span v-else>Evaluación médica general</span>
+                  </div>
+
+                  <div v-if="receta.kairos && receta.kairos.length > 0" class="d-flex flex-column gap-2 mb-3">
+                    <div v-for="med in receta.kairos" :key="med.id" class="p-3 rounded" style="background-color: #fcfcfc; border: 1px solid #f0f0f0;">
+                      <div class="d-flex align-items-center mb-1">
+                        <strong class="text-dark me-2">{{ med.nombre }}</strong>
+                        <span class="badge bg-warning bg-opacity-10 rounded-pill px-2 border border-warning border-opacity-25" style="font-size: 0.75rem;">{{ med.concentracion || med.presentacion || 'Dosis' }}</span>
+                      </div>
+                      <div class="small text-muted mb-2">
+                        {{ med.pivot.amount || '' }} <span v-if="med.pivot.indications">- {{ med.pivot.indications }}</span>
+                      </div>
+                      <div class="small text-primary fst-italic" style="color: #0d6efd;" v-if="med.pivot.way">
+                        <i class="fas fa-exclamation-triangle text-warning me-1"></i>
+                        {{ med.pivot.way }}
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else class="p-3 rounded mb-3 text-muted small" style="background-color: #fcfcfc; border: 1px solid #f0f0f0;">
+                    Medicamentos no especificados en la receta digital.
+                  </div>
+
+                  <div class="small text-muted mt-2">
+                    Válida hasta: <strong class="text-dark">{{ formatDate(receta.effective_date) }}</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="alert alert-light border text-center p-5">
+              <i class="fas fa-capsules text-muted mb-3 fs-1"></i>
+              <h6 class="text-muted">No hay recetas registradas</h6>
+            </div>
+          </div>
+
+          <!-- Órdenes Médicas Tab -->
+          <div v-show="activePill === 'ordenes'">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="mb-0 font-weight-bold d-flex align-items-center text-dark">
+                <i class="fas fa-file-invoice text-primary me-2"></i> Órdenes Médicas
+              </h5>
+            </div>
+
+            <div v-if="allMedicalExams && allMedicalExams.length > 0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead class="bg-light">
+                    <tr>
+                      <th class="border-0 rounded-start">Fecha</th>
+                      <th class="border-0">Examen</th>
+                      <th class="border-0">Tipo</th>
+                      <th class="border-0">Doctor</th>
+                      <th class="border-0 rounded-end text-end">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(examData, idx) in allMedicalExams" :key="idx">
+                      <td>{{ formatDate(examData.date) }}</td>
+                      <td class="fw-bold">{{ examData.exam.name }}</td>
+                      <td>
+                        <span class="badge bg-light text-dark border">{{ examData.exam.type === 1 ? 'Laboratorio' : (examData.exam.type === 2 ? 'Imagenología' : 'Otros') }}</span>
+                      </td>
+                      <td class="text-muted small">{{ examData.doctor }}</td>
+                      <td class="text-end">
+                        <a :href="getExamPdfUrl(examData)" target="_blank" class="btn btn-sm btn-light border text-primary">
+                          <i class="fas fa-print"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div v-else class="alert alert-light border text-center p-5">
+              <i class="fas fa-file-medical text-muted mb-3 fs-1"></i>
+              <h6 class="text-muted">No hay órdenes de exámenes registradas</h6>
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- PRUEBAS PSICOLOGICAS -->
@@ -803,6 +952,24 @@
         </div>
       </div>
 
+      <!-- CONVENIOS -->
+      <div class="tab-pane fade" id="convenios" role="tabpanel">
+        <div class="card border-0 shadow-sm" style="border-radius: 12px; background-color: #fcfcfc;">
+          <div class="card-body p-5 text-center">
+             <div class="mb-4">
+                <i class="fas fa-handshake text-primary opacity-50" style="font-size: 5rem;"></i>
+             </div>
+             <h4 class="font-weight-bold text-dark mb-3">Convenios, Alianzas y Club</h4>
+             <p class="text-muted mx-auto" style="max-width: 500px; font-size: 1.1rem;">
+                Esta sección está en desarrollo. Próximamente podrá gestionar aquí todos los acuerdos institucionales, beneficios de alianzas estratégicas y membresías de Club.
+             </p>
+             <div class="mt-4">
+               <span class="badge bg-warning text-dark px-4 py-2 rounded-pill shadow-sm" style="font-size: 1rem;"><i class="fas fa-tools me-2"></i> Próximamente</span>
+             </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -821,6 +988,8 @@ export default {
       paciente: {},
       loading: true,
       timelineActivity: [],
+      activePill: 'recetas',
+      ciesData: []
     }
   },
   computed: {
@@ -868,6 +1037,24 @@ export default {
       addTest(p.millons, 'Millon');
       
       return combined.sort((a,b) => b.dateStamp - a.dateStamp);
+    },
+    allMedicalExams() {
+      let exams = [];
+      if (this.paciente.appointments) {
+        this.paciente.appointments.forEach(app => {
+          if (app.medical_exams && app.medical_exams.length > 0) {
+            app.medical_exams.forEach(exam => {
+              exams.push({
+                appointmentId: app.id,
+                date: app.date,
+                doctor: app.professional ? app.professional.name : '--',
+                exam: exam
+              });
+            });
+          }
+        });
+      }
+      return exams;
     }
   },
   methods: {
@@ -961,6 +1148,29 @@ export default {
       if(s==5) return 'bg-danger';
       return 'bg-secondary';
     },
+    getHobbies(hobbiesStr) {
+      if (!hobbiesStr) return [];
+      try {
+        return JSON.parse(hobbiesStr);
+      } catch (e) {
+        return [];
+      }
+    },
+    getEstadoNombre(codigo) {
+      const estados = {
+        1: 'Neutro',
+        2: 'Cumplidor',
+        3: 'Promotor',
+        4: 'Wow',
+        5: 'Reprogramador',
+        6: 'Exigente',
+        7: 'Deudor',
+        8: 'Insatisfecho',
+        9: 'Riesgo',
+        10: 'Problemático'
+      };
+      return estados[codigo] || 'Desconocido';
+    },
     getTriajeReferencia(ref) {
       if(ref == 1) return 'Psicológico';
       if(ref == 2) return 'Psiquiátrico';
@@ -1002,10 +1212,39 @@ export default {
       hours = hours % 12;
       hours = hours ? hours : 12; 
       return `${day} ${month} ${year} - ${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+    },
+    getCieNames(diagnosticString) {
+      if(!diagnosticString) return 'Evaluación médica general';
+      try {
+        let parsed = JSON.parse(diagnosticString);
+        if (Array.isArray(parsed) && this.ciesData && this.ciesData.length > 0) {
+           let names = parsed.map(code => {
+              let found = this.ciesData.find(c => c.id == code);
+              return found ? `${found.code} - ${found.description}` : code;
+           });
+           return names.join(', ');
+        }
+        return diagnosticString;
+      } catch (e) {
+        return diagnosticString;
+      }
+    },
+    getExamPdfUrl(examData) {
+      let examObj = {
+        appointment: examData.appointmentId.toString(),
+        name_patient: `${this.paciente.name} ${this.paciente.nombres || ''}`.trim(),
+        attention_date: examData.date.substring(0, 10),
+        medical_exams: [examData.exam]
+      };
+      let jsonStr = JSON.stringify(examObj).split('/').join('-');
+      return `/api/pdf_exam/${jsonStr}?token=${this.$token}`;
     }
   },
   mounted() {
     this.fetchPatientDetails();
+    this.axios.get('/api/cies/a').then(res => {
+      this.ciesData = res.data;
+    });
   },
   watch: {
     pacienteId() {
