@@ -51,6 +51,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       activeHistories: [],
       idUsuario: -1,
       paqueteSeleccionado: null,
+      mostrarModalPago: false,
       procesandoPago: false,
       guardandoReporte: false,
       editandoReporte: false,
@@ -351,6 +352,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           }
         }, _callee3, null, [[3, 11, 15, 18]]);
       }))();
+    },
+    abrirModalPago: function abrirModalPago(paquete) {
+      this.paqueteSeleccionado = paquete;
+      this.mostrarModalPago = true;
     },
     abrirModalReporte: function abrirModalReporte(paquete) {
       var editar = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -1149,13 +1154,9 @@ var render = function render() {
       staticClass: "text-success ms-2 badge bg-success-subtle text-success p-1 px-2 border border-success-subtle rounded-pill"
     }, [_vm._v("Cuotas al día")])]), _vm._v(" "), paquete.debe > 0 ? _c("button", {
       staticClass: "btn btn-light btn-sm shadow-sm action-btn outline-btn",
-      attrs: {
-        "data-bs-toggle": "modal",
-        "data-bs-target": "#modalPagarCuota"
-      },
       on: {
         click: function click($event) {
-          _vm.paqueteSeleccionado = paquete;
+          return _vm.abrirModalPago(paquete);
         }
       }
     }, [_c("i", {
@@ -1336,31 +1337,46 @@ var render = function render() {
       staticClass: "mb-0 text-muted"
     }, [_vm._v("Cuota: S/ " + _vm._s(_vm.calcularCuotaPromedio(deuda).toFixed(2)))])]), _vm._v(" "), _c("button", {
       staticClass: "btn btn-primary rounded-pill debt-action-btn",
-      attrs: {
-        "data-bs-toggle": "modal",
-        "data-bs-target": "#modalPagarCuota"
-      },
       on: {
         click: function click($event) {
-          _vm.paqueteSeleccionado = deuda;
+          return _vm.abrirModalPago(deuda);
         }
       }
     }, [_c("i", {
       staticClass: "far fa-credit-card me-1"
     }), _vm._v(" Registrar Pago\n              ")])])])])]);
-  }), 0)]) : _vm._e(), _vm._v(" "), _c("div", {
-    staticClass: "modal fade",
+  }), 0)]) : _vm._e(), _vm._v(" "), _c("transition", {
     attrs: {
-      id: "modalPagarCuota",
-      tabindex: "-1",
-      "aria-labelledby": "modalPagarCuotaLabel",
-      "aria-hidden": "true"
+      name: "vue-modal-fade"
+    }
+  }, [_vm.mostrarModalPago ? _c("div", {
+    staticClass: "vue-modal-overlay",
+    on: {
+      click: function click($event) {
+        if ($event.target !== $event.currentTarget) return null;
+        _vm.mostrarModalPago = false;
+      }
     }
   }, [_c("div", {
-    staticClass: "modal-dialog modal-lg"
+    staticClass: "vue-modal-box modal-lg"
   }, [_c("div", {
-    staticClass: "modal-content border-0 shadow"
-  }, [_vm._m(7), _vm._v(" "), _vm.paqueteSeleccionado ? _c("div", {
+    staticClass: "modal-header bg-primary text-white"
+  }, [_c("h5", {
+    staticClass: "modal-title"
+  }, [_c("i", {
+    staticClass: "fas fa-file-invoice-dollar me-2"
+  }), _vm._v(" Pagar Cuotas de Membresía")]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close btn-close-white",
+    attrs: {
+      type: "button",
+      "aria-label": "Close"
+    },
+    on: {
+      click: function click($event) {
+        _vm.mostrarModalPago = false;
+      }
+    }
+  })]), _vm._v(" "), _vm.paqueteSeleccionado ? _c("div", {
     staticClass: "modal-body p-4"
   }, [_c("div", {
     staticClass: "row mb-4"
@@ -1370,7 +1386,11 @@ var render = function render() {
     staticClass: "text-uppercase text-muted small fw-bold mb-1"
   }, [_vm._v("Paciente")]), _vm._v(" "), _c("div", {
     staticClass: "d-flex align-items-center"
-  }, [_vm._m(8), _vm._v(" "), _c("h6", {
+  }, [_c("div", {
+    staticClass: "bg-light rounded-circle p-2 me-2"
+  }, [_c("i", {
+    staticClass: "fas fa-user text-primary"
+  })]), _vm._v(" "), _c("h6", {
     staticClass: "mb-0 fw-bold"
   }, [_vm._v(_vm._s(_vm.paqueteSeleccionado.patient_name) + " " + _vm._s(_vm.paqueteSeleccionado.patient_nombres))])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 ps-4"
@@ -1384,7 +1404,15 @@ var render = function render() {
     staticClass: "table-responsive bg-white rounded border"
   }, [_c("table", {
     staticClass: "table table-hover mb-0 align-middle"
-  }, [_vm._m(9), _vm._v(" "), _c("tbody", [_vm._l(_vm.paqueteSeleccionado.deudas || [], function (cuota) {
+  }, [_c("thead", {
+    staticClass: "table-light"
+  }, [_c("tr", [_c("th", {
+    staticClass: "py-3"
+  }, [_vm._v("Fecha de Vencimiento")]), _vm._v(" "), _c("th", [_vm._v("Estado")]), _vm._v(" "), _c("th", {
+    staticClass: "text-end"
+  }, [_vm._v("Monto a Pagar")]), _vm._v(" "), _c("th", {
+    staticClass: "text-center"
+  }, [_vm._v("Acción")])])]), _vm._v(" "), _c("tbody", [_vm._l(_vm.paqueteSeleccionado.deudas || [], function (cuota) {
     return _c("tr", {
       key: cuota.id,
       "class": {
@@ -1431,7 +1459,19 @@ var render = function render() {
     attrs: {
       colspan: "4"
     }
-  }, [_vm._v("No existen registros de cuotas para este paquete.")])]) : _vm._e()], 2)])])]) : _vm._e(), _vm._v(" "), _vm._m(10)])])]), _vm._v(" "), _c("ModalMembresias", {
+  }, [_vm._v("No existen registros de cuotas para este paquete.")])]) : _vm._e()], 2)])])]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer bg-light"
+  }, [_c("button", {
+    staticClass: "btn btn-secondary",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        _vm.mostrarModalPago = false;
+      }
+    }
+  }, [_vm._v("Cerrar ventana")])])])]) : _vm._e()]), _vm._v(" "), _c("ModalMembresias", {
     attrs: {
       idUsuario: _vm.idUsuario,
       vista: "buscar"
@@ -1712,58 +1752,6 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fas fa-user-times"
   })]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "modal-header bg-primary text-white"
-  }, [_c("h5", {
-    staticClass: "modal-title",
-    attrs: {
-      id: "modalPagarCuotaLabel"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-file-invoice-dollar me-2"
-  }), _vm._v(" Pagar Cuotas de Membresía")]), _vm._v(" "), _c("button", {
-    staticClass: "btn-close btn-close-white",
-    attrs: {
-      type: "button",
-      "data-bs-dismiss": "modal",
-      "aria-label": "Close"
-    }
-  })]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "bg-light rounded-circle p-2 me-2"
-  }, [_c("i", {
-    staticClass: "fas fa-user text-primary"
-  })]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("thead", {
-    staticClass: "table-light"
-  }, [_c("tr", [_c("th", {
-    staticClass: "py-3"
-  }, [_vm._v("Fecha de Vencimiento")]), _vm._v(" "), _c("th", [_vm._v("Estado")]), _vm._v(" "), _c("th", {
-    staticClass: "text-end"
-  }, [_vm._v("Monto a Pagar")]), _vm._v(" "), _c("th", {
-    staticClass: "text-center"
-  }, [_vm._v("Acción")])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "modal-footer bg-light"
-  }, [_c("button", {
-    staticClass: "btn btn-secondary",
-    attrs: {
-      type: "button",
-      "data-bs-dismiss": "modal"
-    }
-  }, [_vm._v("Cerrar ventana")])]);
 }];
 render._withStripped = true;
 
@@ -2478,7 +2466,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.push([module.id, "@import url(https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap);"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.paquetes-container[data-v-27b789ef] {\r\n  font-family: 'Inter', sans-serif;\r\n  color: #334155;\r\n  background-color: #f8fafc;\r\n  min-height: 100vh;\r\n  padding: 1.5rem;\r\n  border-radius: 12px;\n}\r\n\r\n/* Header tabs */\n.module-tabs[data-v-27b789ef] {\r\n  display: flex;\r\n  gap: 0.5rem;\r\n  background: #f1f5f9;\r\n  border-radius: 999px;\r\n  padding: 0.25rem;\n}\n.module-tab-btn[data-v-27b789ef] {\r\n  border: none;\r\n  color: #64748b;\r\n  border-radius: 999px;\r\n  font-weight: 600;\r\n  padding: 0.35rem 0.85rem;\n}\n.module-tab-btn.active[data-v-27b789ef] {\r\n  background: #1d4ed8;\r\n  color: #fff;\n}\n.module-tab-btn.active .badge[data-v-27b789ef] {\r\n  background: #fff !important;\r\n  color: #dc2626;\n}\r\n\r\n/* Search Box */\n.search-box[data-v-27b789ef] {\r\n  position: relative;\r\n  width: 100%;\r\n  max-width: 380px;\n}\n.search-box .search-icon[data-v-27b789ef] {\r\n  position: absolute;\r\n  left: 14px;\r\n  top: 50%;\r\n  transform: translateY(-50%);\r\n  color: #94a3b8;\n}\n.search-box input[data-v-27b789ef] {\r\n  padding-left: 40px;\r\n  border-radius: 8px;\r\n  border: 1px solid #cbd5e1;\r\n  background: #fff;\r\n  transition: all 0.2s;\r\n  box-shadow: 0 1px 2px rgba(0,0,0,0.02);\n}\n.search-box input[data-v-27b789ef]:focus {\r\n  border-color: #3b82f6;\r\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);\r\n  outline: none;\n}\r\n\r\n/* Metric Cards */\n.summary-card[data-v-27b789ef] {\r\n  border-radius: 12px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.summary-card[data-v-27b789ef]:hover {\r\n  transform: translateY(-3px);\r\n  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.03) !important;\n}\r\n\r\n/* Filters */\n.filter-label[data-v-27b789ef] {\r\n  width: 60px;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.btn-filter[data-v-27b789ef] {\r\n  background: transparent;\r\n  color: #64748b;\r\n  border: none;\r\n  font-weight: 500;\r\n  padding: 0.4rem 1rem;\r\n  border-radius: 20px;\r\n  transition: all 0.2s;\n}\n.btn-filter[data-v-27b789ef]:hover {\r\n  background: #f1f5f9;\r\n  color: #0f172a;\n}\n.btn-filter.active[data-v-27b789ef] {\r\n  background: #3b82f6;\r\n  color: white;\r\n  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);\n}\r\n\r\n/* Package List */\n.package-card[data-v-27b789ef] {\r\n  border-radius: 14px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.package-card[data-v-27b789ef]:hover {\r\n  box-shadow: 0 10px 20px -5px rgba(0,0,0,0.06), 0 8px 10px -6px rgba(0,0,0,0.04) !important;\n}\n.border-active[data-v-27b789ef] {\r\n  border-left: 5px solid #f59e0b !important;\n}\n.border-completed[data-v-27b789ef] {\r\n  border-left: 5px solid #3b82f6 !important;\n}\n.package-icon[data-v-27b789ef] {\r\n  width: 48px;\r\n  height: 48px;\r\n  border-radius: 12px;\r\n  background: #eff6ff;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 1.5rem;\n}\n.package-title[data-v-27b789ef] {\r\n  color: #0f172a;\r\n  font-size: 1.15rem;\n}\r\n\r\n/* Badges */\n.status-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  font-weight: 600;\r\n  text-transform: uppercase;\r\n  letter-spacing: 0.03em;\n}\n.status-act[data-v-27b789ef] { background: #dcfce7; color: #166534;\n}\n.status-com[data-v-27b789ef] { background: #dbeafe; color: #1e3a8a;\n}\n.status-pen[data-v-27b789ef] { background: #fef9c3; color: #854d0e;\n}\n.status-can[data-v-27b789ef] { background: #fee2e2; color: #991b1b;\n}\n.status-def[data-v-27b789ef] { background: #f1f5f9; color: #475569;\n}\n.type-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  background: #e0f2fe;\r\n  color: #0369a1;\r\n  font-weight: 600;\n}\n.custom-textarea[data-v-27b789ef] {\r\n  border: 1px solid #e2e8f0;\r\n  border-radius: 10px;\r\n  padding: 0.75rem 1rem;\r\n  font-size: 0.95rem;\r\n  transition: all 0.2s;\r\n  background-color: #f8fafc;\n}\n.custom-textarea[data-v-27b789ef]:focus {\r\n  background-color: #fff;\r\n  border-color: #3b82f6;\r\n  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);\n}\n.hover-link[data-v-27b789ef]:hover {\r\n  text-decoration: underline !important;\r\n  opacity: 0.8;\n}\r\n\r\n/* Progress bar smoothing */\n.progress-bar[data-v-27b789ef] {\r\n  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);\n}\r\n\r\n/* Buttons */\n.outline-btn[data-v-27b789ef] {\r\n  border: 1px solid #e2e8f0;\r\n  background: white;\r\n  color: #475569;\r\n  font-weight: 500;\r\n  border-radius: 6px;\r\n  transition: all 0.2s;\n}\n.outline-btn[data-v-27b789ef]:hover {\r\n  background: #f8fafc;\r\n  color: #0f172a;\r\n  border-color: #cbd5e1;\n}\n.hover-link[data-v-27b789ef] {\r\n  transition: color 0.2s;\n}\n.hover-link[data-v-27b789ef]:hover {\r\n  color: #0f172a !important;\n}\n.dropdown-toggle-link[data-v-27b789ef] {\r\n  color: #3b82f6;\r\n  font-weight: 500;\n}\n.dropdown-toggle-link[data-v-27b789ef]:hover {\r\n  color: #2563eb;\n}\n.info-meta span[data-v-27b789ef] {\r\n  font-size: 0.875rem;\n}\n.history-list-container[data-v-27b789ef] {\r\n  max-height: 250px;\r\n  overflow-y: auto;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar {\r\n  width: 6px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-track {\r\n  background: #f1f5f9;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb {\r\n  background: #cbd5e1; \r\n  border-radius: 10px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb:hover {\r\n  background: #94a3b8;\n}\n.history-item[data-v-27b789ef]:last-child {\r\n  border-bottom: none !important;\n}\r\n\r\n/* Deudas */\n.debt-summary-card[data-v-27b789ef] {\r\n  background: #f8fafc;\r\n  border: 1px solid #e2e8f0;\r\n  border-radius: 16px;\r\n  padding: 1.2rem 1.4rem;\n}\n.debt-summary-card p[data-v-27b789ef] {\r\n  color: #64748b;\r\n  font-size: 1.05rem;\n}\n.debt-card[data-v-27b789ef] {\r\n  border: 1px solid #fecaca;\r\n  border-radius: 18px;\r\n  background: #fff;\r\n  padding: 1.8rem;\n}\n.debt-icon[data-v-27b789ef] {\r\n  width: 68px;\r\n  height: 68px;\r\n  border-radius: 16px;\r\n  background: #fee2e2;\r\n  color: #ef4444;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 2rem;\n}\n.debt-meta[data-v-27b789ef] {\r\n  font-size: 1.05rem;\n}\n.debt-progress-label[data-v-27b789ef] {\r\n  font-size: 1.05rem;\n}\n.debt-progress[data-v-27b789ef] {\r\n  width: 100%;\r\n  height: 12px;\r\n  border-radius: 999px;\r\n  background: #f97316;\r\n  overflow: hidden;\n}\n.debt-progress-paid[data-v-27b789ef] {\r\n  height: 100%;\r\n  background: #2563eb;\r\n  border-radius: 999px 0 0 999px;\n}\n.debt-amount[data-v-27b789ef] {\r\n  color: #ef4444;\r\n  font-weight: 700;\r\n  font-size: 16px;\n}\n.debt-action-btn[data-v-27b789ef] {\r\n  padding: 0.55rem 1.2rem;\r\n  font-weight: 600;\r\n  font-size: 1.05rem;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.paquetes-container[data-v-27b789ef] {\r\n  font-family: 'Inter', sans-serif;\r\n  color: #334155;\r\n  background-color: #f8fafc;\r\n  min-height: 100vh;\r\n  padding: 1.5rem;\r\n  border-radius: 12px;\n}\r\n\r\n/* Header tabs */\n.module-tabs[data-v-27b789ef] {\r\n  display: flex;\r\n  gap: 0.5rem;\r\n  background: #f1f5f9;\r\n  border-radius: 999px;\r\n  padding: 0.25rem;\n}\n.module-tab-btn[data-v-27b789ef] {\r\n  border: none;\r\n  color: #64748b;\r\n  border-radius: 999px;\r\n  font-weight: 600;\r\n  padding: 0.35rem 0.85rem;\n}\n.module-tab-btn.active[data-v-27b789ef] {\r\n  background: #1d4ed8;\r\n  color: #fff;\n}\n.module-tab-btn.active .badge[data-v-27b789ef] {\r\n  background: #fff !important;\r\n  color: #dc2626;\n}\r\n\r\n/* Search Box */\n.search-box[data-v-27b789ef] {\r\n  position: relative;\r\n  width: 100%;\r\n  max-width: 380px;\n}\n.search-box .search-icon[data-v-27b789ef] {\r\n  position: absolute;\r\n  left: 14px;\r\n  top: 50%;\r\n  transform: translateY(-50%);\r\n  color: #94a3b8;\n}\n.search-box input[data-v-27b789ef] {\r\n  padding-left: 40px;\r\n  border-radius: 8px;\r\n  border: 1px solid #cbd5e1;\r\n  background: #fff;\r\n  transition: all 0.2s;\r\n  box-shadow: 0 1px 2px rgba(0,0,0,0.02);\n}\n.search-box input[data-v-27b789ef]:focus {\r\n  border-color: #3b82f6;\r\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);\r\n  outline: none;\n}\r\n\r\n/* Metric Cards */\n.summary-card[data-v-27b789ef] {\r\n  border-radius: 12px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.summary-card[data-v-27b789ef]:hover {\r\n  transform: translateY(-3px);\r\n  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.03) !important;\n}\r\n\r\n/* Filters */\n.filter-label[data-v-27b789ef] {\r\n  width: 60px;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.btn-filter[data-v-27b789ef] {\r\n  background: transparent;\r\n  color: #64748b;\r\n  border: none;\r\n  font-weight: 500;\r\n  padding: 0.4rem 1rem;\r\n  border-radius: 20px;\r\n  transition: all 0.2s;\n}\n.btn-filter[data-v-27b789ef]:hover {\r\n  background: #f1f5f9;\r\n  color: #0f172a;\n}\n.btn-filter.active[data-v-27b789ef] {\r\n  background: #3b82f6;\r\n  color: white;\r\n  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);\n}\r\n\r\n/* Package List */\n.package-card[data-v-27b789ef] {\r\n  border-radius: 14px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.package-card[data-v-27b789ef]:hover {\r\n  box-shadow: 0 10px 20px -5px rgba(0,0,0,0.06), 0 8px 10px -6px rgba(0,0,0,0.04) !important;\n}\n.border-active[data-v-27b789ef] {\r\n  border-left: 5px solid #f59e0b !important;\n}\n.border-completed[data-v-27b789ef] {\r\n  border-left: 5px solid #3b82f6 !important;\n}\n.package-icon[data-v-27b789ef] {\r\n  width: 48px;\r\n  height: 48px;\r\n  border-radius: 12px;\r\n  background: #eff6ff;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 1.5rem;\n}\n.package-title[data-v-27b789ef] {\r\n  color: #0f172a;\r\n  font-size: 1.15rem;\n}\r\n\r\n/* Badges */\n.status-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  font-weight: 600;\r\n  text-transform: uppercase;\r\n  letter-spacing: 0.03em;\n}\n.status-act[data-v-27b789ef] { background: #dcfce7; color: #166534;\n}\n.status-com[data-v-27b789ef] { background: #dbeafe; color: #1e3a8a;\n}\n.status-pen[data-v-27b789ef] { background: #fef9c3; color: #854d0e;\n}\n.status-can[data-v-27b789ef] { background: #fee2e2; color: #991b1b;\n}\n.status-def[data-v-27b789ef] { background: #f1f5f9; color: #475569;\n}\n.type-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  background: #e0f2fe;\r\n  color: #0369a1;\r\n  font-weight: 600;\n}\n.custom-textarea[data-v-27b789ef] {\r\n  border: 1px solid #e2e8f0;\r\n  border-radius: 10px;\r\n  padding: 0.75rem 1rem;\r\n  font-size: 0.95rem;\r\n  transition: all 0.2s;\r\n  background-color: #f8fafc;\n}\n.custom-textarea[data-v-27b789ef]:focus {\r\n  background-color: #fff;\r\n  border-color: #3b82f6;\r\n  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);\n}\n.hover-link[data-v-27b789ef]:hover {\r\n  text-decoration: underline !important;\r\n  opacity: 0.8;\n}\r\n\r\n/* Progress bar smoothing */\n.progress-bar[data-v-27b789ef] {\r\n  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);\n}\r\n\r\n/* Buttons */\n.outline-btn[data-v-27b789ef] {\r\n  border: 1px solid #e2e8f0;\r\n  background: white;\r\n  color: #475569;\r\n  font-weight: 500;\r\n  border-radius: 6px;\r\n  transition: all 0.2s;\n}\n.outline-btn[data-v-27b789ef]:hover {\r\n  background: #f8fafc;\r\n  color: #0f172a;\r\n  border-color: #cbd5e1;\n}\n.hover-link[data-v-27b789ef] {\r\n  transition: color 0.2s;\n}\n.hover-link[data-v-27b789ef]:hover {\r\n  color: #0f172a !important;\n}\n.dropdown-toggle-link[data-v-27b789ef] {\r\n  color: #3b82f6;\r\n  font-weight: 500;\n}\n.dropdown-toggle-link[data-v-27b789ef]:hover {\r\n  color: #2563eb;\n}\n.info-meta span[data-v-27b789ef] {\r\n  font-size: 0.875rem;\n}\n.history-list-container[data-v-27b789ef] {\r\n  max-height: 250px;\r\n  overflow-y: auto;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar {\r\n  width: 6px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-track {\r\n  background: #f1f5f9;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb {\r\n  background: #cbd5e1; \r\n  border-radius: 10px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb:hover {\r\n  background: #94a3b8;\n}\n.history-item[data-v-27b789ef]:last-child {\r\n  border-bottom: none !important;\n}\r\n\r\n/* Deudas */\n.debt-summary-card[data-v-27b789ef] {\r\n  background: #f8fafc;\r\n  border: 1px solid #e2e8f0;\r\n  border-radius: 16px;\r\n  padding: 1.2rem 1.4rem;\n}\n.debt-summary-card p[data-v-27b789ef] {\r\n  color: #64748b;\r\n  font-size: 1.05rem;\n}\n.debt-card[data-v-27b789ef] {\r\n  border: 1px solid #fecaca;\r\n  border-radius: 18px;\r\n  background: #fff;\r\n  padding: 1.8rem;\n}\n.debt-icon[data-v-27b789ef] {\r\n  width: 68px;\r\n  height: 68px;\r\n  border-radius: 16px;\r\n  background: #fee2e2;\r\n  color: #ef4444;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 2rem;\n}\n.debt-meta[data-v-27b789ef] {\r\n  font-size: 1.05rem;\n}\n.debt-progress-label[data-v-27b789ef] {\r\n  font-size: 1.05rem;\n}\n.debt-progress[data-v-27b789ef] {\r\n  width: 100%;\r\n  height: 12px;\r\n  border-radius: 999px;\r\n  background: #f97316;\r\n  overflow: hidden;\n}\n.debt-progress-paid[data-v-27b789ef] {\r\n  height: 100%;\r\n  background: #2563eb;\r\n  border-radius: 999px 0 0 999px;\n}\n.debt-amount[data-v-27b789ef] {\r\n  color: #ef4444;\r\n  font-weight: 700;\r\n  font-size: 16px;\n}\n.debt-action-btn[data-v-27b789ef] {\r\n  padding: 0.55rem 1.2rem;\r\n  font-weight: 600;\r\n  font-size: 1.05rem;\n}\r\n\r\n/* Vue Modal Overlay - Bypasea el sistema de modales de Bootstrap */\n.vue-modal-overlay[data-v-27b789ef] {\r\n  position: fixed;\r\n  top: 0;\r\n  left: 0;\r\n  width: 100vw;\r\n  height: 100vh;\r\n  background: rgba(0, 0, 0, 0.5);\r\n  z-index: 99999;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  padding: 1rem;\n}\n.vue-modal-box[data-v-27b789ef] {\r\n  background: #fff;\r\n  border-radius: 12px;\r\n  box-shadow: 0 20px 60px rgba(0,0,0,0.3);\r\n  width: 100%;\r\n  max-width: 800px;\r\n  max-height: 90vh;\r\n  overflow-y: auto;\r\n  display: flex;\r\n  flex-direction: column;\n}\n.vue-modal-box .modal-header[data-v-27b789ef] {\r\n  border-radius: 12px 12px 0 0;\r\n  flex-shrink: 0;\n}\n.vue-modal-box .modal-footer[data-v-27b789ef] {\r\n  border-radius: 0 0 12px 12px;\r\n  flex-shrink: 0;\n}\r\n/* Transition */\n.vue-modal-fade-enter-active[data-v-27b789ef],\r\n.vue-modal-fade-leave-active[data-v-27b789ef] {\r\n  transition: opacity 0.2s ease;\n}\n.vue-modal-fade-enter-from[data-v-27b789ef],\r\n.vue-modal-fade-leave-to[data-v-27b789ef] {\r\n  opacity: 0;\n}\n.vue-modal-fade-enter[data-v-27b789ef],\r\n.vue-modal-fade-leave-to[data-v-27b789ef] {\r\n  opacity: 0;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

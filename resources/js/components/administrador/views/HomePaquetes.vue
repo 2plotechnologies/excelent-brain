@@ -202,9 +202,7 @@
               </div>
               <button class="btn btn-light btn-sm shadow-sm action-btn outline-btn" 
                 v-if="paquete.debe > 0" 
-                data-bs-toggle="modal" 
-                data-bs-target="#modalPagarCuota" 
-                @click="paqueteSeleccionado = paquete">
+                @click="abrirModalPago(paquete)">
                 <i class="far fa-credit-card me-1"></i> Pagar cuota
               </button>
             </div>
@@ -318,9 +316,7 @@
                 </div>
                 <button
                   class="btn btn-primary rounded-pill debt-action-btn"
-                  data-bs-toggle="modal"
-                  data-bs-target="#modalPagarCuota"
-                  @click="paqueteSeleccionado = deuda"
+                  @click="abrirModalPago(deuda)"
                 >
                   <i class="far fa-credit-card me-1"></i> Registrar Pago
                 </button>
@@ -331,13 +327,13 @@
       </div>
     </div>
 
-    <!-- Modal Pagar Cuota -->
-    <div class="modal fade" id="modalPagarCuota" tabindex="-1" aria-labelledby="modalPagarCuotaLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content border-0 shadow">
+    <!-- Modal Pagar Cuota (overlay Vue - bypasea Bootstrap para evitar problemas de z-index con sb-admin-2) -->
+    <transition name="vue-modal-fade">
+      <div v-if="mostrarModalPago" class="vue-modal-overlay" @click.self="mostrarModalPago = false">
+        <div class="vue-modal-box modal-lg">
           <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title" id="modalPagarCuotaLabel"><i class="fas fa-file-invoice-dollar me-2"></i> Pagar Cuotas de Membresía</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h5 class="modal-title"><i class="fas fa-file-invoice-dollar me-2"></i> Pagar Cuotas de Membresía</h5>
+            <button type="button" class="btn-close btn-close-white" @click="mostrarModalPago = false" aria-label="Close"></button>
           </div>
           <div class="modal-body p-4" v-if="paqueteSeleccionado">
             
@@ -400,11 +396,11 @@
 
           </div>
           <div class="modal-footer bg-light">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar ventana</button>
+            <button type="button" class="btn btn-secondary" @click="mostrarModalPago = false">Cerrar ventana</button>
           </div>
         </div>
       </div>
-    </div>
+    </transition>
 
     <ModalMembresias :idUsuario="idUsuario" vista="buscar" @membresiaGuardada="cargarPaquetes(1)"></ModalMembresias>
 
@@ -504,6 +500,7 @@ export default {
       activeHistories: [],
       idUsuario: -1,
       paqueteSeleccionado: null,
+      mostrarModalPago: false,
       procesandoPago: false,
       guardandoReporte: false,
       editandoReporte: false,
@@ -704,6 +701,10 @@ export default {
       } finally {
         this.procesandoPago = false;
       }
+    },
+    abrirModalPago(paquete) {
+      this.paqueteSeleccionado = paquete;
+      this.mostrarModalPago = true;
     },
     abrirModalReporte(paquete, editar = false) {
       this.paqueteSeleccionado = paquete;
@@ -1051,4 +1052,52 @@ export default {
   font-weight: 600;
   font-size: 1.05rem;
 }
+
+/* Vue Modal Overlay - Bypasea el sistema de modales de Bootstrap */
+.vue-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.vue-modal-box {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.vue-modal-box .modal-header {
+  border-radius: 12px 12px 0 0;
+  flex-shrink: 0;
+}
+.vue-modal-box .modal-footer {
+  border-radius: 0 0 12px 12px;
+  flex-shrink: 0;
+}
+/* Transition */
+.vue-modal-fade-enter-active,
+.vue-modal-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.vue-modal-fade-enter-from,
+.vue-modal-fade-leave-to {
+  opacity: 0;
+}
+.vue-modal-fade-enter,
+.vue-modal-fade-leave-to {
+  opacity: 0;
+}
 </style>
+
