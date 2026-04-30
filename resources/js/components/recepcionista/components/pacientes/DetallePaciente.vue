@@ -51,6 +51,11 @@
         <button class="nav-link font-weight-bold small text-muted" id="triaje-tab" data-bs-toggle="tab" data-bs-target="#triaje" type="button" role="tab" >Triaje & Seguridad</button>
       </li>
       <li class="nav-item" role="presentation">
+        <button class="nav-link font-weight-bold small text-muted" id="seguimiento-tab" data-bs-toggle="tab" data-bs-target="#seguimiento" type="button" role="tab" >
+          <i class="fas fa-clipboard-list me-1"></i> Ficha de Seguimiento
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
         <button class="nav-link font-weight-bold small text-muted" id="recetas-tab" data-bs-toggle="tab" data-bs-target="#recetas" type="button" role="tab" >Recetas & Órdenes</button>
       </li>
       <li class="nav-item" role="presentation">
@@ -713,6 +718,349 @@
               </div>
             </div>
           </div>
+
+          <!-- PLANES DE SEGURIDAD -->
+          <div class="col-12 mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="card-title font-weight-bold mb-0">
+                <i class="fas fa-shield-alt text-danger me-2"></i> Plan de Seguridad
+              </h5>
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary btn-sm rounded-pill shadow-sm px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#modalPlanSeguridad" @click="abrirNuevoPlan">
+                  <i class="fas fa-plus me-1"></i> Nuevo Plan
+                </button>
+              </div>
+            </div>
+
+            <div v-if="paciente.planes_seguridad && paciente.planes_seguridad.length > 0">
+              <div class="card border-0 shadow-sm mb-4 rounded-lg" v-for="plan in paciente.planes_seguridad" :key="plan.id" style="background-color: #fcfcfc;">
+                <div class="card-body p-4">
+                  <!-- Header del Plan -->
+                  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div class="d-flex align-items-center">
+                      <div class="rounded-circle bg-danger bg-opacity-10 d-flex justify-content-center align-items-center me-3" style="width: 45px; height: 45px; min-width: 45px;">
+                        <i class="fas fa-shield-alt fs-5"></i>
+                      </div>
+                      <div>
+                        <h6 class="font-weight-bold mb-1 text-dark">Plan de Seguridad - {{ paciente.name }} {{ paciente.nombres }}</h6>
+                        <div class="small text-muted">
+                          Creado: {{ formatDate(plan.fecha) }}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                      <button class="btn btn-light btn-sm rounded shadow-sm border text-muted" @click="descargarPlanPDF(plan)">
+                        <i class="fas fa-download me-1"></i> Descargar PDF
+                      </button>
+                      <button class="btn btn-light btn-sm rounded shadow-sm border text-dark" data-bs-toggle="modal" data-bs-target="#modalVerPlanSeguridad" @click="verPlanSeguridad(plan)">
+                        <i class="fas fa-eye me-1"></i> Ver Completo
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Columnas del Plan -->
+                  <div class="row g-3">
+                    <!-- Señales de Advertencia -->
+                    <div class="col-md-4">
+                      <div class="bg-white p-3 rounded border h-100 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                          <h6 class="small text-muted font-weight-bold text-uppercase mb-0" style="letter-spacing: 0.5px;">
+                            <i class="fas fa-exclamation-triangle text-warning me-1"></i> Señales de advertencia
+                          </h6>
+                          <span class="badge bg-light text-muted rounded-circle">{{ countItems(plan.senales_advertencia) }}</span>
+                        </div>
+                        <ul class="list-unstyled small text-dark mb-0 ps-2" style="list-style-type: disc;">
+                          <li v-for="(item, idx) in previewItems(plan.senales_advertencia)" :key="idx" class="mb-1 text-truncate">{{ item }}</li>
+                        </ul>
+                        <div v-if="countItems(plan.senales_advertencia) > 3" class="small text-primary mt-2">
+                          +{{ countItems(plan.senales_advertencia) - 3 }} más...
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Estrategias de Afrontamiento -->
+                    <div class="col-md-4">
+                      <div class="bg-white p-3 rounded border h-100 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                          <h6 class="small text-muted font-weight-bold text-uppercase mb-0" style="letter-spacing: 0.5px;">
+                            <i class="fas fa-brain text-primary me-1"></i> Estrategias de afrontamiento
+                          </h6>
+                          <span class="badge bg-light text-muted rounded-circle">{{ countItems(plan.estrategias) }}</span>
+                        </div>
+                        <ul class="list-unstyled small text-dark mb-0 ps-2" style="list-style-type: disc;">
+                          <li v-for="(item, idx) in previewItems(plan.estrategias)" :key="idx" class="mb-1 text-truncate">{{ item }}</li>
+                        </ul>
+                        <div v-if="countItems(plan.estrategias) > 3" class="small text-primary mt-2">
+                          +{{ countItems(plan.estrategias) - 3 }} más...
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Razones para vivir -->
+                    <div class="col-md-4">
+                      <div class="bg-white p-3 rounded border h-100 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                          <h6 class="small text-muted font-weight-bold text-uppercase mb-0" style="letter-spacing: 0.5px;">
+                            <i class="far fa-smile text-success me-1"></i> Razones para vivir
+                          </h6>
+                          <span class="badge bg-light text-muted rounded-circle">{{ countItems(plan.razones_vivir) }}</span>
+                        </div>
+                        <ul class="list-unstyled small text-dark mb-0 ps-2" style="list-style-type: disc;">
+                          <li v-for="(item, idx) in previewItems(plan.razones_vivir)" :key="idx" class="mb-1 text-truncate">{{ item }}</li>
+                        </ul>
+                        <div v-if="countItems(plan.razones_vivir) > 3" class="small text-primary mt-2">
+                          +{{ countItems(plan.razones_vivir) - 3 }} más...
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="alert alert-light text-center border py-4 mb-4">
+              <i class="fas fa-shield-alt text-muted mb-3 fs-2 d-block"></i>
+              <h6 class="text-muted">No existen planes de seguridad registrados para este paciente.</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FICHA DE SEGUIMIENTO -->
+      <div class="tab-pane fade" id="seguimiento" role="tabpanel">
+        <div class="row" v-if="fichaView === 'botones'">
+          <div class="col-12 mb-4">
+            <h5 class="card-title font-weight-bold mb-1"><i class="fas fa-clipboard-list text-primary me-2"></i> Ficha de Seguimiento</h5>
+            <p class="text-muted small mb-4">Registre el plan de tratamiento recomendado al paciente.</p>
+            
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="card h-100 border rounded-lg hover-shadow transition" style="cursor: pointer;" @click="fichaView = 'nueva'">
+                  <div class="card-body text-center p-5">
+                    <div class="rounded-circle bg-white bg-opacity-10 text-primary d-flex justify-content-center align-items-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                      <i class="fas fa-plus fs-4"></i>
+                    </div>
+                    <h5 class="font-weight-bold text-dark mb-2">Nueva Ficha</h5>
+                    <p class="text-muted small mb-0">Crear un nuevo plan de seguimiento</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card h-100 border rounded-lg hover-shadow transition" style="cursor: pointer;" @click="fichaView = 'historica'">
+                  <div class="card-body text-center p-5">
+                    <div class="rounded-circle bg-light text-secondary border d-flex justify-content-center align-items-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                      <i class="fas fa-file-alt fs-4"></i>
+                    </div>
+                    <h5 class="font-weight-bold text-dark mb-2">Ficha Histórica</h5>
+                    <p class="text-muted small mb-0">{{ paciente.fichas_seguimiento ? paciente.fichas_seguimiento.length : 0 }} fichas registradas</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="fichaView === 'nueva'">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="font-weight-bold mb-0">Nueva Ficha de Seguimiento</h5>
+            <button class="btn btn-light btn-sm rounded shadow-sm border" @click="fichaView = 'botones'">
+              Cancelar
+            </button>
+          </div>
+
+          <div class="card border-0 shadow-sm rounded-lg mb-4" style="background-color: #fcfcfc;">
+            <div class="card-body p-4">
+              <form @submit.prevent="guardarFichaSeguimiento">
+                <!-- I. Seguimiento de Citas -->
+                <h6 class="font-weight-bold small mb-3">I. Seguimiento de Citas <span class="text-danger">*</span></h6>
+                <div class="mb-4 bg-white p-3 border rounded shadow-sm">
+                  <label class="form-label small text-muted">Tipo de Paquete</label>
+                  <select class="form-select form-select-sm" v-model="nuevaFicha.tipo" required>
+                    <option value="" disabled>Seleccionar paquete...</option>
+                    <option value="Paquete de sesiones">Paquete de sesiones</option>
+                    <option value="Citas individuales">Citas individuales</option>
+                    <option value="Evaluación">Evaluación</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+
+                <!-- II. Frecuencia -->
+                <h6 class="font-weight-bold small mb-3">II. Frecuencia <span class="text-danger">*</span></h6>
+                <div class="mb-4 bg-white p-3 border rounded shadow-sm">
+                  <div class="mb-3">
+                    <select class="form-select form-select-sm" v-model="nuevaFicha.frecuencia" required>
+                      <option value="" disabled>Seleccionar frecuencia...</option>
+                      <option value="1 vez por semana">1 vez por semana</option>
+                      <option value="Quincenal">Quincenal</option>
+                      <option value="Mensual">Mensual</option>
+                      <option value="Otro">Otro</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="form-label small text-muted">Motivo</label>
+                    <textarea class="form-control form-control-sm" rows="2" placeholder="Motivo de la frecuencia seleccionada..." v-model="nuevaFicha.motivo" required></textarea>
+                  </div>
+                </div>
+
+                <!-- III. Profesional -->
+                <h6 class="font-weight-bold small mb-3">III. Profesional <span class="text-danger">*</span></h6>
+                <div class="mb-4 bg-white p-3 border rounded shadow-sm d-flex align-items-center justify-content-between flex-wrap gap-2">
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-user-md text-success me-2"></i>
+                    <select class="form-select form-select-sm border-0 bg-transparent fw-bold text-dark w-auto" v-model="nuevaFicha.professional_id" required>
+                      <option value="" disabled>Seleccionar profesional...</option>
+                      <option v-for="prof in professionalsList" :key="prof.id" :value="prof.id">{{ prof.name }}</option>
+                    </select>
+                  </div>
+                  <span class="badge bg-light text-muted border">Asignado automáticamente</span>
+                </div>
+
+                <!-- IV. Interconsulta -->
+                <h6 class="font-weight-bold small mb-3 d-flex align-items-center">IV. Interconsulta <span class="text-muted ms-1" style="font-weight: 400; font-size: 0.8rem;">(Opcional)</span></h6>
+                <div class="mb-4 bg-white p-3 border rounded shadow-sm">
+                  <div v-for="(item, index) in nuevaFicha.interconsultas" :key="index" class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
+                    <div class="small">
+                      <strong class="text-dark">{{ item.tipo }}</strong> <span class="text-muted mx-1">-</span> <span>{{ getProfessionalName(item.professional_id) }}</span>
+                      <p class="text-muted mb-0 mt-1" v-if="item.motivo">Motivo: {{ item.motivo }}</p>
+                    </div>
+                    <button type="button" class="btn btn-link text-danger p-0" @click="eliminarInterconsulta(index)"><i class="far fa-trash-alt"></i></button>
+                  </div>
+
+                  <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                      <select class="form-select form-select-sm" v-model="tempInterconsulta.tipo">
+                        <option value="" disabled>Especialidad...</option>
+                        <option value="Psicología">Psicología</option>
+                        <option value="Psiquiatría">Psiquiatría</option>
+                        <option value="Neurología">Neurología</option>
+                        <option value="Terapia de Lenguaje">Terapia de Lenguaje</option>
+                        <option value="Terapia Ocupacional">Terapia Ocupacional</option>
+                        <option value="Nutrición">Nutrición</option>
+                        <option value="Otro">Otro</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <select class="form-select form-select-sm" v-model="tempInterconsulta.professional_id">
+                        <option value="" disabled>Profesional...</option>
+                        <option v-for="prof in professionalsList" :key="prof.id" :value="prof.id">{{ prof.name }}</option>
+                      </select>
+                    </div>
+                    <div class="col-12 mt-2">
+                      <textarea class="form-control form-control-sm" rows="1" placeholder="Motivo de la interconsulta..." v-model="tempInterconsulta.motivo"></textarea>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" @click="agregarInterconsulta" :disabled="!tempInterconsulta.tipo || !tempInterconsulta.professional_id">Agregar</button>
+                  <button type="button" class="btn btn-light btn-sm rounded-pill px-3 ms-2" @click="limpiarInterconsulta" v-if="tempInterconsulta.tipo || tempInterconsulta.professional_id">Cancelar</button>
+                </div>
+
+                <!-- V. Recomendaciones -->
+                <h6 class="font-weight-bold small mb-3 d-flex align-items-center">V. Recomendaciones <span class="text-muted ms-1" style="font-weight: 400; font-size: 0.8rem;">(Opcional)</span></h6>
+                <div class="mb-4 bg-white p-3 border rounded shadow-sm">
+                  
+                  <div class="mb-3">
+                    <label class="d-block small text-dark fw-bold mb-2">Grupo De Habilidades</label>
+                    <div class="d-flex flex-wrap gap-2">
+                      <button type="button" class="btn btn-sm rounded-pill px-3 border" :class="isSelectedRecomendacion('Grupo De Habilidades - Niños/Adolescentes') ? 'btn-primary bg-opacity-10 text-primary border-primary' : 'bg-white text-muted'" @click="toggleRecomendacion('Grupo De Habilidades - Niños/Adolescentes')">
+                        <i class="fas fa-check-circle me-1" v-if="isSelectedRecomendacion('Grupo De Habilidades - Niños/Adolescentes')"></i>
+                        <i class="far fa-circle me-1" v-else></i> Niños/Adolescentes
+                      </button>
+                      <button type="button" class="btn btn-sm rounded-pill px-3 border" :class="isSelectedRecomendacion('Grupo De Habilidades - Adultos') ? 'btn-primary bg-opacity-10 text-primary border-primary' : 'bg-white text-muted'" @click="toggleRecomendacion('Grupo De Habilidades - Adultos')">
+                        <i class="fas fa-check-circle me-1" v-if="isSelectedRecomendacion('Grupo De Habilidades - Adultos')"></i>
+                        <i class="far fa-circle me-1" v-else></i> Adultos
+                      </button>
+                      <button type="button" class="btn btn-sm rounded-pill px-3 border" :class="isSelectedRecomendacion('Grupo De Habilidades - Terapia Ocupacional') ? 'btn-primary bg-opacity-10 text-primary border-primary' : 'bg-white text-muted'" @click="toggleRecomendacion('Grupo De Habilidades - Terapia Ocupacional')">
+                        <i class="fas fa-check-circle me-1" v-if="isSelectedRecomendacion('Grupo De Habilidades - Terapia Ocupacional')"></i>
+                        <i class="far fa-circle me-1" v-else></i> Terapia Ocupacional
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="d-block small text-dark fw-bold mb-2">Talleres</label>
+                    <div class="d-flex flex-wrap gap-2">
+                      <button type="button" class="btn btn-sm rounded-pill px-3 border" :class="isSelectedRecomendacion('Talleres - Niños/Adolescentes') ? 'btn-primary bg-opacity-10 text-primary border-primary' : 'bg-white text-muted'" @click="toggleRecomendacion('Talleres - Niños/Adolescentes')">
+                        <i class="fas fa-check-circle me-1" v-if="isSelectedRecomendacion('Talleres - Niños/Adolescentes')"></i>
+                        <i class="far fa-circle me-1" v-else></i> Niños/Adolescentes
+                      </button>
+                      <button type="button" class="btn btn-sm rounded-pill px-3 border" :class="isSelectedRecomendacion('Talleres - Adultos') ? 'btn-primary bg-opacity-10 text-primary border-primary' : 'bg-white text-muted'" @click="toggleRecomendacion('Talleres - Adultos')">
+                        <i class="fas fa-check-circle me-1" v-if="isSelectedRecomendacion('Talleres - Adultos')"></i>
+                        <i class="far fa-circle me-1" v-else></i> Adultos
+                      </button>
+                      <button type="button" class="btn btn-sm rounded-pill px-3 border" :class="isSelectedRecomendacion('Talleres - Terapia Ocupacional') ? 'btn-primary bg-opacity-10 text-primary border-primary' : 'bg-white text-muted'" @click="toggleRecomendacion('Talleres - Terapia Ocupacional')">
+                        <i class="fas fa-check-circle me-1" v-if="isSelectedRecomendacion('Talleres - Terapia Ocupacional')"></i>
+                        <i class="far fa-circle me-1" v-else></i> Terapia Ocupacional
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="d-block small text-dark fw-bold mb-2">Otros</label>
+                    <div class="d-flex flex-wrap gap-2">
+                      <button type="button" class="btn btn-sm rounded-pill px-3 border" :class="isSelectedRecomendacion('Otros - Niños/Adolescentes') ? 'btn-primary bg-opacity-10 text-primary border-primary' : 'bg-white text-muted'" @click="toggleRecomendacion('Otros - Niños/Adolescentes')">
+                        <i class="fas fa-check-circle me-1" v-if="isSelectedRecomendacion('Otros - Niños/Adolescentes')"></i>
+                        <i class="far fa-circle me-1" v-else></i> Niños/Adolescentes
+                      </button>
+                      <button type="button" class="btn btn-sm rounded-pill px-3 border" :class="isSelectedRecomendacion('Otros - Adultos') ? 'btn-primary bg-opacity-10 text-primary border-primary' : 'bg-white text-muted'" @click="toggleRecomendacion('Otros - Adultos')">
+                        <i class="fas fa-check-circle me-1" v-if="isSelectedRecomendacion('Otros - Adultos')"></i>
+                        <i class="far fa-circle me-1" v-else></i> Adultos
+                      </button>
+                      <button type="button" class="btn btn-sm rounded-pill px-3 border" :class="isSelectedRecomendacion('Otros - Terapia Ocupacional') ? 'btn-primary bg-opacity-10 text-primary border-primary' : 'bg-white text-muted'" @click="toggleRecomendacion('Otros - Terapia Ocupacional')">
+                        <i class="fas fa-check-circle me-1" v-if="isSelectedRecomendacion('Otros - Terapia Ocupacional')"></i>
+                        <i class="far fa-circle me-1" v-else></i> Terapia Ocupacional
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                  <button type="button" class="btn btn-light border px-4" @click="fichaView = 'botones'">Cancelar</button>
+                  <button type="submit" class="btn btn-primary px-4" :disabled="savingFicha">
+                    <span v-if="savingFicha" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Guardar Ficha
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="fichaView === 'historica'">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="font-weight-bold mb-0">Ficha Histórica</h5>
+            <button class="btn btn-light btn-sm rounded shadow-sm border" @click="fichaView = 'botones'">
+              Volver
+            </button>
+          </div>
+
+          <div v-if="paciente.fichas_seguimiento && paciente.fichas_seguimiento.length > 0">
+            <div class="card border mb-3 rounded-lg hover-shadow transition" v-for="(ficha, index) in paciente.fichas_seguimiento" :key="ficha.id">
+              <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center">
+                  <div class="rounded bg-light text-secondary border d-flex justify-content-center align-items-center me-3" style="width: 45px; height: 45px;">
+                    <i class="fas fa-file-alt"></i>
+                  </div>
+                  <div>
+                    <h6 class="font-weight-bold text-dark mb-1">Ficha {{ paciente.fichas_seguimiento.length - index }}</h6>
+                    <div class="small text-muted">
+                      {{ formatDate(ficha.fecha) }} - {{ ficha.tipo }} - {{ ficha.frecuencia }} - {{ getProfessionalName(ficha.professional_id) }}
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <span class="badge" :class="index === 0 ? 'bg-success bg-opacity-10 border border-success border-opacity-25' : 'bg-secondary bg-opacity-10 border border-secondary border-opacity-25'" style="font-size: 0.75rem; border-radius: 20px; padding: 0.35em 0.8em;">
+                    {{ index === 0 ? 'Activo' : 'Culminado' }}
+                  </span>
+                  <button class="btn btn-sm btn-light border text-primary" @click="verDetalleFicha(ficha)">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="alert alert-light border text-center p-5 rounded-lg">
+            <i class="fas fa-file-alt text-muted mb-3 fs-1"></i>
+            <h6 class="text-muted">No hay fichas históricas registradas para este paciente.</h6>
+          </div>
         </div>
       </div>
 
@@ -971,6 +1319,244 @@
       </div>
 
     </div>
+
+    <!-- Modal Detalle Ficha -->
+    <div class="modal fade" id="modalDetalleFicha" tabindex="-1" aria-labelledby="modalDetalleFichaLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-lg">
+          <div class="modal-header border-bottom-0 bg-light">
+            <h5 class="modal-title font-weight-bold" id="modalDetalleFichaLabel">
+              <i class="fas fa-clipboard-list text-primary me-2"></i> Detalles de la Ficha de Seguimiento
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4" v-if="fichaSeleccionada">
+            
+            <div class="row mb-4 g-3">
+              <div class="col-md-6">
+                <div class="p-3 bg-white border rounded shadow-sm h-100">
+                  <p class="text-muted small mb-1">Fecha de Creación</p>
+                  <p class="font-weight-bold mb-0 text-dark">{{ formatDate(fichaSeleccionada.fecha) }}</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white border rounded shadow-sm h-100">
+                  <p class="text-muted small mb-1">Profesional Asignado</p>
+                  <p class="font-weight-bold mb-0 text-dark"><i class="fas fa-user-md text-success me-1"></i> {{ getProfessionalName(fichaSeleccionada.professional_id) }}</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white border rounded shadow-sm h-100">
+                  <p class="text-muted small mb-1">Tipo de Paquete</p>
+                  <p class="font-weight-bold mb-0 text-dark">{{ fichaSeleccionada.tipo }}</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white border rounded shadow-sm h-100">
+                  <p class="text-muted small mb-1">Frecuencia</p>
+                  <p class="font-weight-bold mb-0 text-dark">{{ fichaSeleccionada.frecuencia }}</p>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="p-3 bg-white border rounded shadow-sm">
+                  <p class="text-muted small mb-1">Motivo Frecuencia</p>
+                  <p class="mb-0 text-dark">{{ fichaSeleccionada.motivo }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interconsultas -->
+            <div v-if="fichaSeleccionada.interconsultas && fichaSeleccionada.interconsultas.length > 0" class="mb-4">
+              <h6 class="font-weight-bold mb-3 border-bottom pb-2"><i class="fas fa-hand-holding-medical text-primary me-2"></i> Interconsultas</h6>
+              <div class="card border-0 bg-light shadow-sm mb-2" v-for="(inter, idx) in fichaSeleccionada.interconsultas" :key="idx">
+                <div class="card-body p-3">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-primary bg-opacity-10 border border-primary px-2 py-1 rounded">{{ inter.tipo }}</span>
+                    <span class="small text-muted font-weight-bold"><i class="fas fa-user-md"></i> {{ getProfessionalName(inter.professional_id) }}</span>
+                  </div>
+                  <p class="mb-0 small text-dark mt-2" v-if="inter.motivo"><strong>Motivo:</strong> {{ inter.motivo }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recomendaciones -->
+            <div v-if="getRecomendacionesParsed(fichaSeleccionada.recomendaciones).length > 0">
+              <h6 class="font-weight-bold mb-3 border-bottom pb-2"><i class="fas fa-tasks text-success me-2"></i> Recomendaciones</h6>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-success bg-opacity-10 border border-success p-2 rounded-pill" v-for="(rec, idx) in getRecomendacionesParsed(fichaSeleccionada.recomendaciones)" :key="idx">
+                  <i class="fas fa-check me-1"></i> {{ rec }}
+                </span>
+              </div>
+            </div>
+
+          </div>
+          <div class="modal-footer border-top-0 pt-0">
+            <button type="button" class="btn btn-light border px-4" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Nuevo Plan de Seguridad -->
+    <div class="modal fade" id="modalPlanSeguridad" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-lg">
+          <div class="modal-header border-bottom-0 bg-light">
+            <h5 class="modal-title font-weight-bold">
+              <i class="fas fa-shield-alt text-danger me-2"></i> Nuevo Plan de Seguridad
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4 bg-light">
+            <form @submit.prevent="guardarPlanSeguridad">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label font-weight-bold small text-dark">Señales de advertencia <span class="text-danger">*</span></label>
+                  <textarea class="form-control" rows="3" v-model="nuevoPlanSeguridad.senales_advertencia" placeholder="Pensamientos, imágenes, humor, situaciones, conducta..." required></textarea>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label font-weight-bold small text-dark">Estrategias de afrontamiento internas <span class="text-danger">*</span></label>
+                  <textarea class="form-control" rows="3" v-model="nuevoPlanSeguridad.estrategias" placeholder="Cosas que puedo hacer para distraerme sin contactar a otra persona..." required></textarea>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label font-weight-bold small text-dark">Personas y entornos sociales de distracción <span class="text-danger">*</span></label>
+                  <textarea class="form-control" rows="3" v-model="nuevoPlanSeguridad.personas_dis" placeholder="Nombres, teléfonos, lugares seguros..." required></textarea>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label font-weight-bold small text-dark">Personas a quienes puedo pedir ayuda <span class="text-danger">*</span></label>
+                  <textarea class="form-control" rows="3" v-model="nuevoPlanSeguridad.personas_ayuda" placeholder="Nombres, teléfonos..." required></textarea>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label font-weight-bold small text-dark">Profesionales / Agencias de emergencia <span class="text-danger">*</span></label>
+                  <textarea class="form-control" rows="3" v-model="nuevoPlanSeguridad.contactos_emergencia" placeholder="Clínica, hospital de urgencias, línea de prevención de suicidio..." required></textarea>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label font-weight-bold small text-dark">Medidas para hacer el entorno más seguro <span class="text-danger">*</span></label>
+                  <textarea class="form-control" rows="3" v-model="nuevoPlanSeguridad.medidas" placeholder="Eliminar acceso a métodos letales..." required></textarea>
+                </div>
+                <div class="col-12">
+                  <label class="form-label font-weight-bold small text-dark">Mis Razones para vivir <span class="text-danger">*</span></label>
+                  <textarea class="form-control" rows="3" v-model="nuevoPlanSeguridad.razones_vivir" placeholder="Aspectos importantes que me mantienen con vida..." required></textarea>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                <button type="button" class="btn btn-light border px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary px-4" :disabled="savingPlanSeguridad">
+                  <span v-if="savingPlanSeguridad" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Guardar Plan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Ver Plan de Seguridad Completo -->
+    <div class="modal fade" id="modalVerPlanSeguridad" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-lg">
+          <div class="modal-header border-bottom-0 bg-light d-flex align-items-center">
+            <h5 class="modal-title font-weight-bold mb-0">
+              <i class="fas fa-shield-alt text-danger me-2"></i> Plan de Seguridad
+            </h5>
+            <div class="ms-auto me-3 small text-muted" v-if="planSeguridadSeleccionado">
+               Creado: {{ formatDate(planSeguridadSeleccionado.fecha) }}
+            </div>
+            <button type="button" class="btn-close m-0" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4" v-if="planSeguridadSeleccionado">
+            
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="card h-100 border-light shadow-sm">
+                  <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                    <h6 class="font-weight-bold text-dark mb-0"><i class="fas fa-exclamation-triangle text-warning me-2"></i> 1. Señales de advertencia</h6>
+                  </div>
+                  <div class="card-body">
+                    <p class="small text-muted mb-0" style="white-space: pre-wrap;">{{ planSeguridadSeleccionado.senales_advertencia }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="card h-100 border-light shadow-sm">
+                  <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                    <h6 class="font-weight-bold text-dark mb-0"><i class="fas fa-brain text-primary me-2"></i> 2. Estrategias de afrontamiento internas</h6>
+                  </div>
+                  <div class="card-body">
+                    <p class="small text-muted mb-0" style="white-space: pre-wrap;">{{ planSeguridadSeleccionado.estrategias }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="card h-100 border-light shadow-sm">
+                  <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                    <h6 class="font-weight-bold text-dark mb-0"><i class="fas fa-users text-info me-2"></i> 3. Personas y entornos de distracción</h6>
+                  </div>
+                  <div class="card-body">
+                    <p class="small text-muted mb-0" style="white-space: pre-wrap;">{{ planSeguridadSeleccionado.personas_dis }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="card h-100 border-light shadow-sm">
+                  <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                    <h6 class="font-weight-bold text-dark mb-0"><i class="fas fa-hands-helping text-success me-2"></i> 4. Personas a quienes puedo pedir ayuda</h6>
+                  </div>
+                  <div class="card-body">
+                    <p class="small text-muted mb-0" style="white-space: pre-wrap;">{{ planSeguridadSeleccionado.personas_ayuda }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="card h-100 border-light shadow-sm">
+                  <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                    <h6 class="font-weight-bold text-dark mb-0"><i class="fas fa-ambulance text-danger me-2"></i> 5. Profesionales de emergencia</h6>
+                  </div>
+                  <div class="card-body">
+                    <p class="small text-muted mb-0" style="white-space: pre-wrap;">{{ planSeguridadSeleccionado.contactos_emergencia }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="card h-100 border-light shadow-sm">
+                  <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                    <h6 class="font-weight-bold text-dark mb-0"><i class="fas fa-lock text-secondary me-2"></i> 6. Entorno más seguro</h6>
+                  </div>
+                  <div class="card-body">
+                    <p class="small text-muted mb-0" style="white-space: pre-wrap;">{{ planSeguridadSeleccionado.medidas }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="card h-100 border-light shadow-sm">
+                  <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                    <h6 class="font-weight-bold text-dark mb-0"><i class="far fa-smile-beam text-warning me-2"></i> 7. Razones para vivir</h6>
+                  </div>
+                  <div class="card-body">
+                    <p class="small text-muted mb-0" style="white-space: pre-wrap;">{{ planSeguridadSeleccionado.razones_vivir }}</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+          <div class="modal-footer border-top-0 pt-0">
+            <button type="button" class="btn btn-light border px-4" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primary px-4" @click="descargarPlanPDF(planSeguridadSeleccionado)">
+              <i class="fas fa-download me-1"></i> Descargar PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -989,7 +1575,35 @@ export default {
       loading: true,
       timelineActivity: [],
       activePill: 'recetas',
-      ciesData: []
+      ciesData: [],
+      fichaView: 'botones',
+      savingFicha: false,
+      professionalsList: [],
+      fichaSeleccionada: null,
+      nuevaFicha: {
+        tipo: '',
+        frecuencia: '',
+        motivo: '',
+        professional_id: '',
+        interconsultas: [],
+        recomendaciones: []
+      },
+      tempInterconsulta: {
+        tipo: '',
+        professional_id: '',
+        motivo: ''
+      },
+      nuevoPlanSeguridad: {
+        senales_advertencia: '',
+        estrategias: '',
+        personas_dis: '',
+        personas_ayuda: '',
+        razones_vivir: '',
+        medidas: '',
+        contactos_emergencia: ''
+      },
+      planSeguridadSeleccionado: null,
+      savingPlanSeguridad: false
     }
   },
   computed: {
@@ -1058,6 +1672,69 @@ export default {
     }
   },
   methods: {
+    countItems(text) {
+      if (!text) return 0;
+      return text.split('\n').filter(line => line.trim() !== '').length;
+    },
+    previewItems(text) {
+      if (!text) return [];
+      return text.split('\n').filter(line => line.trim() !== '').slice(0, 3);
+    },
+    abrirNuevoPlan() {
+      this.nuevoPlanSeguridad = {
+        senales_advertencia: '',
+        estrategias: '',
+        personas_dis: '',
+        personas_ayuda: '',
+        razones_vivir: '',
+        medidas: '',
+        contactos_emergencia: ''
+      };
+    },
+    async guardarPlanSeguridad() {
+      try {
+        this.savingPlanSeguridad = true;
+        const payload = {
+          patient_id: this.paciente.id,
+          ...this.nuevoPlanSeguridad
+        };
+        const response = await axios.post('/api/plan-seguridad', payload);
+        if (response.data && response.data.plan) {
+          if (!this.paciente.planes_seguridad) {
+            this.paciente.planes_seguridad = [];
+          }
+          this.paciente.planes_seguridad.unshift(response.data.plan);
+          
+          $('#modalPlanSeguridad').modal('hide');
+          this.$swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: 'Plan de seguridad guardado correctamente',
+            timer: 1500,
+            showConfirmButton: false
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        this.$swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo guardar el plan de seguridad'
+        });
+      } finally {
+        this.savingPlanSeguridad = false;
+      }
+    },
+    verPlanSeguridad(plan) {
+      this.planSeguridadSeleccionado = plan;
+    },
+    descargarPlanPDF(plan) {
+      this.$swal.fire({
+        icon: 'info',
+        title: 'Próximamente',
+        text: 'La descarga de PDF para planes de seguridad estará disponible pronto.'
+      });
+    },
     async fetchPatientDetails() {
       this.loading = true;
       try {
@@ -1238,6 +1915,79 @@ export default {
       };
       let jsonStr = JSON.stringify(examObj).split('/').join('-');
       return `/api/pdf_exam/${jsonStr}?token=${this.$token}`;
+    },
+    // Ficha Seguimiento methods
+    getProfessionalName(id) {
+      const p = this.professionalsList.find(x => x.id == id);
+      return p ? p.name : '--';
+    },
+    isSelectedRecomendacion(val) {
+      return this.nuevaFicha.recomendaciones.includes(val);
+    },
+    toggleRecomendacion(val) {
+      const idx = this.nuevaFicha.recomendaciones.indexOf(val);
+      if (idx > -1) {
+        this.nuevaFicha.recomendaciones.splice(idx, 1);
+      } else {
+        this.nuevaFicha.recomendaciones.push(val);
+      }
+    },
+    agregarInterconsulta() {
+      if (!this.tempInterconsulta.tipo || !this.tempInterconsulta.professional_id) return;
+      this.nuevaFicha.interconsultas.push({ ...this.tempInterconsulta });
+      this.limpiarInterconsulta();
+    },
+    eliminarInterconsulta(idx) {
+      this.nuevaFicha.interconsultas.splice(idx, 1);
+    },
+    limpiarInterconsulta() {
+      this.tempInterconsulta = { tipo: '', professional_id: '', motivo: '' };
+    },
+    async guardarFichaSeguimiento() {
+      this.savingFicha = true;
+      try {
+        const payload = {
+          patient_id: this.paciente.id,
+          professional_id: this.nuevaFicha.professional_id,
+          tipo: this.nuevaFicha.tipo,
+          frecuencia: this.nuevaFicha.frecuencia,
+          motivo: this.nuevaFicha.motivo,
+          recomendaciones: JSON.stringify(this.nuevaFicha.recomendaciones),
+          interconsultas: this.nuevaFicha.interconsultas
+        };
+        const res = await this.axios.post('/api/ficha-seguimiento', payload);
+        this.$swal('Éxito', 'Ficha de seguimiento guardada correctamente.', 'success');
+        this.fichaView = 'historica';
+        this.nuevaFicha = {
+          tipo: '',
+          frecuencia: '',
+          motivo: '',
+          professional_id: '',
+          interconsultas: [],
+          recomendaciones: []
+        };
+        this.fetchPatientDetails(); // Refresh patient data to load new ficha.
+      } catch (e) {
+        console.error(e);
+        console.error(e.response.data);
+        this.$swal('Error', 'Ocurrió un error al guardar la ficha.', 'error');
+      } finally {
+        this.savingFicha = false;
+      }
+    },
+    verDetalleFicha(ficha) {
+      this.fichaSeleccionada = ficha;
+      let modal = new bootstrap.Modal(document.getElementById('modalDetalleFicha'));
+      modal.show();
+    },
+    getRecomendacionesParsed(recs) {
+      if (!recs) return [];
+      try {
+        let parsed = JSON.parse(recs);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch(e) {
+        return [];
+      }
     }
   },
   mounted() {
@@ -1245,6 +1995,9 @@ export default {
     this.axios.get('/api/cies/a').then(res => {
       this.ciesData = res.data;
     });
+    this.axios.get('/api/professional').then(res => {
+      this.professionalsList = res.data;
+    }).catch(err => console.error(err));
   },
   watch: {
     pacienteId() {

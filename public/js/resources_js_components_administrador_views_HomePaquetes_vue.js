@@ -13,6 +13,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _recepcionista_components_pagos_ModalMembresias_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../recepcionista/components/pagos/ModalMembresias.vue */ "./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
 function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
 function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
@@ -46,7 +51,15 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       activeHistories: [],
       idUsuario: -1,
       paqueteSeleccionado: null,
-      procesandoPago: false
+      procesandoPago: false,
+      guardandoReporte: false,
+      editandoReporte: false,
+      formReporte: {
+        resumen: '',
+        logros: '',
+        recomendaciones: '',
+        proximos_pasos: ''
+      }
     };
   },
   computed: {
@@ -337,6 +350,74 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               return _context3.stop();
           }
         }, _callee3, null, [[3, 11, 15, 18]]);
+      }))();
+    },
+    abrirModalReporte: function abrirModalReporte(paquete) {
+      var editar = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      this.paqueteSeleccionado = paquete;
+      this.editandoReporte = editar;
+      if (editar && paquete.reporte_extra) {
+        this.formReporte = {
+          resumen: paquete.reporte_extra.resumen,
+          logros: paquete.reporte_extra.logros,
+          recomendaciones: paquete.reporte_extra.recomendaciones,
+          proximos_pasos: paquete.reporte_extra.proximos_pasos
+        };
+      } else {
+        this.formReporte = {
+          resumen: '',
+          logros: '',
+          recomendaciones: '',
+          proximos_pasos: ''
+        };
+      }
+      var modal = new bootstrap.Modal(document.getElementById('modalReporteExtra'));
+      modal.show();
+    },
+    guardarReporteExtra: function guardarReporteExtra() {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var payload, modalElement, modal;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              if (!(!_this5.formReporte.resumen || !_this5.formReporte.logros)) {
+                _context4.next = 3;
+                break;
+              }
+              alert('Por favor complete al menos el resumen y los logros.');
+              return _context4.abrupt("return");
+            case 3:
+              _this5.guardandoReporte = true;
+              _context4.prev = 4;
+              payload = _objectSpread(_objectSpread({}, _this5.formReporte), {}, {
+                membresia_id: _this5.paqueteSeleccionado.id
+              });
+              _context4.next = 8;
+              return _this5.axios.post('/api/reporte-paquete-extra', payload);
+            case 8:
+              // Cerrar modal y recargar
+              modalElement = document.getElementById('modalReporteExtra');
+              modal = bootstrap.Modal.getInstance(modalElement);
+              modal.hide();
+              _this5.cargarPaquetes(_this5.pagination.current_page);
+              alert('Reporte guardado exitosamente.');
+              _context4.next = 19;
+              break;
+            case 15:
+              _context4.prev = 15;
+              _context4.t0 = _context4["catch"](4);
+              console.error(_context4.t0);
+              alert('Ocurrió un error al guardar el reporte.');
+            case 19:
+              _context4.prev = 19;
+              _this5.guardandoReporte = false;
+              return _context4.finish(19);
+            case 22:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4, null, [[4, 15, 19, 22]]);
       }))();
     }
   }
@@ -1085,7 +1166,22 @@ var render = function render() {
       staticClass: "d-flex gap-3 small"
     }, [paquete.descuento > 0 ? _c("span", {
       staticClass: "text-success fw-bold"
-    }, [_vm._v("-" + _vm._s(paquete.descuento) + " desc.")]) : _vm._e(), _vm._v(" "), paquete.estado === 3 ? _c("a", {
+    }, [_vm._v("-" + _vm._s(paquete.descuento) + " desc.")]) : _vm._e(), _vm._v(" "), paquete.estado === 3 ? [!paquete.reporte_extra ? _c("a", {
+      staticClass: "text-warning text-decoration-none hover-link fw-bold",
+      attrs: {
+        href: "#"
+      },
+      on: {
+        click: function click($event) {
+          $event.preventDefault();
+          return _vm.abrirModalReporte(paquete);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-plus-circle me-1"
+    }), _vm._v(" Añadir reporte\n              ")]) : _c("div", {
+      staticClass: "d-flex gap-2"
+    }, [_c("a", {
       staticClass: "text-primary text-decoration-none hover-link",
       attrs: {
         href: "#"
@@ -1098,7 +1194,20 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "far fa-file-alt me-1"
-    }), _vm._v(" Ver reporte")]) : _vm._e()]), _vm._v(" "), _c("a", {
+    }), _vm._v(" Ver reporte\n                ")]), _vm._v(" "), _c("a", {
+      staticClass: "text-muted text-decoration-none hover-link",
+      attrs: {
+        href: "#"
+      },
+      on: {
+        click: function click($event) {
+          $event.preventDefault();
+          return _vm.abrirModalReporte(paquete, true);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-edit"
+    })])])] : _vm._e()], 2), _vm._v(" "), _c("a", {
       staticClass: "small text-primary text-decoration-none dropdown-toggle-link",
       attrs: {
         href: "#"
@@ -1332,7 +1441,152 @@ var render = function render() {
         return _vm.cargarPaquetes(1);
       }
     }
-  }), _vm._v(" "), _vm.vistaActiva === "paquetes" && _vm.pagination.last_page > 1 ? _c("div", {
+  }), _vm._v(" "), _c("div", {
+    staticClass: "modal fade",
+    attrs: {
+      id: "modalReporteExtra",
+      tabindex: "-1",
+      "aria-hidden": "true"
+    }
+  }, [_c("div", {
+    staticClass: "modal-dialog modal-lg"
+  }, [_c("div", {
+    staticClass: "modal-content border-0 shadow-lg"
+  }, [_c("div", {
+    staticClass: "modal-header border-0 pb-0"
+  }, [_c("h5", {
+    staticClass: "modal-title fw-bold d-flex align-items-center gap-2"
+  }, [_c("i", {
+    staticClass: "fas fa-file-medical text-primary"
+  }), _vm._v("\n            " + _vm._s(_vm.editandoReporte ? "Editar Reporte" : "Añadir Reporte") + " — " + _vm._s(_vm.paqueteSeleccionado ? _vm.paqueteSeleccionado.paquete_nombre : "") + "\n          ")]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal",
+      "aria-label": "Close"
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "modal-body p-4"
+  }, [_c("div", {
+    staticClass: "mb-4"
+  }, [_c("label", {
+    staticClass: "form-label fw-semibold text-muted small text-uppercase"
+  }, [_vm._v("Resumen del Tratamiento")]), _vm._v(" "), _c("textarea", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.formReporte.resumen,
+      expression: "formReporte.resumen"
+    }],
+    staticClass: "form-control custom-textarea",
+    attrs: {
+      rows: "4",
+      placeholder: "Escribe un resumen general del proceso..."
+    },
+    domProps: {
+      value: _vm.formReporte.resumen
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.formReporte, "resumen", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-4"
+  }, [_c("label", {
+    staticClass: "form-label fw-semibold text-muted small text-uppercase"
+  }, [_vm._v("Logros Alcanzados (uno por línea)")]), _vm._v(" "), _c("textarea", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.formReporte.logros,
+      expression: "formReporte.logros"
+    }],
+    staticClass: "form-control custom-textarea",
+    attrs: {
+      rows: "4",
+      placeholder: "• Logro 1&#10;• Logro 2..."
+    },
+    domProps: {
+      value: _vm.formReporte.logros
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.formReporte, "logros", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-4"
+  }, [_c("label", {
+    staticClass: "form-label fw-semibold text-muted small text-uppercase"
+  }, [_vm._v("Recomendaciones")]), _vm._v(" "), _c("textarea", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.formReporte.recomendaciones,
+      expression: "formReporte.recomendaciones"
+    }],
+    staticClass: "form-control custom-textarea",
+    attrs: {
+      rows: "4",
+      placeholder: "Sugerencias para el paciente..."
+    },
+    domProps: {
+      value: _vm.formReporte.recomendaciones
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.formReporte, "recomendaciones", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3"
+  }, [_c("label", {
+    staticClass: "form-label fw-semibold text-muted small text-uppercase"
+  }, [_vm._v("Próximos Pasos")]), _vm._v(" "), _c("textarea", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.formReporte.proximos_pasos,
+      expression: "formReporte.proximos_pasos"
+    }],
+    staticClass: "form-control custom-textarea",
+    attrs: {
+      rows: "4",
+      placeholder: "Plan a futuro o continuación..."
+    },
+    domProps: {
+      value: _vm.formReporte.proximos_pasos
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.formReporte, "proximos_pasos", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer border-0 pt-0 pb-4 px-4"
+  }, [_c("button", {
+    staticClass: "btn btn-light px-4 fw-bold text-muted",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Cancelar")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary px-4 fw-bold shadow-sm",
+    attrs: {
+      type: "button",
+      disabled: _vm.guardandoReporte
+    },
+    on: {
+      click: _vm.guardarReporteExtra
+    }
+  }, [_vm.guardandoReporte ? _c("i", {
+    staticClass: "fas fa-spinner fa-spin me-1"
+  }) : _vm._e(), _vm._v("\n            " + _vm._s(_vm.editandoReporte ? "Actualizar Reporte" : "Guardar Reporte") + "\n          ")])])])])]), _vm._v(" "), _vm.vistaActiva === "paquetes" && _vm.pagination.last_page > 1 ? _c("div", {
     key: "paquetes",
     staticClass: "d-flex justify-content-center mt-4"
   }, [_c("nav", {
@@ -2224,7 +2478,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.push([module.id, "@import url(https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap);"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.paquetes-container[data-v-27b789ef] {\r\n  font-family: 'Inter', sans-serif;\r\n  color: #334155;\r\n  background-color: #f8fafc;\r\n  min-height: 100vh;\r\n  padding: 1.5rem;\r\n  border-radius: 12px;\n}\r\n\r\n/* Header tabs */\n.module-tabs[data-v-27b789ef] {\r\n  display: flex;\r\n  gap: 0.5rem;\r\n  background: #f1f5f9;\r\n  border-radius: 999px;\r\n  padding: 0.25rem;\n}\n.module-tab-btn[data-v-27b789ef] {\r\n  border: none;\r\n  color: #64748b;\r\n  border-radius: 999px;\r\n  font-weight: 600;\r\n  padding: 0.35rem 0.85rem;\n}\n.module-tab-btn.active[data-v-27b789ef] {\r\n  background: #1d4ed8;\r\n  color: #fff;\n}\n.module-tab-btn.active .badge[data-v-27b789ef] {\r\n  background: #fff !important;\r\n  color: #dc2626;\n}\r\n\r\n/* Search Box */\n.search-box[data-v-27b789ef] {\r\n  position: relative;\r\n  width: 100%;\r\n  max-width: 380px;\n}\n.search-box .search-icon[data-v-27b789ef] {\r\n  position: absolute;\r\n  left: 14px;\r\n  top: 50%;\r\n  transform: translateY(-50%);\r\n  color: #94a3b8;\n}\n.search-box input[data-v-27b789ef] {\r\n  padding-left: 40px;\r\n  border-radius: 8px;\r\n  border: 1px solid #cbd5e1;\r\n  background: #fff;\r\n  transition: all 0.2s;\r\n  box-shadow: 0 1px 2px rgba(0,0,0,0.02);\n}\n.search-box input[data-v-27b789ef]:focus {\r\n  border-color: #3b82f6;\r\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);\r\n  outline: none;\n}\r\n\r\n/* Metric Cards */\n.summary-card[data-v-27b789ef] {\r\n  border-radius: 12px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.summary-card[data-v-27b789ef]:hover {\r\n  transform: translateY(-3px);\r\n  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.03) !important;\n}\r\n\r\n/* Filters */\n.filter-label[data-v-27b789ef] {\r\n  width: 60px;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.btn-filter[data-v-27b789ef] {\r\n  background: transparent;\r\n  color: #64748b;\r\n  border: none;\r\n  font-weight: 500;\r\n  padding: 0.4rem 1rem;\r\n  border-radius: 20px;\r\n  transition: all 0.2s;\n}\n.btn-filter[data-v-27b789ef]:hover {\r\n  background: #f1f5f9;\r\n  color: #0f172a;\n}\n.btn-filter.active[data-v-27b789ef] {\r\n  background: #3b82f6;\r\n  color: white;\r\n  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);\n}\r\n\r\n/* Package List */\n.package-card[data-v-27b789ef] {\r\n  border-radius: 14px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.package-card[data-v-27b789ef]:hover {\r\n  box-shadow: 0 10px 20px -5px rgba(0,0,0,0.06), 0 8px 10px -6px rgba(0,0,0,0.04) !important;\n}\n.border-active[data-v-27b789ef] {\r\n  border-left: 5px solid #f59e0b !important;\n}\n.border-completed[data-v-27b789ef] {\r\n  border-left: 5px solid #3b82f6 !important;\n}\n.package-icon[data-v-27b789ef] {\r\n  width: 48px;\r\n  height: 48px;\r\n  border-radius: 12px;\r\n  background: #eff6ff;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 1.5rem;\n}\n.package-title[data-v-27b789ef] {\r\n  color: #0f172a;\r\n  font-size: 1.15rem;\n}\r\n\r\n/* Badges */\n.status-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  font-weight: 600;\r\n  text-transform: uppercase;\r\n  letter-spacing: 0.03em;\n}\n.status-act[data-v-27b789ef] { background: #dcfce7; color: #166534;\n}\n.status-com[data-v-27b789ef] { background: #dbeafe; color: #1e3a8a;\n}\n.status-pen[data-v-27b789ef] { background: #fef9c3; color: #854d0e;\n}\n.status-can[data-v-27b789ef] { background: #fee2e2; color: #991b1b;\n}\n.status-def[data-v-27b789ef] { background: #f1f5f9; color: #475569;\n}\n.type-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  background: #e0f2fe;\r\n  color: #0369a1;\r\n  font-weight: 600;\n}\r\n\r\n/* Progress bar smoothing */\n.progress-bar[data-v-27b789ef] {\r\n  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);\n}\r\n\r\n/* Buttons */\n.outline-btn[data-v-27b789ef] {\r\n  border: 1px solid #e2e8f0;\r\n  background: white;\r\n  color: #475569;\r\n  font-weight: 500;\r\n  border-radius: 6px;\r\n  transition: all 0.2s;\n}\n.outline-btn[data-v-27b789ef]:hover {\r\n  background: #f8fafc;\r\n  color: #0f172a;\r\n  border-color: #cbd5e1;\n}\n.hover-link[data-v-27b789ef] {\r\n  transition: color 0.2s;\n}\n.hover-link[data-v-27b789ef]:hover {\r\n  color: #0f172a !important;\n}\n.dropdown-toggle-link[data-v-27b789ef] {\r\n  color: #3b82f6;\r\n  font-weight: 500;\n}\n.dropdown-toggle-link[data-v-27b789ef]:hover {\r\n  color: #2563eb;\n}\n.info-meta span[data-v-27b789ef] {\r\n  font-size: 0.875rem;\n}\n.history-list-container[data-v-27b789ef] {\r\n  max-height: 250px;\r\n  overflow-y: auto;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar {\r\n  width: 6px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-track {\r\n  background: #f1f5f9;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb {\r\n  background: #cbd5e1; \r\n  border-radius: 10px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb:hover {\r\n  background: #94a3b8;\n}\n.history-item[data-v-27b789ef]:last-child {\r\n  border-bottom: none !important;\n}\r\n\r\n/* Deudas */\n.debt-summary-card[data-v-27b789ef] {\r\n  background: #f8fafc;\r\n  border: 1px solid #e2e8f0;\r\n  border-radius: 16px;\r\n  padding: 1.2rem 1.4rem;\n}\n.debt-summary-card p[data-v-27b789ef] {\r\n  color: #64748b;\r\n  font-size: 1.05rem;\n}\n.debt-card[data-v-27b789ef] {\r\n  border: 1px solid #fecaca;\r\n  border-radius: 18px;\r\n  background: #fff;\r\n  padding: 1.8rem;\n}\n.debt-icon[data-v-27b789ef] {\r\n  width: 68px;\r\n  height: 68px;\r\n  border-radius: 16px;\r\n  background: #fee2e2;\r\n  color: #ef4444;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 2rem;\n}\n.debt-meta[data-v-27b789ef] {\r\n  font-size: 1.05rem;\n}\n.debt-progress-label[data-v-27b789ef] {\r\n  font-size: 1.05rem;\n}\n.debt-progress[data-v-27b789ef] {\r\n  width: 100%;\r\n  height: 12px;\r\n  border-radius: 999px;\r\n  background: #f97316;\r\n  overflow: hidden;\n}\n.debt-progress-paid[data-v-27b789ef] {\r\n  height: 100%;\r\n  background: #2563eb;\r\n  border-radius: 999px 0 0 999px;\n}\n.debt-amount[data-v-27b789ef] {\r\n  color: #ef4444;\r\n  font-weight: 700;\r\n  font-size: 16px;\n}\n.debt-action-btn[data-v-27b789ef] {\r\n  padding: 0.55rem 1.2rem;\r\n  font-weight: 600;\r\n  font-size: 1.05rem;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.paquetes-container[data-v-27b789ef] {\r\n  font-family: 'Inter', sans-serif;\r\n  color: #334155;\r\n  background-color: #f8fafc;\r\n  min-height: 100vh;\r\n  padding: 1.5rem;\r\n  border-radius: 12px;\n}\r\n\r\n/* Header tabs */\n.module-tabs[data-v-27b789ef] {\r\n  display: flex;\r\n  gap: 0.5rem;\r\n  background: #f1f5f9;\r\n  border-radius: 999px;\r\n  padding: 0.25rem;\n}\n.module-tab-btn[data-v-27b789ef] {\r\n  border: none;\r\n  color: #64748b;\r\n  border-radius: 999px;\r\n  font-weight: 600;\r\n  padding: 0.35rem 0.85rem;\n}\n.module-tab-btn.active[data-v-27b789ef] {\r\n  background: #1d4ed8;\r\n  color: #fff;\n}\n.module-tab-btn.active .badge[data-v-27b789ef] {\r\n  background: #fff !important;\r\n  color: #dc2626;\n}\r\n\r\n/* Search Box */\n.search-box[data-v-27b789ef] {\r\n  position: relative;\r\n  width: 100%;\r\n  max-width: 380px;\n}\n.search-box .search-icon[data-v-27b789ef] {\r\n  position: absolute;\r\n  left: 14px;\r\n  top: 50%;\r\n  transform: translateY(-50%);\r\n  color: #94a3b8;\n}\n.search-box input[data-v-27b789ef] {\r\n  padding-left: 40px;\r\n  border-radius: 8px;\r\n  border: 1px solid #cbd5e1;\r\n  background: #fff;\r\n  transition: all 0.2s;\r\n  box-shadow: 0 1px 2px rgba(0,0,0,0.02);\n}\n.search-box input[data-v-27b789ef]:focus {\r\n  border-color: #3b82f6;\r\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);\r\n  outline: none;\n}\r\n\r\n/* Metric Cards */\n.summary-card[data-v-27b789ef] {\r\n  border-radius: 12px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.summary-card[data-v-27b789ef]:hover {\r\n  transform: translateY(-3px);\r\n  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.03) !important;\n}\r\n\r\n/* Filters */\n.filter-label[data-v-27b789ef] {\r\n  width: 60px;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.btn-filter[data-v-27b789ef] {\r\n  background: transparent;\r\n  color: #64748b;\r\n  border: none;\r\n  font-weight: 500;\r\n  padding: 0.4rem 1rem;\r\n  border-radius: 20px;\r\n  transition: all 0.2s;\n}\n.btn-filter[data-v-27b789ef]:hover {\r\n  background: #f1f5f9;\r\n  color: #0f172a;\n}\n.btn-filter.active[data-v-27b789ef] {\r\n  background: #3b82f6;\r\n  color: white;\r\n  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);\n}\r\n\r\n/* Package List */\n.package-card[data-v-27b789ef] {\r\n  border-radius: 14px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.package-card[data-v-27b789ef]:hover {\r\n  box-shadow: 0 10px 20px -5px rgba(0,0,0,0.06), 0 8px 10px -6px rgba(0,0,0,0.04) !important;\n}\n.border-active[data-v-27b789ef] {\r\n  border-left: 5px solid #f59e0b !important;\n}\n.border-completed[data-v-27b789ef] {\r\n  border-left: 5px solid #3b82f6 !important;\n}\n.package-icon[data-v-27b789ef] {\r\n  width: 48px;\r\n  height: 48px;\r\n  border-radius: 12px;\r\n  background: #eff6ff;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 1.5rem;\n}\n.package-title[data-v-27b789ef] {\r\n  color: #0f172a;\r\n  font-size: 1.15rem;\n}\r\n\r\n/* Badges */\n.status-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  font-weight: 600;\r\n  text-transform: uppercase;\r\n  letter-spacing: 0.03em;\n}\n.status-act[data-v-27b789ef] { background: #dcfce7; color: #166534;\n}\n.status-com[data-v-27b789ef] { background: #dbeafe; color: #1e3a8a;\n}\n.status-pen[data-v-27b789ef] { background: #fef9c3; color: #854d0e;\n}\n.status-can[data-v-27b789ef] { background: #fee2e2; color: #991b1b;\n}\n.status-def[data-v-27b789ef] { background: #f1f5f9; color: #475569;\n}\n.type-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  background: #e0f2fe;\r\n  color: #0369a1;\r\n  font-weight: 600;\n}\n.custom-textarea[data-v-27b789ef] {\r\n  border: 1px solid #e2e8f0;\r\n  border-radius: 10px;\r\n  padding: 0.75rem 1rem;\r\n  font-size: 0.95rem;\r\n  transition: all 0.2s;\r\n  background-color: #f8fafc;\n}\n.custom-textarea[data-v-27b789ef]:focus {\r\n  background-color: #fff;\r\n  border-color: #3b82f6;\r\n  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);\n}\n.hover-link[data-v-27b789ef]:hover {\r\n  text-decoration: underline !important;\r\n  opacity: 0.8;\n}\r\n\r\n/* Progress bar smoothing */\n.progress-bar[data-v-27b789ef] {\r\n  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);\n}\r\n\r\n/* Buttons */\n.outline-btn[data-v-27b789ef] {\r\n  border: 1px solid #e2e8f0;\r\n  background: white;\r\n  color: #475569;\r\n  font-weight: 500;\r\n  border-radius: 6px;\r\n  transition: all 0.2s;\n}\n.outline-btn[data-v-27b789ef]:hover {\r\n  background: #f8fafc;\r\n  color: #0f172a;\r\n  border-color: #cbd5e1;\n}\n.hover-link[data-v-27b789ef] {\r\n  transition: color 0.2s;\n}\n.hover-link[data-v-27b789ef]:hover {\r\n  color: #0f172a !important;\n}\n.dropdown-toggle-link[data-v-27b789ef] {\r\n  color: #3b82f6;\r\n  font-weight: 500;\n}\n.dropdown-toggle-link[data-v-27b789ef]:hover {\r\n  color: #2563eb;\n}\n.info-meta span[data-v-27b789ef] {\r\n  font-size: 0.875rem;\n}\n.history-list-container[data-v-27b789ef] {\r\n  max-height: 250px;\r\n  overflow-y: auto;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar {\r\n  width: 6px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-track {\r\n  background: #f1f5f9;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb {\r\n  background: #cbd5e1; \r\n  border-radius: 10px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb:hover {\r\n  background: #94a3b8;\n}\n.history-item[data-v-27b789ef]:last-child {\r\n  border-bottom: none !important;\n}\r\n\r\n/* Deudas */\n.debt-summary-card[data-v-27b789ef] {\r\n  background: #f8fafc;\r\n  border: 1px solid #e2e8f0;\r\n  border-radius: 16px;\r\n  padding: 1.2rem 1.4rem;\n}\n.debt-summary-card p[data-v-27b789ef] {\r\n  color: #64748b;\r\n  font-size: 1.05rem;\n}\n.debt-card[data-v-27b789ef] {\r\n  border: 1px solid #fecaca;\r\n  border-radius: 18px;\r\n  background: #fff;\r\n  padding: 1.8rem;\n}\n.debt-icon[data-v-27b789ef] {\r\n  width: 68px;\r\n  height: 68px;\r\n  border-radius: 16px;\r\n  background: #fee2e2;\r\n  color: #ef4444;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 2rem;\n}\n.debt-meta[data-v-27b789ef] {\r\n  font-size: 1.05rem;\n}\n.debt-progress-label[data-v-27b789ef] {\r\n  font-size: 1.05rem;\n}\n.debt-progress[data-v-27b789ef] {\r\n  width: 100%;\r\n  height: 12px;\r\n  border-radius: 999px;\r\n  background: #f97316;\r\n  overflow: hidden;\n}\n.debt-progress-paid[data-v-27b789ef] {\r\n  height: 100%;\r\n  background: #2563eb;\r\n  border-radius: 999px 0 0 999px;\n}\n.debt-amount[data-v-27b789ef] {\r\n  color: #ef4444;\r\n  font-weight: 700;\r\n  font-size: 16px;\n}\n.debt-action-btn[data-v-27b789ef] {\r\n  padding: 0.55rem 1.2rem;\r\n  font-weight: 600;\r\n  font-size: 1.05rem;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

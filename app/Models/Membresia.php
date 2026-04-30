@@ -16,4 +16,9 @@ class Membresia extends Model
     public function precio(){
         return $this->belongsTo( Precio::class, 'tipo' );
     }
+
+    public function reporte_extra()
+    {
+        return $this->hasOne(ReportePaqueteExtra::class, 'membresia_id');
+    }
 }

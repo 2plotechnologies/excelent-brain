@@ -165,6 +165,41 @@
         </table>
     </div>
 
+    <!-- REPORTE EXTRA -->
+    @if(isset($reporte_extra) && $reporte_extra)
+    <div class="section">
+        <div class="section-title">Resumen del Tratamiento</div>
+        <div style="background: #f9f9f9; padding: 10px; border-radius: 5px; text-align: justify; line-height: 1.5;">
+            {!! nl2br(e($reporte_extra->resumen)) !!}
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Logros Alcanzados</div>
+        <ul style="padding-left: 20px; line-height: 1.4;">
+            @foreach(explode("\n", $reporte_extra->logros) as $logro)
+                @if(trim($logro) != '')
+                    <li style="margin-bottom: 5px;">{{ trim($logro, "• \t\n\r\0\x0B") }}</li>
+                @endif
+            @endforeach
+        </ul>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Recomendaciones</div>
+        <div style="background: #f9f9f9; padding: 10px; border-radius: 5px; text-align: justify; line-height: 1.5;">
+            {!! nl2br(e($reporte_extra->recomendaciones)) !!}
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Próximos Pasos</div>
+        <div style="background: #f9f9f9; padding: 10px; border-radius: 5px; text-align: justify; line-height: 1.5;">
+            {!! nl2br(e($reporte_extra->proximos_pasos)) !!}
+        </div>
+    </div>
+    @endif
+
     <!-- CITAS -->
     <div class="section">
         <div class="section-title">Citas</div>

@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\Extra_payment;
 use App\Models\Patient;
 use App\Models\Professional;
+use App\Models\ReportePaqueteExtra;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
@@ -22,6 +23,7 @@ class PaqueteController extends Controller
 
         $query = Membresia::where('membresias.activo', 1)
             ->whereNotNull('membresias.patient_id')
+            ->with('reporte_extra')
             ->join('patients as pt', 'pt.id', '=', 'membresias.patient_id')
             ->join('precios as p', 'p.id', '=', 'membresias.tipo')
             ->leftJoin('users as u', 'u.id', '=', 'membresias.user_id')
@@ -132,6 +134,39 @@ class PaqueteController extends Controller
         ]);
     }
 
+    public function storeReportePaqueteExtra(Request $request){
+
+        $validated = $request->validate([
+            'resumen' => 'required|string',
+            'logros' => 'required|string',
+            'recomendaciones' => 'required|string',
+            'proximos_pasos' => 'required|string',
+            'membresia_id' => 'required|integer|exists:membresias,id',
+        ]);
+
+        $reportePaqueteExtra = ReportePaqueteExtra::create([
+            'resumen' => $validated['resumen'],
+            'logros' => $validated['logros'],
+            'recomendaciones' => $validated['recomendaciones'],
+            'proximos_pasos' => $validated['proximos_pasos'],
+            'membresia_id' => $validated['membresia_id'],
+            'fecha' => Carbon::now()->format('Y-m-d'),
+        ]);
+
+        return response()->json([
+            'message' => 'Reporte de paquete extra creado exitosamente.',
+            'reporte' => $reportePaqueteExtra,
+        ]);
+    }
+
+    public function getReportesPaquetesExtra($membresia_id){
+        $reportePaqueteExtra = ReportePaqueteExtra::with([
+            'membresia',
+            'membresia.patient',
+        ])->where('membresia_id', $membresia_id)->orderBy('fecha', 'desc')->get();
+        return response()->json($reportePaqueteExtra);
+    }
+
     public function pdfReportePaquete($id)
     {
         $membresia = DB::table('membresias as m')
@@ -152,6 +187,8 @@ class PaqueteController extends Controller
             )
             ->where('m.id', $id)
             ->first();
+
+        $reporteExtra = \App\Models\ReportePaqueteExtra::where('membresia_id', $id)->first();
 
         if (!$membresia) {
             return response()->json([
@@ -217,6 +254,7 @@ class PaqueteController extends Controller
             'total_citas' => $citas->count(),
             'total_pagado' => $pagos->sum('price'),
             'status_name' => $membresia->status_name,
+            'reporte_extra' => $reporteExtra
         ];
 
         $pdf = PDF::loadView('admin.pdf_reporte_paquete', $data);

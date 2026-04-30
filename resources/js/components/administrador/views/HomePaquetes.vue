@@ -214,7 +214,20 @@
           <div class="d-flex justify-content-between align-items-center mt-3 pt-2">
             <div class="d-flex gap-3 small">
               <span class="text-success fw-bold" v-if="paquete.descuento > 0">-{{ paquete.descuento }} desc.</span>
-              <a v-if="paquete.estado === 3" href="#" class="text-primary text-decoration-none hover-link" @click.prevent="verReporte(paquete)"><i class="far fa-file-alt me-1"></i> Ver reporte</a>
+              
+              <template v-if="paquete.estado === 3">
+                <a v-if="!paquete.reporte_extra" href="#" class="text-warning text-decoration-none hover-link fw-bold" @click.prevent="abrirModalReporte(paquete)">
+                  <i class="fas fa-plus-circle me-1"></i> Añadir reporte
+                </a>
+                <div v-else class="d-flex gap-2">
+                  <a href="#" class="text-primary text-decoration-none hover-link" @click.prevent="verReporte(paquete)">
+                    <i class="far fa-file-alt me-1"></i> Ver reporte
+                  </a>
+                  <a href="#" class="text-muted text-decoration-none hover-link" @click.prevent="abrirModalReporte(paquete, true)">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                </div>
+              </template>
             </div>
             
             <a href="#" class="small text-primary text-decoration-none dropdown-toggle-link" @click.prevent="toggleHistory(paquete.id)">
@@ -395,6 +408,49 @@
 
     <ModalMembresias :idUsuario="idUsuario" vista="buscar" @membresiaGuardada="cargarPaquetes(1)"></ModalMembresias>
 
+    <!-- Modal Editar Reporte Extra -->
+    <div class="modal fade" id="modalReporteExtra" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+              <i class="fas fa-file-medical text-primary"></i>
+              {{ editandoReporte ? 'Editar Reporte' : 'Añadir Reporte' }} — {{ paqueteSeleccionado ? paqueteSeleccionado.paquete_nombre : '' }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            <div class="mb-4">
+              <label class="form-label fw-semibold text-muted small text-uppercase">Resumen del Tratamiento</label>
+              <textarea class="form-control custom-textarea" rows="4" v-model="formReporte.resumen" placeholder="Escribe un resumen general del proceso..."></textarea>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-semibold text-muted small text-uppercase">Logros Alcanzados (uno por línea)</label>
+              <textarea class="form-control custom-textarea" rows="4" v-model="formReporte.logros" placeholder="• Logro 1&#10;• Logro 2..."></textarea>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-semibold text-muted small text-uppercase">Recomendaciones</label>
+              <textarea class="form-control custom-textarea" rows="4" v-model="formReporte.recomendaciones" placeholder="Sugerencias para el paciente..."></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold text-muted small text-uppercase">Próximos Pasos</label>
+              <textarea class="form-control custom-textarea" rows="4" v-model="formReporte.proximos_pasos" placeholder="Plan a futuro o continuación..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer border-0 pt-0 pb-4 px-4">
+            <button type="button" class="btn btn-light px-4 fw-bold text-muted" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" @click="guardarReporteExtra" :disabled="guardandoReporte">
+              <i class="fas fa-spinner fa-spin me-1" v-if="guardandoReporte"></i>
+              {{ editandoReporte ? 'Actualizar Reporte' : 'Guardar Reporte' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Paginación -->
     <div class="d-flex justify-content-center mt-4" v-if="vistaActiva === 'paquetes' && pagination.last_page > 1" :key="'paquetes'">
       <nav aria-label="Page navigation">
@@ -448,7 +504,15 @@ export default {
       activeHistories: [],
       idUsuario: -1,
       paqueteSeleccionado: null,
-      procesandoPago: false
+      procesandoPago: false,
+      guardandoReporte: false,
+      editandoReporte: false,
+      formReporte: {
+        resumen: '',
+        logros: '',
+        recomendaciones: '',
+        proximos_pasos: ''
+      }
     };
   },
   computed: {
@@ -640,6 +704,58 @@ export default {
       } finally {
         this.procesandoPago = false;
       }
+    },
+    abrirModalReporte(paquete, editar = false) {
+      this.paqueteSeleccionado = paquete;
+      this.editandoReporte = editar;
+      
+      if (editar && paquete.reporte_extra) {
+        this.formReporte = {
+          resumen: paquete.reporte_extra.resumen,
+          logros: paquete.reporte_extra.logros,
+          recomendaciones: paquete.reporte_extra.recomendaciones,
+          proximos_pasos: paquete.reporte_extra.proximos_pasos
+        };
+      } else {
+        this.formReporte = {
+          resumen: '',
+          logros: '',
+          recomendaciones: '',
+          proximos_pasos: ''
+        };
+      }
+      
+      const modal = new bootstrap.Modal(document.getElementById('modalReporteExtra'));
+      modal.show();
+    },
+    async guardarReporteExtra() {
+      if (!this.formReporte.resumen || !this.formReporte.logros) {
+        alert('Por favor complete al menos el resumen y los logros.');
+        return;
+      }
+
+      this.guardandoReporte = true;
+      try {
+        const payload = {
+          ...this.formReporte,
+          membresia_id: this.paqueteSeleccionado.id
+        };
+
+        await this.axios.post('/api/reporte-paquete-extra', payload);
+        
+        // Cerrar modal y recargar
+        const modalElement = document.getElementById('modalReporteExtra');
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        modal.hide();
+        
+        this.cargarPaquetes(this.pagination.current_page);
+        alert('Reporte guardado exitosamente.');
+      } catch (error) {
+        console.error(error);
+        alert('Ocurrió un error al guardar el reporte.');
+      } finally {
+        this.guardandoReporte = false;
+      }
     }
   }
 }
@@ -797,6 +913,26 @@ export default {
   background: #e0f2fe;
   color: #0369a1;
   font-weight: 600;
+}
+
+.custom-textarea {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  background-color: #f8fafc;
+}
+
+.custom-textarea:focus {
+  background-color: #fff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.hover-link:hover {
+  text-decoration: underline !important;
+  opacity: 0.8;
 }
 
 /* Progress bar smoothing */

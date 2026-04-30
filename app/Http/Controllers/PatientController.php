@@ -16,6 +16,9 @@ use App\Models\Professional;
 use App\Models\Reschedule;
 use App\Models\Triaje;
 use App\Models\Relative;
+use App\Models\FichaSeguimiento;
+use App\Models\InterconsultaSeguimiento;
+use App\Models\PlanSeguridad;
 use Faker\Provider\ar_EG\Person;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\TryCatch;
@@ -906,6 +909,86 @@ class PatientController extends Controller
 			return $seguimientos;
 		}
 
+		public function storeFichaSeguimiento(Request $request){
+			$validated = $request->validate([
+				'patient_id' => 'required|integer',
+				'professional_id' => 'required|integer',
+				'tipo' => 'required|string',
+				'frecuencia' => 'required|string',
+				'motivo' => 'required|string',
+				'recomendaciones' => 'nullable|string',
+			]);
+
+			$fichaSeguimiento = new FichaSeguimiento();
+			$fichaSeguimiento->patient_id = $validated['patient_id'];
+			$fichaSeguimiento->professional_id = $validated['professional_id'];
+			$fichaSeguimiento->tipo = $validated['tipo'];
+			$fichaSeguimiento->frecuencia = $validated['frecuencia'];
+			$fichaSeguimiento->motivo = $validated['motivo'];
+			$fichaSeguimiento->recomendaciones = $validated['recomendaciones'] ?? '';
+			$fichaSeguimiento->fecha = Carbon::now()->format('Y-m-d');
+			$fichaSeguimiento->save();
+
+			if($request->get('interconsultas')){
+				foreach($request->get('interconsultas') as $interconsulta){
+					InterconsultaSeguimiento::create([
+						'tipo' => $interconsulta['tipo'],
+						'professional_id' => $interconsulta['professional_id'],
+						'motivo' => $interconsulta['motivo'] ?? '',
+						'ficha_seguimiento_id' => $fichaSeguimiento->id,
+					]);
+				}
+			}
+
+			return response()->json([
+				'message' => 'Ficha de seguimiento creada exitosamente.',
+				'ficha' => $fichaSeguimiento,
+			]);
+		}
+
+		public function getFichasSeguimiento($patient_id){
+			$fichaSeguimiento = FichaSeguimiento::with([
+				'interconsultas',
+			])->where('patient_id', $patient_id)->orderBy('fecha', 'desc')->get();
+			return response()->json($fichaSeguimiento);
+		}
+
+		public function storePlanSeguridad(Request $request){
+			$validated = $request->validate([
+				'patient_id' => 'required|integer',
+				'senales_advertencia' => 'required|string',
+				'estrategias' => 'required|string',
+				'personas_dis' => 'required|string',
+				'personas_ayuda' => 'required|string',
+				'razones_vivir' => 'required|string',
+				'medidas' => 'required|string',
+				'contactos_emergencia' => 'required|string',
+			]);
+
+			$planSeguridad = PlanSeguridad::create([
+				'fecha' => Carbon::now()->format('Y-m-d'),
+				'patient_id' => $validated['patient_id'],
+				'senales_advertencia' => $validated['senales_advertencia'],
+				'estrategias' => $validated['estrategias'],
+				'personas_dis' => $validated['personas_dis'],
+				'personas_ayuda' => $validated['personas_ayuda'],
+				'razones_vivir' => $validated['razones_vivir'],
+				'medidas' => $validated['medidas'],
+				'contactos_emergencia' => $validated['contactos_emergencia'],
+			]);
+
+			return response()->json([
+				'message' => 'Plan de seguridad creado exitosamente.',
+				'plan' => $planSeguridad,
+			]);
+		}
+
+		public function getPlanesSeguridad($patient_id){
+			$planesSeguridad = PlanSeguridad::where('patient_id', $patient_id)->orderBy('fecha', 'desc')->get();
+			return response()->json($planesSeguridad);
+		}
+		
+
 		public function getFullPatientDetails($id)
 		{
 			$patient = Patient::with([
@@ -941,6 +1024,9 @@ class PatientController extends Controller
 				$patient->distrito = DB::table('ubdistrito')->where('idDist', $patient->address->district)->first()->distrito;
 			}
 			$patient->triajes = DB::table('triaje')->where('patient_id', $id)->orderBy('id', 'desc')->get();
+			$patient->fichas_seguimiento = FichaSeguimiento::with('interconsultas')
+				->where('patient_id', $id)->orderBy('fecha', 'desc')->get();
+			$patient->planes_seguridad = DB::table('planes_seguridad')->where('patient_id', $id)->orderBy('fecha', 'desc')->get();
 			$patient->semaforo_estados = DB::table('semaforo')->where('patient_id', $id)->orderBy('registro', 'desc')->get();
 			$patient->deudas_financieras = DB::table('deudas')->where('patient_id', $id)->orderBy('fecha', 'desc')->get();
 			$patient->archivos_list = DB::table('archivos')->where('patient_id', $id)->get();

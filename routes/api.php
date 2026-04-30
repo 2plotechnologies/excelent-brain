@@ -101,6 +101,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('patient/{id}/full-details', [PatientController::class, 'getFullPatientDetails']);
         Route::get('chat/{patient_id}', [ChatRecepcionController::class, 'getChat']);
         Route::post('chat', [ChatRecepcionController::class, 'addMessage']);
+        Route::get('fichas-seguimiento/{patient_id}', [PatientController::class, 'getFichasSeguimiento']);
+        Route::post('ficha-seguimiento', [PatientController::class, 'storeFichaSeguimiento']);
+        Route::get('planes-seguridad/{patient_id}', [PatientController::class, 'getPlanesSeguridad']);
+        Route::post('plan-seguridad', [PatientController::class, 'storePlanSeguridad']);
 
         // Admin-only patient routes
         Route::middleware('role:administrador,recepcionista')->group(function () {
@@ -236,7 +240,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('insertarSeguimiento', [ExtrasController::class, 'insertarSeguimiento']);
         Route::get('pedirHistorialSeguimientos/{id}', [ExtrasController::class, 'pedirHistorialSeguimientos']);
         Route::get('listarPaquetes', [PaqueteController::class, 'listarPaquetes']);
+
+        //Reportes paquetes extra
         Route::get('reportePaquete/{id}', [PaqueteController::class, 'pdfReportePaquete']);
+        Route::get('reportes-paquetes-extra/{membresia_id}', [PaqueteController::class, 'getReportesPaquetesExtra']);
+        Route::post('reporte-paquete-extra', [PaqueteController::class, 'storeReportePaqueteExtra']);
+
     });
 
     // ── PROFESSIONALS & SCHEDULES ─────────────────────────────────────────────
