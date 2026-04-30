@@ -28,7 +28,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         signing: this.prof.signing,
         user_id: this.prof.user_id,
         email: this.prof.email,
-        password: this.prof.password
+        password: this.prof.password,
+        especialidad_receta: this.prof.especialidad_receta,
+        cmp: this.prof.cmp,
+        rne: this.prof.rne,
+        cpsp: this.prof.cpsp
       },
       type: ''
     };
@@ -400,7 +404,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               formData.append('cv_description', _this.prof.cv_description);
               formData.append('photo', _this.profe.photo);
               formData.append('signing', _this.profe.signing);
-              _context.next = 12;
+              formData.append('especialidad_receta', _this.prof.especialidad_receta || '');
+              formData.append('cmp', _this.prof.cmp || '');
+              formData.append('rne', _this.prof.rne || '');
+              formData.append('cpsp', _this.prof.cpsp || '');
+              _context.next = 16;
               return _this.axios.post('/api/professional', formData, config).then(function (response) {
                 console.log('rpta:' + response);
                 _this.clearModal();
@@ -411,7 +419,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               })["catch"](function (error) {
                 console.log(error);
               });
-            case 12:
+            case 16:
             case "end":
               return _context.stop();
           }
@@ -439,8 +447,12 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               formData.append('cv_description', _this2.prof.cv_description);
               formData.append('photo', _this2.profe.photo);
               formData.append('signing', _this2.profe.signing);
+              formData.append('especialidad_receta', _this2.prof.especialidad_receta || '');
+              formData.append('cmp', _this2.prof.cmp || '');
+              formData.append('rne', _this2.prof.rne || '');
+              formData.append('cpsp', _this2.prof.cpsp || '');
               formData.append('_method', 'PUT');
-              _context2.next = 13;
+              _context2.next = 17;
               return _this2.axios.post('/api/professional/' + _this2.prof.id, formData, config).then(function (response) {
                 //this.clearModal()
                 //this.clearImg()
@@ -450,7 +462,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               })["catch"](function (error) {
                 console.log('error' + error);
               });
-            case 13:
+            case 17:
             case "end":
               return _context2.stop();
           }
@@ -1655,7 +1667,115 @@ var render = function render() {
         _vm.$set(_vm.prof, "cv_description", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", {
+  })]), _vm._v(" "), _c("hr"), _vm._v(" "), _c("h6", [_vm._v("Datos para Recetas")]), _vm._v(" "), _c("div", {
+    staticClass: "form-group"
+  }, [_c("label", {
+    attrs: {
+      "for": "especialidad_receta"
+    }
+  }, [_vm._v("Especialidad para Recetas")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.prof.especialidad_receta,
+      expression: "prof.especialidad_receta"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      placeholder: "Ej: TERAPEUTA DE FAMILIAS Y PAREJAS"
+    },
+    domProps: {
+      value: _vm.prof.especialidad_receta
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.prof, "especialidad_receta", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _vm.prof.profession === "Psiquiatra" ? _c("div", [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", {
+    attrs: {
+      "for": "cmp"
+    }
+  }, [_vm._v("CMP (Colegio Médico del Perú)")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.prof.cmp,
+      expression: "prof.cmp"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      placeholder: "Ej: 12345"
+    },
+    domProps: {
+      value: _vm.prof.cmp
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.prof, "cmp", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "form-group"
+  }, [_c("label", {
+    attrs: {
+      "for": "rne"
+    }
+  }, [_vm._v("RNE (Registro Nacional de Especialistas)")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.prof.rne,
+      expression: "prof.rne"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      placeholder: "Ej: 67890"
+    },
+    domProps: {
+      value: _vm.prof.rne
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.prof, "rne", $event.target.value);
+      }
+    }
+  })])]) : _vm._e(), _vm._v(" "), _vm.prof.profession === "Psicólogo" ? _c("div", [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", {
+    attrs: {
+      "for": "cpsp"
+    }
+  }, [_vm._v("CPsP (Colegio de Psicólogos del Perú)")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.prof.cpsp,
+      expression: "prof.cpsp"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      placeholder: "Ej: 1234"
+    },
+    domProps: {
+      value: _vm.prof.cpsp
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.prof, "cpsp", $event.target.value);
+      }
+    }
+  })])]) : _vm._e()]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4 d-flex flex-column align-items-center"
   }, [_vm.type == "Agregar" ? _c("img", {
     staticClass: "rounded-circle",

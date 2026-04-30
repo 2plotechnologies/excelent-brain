@@ -165,7 +165,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.provincias = this.ubigeo.provincias.filter(function (provincia) {
         return provincia.idDepa == idDepa;
       });
-      if (borrar) this.dataPatient.patient.address.district = -1;
+      if (borrar) this.dataPatient.address.district = -1;
     },
     moverDistritos: function moverDistritos() {
       var idProv = this.dataPatient.address.province;
@@ -189,16 +189,36 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   mounted: function mounted() {
     //this.$parent.$on('cambioDato', this.capturaSeñal);
   },
-  computed: {
-    updateValues: function updateValues() {
-      return this.datos = this.dataPatient;
+  watch: {
+    dataPatient: {
+      handler: function handler() {
+        if (!this.dataPatient) return;
+        if (!this.dataPatient.address || Array.isArray(this.dataPatient.address)) {
+          this.dataPatient.address = {
+            department: -1,
+            province: -1,
+            district: -1,
+            address: ''
+          };
+        }
+        if (!this.dataPatient.relative || this.dataPatient.relative.length === 0) {
+          this.dataPatient.relative = [{
+            name: '',
+            phone: '',
+            kinship: ''
+          }, {
+            name: '',
+            phone: '',
+            kinship: ''
+          }];
+        }
+        this.datos = this.dataPatient;
+      },
+      immediate: true
     }
   },
-  updated: function updated() {
-    this.updateValues;
-  },
   created: function created() {
-    this.updateValues;
+    //this.updateValues;
     this.listarDepartamentos();
   }
 });
@@ -2538,12 +2558,12 @@ var render = function render() {
     attrs: {
       queInteresado: _vm.queInteresado
     }
-  }), _vm._v(" "), _c("ModalPagarDeuda", {
+  }), _vm._v(" "), _vm.queDeuda ? _c("ModalPagarDeuda", {
     attrs: {
       deuda: _vm.queDeuda,
       usuario: _vm.idUsuario
     }
-  }), _vm._v(" "), _c("ModalCambiarSeguimiento", {
+  }) : _vm._e(), _vm._v(" "), _c("ModalCambiarSeguimiento", {
     attrs: {
       seguimientos: _vm.seguimientos,
       idPaciente: _vm.queId,

@@ -54,7 +54,7 @@
         <div class="col-md-6 col-xl-3">
           <div class="card border-start border-danger border-4 h-100">
             <div class="card-body py-3">
-              <div class="small text-muted">Recuperación</div>
+              <div class="small text-muted">Activos</div>
               <div class="display-6 fw-bold">{{ resumen.recuperacion }}</div>
             </div>
           </div>
@@ -145,7 +145,7 @@
         <div class="col-md-6 col-xl-3">
           <div class="card border-start border-primary border-4 h-100 shadow-sm">
             <div class="card-body py-3 d-flex align-items-center">
-              <div class="bg-primary bg-opacity-10 text-primary rounded p-3 me-3 fs-4"><i class="fa-solid fa-users"></i></div>
+              <div class="bg-primary bg-opacity-10 rounded p-3 me-3 fs-4"><i class="fa-solid fa-users"></i></div>
               <div>
                 <div class="display-6 fw-bold mb-0 lh-1">{{ crmResumen.total }}</div>
                 <div class="small text-muted">Total Pacientes</div>
@@ -156,7 +156,7 @@
         <div class="col-md-6 col-xl-3">
           <div class="card border-start border-success border-4 h-100 shadow-sm">
             <div class="card-body py-3 d-flex align-items-center">
-              <div class="bg-success bg-opacity-10 text-success rounded p-3 me-3 fs-4"><i class="fa-solid fa-arrow-trend-up"></i></div>
+              <div class="bg-success bg-opacity-10 rounded p-3 me-3 fs-4"><i class="fa-solid fa-arrow-trend-up"></i></div>
               <div>
                 <div class="display-6 fw-bold mb-0 lh-1">{{ crmResumen.activos }}</div>
                 <div class="small text-muted">Activos</div>
@@ -167,7 +167,7 @@
         <div class="col-md-6 col-xl-3">
           <div class="card border-start border-warning border-4 h-100 shadow-sm">
             <div class="card-body py-3 d-flex align-items-center">
-              <div class="bg-warning bg-opacity-10 text-warning rounded p-3 me-3 fs-4"><i class="fa-solid fa-pause"></i></div>
+              <div class="bg-warning bg-opacity-10 rounded p-3 me-3 fs-4"><i class="fa-solid fa-pause"></i></div>
               <div>
                 <div class="display-6 fw-bold mb-0 lh-1">{{ crmResumen.pausa }}</div>
                 <div class="small text-muted">En Pausa</div>
@@ -178,7 +178,7 @@
         <div class="col-md-6 col-xl-3">
           <div class="card border-start border-danger border-4 h-100 shadow-sm">
             <div class="card-body py-3 d-flex align-items-center">
-              <div class="bg-danger bg-opacity-10 text-danger rounded p-3 me-3 fs-4"><i class="fa-solid fa-user-xmark"></i></div>
+              <div class="bg-danger bg-opacity-10 rounded p-3 me-3 fs-4"><i class="fa-solid fa-user-xmark"></i></div>
               <div>
                 <div class="display-6 fw-bold mb-0 lh-1">{{ crmResumen.perdidos }}</div>
                 <div class="small text-muted">Perdidos</div>
@@ -526,13 +526,13 @@ export default {
       if (this.tabActiva === 'fidelizacion') {
         return ['Fidelizado', 'No Fidelizado'];
       }
-      return ['Recuperación', 'Inactivo'];
+      return ['Activo', 'Inactivo'];
     },
     pacientesTab() {
       if (this.tabActiva === 'fidelizacion') {
         return this.pacientes.filter((item) => ['Fidelizado', 'No Fidelizado'].includes(item.etiqueta));
       }
-      return this.pacientes.filter((item) => ['Recuperación', 'Inactivo'].includes(item.etiqueta));
+      return this.pacientes.filter((item) => ['Activo', 'Inactivo'].includes(item.etiqueta));
     },
     pacientesFiltrados() {
       const texto = this.buscador.trim().toLowerCase();
@@ -692,6 +692,7 @@ export default {
       if (etiqueta === 'Fidelizado') return 'bg-success';
       if (etiqueta === 'No Fidelizado') return 'bg-warning text-dark';
       if (etiqueta === 'Inactivo') return 'bg-secondary';
+      if (etiqueta === 'Activo') return 'bg-danger';
       return 'bg-danger';
     },
     

@@ -76,7 +76,7 @@ __webpack_require__.r(__webpack_exports__);
 
     window.axios.defaults.headers.common['Authorization'] = "Bearer ".concat(this.token);
     this.axios.get('/api/user').then(function (res) {
-      console.log('home page', res.data.user);
+      //console.log('home page', res.data.user)
       var _res$data$user = res.data.user,
         id = _res$data$user.id,
         email = _res$data$user.email,

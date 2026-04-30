@@ -74,7 +74,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
       if (this.tabActiva === 'fidelizacion') {
         return ['Fidelizado', 'No Fidelizado'];
       }
-      return ['Recuperación', 'Inactivo'];
+      return ['Activo', 'Inactivo'];
     },
     pacientesTab: function pacientesTab() {
       if (this.tabActiva === 'fidelizacion') {
@@ -83,7 +83,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
         });
       }
       return this.pacientes.filter(function (item) {
-        return ['Recuperación', 'Inactivo'].includes(item.etiqueta);
+        return ['Activo', 'Inactivo'].includes(item.etiqueta);
       });
     },
     pacientesFiltrados: function pacientesFiltrados() {
@@ -339,6 +339,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
       if (etiqueta === 'Fidelizado') return 'bg-success';
       if (etiqueta === 'No Fidelizado') return 'bg-warning text-dark';
       if (etiqueta === 'Inactivo') return 'bg-secondary';
+      if (etiqueta === 'Activo') return 'bg-danger';
       return 'bg-danger';
     },
     // CRM Methods
@@ -571,7 +572,7 @@ var render = function render() {
     staticClass: "card-body py-3"
   }, [_c("div", {
     staticClass: "small text-muted"
-  }, [_vm._v("Recuperación")]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Activos")]), _vm._v(" "), _c("div", {
     staticClass: "display-6 fw-bold"
   }, [_vm._v(_vm._s(_vm.resumen.recuperacion))])])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 col-xl-3"
@@ -1360,7 +1361,7 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "bg-primary bg-opacity-10 text-primary rounded p-3 me-3 fs-4"
+    staticClass: "bg-primary bg-opacity-10 rounded p-3 me-3 fs-4"
   }, [_c("i", {
     staticClass: "fa-solid fa-users"
   })]);
@@ -1368,7 +1369,7 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "bg-success bg-opacity-10 text-success rounded p-3 me-3 fs-4"
+    staticClass: "bg-success bg-opacity-10 rounded p-3 me-3 fs-4"
   }, [_c("i", {
     staticClass: "fa-solid fa-arrow-trend-up"
   })]);
@@ -1376,7 +1377,7 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "bg-warning bg-opacity-10 text-warning rounded p-3 me-3 fs-4"
+    staticClass: "bg-warning bg-opacity-10 rounded p-3 me-3 fs-4"
   }, [_c("i", {
     staticClass: "fa-solid fa-pause"
   })]);
@@ -1384,7 +1385,7 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "bg-danger bg-opacity-10 text-danger rounded p-3 me-3 fs-4"
+    staticClass: "bg-danger bg-opacity-10 rounded p-3 me-3 fs-4"
   }, [_c("i", {
     staticClass: "fa-solid fa-user-xmark"
   })]);

@@ -3151,17 +3151,17 @@ var render = function render() {
       foto: _vm.foto,
       habilitarEliminado: _vm.habilitarEliminado
     }
-  }), _vm._v(" "), _c("ModalDividirPago", {
+  }), _vm._v(" "), _vm.pagoSeleccionado ? _c("ModalDividirPago", {
     attrs: {
       pago: _vm.pagoSeleccionado,
       idUsuario: _vm.$attrs.idUser
     }
-  }), _vm._v(" "), _c("ModalFacturacion", {
+  }) : _vm._e(), _vm._v(" "), _vm.pagoSeleccionado ? _c("ModalFacturacion", {
     attrs: {
       idSede: _vm.$attrs.idSede,
       pago: _vm.pagoSeleccionado
     }
-  })], 1);
+  }) : _vm._e()], 1);
 };
 var staticRenderFns = [function () {
   var _vm = this,

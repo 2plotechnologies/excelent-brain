@@ -492,7 +492,115 @@ var render = function render() {
         _vm.$set(_vm.professional, "cv_description", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("button", {
+  })]), _vm._v(" "), _c("hr"), _vm._v(" "), _c("h6", [_vm._v("Datos para Recetas")]), _vm._v(" "), _c("div", {
+    staticClass: "form-group"
+  }, [_c("label", {
+    attrs: {
+      "for": "especialidad_receta"
+    }
+  }, [_vm._v("Especialidad para Recetas")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.professional.especialidad_receta,
+      expression: "professional.especialidad_receta"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      placeholder: "Ej: TERAPEUTA DE FAMILIAS Y PAREJAS"
+    },
+    domProps: {
+      value: _vm.professional.especialidad_receta
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.professional, "especialidad_receta", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _vm.professional.profession === "Psiquiatra" ? _c("div", [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", {
+    attrs: {
+      "for": "cmp"
+    }
+  }, [_vm._v("CMP (Colegio Médico del Perú)")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.professional.cmp,
+      expression: "professional.cmp"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      placeholder: "Ej: 12345"
+    },
+    domProps: {
+      value: _vm.professional.cmp
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.professional, "cmp", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "form-group"
+  }, [_c("label", {
+    attrs: {
+      "for": "rne"
+    }
+  }, [_vm._v("RNE (Registro Nacional de Especialistas)")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.professional.rne,
+      expression: "professional.rne"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      placeholder: "Ej: 67890"
+    },
+    domProps: {
+      value: _vm.professional.rne
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.professional, "rne", $event.target.value);
+      }
+    }
+  })])]) : _vm._e(), _vm._v(" "), _vm.professional.profession === "Psicólogo" ? _c("div", [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", {
+    attrs: {
+      "for": "cpsp"
+    }
+  }, [_vm._v("CPsP (Colegio de Psicólogos del Perú)")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.professional.cpsp,
+      expression: "professional.cpsp"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      placeholder: "Ej: 1234"
+    },
+    domProps: {
+      value: _vm.professional.cpsp
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.professional, "cpsp", $event.target.value);
+      }
+    }
+  })])]) : _vm._e(), _vm._v(" "), _c("button", {
     staticClass: "btn btn-secondary",
     attrs: {
       type: "button",

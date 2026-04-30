@@ -225,7 +225,7 @@ import moment from 'moment'
 				this.caso.moneda = this.dataCita.payment?.payment_method == undefined ? 1:this.dataCita.payment?.payment_method ;
 				this.caso.continuo = this.dataCita.payment?.continuo;
 				this.caso.user_id = this.idUsuario
-				this.neto = parseFloat(this.dataCita.payment?.price)
+				this.neto = parseFloat(this.dataCita.payment?.price) || 0
 			}
 		},
 		created () {
@@ -233,9 +233,8 @@ import moment from 'moment'
 			this.caso.pago = this.dataCita.payment?.pay_status;
 			this.caso.moneda = this.dataCita.payment?.payment_method == undefined ? 1:this.dataCita?.payment.payment_method ;
 			this.caso.continuo = this.dataCita.payment?.continuo;
-			this.caso.user_id = this.idUsuario
-
-
+			this.caso.user_id = this.idUsuario;
+			this.neto = parseFloat(this.dataCita.payment?.price) || 0;
 		},
 	}
 </script>

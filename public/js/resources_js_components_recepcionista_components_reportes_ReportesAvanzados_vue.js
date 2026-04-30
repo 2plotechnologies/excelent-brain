@@ -152,7 +152,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.provincias = this.ubigeo.provincias.filter(function (provincia) {
         return provincia.idDepa == idDepa;
       });
-      if (borrar) this.dataPatient.patient.address.district = -1;
+      if (borrar) this.dataPatient.address.district = -1;
     },
     moverDistritos: function moverDistritos() {
       var idProv = this.dataPatient.address.province;
@@ -176,16 +176,36 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   mounted: function mounted() {
     //this.$parent.$on('cambioDato', this.capturaSeñal);
   },
-  computed: {
-    updateValues: function updateValues() {
-      return this.datos = this.dataPatient;
+  watch: {
+    dataPatient: {
+      handler: function handler() {
+        if (!this.dataPatient) return;
+        if (!this.dataPatient.address || Array.isArray(this.dataPatient.address)) {
+          this.dataPatient.address = {
+            department: -1,
+            province: -1,
+            district: -1,
+            address: ''
+          };
+        }
+        if (!this.dataPatient.relative || this.dataPatient.relative.length === 0) {
+          this.dataPatient.relative = [{
+            name: '',
+            phone: '',
+            kinship: ''
+          }, {
+            name: '',
+            phone: '',
+            kinship: ''
+          }];
+        }
+        this.datos = this.dataPatient;
+      },
+      immediate: true
     }
   },
-  updated: function updated() {
-    this.updateValues;
-  },
   created: function created() {
-    this.updateValues;
+    //this.updateValues;
     this.listarDepartamentos();
   }
 });
@@ -222,7 +242,7 @@ __webpack_require__.r(__webpack_exports__);
       idReporte: 0,
       resultados: [],
       ocultarFechas: false,
-      dataPaciente: [],
+      dataPaciente: null,
       fecha: {
         año: moment__WEBPACK_IMPORTED_MODULE_2___default()().format('YYYY'),
         mes: moment__WEBPACK_IMPORTED_MODULE_2___default()().format('M')
@@ -1862,11 +1882,11 @@ var render = function render() {
       idProfesional: 7,
       elegido: _vm.elegido
     }
-  }), _vm._v(" "), _c("ModalEditPatients", {
+  }), _vm._v(" "), _vm.dataPaciente ? _c("ModalEditPatients", {
     attrs: {
       dataPatient: _vm.dataPaciente
     }
-  })], 1);
+  }) : _vm._e()], 1);
 };
 var staticRenderFns = [function () {
   var _vm = this,

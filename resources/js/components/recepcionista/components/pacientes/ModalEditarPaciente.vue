@@ -4,7 +4,7 @@
     <div class="modal-content">
       <div class="modal-header">
 				<h5 class="modal-title" id="exampleModalLabel"> Datos del Paciente</h5>
-        <button type="button" id="btnCerrarEdPac" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" id="btnCerrarEdPac" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -71,10 +71,10 @@
 							<div class="col-sm-6">
 								<label for="name">Género</label>
 								<select class="form-select" id="sexo" v-model="dataPatient.gender">
-									<option value="2">Sin definir</option>
-									<option value="0">Femenino</option>
-									<option value="1">Masculino</option>
-							    <option value="3">LGTB+</option>
+									<option :value="2">Sin definir</option>
+									<option :value="0">Femenino</option>
+									<option :value="1">Masculino</option>
+							    <option :value="3">LGTB+</option>
 								</select>
 							</div>
               <div class="col-sm-6">
@@ -191,7 +191,13 @@ export default {
     closeModal() {
       document.getElementById('btnCerrarEdPac').click();
     },
+
 		async listarDepartamentos(){
+			if (this.ubigeo.departamentos.length > 0) {
+				this.moverProvincias(false);
+				this.moverDistritos();
+				return;
+			}
 			await this.axios.get('/api/departamentos')
 			.then(response => {
 				this.ubigeo.departamentos = response.data['departamentos'];
@@ -205,14 +211,23 @@ export default {
 				this.moverDistritos()
 			})
 		},
+
 		moverProvincias(borrar){
-			let idDepa= this.dataPatient.address.department ;
-			this.provincias = this.ubigeo.provincias.filter(provincia=> provincia.idDepa == idDepa)
-			if(borrar) this.dataPatient.patient.address.district=-1;
+				if (this.dataPatient.address) {
+				let idDepa= this.dataPatient.address.department ;
+				this.provincias = this.ubigeo.provincias.filter(provincia=> provincia.idDepa == idDepa)
+				if(borrar) {
+					this.dataPatient.address.province = -1;
+					this.dataPatient.address.district = -1;
+					this.distritos = [];
+				}
+			}
 		},
 		moverDistritos(){			
-			let idProv= this.dataPatient.address.province;
-			this.distritos = this.ubigeo.distritos.filter(distrito=> distrito.idProv == idProv)
+			if (this.dataPatient.address) {
+				let idProv= this.dataPatient.address.province;
+				this.distritos = this.ubigeo.distritos.filter(distrito=> distrito.idProv == idProv)
+			}
 		},
 		capturaSeñal() {
       console.log('apli');
@@ -226,10 +241,24 @@ export default {
 		//this.$parent.$on('cambioDato', this.capturaSeñal);
 	},
 
-  computed: {
-    updateValues () {      
-			this.listarDepartamentos();
-      return this.datos = this.dataPatient
+  watch: {
+    dataPatient: {
+      handler(newVal) {
+        if (newVal) {
+          if (!newVal.address) {
+            newVal.address = { address: '', department: -1, province: -1, district: -1 };
+          }
+          this.datos = newVal;
+          if (this.ubigeo.departamentos.length > 0) {
+            this.moverProvincias(false);
+            this.moverDistritos();
+          } else {
+            this.listarDepartamentos();
+          }
+        }
+      },
+      deep: true,
+      immediate: true,
     }
   },
 
@@ -239,7 +268,7 @@ export default {
   },
 
   created () {
-    this.updateValues;
+    //this.updateValues;
   },
 } 
 </script>

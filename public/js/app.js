@@ -8268,16 +8268,17 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.caso.moneda = ((_this$dataCita$paymen2 = this.dataCita.payment) === null || _this$dataCita$paymen2 === void 0 ? void 0 : _this$dataCita$paymen2.payment_method) == undefined ? 1 : (_this$dataCita$paymen3 = this.dataCita.payment) === null || _this$dataCita$paymen3 === void 0 ? void 0 : _this$dataCita$paymen3.payment_method;
       this.caso.continuo = (_this$dataCita$paymen4 = this.dataCita.payment) === null || _this$dataCita$paymen4 === void 0 ? void 0 : _this$dataCita$paymen4.continuo;
       this.caso.user_id = this.idUsuario;
-      this.neto = parseFloat((_this$dataCita$paymen5 = this.dataCita.payment) === null || _this$dataCita$paymen5 === void 0 ? void 0 : _this$dataCita$paymen5.price);
+      this.neto = parseFloat((_this$dataCita$paymen5 = this.dataCita.payment) === null || _this$dataCita$paymen5 === void 0 ? void 0 : _this$dataCita$paymen5.price) || 0;
     }
   },
   created: function created() {
-    var _this$dataCita$paymen6, _this$dataCita$paymen7, _this$dataCita, _this$dataCita$paymen8;
+    var _this$dataCita$paymen6, _this$dataCita$paymen7, _this$dataCita, _this$dataCita$paymen8, _this$dataCita$paymen9;
     this.dataCita = this.cita;
     this.caso.pago = (_this$dataCita$paymen6 = this.dataCita.payment) === null || _this$dataCita$paymen6 === void 0 ? void 0 : _this$dataCita$paymen6.pay_status;
     this.caso.moneda = ((_this$dataCita$paymen7 = this.dataCita.payment) === null || _this$dataCita$paymen7 === void 0 ? void 0 : _this$dataCita$paymen7.payment_method) == undefined ? 1 : (_this$dataCita = this.dataCita) === null || _this$dataCita === void 0 ? void 0 : _this$dataCita.payment.payment_method;
     this.caso.continuo = (_this$dataCita$paymen8 = this.dataCita.payment) === null || _this$dataCita$paymen8 === void 0 ? void 0 : _this$dataCita$paymen8.continuo;
     this.caso.user_id = this.idUsuario;
+    this.neto = parseFloat((_this$dataCita$paymen9 = this.dataCita.payment) === null || _this$dataCita$paymen9 === void 0 ? void 0 : _this$dataCita$paymen9.price) || 0;
   }
 });
 

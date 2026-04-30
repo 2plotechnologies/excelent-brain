@@ -2328,7 +2328,15 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              _context2.next = 2;
+              if (!(_this2.ubigeo.departamentos.length > 0)) {
+                _context2.next = 4;
+                break;
+              }
+              _this2.moverProvincias(false);
+              _this2.moverDistritos();
+              return _context2.abrupt("return");
+            case 4:
+              _context2.next = 6;
               return _this2.axios.get('/api/departamentos').then(function (response) {
                 _this2.ubigeo.departamentos = response.data['departamentos'];
                 _this2.ubigeo.provincias = response.data['provincias'];
@@ -2342,7 +2350,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 _this2.moverProvincias(false);
                 _this2.moverDistritos();
               });
-            case 2:
+            case 6:
             case "end":
               return _context2.stop();
           }
@@ -2350,17 +2358,25 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }))();
     },
     moverProvincias: function moverProvincias(borrar) {
-      var idDepa = this.dataPatient.address.department;
-      this.provincias = this.ubigeo.provincias.filter(function (provincia) {
-        return provincia.idDepa == idDepa;
-      });
-      if (borrar) this.dataPatient.patient.address.district = -1;
+      if (this.dataPatient.address) {
+        var idDepa = this.dataPatient.address.department;
+        this.provincias = this.ubigeo.provincias.filter(function (provincia) {
+          return provincia.idDepa == idDepa;
+        });
+        if (borrar) {
+          this.dataPatient.address.province = -1;
+          this.dataPatient.address.district = -1;
+          this.distritos = [];
+        }
+      }
     },
     moverDistritos: function moverDistritos() {
-      var idProv = this.dataPatient.address.province;
-      this.distritos = this.ubigeo.distritos.filter(function (distrito) {
-        return distrito.idProv == idProv;
-      });
+      if (this.dataPatient.address) {
+        var idProv = this.dataPatient.address.province;
+        this.distritos = this.ubigeo.distritos.filter(function (distrito) {
+          return distrito.idProv == idProv;
+        });
+      }
     },
     capturaSeñal: function capturaSeñal() {
       console.log('apli');
@@ -2378,10 +2394,29 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   mounted: function mounted() {
     //this.$parent.$on('cambioDato', this.capturaSeñal);
   },
-  computed: {
-    updateValues: function updateValues() {
-      this.listarDepartamentos();
-      return this.datos = this.dataPatient;
+  watch: {
+    dataPatient: {
+      handler: function handler(newVal) {
+        if (newVal) {
+          if (!newVal.address) {
+            newVal.address = {
+              address: '',
+              department: -1,
+              province: -1,
+              district: -1
+            };
+          }
+          this.datos = newVal;
+          if (this.ubigeo.departamentos.length > 0) {
+            this.moverProvincias(false);
+            this.moverDistritos();
+          } else {
+            this.listarDepartamentos();
+          }
+        }
+      },
+      deep: true,
+      immediate: true
     }
   },
   updated: function updated() {
@@ -2389,7 +2424,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     //console.log('ver paciente rel ',this.dataPatient.relative);
   },
   created: function created() {
-    this.updateValues;
+    //this.updateValues;
   }
 });
 
@@ -7747,20 +7782,20 @@ var render = function render() {
       }
     }
   }, [_c("option", {
-    attrs: {
-      value: "2"
+    domProps: {
+      value: 2
     }
   }, [_vm._v("Sin definir")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "0"
+    domProps: {
+      value: 0
     }
   }, [_vm._v("Femenino")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "1"
+    domProps: {
+      value: 1
     }
   }, [_vm._v("Masculino")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "3"
+    domProps: {
+      value: 3
     }
   }, [_vm._v("LGTB+")])])]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-6"
@@ -8120,7 +8155,7 @@ var staticRenderFns = [function () {
     attrs: {
       type: "button",
       id: "btnCerrarEdPac",
-      "data-dismiss": "modal",
+      "data-bs-dismiss": "modal",
       "aria-label": "Close"
     }
   }, [_c("span", {
