@@ -70,6 +70,30 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
     };
   },
   computed: {
+    fidelizacionStats: function fidelizacionStats() {
+      var f = this.resumen.fidelizados || 0;
+      var nf = this.resumen.noFidelizados || 0;
+      var total = f + nf;
+      var tasa = total > 0 ? (f / total * 100).toFixed(1) : 0;
+      return {
+        total: total,
+        fidelizados: f,
+        noFidelizados: nf,
+        tasa: tasa
+      };
+    },
+    recuperacionStats: function recuperacionStats() {
+      var act = this.resumen.recuperacion || 0;
+      var inact = this.resumen.inactivos || 0;
+      var total = act + inact;
+      var tasa = total > 0 ? (act / total * 100).toFixed(1) : 0;
+      return {
+        total: total,
+        activos: act,
+        inactivos: inact,
+        tasa: tasa
+      };
+    },
     estadosActuales: function estadosActuales() {
       if (this.tabActiva === 'fidelizacion') {
         return ['Fidelizado', 'No Fidelizado'];
@@ -535,7 +559,91 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fa-solid fa-bell me-1"
-  }), _vm._v(" CRM Seguimiento\n    ")])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" CRM Seguimiento\n    ")])]), _vm._v(" "), _vm.tabActiva === "fidelizacion" ? _c("div", [_c("div", {
+    staticClass: "row g-3 mb-3"
+  }, [_c("div", {
+    staticClass: "col-md-6 col-xl-3"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm h-100 rounded-4"
+  }, [_c("div", {
+    staticClass: "card-body p-4 d-flex align-items-center"
+  }, [_vm._m(1), _vm._v(" "), _c("div", [_c("h6", {
+    staticClass: "text-muted mb-1 fw-semibold"
+  }, [_vm._v("Total Pacientes")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 fw-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.fidelizacionStats.total))])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 col-xl-3"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm h-100 rounded-4"
+  }, [_c("div", {
+    staticClass: "card-body p-4 d-flex align-items-center"
+  }, [_vm._m(2), _vm._v(" "), _c("div", [_c("h6", {
+    staticClass: "text-muted mb-1 fw-semibold"
+  }, [_vm._v("Fidelizados")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 fw-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.fidelizacionStats.fidelizados))])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 col-xl-3"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm h-100 rounded-4"
+  }, [_c("div", {
+    staticClass: "card-body p-4 d-flex align-items-center"
+  }, [_vm._m(3), _vm._v(" "), _c("div", [_c("h6", {
+    staticClass: "text-muted mb-1 fw-semibold"
+  }, [_vm._v("No Fidelizados")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 fw-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.fidelizacionStats.noFidelizados))])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 col-xl-3"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm h-100 rounded-4"
+  }, [_c("div", {
+    staticClass: "card-body p-4 d-flex align-items-center"
+  }, [_vm._m(4), _vm._v(" "), _c("div", [_c("h6", {
+    staticClass: "text-muted mb-1 fw-semibold"
+  }, [_vm._v("Tasa Fidelización")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 fw-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.fidelizacionStats.tasa) + "%")])])])])])])]) : _vm._e(), _vm._v(" "), _vm.tabActiva === "recuperacion" ? _c("div", [_c("div", {
+    staticClass: "row g-3 mb-3"
+  }, [_c("div", {
+    staticClass: "col-md-6 col-xl-3"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm h-100 rounded-4"
+  }, [_c("div", {
+    staticClass: "card-body p-4 d-flex align-items-center"
+  }, [_vm._m(5), _vm._v(" "), _c("div", [_c("h6", {
+    staticClass: "text-muted mb-1 fw-semibold"
+  }, [_vm._v("Total en Evaluación")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 fw-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.recuperacionStats.total))])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 col-xl-3"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm h-100 rounded-4"
+  }, [_c("div", {
+    staticClass: "card-body p-4 d-flex align-items-center"
+  }, [_vm._m(6), _vm._v(" "), _c("div", [_c("h6", {
+    staticClass: "text-muted mb-1 fw-semibold"
+  }, [_vm._v("Activos")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 fw-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.recuperacionStats.activos))])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 col-xl-3"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm h-100 rounded-4"
+  }, [_c("div", {
+    staticClass: "card-body p-4 d-flex align-items-center"
+  }, [_vm._m(7), _vm._v(" "), _c("div", [_c("h6", {
+    staticClass: "text-muted mb-1 fw-semibold"
+  }, [_vm._v("Inactivos")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 fw-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.recuperacionStats.inactivos))])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 col-xl-3"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm h-100 rounded-4"
+  }, [_c("div", {
+    staticClass: "card-body p-4 d-flex align-items-center"
+  }, [_vm._m(8), _vm._v(" "), _c("div", [_c("h6", {
+    staticClass: "text-muted mb-1 fw-semibold"
+  }, [_vm._v("Tasa Actividad")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 fw-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.recuperacionStats.tasa) + "%")])])])])])])]) : _vm._e(), _vm._v(" "), _c("div", {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -543,48 +651,6 @@ var render = function render() {
       expression: "tabActiva !== 'crmSeguimiento'"
     }]
   }, [_c("div", {
-    staticClass: "row g-3 mb-3"
-  }, [_c("div", {
-    staticClass: "col-md-6 col-xl-3"
-  }, [_c("div", {
-    staticClass: "card border-start border-success border-4 h-100"
-  }, [_c("div", {
-    staticClass: "card-body py-3"
-  }, [_c("div", {
-    staticClass: "small text-muted"
-  }, [_vm._v("Fidelizados")]), _vm._v(" "), _c("div", {
-    staticClass: "display-6 fw-bold"
-  }, [_vm._v(_vm._s(_vm.resumen.fidelizados))])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-6 col-xl-3"
-  }, [_c("div", {
-    staticClass: "card border-start border-warning border-4 h-100"
-  }, [_c("div", {
-    staticClass: "card-body py-3"
-  }, [_c("div", {
-    staticClass: "small text-muted"
-  }, [_vm._v("No fidelizados")]), _vm._v(" "), _c("div", {
-    staticClass: "display-6 fw-bold"
-  }, [_vm._v(_vm._s(_vm.resumen.noFidelizados))])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-6 col-xl-3"
-  }, [_c("div", {
-    staticClass: "card border-start border-danger border-4 h-100"
-  }, [_c("div", {
-    staticClass: "card-body py-3"
-  }, [_c("div", {
-    staticClass: "small text-muted"
-  }, [_vm._v("Activos")]), _vm._v(" "), _c("div", {
-    staticClass: "display-6 fw-bold"
-  }, [_vm._v(_vm._s(_vm.resumen.recuperacion))])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-6 col-xl-3"
-  }, [_c("div", {
-    staticClass: "card border-start border-secondary border-4 h-100"
-  }, [_c("div", {
-    staticClass: "card-body py-3"
-  }, [_c("div", {
-    staticClass: "small text-muted"
-  }, [_vm._v("Inactivos")]), _vm._v(" "), _c("div", {
-    staticClass: "display-6 fw-bold"
-  }, [_vm._v(_vm._s(_vm.resumen.inactivos))])])])])]), _vm._v(" "), _c("div", {
     staticClass: "card mb-3"
   }, [_c("div", {
     staticClass: "card-body"
@@ -655,7 +721,7 @@ var render = function render() {
     staticClass: "table-responsive"
   }, [_c("table", {
     staticClass: "table table-hover mb-0"
-  }, [_vm._m(1), _vm._v(" "), _c("tbody", [_vm.cargando ? _c("tr", [_vm._m(2)]) : [_vm._l(_vm.pacientesFiltrados, function (item) {
+  }, [_vm._m(9), _vm._v(" "), _c("tbody", [_vm.cargando ? _c("tr", [_vm._m(10)]) : [_vm._l(_vm.pacientesFiltrados, function (item) {
     return _c("tr", {
       key: item.patient_id
     }, [_c("td", {
@@ -676,44 +742,44 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "col-md-6 col-xl-3"
   }, [_c("div", {
-    staticClass: "card border-start border-primary border-4 h-100 shadow-sm"
+    staticClass: "card border-0 shadow-sm h-100 rounded-4"
   }, [_c("div", {
-    staticClass: "card-body py-3 d-flex align-items-center"
-  }, [_vm._m(3), _vm._v(" "), _c("div", [_c("div", {
-    staticClass: "display-6 fw-bold mb-0 lh-1"
-  }, [_vm._v(_vm._s(_vm.crmResumen.total))]), _vm._v(" "), _c("div", {
-    staticClass: "small text-muted"
-  }, [_vm._v("Total Pacientes")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body p-4 d-flex align-items-center"
+  }, [_vm._m(11), _vm._v(" "), _c("div", [_c("h6", {
+    staticClass: "text-muted mb-1 fw-semibold"
+  }, [_vm._v("Total Interesados")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 fw-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.crmResumen.total))])])])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 col-xl-3"
   }, [_c("div", {
-    staticClass: "card border-start border-success border-4 h-100 shadow-sm"
+    staticClass: "card border-0 shadow-sm h-100 rounded-4"
   }, [_c("div", {
-    staticClass: "card-body py-3 d-flex align-items-center"
-  }, [_vm._m(4), _vm._v(" "), _c("div", [_c("div", {
-    staticClass: "display-6 fw-bold mb-0 lh-1"
-  }, [_vm._v(_vm._s(_vm.crmResumen.activos))]), _vm._v(" "), _c("div", {
-    staticClass: "small text-muted"
-  }, [_vm._v("Activos")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body p-4 d-flex align-items-center"
+  }, [_vm._m(12), _vm._v(" "), _c("div", [_c("h6", {
+    staticClass: "text-muted mb-1 fw-semibold"
+  }, [_vm._v("Activos")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 fw-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.crmResumen.activos))])])])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 col-xl-3"
   }, [_c("div", {
-    staticClass: "card border-start border-warning border-4 h-100 shadow-sm"
+    staticClass: "card border-0 shadow-sm h-100 rounded-4"
   }, [_c("div", {
-    staticClass: "card-body py-3 d-flex align-items-center"
-  }, [_vm._m(5), _vm._v(" "), _c("div", [_c("div", {
-    staticClass: "display-6 fw-bold mb-0 lh-1"
-  }, [_vm._v(_vm._s(_vm.crmResumen.pausa))]), _vm._v(" "), _c("div", {
-    staticClass: "small text-muted"
-  }, [_vm._v("En Pausa")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body p-4 d-flex align-items-center"
+  }, [_vm._m(13), _vm._v(" "), _c("div", [_c("h6", {
+    staticClass: "text-muted mb-1 fw-semibold"
+  }, [_vm._v("En Pausa")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 fw-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.crmResumen.pausa))])])])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 col-xl-3"
   }, [_c("div", {
-    staticClass: "card border-start border-danger border-4 h-100 shadow-sm"
+    staticClass: "card border-0 shadow-sm h-100 rounded-4"
   }, [_c("div", {
-    staticClass: "card-body py-3 d-flex align-items-center"
-  }, [_vm._m(6), _vm._v(" "), _c("div", [_c("div", {
-    staticClass: "display-6 fw-bold mb-0 lh-1"
-  }, [_vm._v(_vm._s(_vm.crmResumen.perdidos))]), _vm._v(" "), _c("div", {
-    staticClass: "small text-muted"
-  }, [_vm._v("Perdidos")])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card-body p-4 d-flex align-items-center"
+  }, [_vm._m(14), _vm._v(" "), _c("div", [_c("h6", {
+    staticClass: "text-muted mb-1 fw-semibold"
+  }, [_vm._v("Perdidos")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 fw-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.crmResumen.perdidos))])])])])])]), _vm._v(" "), _c("div", {
     staticClass: "card mb-3 shadow-sm border-0"
   }, [_c("div", {
     staticClass: "card-body"
@@ -723,7 +789,7 @@ var render = function render() {
     staticClass: "col-lg-6"
   }, [_c("div", {
     staticClass: "input-group"
-  }, [_vm._m(7), _vm._v(" "), _c("input", {
+  }, [_vm._m(15), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -855,7 +921,7 @@ var render = function render() {
     staticClass: "table-responsive"
   }, [_c("table", {
     staticClass: "table table-hover align-middle mb-0 crm-table"
-  }, [_vm._m(8), _vm._v(" "), _c("tbody", [_vm.cargandoCRM ? _c("tr", [_vm._m(9)]) : [_vm._l(_vm.crmPacientesFiltrados, function (item) {
+  }, [_vm._m(16), _vm._v(" "), _c("tbody", [_vm.cargandoCRM ? _c("tr", [_vm._m(17)]) : [_vm._l(_vm.crmPacientesFiltrados, function (item) {
     return _c("tr", {
       key: item.id
     }, [_c("td", [_c("div", {
@@ -999,7 +1065,7 @@ var render = function render() {
     staticClass: "modal-header border-bottom-0 pb-0"
   }, [_vm.pacienteCRMSeleccionado ? _c("div", {
     staticClass: "d-flex align-items-center"
-  }, [_vm._m(10), _vm._v(" "), _c("div", [_c("h5", {
+  }, [_vm._m(18), _vm._v(" "), _c("div", [_c("h5", {
     staticClass: "modal-title fw-bold mb-0 text-capitalize"
   }, [_vm._v(_vm._s(_vm.pacienteCRMSeleccionado.name) + " " + _vm._s(_vm.pacienteCRMSeleccionado.nombres))]), _vm._v(" "), _c("div", {
     staticClass: "text-muted small"
@@ -1045,7 +1111,7 @@ var render = function render() {
     staticClass: "col-3"
   }, [_c("div", {
     staticClass: "card border-0 shadow-sm rounded-3 py-2"
-  }, [_vm._m(11), _vm._v(" "), _c("div", {
+  }, [_vm._m(19), _vm._v(" "), _c("div", {
     staticClass: "fw-bold fs-5 lh-1 mt-1"
   }, [_vm._v(_vm._s(_vm.pacienteCRMSeleccionado.total_membresias))]), _vm._v(" "), _c("div", {
     staticClass: "small text-muted",
@@ -1056,7 +1122,7 @@ var render = function render() {
     staticClass: "col-3"
   }, [_c("div", {
     staticClass: "card border-0 shadow-sm rounded-3 py-2"
-  }, [_vm._m(12), _vm._v(" "), _c("div", {
+  }, [_vm._m(20), _vm._v(" "), _c("div", {
     staticClass: "fw-bold fs-5 lh-1 mt-1"
   }, [_vm._v(_vm._s(_vm.pacienteCRMSeleccionado.total_citas))]), _vm._v(" "), _c("div", {
     staticClass: "small text-muted",
@@ -1067,7 +1133,7 @@ var render = function render() {
     staticClass: "col-3"
   }, [_c("div", {
     staticClass: "card border-0 shadow-sm rounded-3 py-2"
-  }, [_vm._m(13), _vm._v(" "), _c("div", {
+  }, [_vm._m(21), _vm._v(" "), _c("div", {
     staticClass: "fw-bold fs-5 lh-1 mt-1"
   }, [_vm._v(_vm._s(_vm.pacienteCRMSeleccionado.total_citas_reprogramadas))]), _vm._v(" "), _c("div", {
     staticClass: "small text-muted",
@@ -1078,7 +1144,7 @@ var render = function render() {
     staticClass: "col-3"
   }, [_c("div", {
     staticClass: "card border-0 shadow-sm rounded-3 py-2"
-  }, [_vm._m(14), _vm._v(" "), _vm.pacienteCRMSeleccionado.lastAppointment ? _c("div", {
+  }, [_vm._m(22), _vm._v(" "), _vm.pacienteCRMSeleccionado.lastAppointment ? _c("div", {
     staticClass: "fw-bold fs-6 lh-1 mt-1"
   }, [_vm._v(_vm._s(_vm.fechaLatam(_vm.pacienteCRMSeleccionado.lastAppointment.date)))]) : _c("div", {
     staticClass: "fw-bold fs-6 lh-1 mt-1 text-muted"
@@ -1338,6 +1404,102 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3",
+    staticStyle: {
+      width: "48px",
+      height: "48px"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-users fs-4"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3",
+    staticStyle: {
+      width: "48px",
+      height: "48px"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-user-check fs-4"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3",
+    staticStyle: {
+      width: "48px",
+      height: "48px"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-user-xmark fs-4"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3",
+    staticStyle: {
+      width: "48px",
+      height: "48px"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-chart-pie fs-4"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3",
+    staticStyle: {
+      width: "48px",
+      height: "48px"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-users fs-4"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3",
+    staticStyle: {
+      width: "48px",
+      height: "48px"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-user-clock fs-4"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "bg-secondary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3",
+    staticStyle: {
+      width: "48px",
+      height: "48px"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-user-minus fs-4"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3",
+    staticStyle: {
+      width: "48px",
+      height: "48px"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-bolt fs-4"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
   return _c("thead", [_c("tr", [_c("th", [_vm._v("Paciente")]), _vm._v(" "), _c("th", [_vm._v("Servicio")]), _vm._v(" "), _c("th", [_vm._v("Profesional")]), _vm._v(" "), _c("th", [_vm._v("Citas")]), _vm._v(" "), _c("th", [_vm._v("1° Atención")]), _vm._v(" "), _c("th", [_vm._v("Última Cita")]), _vm._v(" "), _c("th", [_vm._v("Días sin venir")]), _vm._v(" "), _c("th", [_vm._v("Etiqueta")])])]);
 }, function () {
   var _vm = this,
@@ -1361,33 +1523,49 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "bg-primary bg-opacity-10 rounded p-3 me-3 fs-4"
+    staticClass: "bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3",
+    staticStyle: {
+      width: "48px",
+      height: "48px"
+    }
   }, [_c("i", {
-    staticClass: "fa-solid fa-users"
+    staticClass: "fa-solid fa-address-book fs-4"
   })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "bg-success bg-opacity-10 rounded p-3 me-3 fs-4"
+    staticClass: "bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3",
+    staticStyle: {
+      width: "48px",
+      height: "48px"
+    }
   }, [_c("i", {
-    staticClass: "fa-solid fa-arrow-trend-up"
+    staticClass: "fa-solid fa-check-circle fs-4"
   })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "bg-warning bg-opacity-10 rounded p-3 me-3 fs-4"
+    staticClass: "bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3",
+    staticStyle: {
+      width: "48px",
+      height: "48px"
+    }
   }, [_c("i", {
-    staticClass: "fa-solid fa-pause"
+    staticClass: "fa-solid fa-pause-circle fs-4"
   })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "bg-danger bg-opacity-10 rounded p-3 me-3 fs-4"
+    staticClass: "bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3",
+    staticStyle: {
+      width: "48px",
+      height: "48px"
+    }
   }, [_c("i", {
-    staticClass: "fa-solid fa-user-xmark"
+    staticClass: "fa-solid fa-times-circle fs-4"
   })]);
 }, function () {
   var _vm = this,

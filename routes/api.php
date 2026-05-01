@@ -31,6 +31,7 @@ use App\Http\Controllers\PaqueteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ChatRecepcionController;
 use App\Http\Controllers\SeguimientoCRMController;
+use App\Http\Controllers\ReporteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -323,4 +324,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/seguimientosCRM', [SeguimientoCRMController::class, 'store']);
     Route::put('/seguimientosCRM/{id}', [SeguimientoCRMController::class, 'update']);
     Route::delete('/seguimientosCRM/{id}', [SeguimientoCRMController::class, 'destroy']);
+
+    //Reportes      
+    Route::prefix('reportes')->group(function () {
+        Route::get('/medios-pago', [ReporteController::class, 'mediosPago']);
+        Route::get('/ingresos', [ReporteController::class, 'ingresos']);
+        Route::get('/conteo-profesional', [ReporteController::class, 'conteoProfesional']);
+        Route::get('/continuidad', [ReporteController::class, 'continuidad']);
+        Route::get('/especialidad', [ReporteController::class, 'especialidad']);
+        Route::get('/medicamentos', [ReporteController::class, 'medicamentos']);
+        Route::get('/produccion', [ReporteController::class, 'produccion']);
+        Route::get('/recetas-profesional', [ReporteController::class, 'recetasProfesional']);
+        Route::get('/sexo', [ReporteController::class, 'sexo']);
+        Route::get('/reprogramaciones', [ReporteController::class, 'reprogramaciones']);
+        Route::get('/altas', [ReporteController::class, 'altas']);
+    });
 });

@@ -803,6 +803,20 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "nav-link",
     attrs: {
+      to: "/recepcionista/reportes-estadisticos"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-chart-pie"
+  }), _vm._v(" "), _c("span", [_vm._v("Reportes")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "nav-item nav__list",
+    on: {
+      click: function click($event) {
+        return _vm.activeSidebar();
+      }
+    }
+  }, [_c("router-link", {
+    staticClass: "nav-link",
+    attrs: {
       to: "/recepcionista/limbo"
     }
   }, [_c("i", {

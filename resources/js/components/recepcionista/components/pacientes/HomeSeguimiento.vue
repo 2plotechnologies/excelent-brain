@@ -33,42 +33,123 @@
       </button>
     </div>
 
-    <div v-show="tabActiva !== 'crmSeguimiento'">
+    <!-- Fidelizacion Stats -->
+    <div v-if="tabActiva === 'fidelizacion'">
       <div class="row g-3 mb-3">
         <div class="col-md-6 col-xl-3">
-          <div class="card border-start border-success border-4 h-100">
-            <div class="card-body py-3">
-              <div class="small text-muted">Fidelizados</div>
-              <div class="display-6 fw-bold">{{ resumen.fidelizados }}</div>
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-users fs-4"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1 fw-semibold">Total Pacientes</h6>
+                <h3 class="mb-0 fw-bold text-dark">{{ fidelizacionStats.total }}</h3>
+              </div>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-xl-3">
-          <div class="card border-start border-warning border-4 h-100">
-            <div class="card-body py-3">
-              <div class="small text-muted">No fidelizados</div>
-              <div class="display-6 fw-bold">{{ resumen.noFidelizados }}</div>
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-user-check fs-4"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1 fw-semibold">Fidelizados</h6>
+                <h3 class="mb-0 fw-bold text-dark">{{ fidelizacionStats.fidelizados }}</h3>
+              </div>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-xl-3">
-          <div class="card border-start border-danger border-4 h-100">
-            <div class="card-body py-3">
-              <div class="small text-muted">Activos</div>
-              <div class="display-6 fw-bold">{{ resumen.recuperacion }}</div>
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-user-xmark fs-4"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1 fw-semibold">No Fidelizados</h6>
+                <h3 class="mb-0 fw-bold text-dark">{{ fidelizacionStats.noFidelizados }}</h3>
+              </div>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-xl-3">
-          <div class="card border-start border-secondary border-4 h-100">
-            <div class="card-body py-3">
-              <div class="small text-muted">Inactivos</div>
-              <div class="display-6 fw-bold">{{ resumen.inactivos }}</div>
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-chart-pie fs-4"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1 fw-semibold">Tasa Fidelización</h6>
+                <h3 class="mb-0 fw-bold text-dark">{{ fidelizacionStats.tasa }}%</h3>
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
+    <!-- Recuperacion Stats -->
+    <div v-if="tabActiva === 'recuperacion'">
+      <div class="row g-3 mb-3">
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-users fs-4"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1 fw-semibold">Total en Evaluación</h6>
+                <h3 class="mb-0 fw-bold text-dark">{{ recuperacionStats.total }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-user-clock fs-4"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1 fw-semibold">Activos</h6>
+                <h3 class="mb-0 fw-bold text-dark">{{ recuperacionStats.activos }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-secondary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-user-minus fs-4"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1 fw-semibold">Inactivos</h6>
+                <h3 class="mb-0 fw-bold text-dark">{{ recuperacionStats.inactivos }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-bolt fs-4"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1 fw-semibold">Tasa Actividad</h6>
+                <h3 class="mb-0 fw-bold text-dark">{{ recuperacionStats.tasa }}%</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div v-show="tabActiva !== 'crmSeguimiento'">
       <div class="card mb-3">
         <div class="card-body">
           <div class="row g-2 align-items-center">
@@ -143,45 +224,53 @@
       <!-- Stats Cards -->
       <div class="row g-3 mb-3 mt-1">
         <div class="col-md-6 col-xl-3">
-          <div class="card border-start border-primary border-4 h-100 shadow-sm">
-            <div class="card-body py-3 d-flex align-items-center">
-              <div class="bg-primary bg-opacity-10 rounded p-3 me-3 fs-4"><i class="fa-solid fa-users"></i></div>
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-address-book fs-4"></i>
+              </div>
               <div>
-                <div class="display-6 fw-bold mb-0 lh-1">{{ crmResumen.total }}</div>
-                <div class="small text-muted">Total Pacientes</div>
+                <h6 class="text-muted mb-1 fw-semibold">Total Interesados</h6>
+                <h3 class="mb-0 fw-bold text-dark">{{ crmResumen.total }}</h3>
               </div>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-xl-3">
-          <div class="card border-start border-success border-4 h-100 shadow-sm">
-            <div class="card-body py-3 d-flex align-items-center">
-              <div class="bg-success bg-opacity-10 rounded p-3 me-3 fs-4"><i class="fa-solid fa-arrow-trend-up"></i></div>
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-check-circle fs-4"></i>
+              </div>
               <div>
-                <div class="display-6 fw-bold mb-0 lh-1">{{ crmResumen.activos }}</div>
-                <div class="small text-muted">Activos</div>
+                <h6 class="text-muted mb-1 fw-semibold">Activos</h6>
+                <h3 class="mb-0 fw-bold text-dark">{{ crmResumen.activos }}</h3>
               </div>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-xl-3">
-          <div class="card border-start border-warning border-4 h-100 shadow-sm">
-            <div class="card-body py-3 d-flex align-items-center">
-              <div class="bg-warning bg-opacity-10 rounded p-3 me-3 fs-4"><i class="fa-solid fa-pause"></i></div>
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-pause-circle fs-4"></i>
+              </div>
               <div>
-                <div class="display-6 fw-bold mb-0 lh-1">{{ crmResumen.pausa }}</div>
-                <div class="small text-muted">En Pausa</div>
+                <h6 class="text-muted mb-1 fw-semibold">En Pausa</h6>
+                <h3 class="mb-0 fw-bold text-dark">{{ crmResumen.pausa }}</h3>
               </div>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-xl-3">
-          <div class="card border-start border-danger border-4 h-100 shadow-sm">
-            <div class="card-body py-3 d-flex align-items-center">
-              <div class="bg-danger bg-opacity-10 rounded p-3 me-3 fs-4"><i class="fa-solid fa-user-xmark"></i></div>
+          <div class="card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex align-items-center">
+              <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-times-circle fs-4"></i>
+              </div>
               <div>
-                <div class="display-6 fw-bold mb-0 lh-1">{{ crmResumen.perdidos }}</div>
-                <div class="small text-muted">Perdidos</div>
+                <h6 class="text-muted mb-1 fw-semibold">Perdidos</h6>
+                <h3 class="mb-0 fw-bold text-dark">{{ crmResumen.perdidos }}</h3>
               </div>
             </div>
           </div>
@@ -522,6 +611,20 @@ export default {
     };
   },
   computed: {
+    fidelizacionStats() {
+      const f = this.resumen.fidelizados || 0;
+      const nf = this.resumen.noFidelizados || 0;
+      const total = f + nf;
+      const tasa = total > 0 ? ((f / total) * 100).toFixed(1) : 0;
+      return { total, fidelizados: f, noFidelizados: nf, tasa };
+    },
+    recuperacionStats() {
+      const act = this.resumen.recuperacion || 0;
+      const inact = this.resumen.inactivos || 0;
+      const total = act + inact;
+      const tasa = total > 0 ? ((act / total) * 100).toFixed(1) : 0;
+      return { total, activos: act, inactivos: inact, tasa };
+    },
     estadosActuales() {
       if (this.tabActiva === 'fidelizacion') {
         return ['Fidelizado', 'No Fidelizado'];
