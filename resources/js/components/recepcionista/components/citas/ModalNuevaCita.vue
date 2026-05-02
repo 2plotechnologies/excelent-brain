@@ -212,28 +212,69 @@
 												<i class="fas fa-wallet text-primary me-2"></i>Configuración de Pago
 											</h6>
 											
-											<div class="form-check form-switch mb-4 custom-switch">
+											<!-- Adelanto -->
+											<div class="form-check form-switch mb-3 custom-switch">
 												<input class="form-check-input" type="checkbox" id="checkAdelanto" v-model="tieneAdelanto" @change="precioDinamico()">
 												<label class="form-check-label ms-2" for="checkAdelanto">¿Registrar adelanto?</label>
 											</div>
 
-											<div v-if="tieneAdelanto" class="transition-all slide-down">
+											<div v-if="tieneAdelanto" class="transition-all slide-down mb-3 bg-light rounded p-3">
 												<div class="form-group mb-3">
 													<label class="small text-muted font-weight-bold">Monto del adelanto (S/)</label>
 													<div class="input-group">
-														<span class="input-group-text bg-light border-0">S/</span>
-														<input type="number" class="form-control border-0 bg-light" v-model="descuentoAdelanto" @keyup="precioDinamico()">
+														<span class="input-group-text bg-white border-0">S/</span>
+														<input type="number" class="form-control border-0 bg-white" v-model="descuentoAdelanto" @keyup="precioDinamico()">
 													</div>
 												</div>
 												<div class="form-group mb-3">
 													<label class="small text-muted font-weight-bold">Método de pago del adelanto</label>
-													<select class="form-select border-0 bg-light" v-model="monedaAdelanto">
+													<select class="form-select border-0 bg-white" v-model="monedaAdelanto">
 														<option v-for="moneda in monedas" :key="moneda.id" :value="moneda.id">{{ moneda.tipo }}</option>
 													</select>
 												</div>
 												<div class="form-group">
 													<label class="small text-muted font-weight-bold">Referencia del adelanto</label>
-													<input type="text" class="form-control border-0 bg-light" placeholder="Ej: Pago por Yape, Fecha..." v-model="razonAdelanto">
+													<input type="text" class="form-control border-0 bg-white" placeholder="Ej: Pago por Yape, Fecha..." v-model="razonAdelanto">
+												</div>
+											</div>
+
+											<!-- Descuento (%) -->
+											<div class="form-check form-switch mb-3 custom-switch">
+												<input class="form-check-input" type="checkbox" id="checkDescuento" v-model="tieneDescuento" @change="precioDinamico()">
+												<label class="form-check-label ms-2" for="checkDescuento">¿Aplicar descuento (%)?</label>
+											</div>
+
+											<div v-if="tieneDescuento" class="transition-all slide-down mb-3 bg-light rounded p-3">
+												<div class="form-group mb-3">
+													<label class="small text-muted font-weight-bold">Descuento (%)</label>
+													<div class="input-group">
+														<input type="number" class="form-control border-0 bg-white" v-model="descuentoPorcentaje" @keyup="precioDinamico()">
+														<span class="input-group-text bg-white border-0">%</span>
+													</div>
+												</div>
+												<div class="form-group">
+													<label class="small text-muted font-weight-bold">Motivo del descuento</label>
+													<input type="text" class="form-control border-0 bg-white" placeholder="Motivo..." v-model="razonPorcentaje">
+												</div>
+											</div>
+
+											<!-- Rebaja (S/) -->
+											<div class="form-check form-switch mb-4 custom-switch">
+												<input class="form-check-input" type="checkbox" id="checkRebaja" v-model="tieneRebaja" @change="precioDinamico()">
+												<label class="form-check-label ms-2" for="checkRebaja">¿Aplicar rebaja (S/)?</label>
+											</div>
+
+											<div v-if="tieneRebaja" class="transition-all slide-down mb-4 bg-light rounded p-3">
+												<div class="form-group mb-3">
+													<label class="small text-muted font-weight-bold">Monto a rebajar (S/)</label>
+													<div class="input-group">
+														<span class="input-group-text bg-white border-0">S/</span>
+														<input type="number" class="form-control border-0 bg-white" v-model="descuentoRebaja" @keyup="precioDinamico()">
+													</div>
+												</div>
+												<div class="form-group">
+													<label class="small text-muted font-weight-bold">Motivo de la rebaja</label>
+													<input type="text" class="form-control border-0 bg-white" placeholder="Motivo..." v-model="razonRebaja">
 												</div>
 											</div>
 

@@ -6920,7 +6920,11 @@ var render = function render() {
       "chart-data": _vm.donutObj,
       "chart-options": _vm.pieOptions
     }
-  })], 1) : _vm._e()])])]), _vm._v(" "), _c("div", {
+  })], 1) : _c("div", {
+    staticClass: "text-center text-muted d-flex h-100 align-items-center justify-content-center pb-4"
+  }, [_c("p", {
+    staticClass: "mb-0"
+  }, [_vm._v("No hay datos suficientes")])])])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-0 shadow-sm",
@@ -6934,7 +6938,7 @@ var render = function render() {
     }
   }, [_c("h6", {
     staticClass: "font-weight-bold text-dark mb-4"
-  }, [_vm._v("Estados de Pacientes")]), _vm._v(" "), _vm.dashData.completadas !== undefined ? _c("div", {
+  }, [_vm._v("Estados de Pacientes")]), _vm._v(" "), _vm.dashData.completadas !== undefined && _vm.dashData.completadas + _vm.dashData.pendientes + _vm.dashData.canceladas + _vm.dashData.reprogramadas > 0 ? _c("div", {
     style: {
       height: "100%",
       position: "relative",
@@ -6945,7 +6949,11 @@ var render = function render() {
       "chart-data": _vm.barObj,
       "chart-options": _vm.barOptions
     }
-  })], 1) : _vm._e()])])])]), _vm._v(" "), _c("p", {
+  })], 1) : _vm.dashData.completadas !== undefined ? _c("div", {
+    staticClass: "text-center text-muted d-flex h-100 align-items-center justify-content-center pb-4"
+  }, [_c("p", {
+    staticClass: "mb-0"
+  }, [_vm._v("No hay datos suficientes")])]) : _vm._e()])])])]), _vm._v(" "), _c("p", {
     staticClass: "mt-4 mb-3 font-weight-bold text-dark",
     staticStyle: {
       "font-size": "1.1rem"

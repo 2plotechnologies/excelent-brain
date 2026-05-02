@@ -12516,7 +12516,7 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "card border-0 shadow-sm rounded-4 bg-white p-4 h-100"
   }, [_vm._m(14), _vm._v(" "), _c("div", {
-    staticClass: "form-check form-switch mb-4 custom-switch"
+    staticClass: "form-check form-switch mb-3 custom-switch"
   }, [_c("input", {
     directives: [{
       name: "model",
@@ -12558,7 +12558,7 @@ var render = function render() {
       "for": "checkAdelanto"
     }
   }, [_vm._v("¿Registrar adelanto?")])]), _vm._v(" "), _vm.tieneAdelanto ? _c("div", {
-    staticClass: "transition-all slide-down"
+    staticClass: "transition-all slide-down mb-3 bg-light rounded p-3"
   }, [_c("div", {
     staticClass: "form-group mb-3"
   }, [_c("label", {
@@ -12566,7 +12566,7 @@ var render = function render() {
   }, [_vm._v("Monto del adelanto (S/)")]), _vm._v(" "), _c("div", {
     staticClass: "input-group"
   }, [_c("span", {
-    staticClass: "input-group-text bg-light border-0"
+    staticClass: "input-group-text bg-white border-0"
   }, [_vm._v("S/")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
@@ -12574,7 +12574,7 @@ var render = function render() {
       value: _vm.descuentoAdelanto,
       expression: "descuentoAdelanto"
     }],
-    staticClass: "form-control border-0 bg-light",
+    staticClass: "form-control border-0 bg-white",
     attrs: {
       type: "number"
     },
@@ -12601,7 +12601,7 @@ var render = function render() {
       value: _vm.monedaAdelanto,
       expression: "monedaAdelanto"
     }],
-    staticClass: "form-select border-0 bg-light",
+    staticClass: "form-select border-0 bg-white",
     on: {
       change: function change($event) {
         var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
@@ -12631,7 +12631,7 @@ var render = function render() {
       value: _vm.razonAdelanto,
       expression: "razonAdelanto"
     }],
-    staticClass: "form-control border-0 bg-light",
+    staticClass: "form-control border-0 bg-white",
     attrs: {
       type: "text",
       placeholder: "Ej: Pago por Yape, Fecha..."
@@ -12643,6 +12643,206 @@ var render = function render() {
       input: function input($event) {
         if ($event.target.composing) return;
         _vm.razonAdelanto = $event.target.value;
+      }
+    }
+  })])]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "form-check form-switch mb-3 custom-switch"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.tieneDescuento,
+      expression: "tieneDescuento"
+    }],
+    staticClass: "form-check-input",
+    attrs: {
+      type: "checkbox",
+      id: "checkDescuento"
+    },
+    domProps: {
+      checked: Array.isArray(_vm.tieneDescuento) ? _vm._i(_vm.tieneDescuento, null) > -1 : _vm.tieneDescuento
+    },
+    on: {
+      change: [function ($event) {
+        var $$a = _vm.tieneDescuento,
+          $$el = $event.target,
+          $$c = $$el.checked ? true : false;
+        if (Array.isArray($$a)) {
+          var $$v = null,
+            $$i = _vm._i($$a, $$v);
+          if ($$el.checked) {
+            $$i < 0 && (_vm.tieneDescuento = $$a.concat([$$v]));
+          } else {
+            $$i > -1 && (_vm.tieneDescuento = $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
+          }
+        } else {
+          _vm.tieneDescuento = $$c;
+        }
+      }, function ($event) {
+        return _vm.precioDinamico();
+      }]
+    }
+  }), _vm._v(" "), _c("label", {
+    staticClass: "form-check-label ms-2",
+    attrs: {
+      "for": "checkDescuento"
+    }
+  }, [_vm._v("¿Aplicar descuento (%)?")])]), _vm._v(" "), _vm.tieneDescuento ? _c("div", {
+    staticClass: "transition-all slide-down mb-3 bg-light rounded p-3"
+  }, [_c("div", {
+    staticClass: "form-group mb-3"
+  }, [_c("label", {
+    staticClass: "small text-muted font-weight-bold"
+  }, [_vm._v("Descuento (%)")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.descuentoPorcentaje,
+      expression: "descuentoPorcentaje"
+    }],
+    staticClass: "form-control border-0 bg-white",
+    attrs: {
+      type: "number"
+    },
+    domProps: {
+      value: _vm.descuentoPorcentaje
+    },
+    on: {
+      keyup: function keyup($event) {
+        return _vm.precioDinamico();
+      },
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.descuentoPorcentaje = $event.target.value;
+      }
+    }
+  }), _vm._v(" "), _c("span", {
+    staticClass: "input-group-text bg-white border-0"
+  }, [_vm._v("%")])])]), _vm._v(" "), _c("div", {
+    staticClass: "form-group"
+  }, [_c("label", {
+    staticClass: "small text-muted font-weight-bold"
+  }, [_vm._v("Motivo del descuento")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.razonPorcentaje,
+      expression: "razonPorcentaje"
+    }],
+    staticClass: "form-control border-0 bg-white",
+    attrs: {
+      type: "text",
+      placeholder: "Motivo..."
+    },
+    domProps: {
+      value: _vm.razonPorcentaje
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.razonPorcentaje = $event.target.value;
+      }
+    }
+  })])]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "form-check form-switch mb-4 custom-switch"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.tieneRebaja,
+      expression: "tieneRebaja"
+    }],
+    staticClass: "form-check-input",
+    attrs: {
+      type: "checkbox",
+      id: "checkRebaja"
+    },
+    domProps: {
+      checked: Array.isArray(_vm.tieneRebaja) ? _vm._i(_vm.tieneRebaja, null) > -1 : _vm.tieneRebaja
+    },
+    on: {
+      change: [function ($event) {
+        var $$a = _vm.tieneRebaja,
+          $$el = $event.target,
+          $$c = $$el.checked ? true : false;
+        if (Array.isArray($$a)) {
+          var $$v = null,
+            $$i = _vm._i($$a, $$v);
+          if ($$el.checked) {
+            $$i < 0 && (_vm.tieneRebaja = $$a.concat([$$v]));
+          } else {
+            $$i > -1 && (_vm.tieneRebaja = $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
+          }
+        } else {
+          _vm.tieneRebaja = $$c;
+        }
+      }, function ($event) {
+        return _vm.precioDinamico();
+      }]
+    }
+  }), _vm._v(" "), _c("label", {
+    staticClass: "form-check-label ms-2",
+    attrs: {
+      "for": "checkRebaja"
+    }
+  }, [_vm._v("¿Aplicar rebaja (S/)?")])]), _vm._v(" "), _vm.tieneRebaja ? _c("div", {
+    staticClass: "transition-all slide-down mb-4 bg-light rounded p-3"
+  }, [_c("div", {
+    staticClass: "form-group mb-3"
+  }, [_c("label", {
+    staticClass: "small text-muted font-weight-bold"
+  }, [_vm._v("Monto a rebajar (S/)")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group"
+  }, [_c("span", {
+    staticClass: "input-group-text bg-white border-0"
+  }, [_vm._v("S/")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.descuentoRebaja,
+      expression: "descuentoRebaja"
+    }],
+    staticClass: "form-control border-0 bg-white",
+    attrs: {
+      type: "number"
+    },
+    domProps: {
+      value: _vm.descuentoRebaja
+    },
+    on: {
+      keyup: function keyup($event) {
+        return _vm.precioDinamico();
+      },
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.descuentoRebaja = $event.target.value;
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "form-group"
+  }, [_c("label", {
+    staticClass: "small text-muted font-weight-bold"
+  }, [_vm._v("Motivo de la rebaja")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.razonRebaja,
+      expression: "razonRebaja"
+    }],
+    staticClass: "form-control border-0 bg-white",
+    attrs: {
+      type: "text",
+      placeholder: "Motivo..."
+    },
+    domProps: {
+      value: _vm.razonRebaja
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.razonRebaja = $event.target.value;
       }
     }
   })])]) : _vm._e(), _vm._v(" "), _c("hr", {

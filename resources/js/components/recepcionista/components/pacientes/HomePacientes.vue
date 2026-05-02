@@ -131,6 +131,9 @@
                         <div style="position: relative; height: 100%; width: 100%;" v-if="tiposDataLoaded">
                             <Doughnut :chart-data="donutObj" :chart-options="pieOptions" />
                         </div>
+                        <div v-else class="text-center text-muted d-flex h-100 align-items-center justify-content-center pb-4">
+                            <p class="mb-0">No hay datos suficientes</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -140,9 +143,12 @@
                         <h6 class="font-weight-bold text-dark mb-4">Estados de Pacientes</h6>
                         <div 
                           :style="{ height: '100%', position: 'relative', width: '100%' }"
-                          v-if="dashData.completadas !== undefined"
+                          v-if="dashData.completadas !== undefined && (dashData.completadas + dashData.pendientes + dashData.canceladas + dashData.reprogramadas) > 0"
                         >
                             <Bar :chart-data="barObj" :chart-options="barOptions" />
+                        </div>
+                        <div v-else-if="dashData.completadas !== undefined" class="text-center text-muted d-flex h-100 align-items-center justify-content-center pb-4">
+                            <p class="mb-0">No hay datos suficientes</p>
                         </div>
                     </div>
                 </div>
