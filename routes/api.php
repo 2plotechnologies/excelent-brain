@@ -32,6 +32,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ChatRecepcionController;
 use App\Http\Controllers\SeguimientoCRMController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\QuestionnaireController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +46,10 @@ use Illuminate\Support\Facades\Route;
 Route::post('login', [AuthController::class, 'login']);
 Route::get('listarPrecios', [ExtrasController::class, 'listarPrecios']);
 Route::get('preciosMembresias', [ExtrasController::class, 'preciosMembresias']);
+
+//Rutas publicas para cuestionarios.
+Route::get('/cuestionario/{token}', [QuestionnaireController::class, 'show']);
+Route::post('/cuestionario/{token}', [QuestionnaireController::class, 'store']);
 
 // ─── AUTHENTICATED ────────────────────────────────────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {
@@ -106,7 +111,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('ficha-seguimiento', [PatientController::class, 'storeFichaSeguimiento']);
         Route::get('planes-seguridad/{patient_id}', [PatientController::class, 'getPlanesSeguridad']);
         Route::post('plan-seguridad', [PatientController::class, 'storePlanSeguridad']);
-
+        Route::post('/pacientes/{id}/generar-link', [QuestionnaireController::class, 'generarLinkApi']);
+        Route::get('/pacientes/{id}/ultimo-autotriaje', [QuestionnaireController::class, 'ultimoAutoTriaje']);
         // Admin-only patient routes
         Route::middleware('role:administrador,recepcionista')->group(function () {
             Route::get('getLast10PatientsAdmin', [PatientController::class, 'getLast10PatientsAdmin']);

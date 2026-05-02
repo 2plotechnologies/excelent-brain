@@ -1,5 +1,6 @@
 // 1. Login
 const Login = () => import('./components/login/Login.vue')
+const AutoTriaje = () => import('./components/acceso_publico/AutoTriaje.vue')
 
 
 // 2. Homepage
@@ -115,6 +116,12 @@ export const routes = [
     path: '/login',
     name: 'login',
     component: Login,
+    meta: { guest: true }
+  },
+  {
+    path: '/cuestionario/:token',
+    name: 'cuestionario',
+    component: AutoTriaje,
     meta: { guest: true }
   },
   {

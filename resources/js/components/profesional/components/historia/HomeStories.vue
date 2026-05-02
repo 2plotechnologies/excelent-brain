@@ -93,9 +93,12 @@
 								<a v-else :href="`/api/pdfEvolution/restricted/${historia.id}?token=${$token}`" class="btn btn-primary btn-circle" title="Generar PDF para evoluciones" target="_blank"> <i class="fas fa-file-pdf"></i> </a>
 								<a v-if="dataUser.profession!='Psicólogo'" :href="`/profesional/recetas/${historia.id}`" class="btn btn-primary btn-circle" title="Generar receta"><i class="fa-solid fa-vial"></i></a>
 								<button 
-									@click="prepararPaciente(historia)" class="btn btn-info btn-circle" title="Agregar triaje" >
+									@click="prepararPaciente(historia)" class="btn btn-info btn-circle text-white" title="Agregar triaje" >
 									<i class="fa-solid fa-shield-heart"></i>
-													<!-- data-bs-toggle="modal" data-bs-target="#modalTriaje" -->
+								</button>
+								<button 
+									@click="datosPaciente = historia" class="btn btn-secondary btn-circle" title="Ver autotriaje" data-bs-toggle="modal" data-bs-target="#modalVerAutoTriaje">
+									<i class="fa-solid fa-clipboard-list"></i>
 								</button>
 								<!--Cargar mensajes del chat de recepcionista a profesional.-->
 								<a 
@@ -114,6 +117,7 @@
 
     <modal-triaje v-if="datosPaciente" :dataPatient="datosPaciente" :profesionales="profesionales" ></modal-triaje>
 	<modal-chat :patient="datosPaciente"></modal-chat>
+	<modal-ver-auto-triaje :patient-id="datosPaciente ? datosPaciente.id : null"></modal-ver-auto-triaje>
 
 	</main>
 </template>
@@ -133,6 +137,7 @@
 import StorieModal from './StorieModal.vue'
 import ModalTriaje from '../../../recepcionista/components/pacientes/ModalTriaje.vue';
 import ModalChat from '../../../recepcionista/components/pacientes/ModalChat.vue';
+import ModalVerAutoTriaje from '../../../acceso_publico/ModalVerAutoTriaje.vue';
 
 export default {
 	name: 'home-stories',
@@ -148,7 +153,7 @@ export default {
 		dataUser: Object
 	},
 
-	components: { StorieModal, ModalTriaje, ModalChat },
+	components: { StorieModal, ModalTriaje, ModalChat, ModalVerAutoTriaje },
 
 	methods: {
 		prepararPaciente(paciente){

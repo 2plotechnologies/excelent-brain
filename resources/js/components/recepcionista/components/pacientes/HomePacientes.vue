@@ -279,6 +279,11 @@
                         <i class="fa-solid fa-lungs me-2 text-info"></i> Nuevo Triaje
                       </a>
                     </li>
+                    <li v-if="paciente.vivo==1">
+                      <a class="dropdown-item" href="#" @click.prevent="generarLinkAutotriaje(paciente)">
+                        <i class="fa-solid fa-link me-2 text-primary"></i> Generar link autotriaje
+                      </a>
+                    </li>
 
                     <!-- Faltas -->
                     <li>
@@ -332,6 +337,32 @@
 		<OffVerMembresias :queId="queId" :nombrePaciente="nombrePaciente" :idUser="$attrs.idUser" :profesional="profesionales" :paciente="dataPaciente"></OffVerMembresias>
 		<ModalAcuerdos :paciente="dataPaciente" :idUser="$attrs.idUser"></ModalAcuerdos>
     <ModalChat :patient="dataPaciente"></ModalChat>
+
+    <!-- Modal Link Autotriaje -->
+    <div class="modal fade" id="modalLinkAutotriaje" tabindex="-1" aria-labelledby="modalLinkAutotriajeLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header border-bottom-0">
+            <h5 class="modal-title font-weight-bold" id="modalLinkAutotriajeLabel">Link de Autotriaje</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body pb-4">
+            <p class="text-secondary text-sm mb-3">El siguiente enlace es válido únicamente por 1 hora. Envíalo al paciente para que pueda completar su autotriaje.</p>
+            
+            <div class="input-group mb-3">
+              <input type="text" class="form-control bg-light" :value="linkGenerado" readonly id="inputLinkAutotriaje">
+              <button class="btn btn-outline-secondary" type="button" @click="copiarLink">
+                <i class="far fa-copy"></i> Copiar
+              </button>
+            </div>
+            
+            <a :href="'https://api.whatsapp.com/send?text=' + encodeURIComponent('Hola, por favor completa tu autotriaje en el siguiente enlace válido por 1 hora:\n\n' + linkGenerado)" target="_blank" class="btn btn-success w-100 mt-2" :class="{'disabled': !linkGenerado}">
+              <i class="fab fa-whatsapp me-2"></i> Enviar por WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
 		
   </main>
 </template>
@@ -365,7 +396,7 @@ export default {
   data () {
     return {
       dataPatients: [], queId:null, vistaActual: 'lista',
-      data: null, dataTriajes:null,
+      data: null, dataTriajes:null, linkGenerado: '',
       dashData: { pacientesActivos:0, nuevosDelMes:0, conCitaHoy:0, conDeuda:0, casosSOS:0, tasaRetencion:0, pendientes:0, completadas:0, canceladas:0, reprogramadas:0, tiposAtencion:[] },
       tiposDataLoaded: false,
       donutObj: {
@@ -606,6 +637,24 @@ export default {
       if (!dateStr) return '-';
       const options = { day: '2-digit', month: 'short', year: 'numeric' };
       return new Date(dateStr).toLocaleDateString('es-ES', options);
+    },
+    async generarLinkAutotriaje(paciente) {
+      try {
+        const response = await this.axios.post(`/api/pacientes/${paciente.id}/generar-link`);
+        this.linkGenerado = response.data.link;
+        var myModal = new window.bootstrap.Modal(document.getElementById('modalLinkAutotriaje'));
+        myModal.show();
+      } catch (error) {
+        console.error(error);
+        alert('Ocurrió un error al generar el enlace');
+      }
+    },
+    copiarLink() {
+      const input = document.getElementById('inputLinkAutotriaje');
+      input.select();
+      input.setSelectionRange(0, 99999);
+      document.execCommand('copy');
+      alert('Link copiado al portapapeles');
     }
   },
 	updated () {
