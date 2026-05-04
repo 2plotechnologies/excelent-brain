@@ -139,7 +139,7 @@
           <hr class="my-4" style="opacity: 0.1;">
 
           <!-- ACTION BUTTONS -->
-          <div class="d-flex flex-wrap gap-2 justify-content-center pb-4">
+          <div class="d-flex flex-wrap gap-2 justify-content-left pb-4">
             <!-- Main Actions -->
             <button v-if="cita.status != 3" @click="$emit('openModal', cita, '#reprogModal', indiceElegido)" data-bs-target="#reprogModal" data-bs-toggle="modal" class="btn btn-action btn-outline-primary">
               <i class="fas fa-sync-alt mr-2"></i> Reprogramar
@@ -155,20 +155,17 @@
 
             <button @click="$emit('openModal', cita, '#modalEstado', indiceElegido)" data-bs-toggle="modal" data-bs-target="#modalEstado" class="btn btn-action btn-outline-secondary">
               <i class="fas fa-user-slash mr-2"></i> No Asistió
-            </button>
+            </button> 
 
-            <!-- Secondary / Extras -->
-            <div class="w-100 d-flex justify-content-center gap-2 mt-2">
               <a :href="getWhatsappLink(cita)" target="_blank" class="btn btn-action btn-outline-success">
                 <i class="fab fa-whatsapp mr-2"></i> WhatsApp
               </a>
               <a :href="'tel:' + (cita.patient.phone || '').replace(/\s/g, '')" class="btn btn-action btn-outline-dark">
                 <i class="fas fa-phone-alt mr-2"></i> Llamar
               </a>
-            </div>
 
             <!-- More Extras Icons row -->
-            <div class="w-100 d-flex justify-content-center gap-4 mt-3">
+            <div class="w-100 d-flex justify-content-left gap-4 mt-3">
               <button @click="$emit('intercambiar', cita)" data-bs-target="#modalIntercambio" data-bs-toggle="modal" class="btn btn-link text-muted p-0 small" title="Intercambiar">
                 <i class="fas fa-retweet"></i> Intercambiar
               </button>

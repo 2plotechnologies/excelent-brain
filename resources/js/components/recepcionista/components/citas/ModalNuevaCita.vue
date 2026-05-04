@@ -17,7 +17,7 @@
 								<i class="fas" :class="step.icon"></i>
 							</div>
 							<span class="step-label ms-2 d-none d-md-inline">{{ step.label }}</span>
-							<div v-if="step.id < 7" class="step-connector mx-3 d-none d-lg-block"></div>
+							<div v-if="step.id < 8" class="step-connector mx-3 d-none d-lg-block"></div>
 						</div>
 					</div>
 
@@ -61,11 +61,11 @@
 						</div>
 					</div>
 
-					<!-- Step 2: Tipo -->
+					<!-- Step 2: Especialidad -->
 					<div v-show="pasoActual === 2">
 						<div class="row justify-content-center">
 							<div class="col-md-10">
-								<p class="mb-3 lead text-center font-weight-bold">Tipo de Consulta</p>
+								<p class="mb-3 lead text-center font-weight-bold">Tipo de Consulta (Especialidad)</p>
 								
 								<div class="row mb-4">
 									<div v-for="cat in categorias" :key="cat.id" class="col-md-6 mb-3">
@@ -85,10 +85,17 @@
 										</div>
 									</div>
 								</div>
+							</div>
+						</div>
+					</div>
 
+					<!-- Step 3: Servicio -->
+					<div v-show="pasoActual === 3">
+						<div class="row justify-content-center">
+							<div class="col-md-10">
+								<p class="mb-3 lead text-center font-weight-bold">Seleccionar Servicio Específico</p>
 								<div class="card border-0 shadow-sm rounded-4 mb-4" v-if="cita.clasification">
 									<div class="card-body p-4">
-										<p class="small text-muted mb-3 font-weight-bold"><i class="fas fa-list me-2"></i>Seleccionar Servicio Específico</p>
 										<div class="list-group list-group-flush rounded-4 overflow-hidden border">
 											<button type="button" v-for="precio in precios" :key="precio.id" v-if="precio.idClasificacion==cita.clasification && precio.servicio=='1' && precio.id!=48 && precio.id!=49 && precio.activo=='1'" class="list-group-item list-group-item-action border-0 d-flex justify-content-between align-items-center p-3" @click="seleccionarServicio(precio.id)" :class="{ 'bg-light': cita.type == precio.id }">
 												<span>{{ precio.descripcion }}</span>
@@ -101,58 +108,61 @@
 						</div>
 					</div>
 
-					<!-- Step 3: Profesional -->
-					<div v-show="pasoActual === 3">
-						<div class="row justify-content-center">
-							<div class="col-md-8 text-center py-5">
-								<p class="mb-4 lead font-weight-bold">Profesional Asignado</p>
-								<div class="professional-card p-5 bg-white shadow-sm rounded-5 mb-4 border transition-all">
-									<div class="avatar-xl mx-auto mb-4 bg-soft-primary d-flex align-items-center justify-content-center rounded-circle border border-primary">
-										<i class="fas fa-user-md fa-4x text-primary"></i>
-									</div>
-									<h3 class="mb-1 text-dark font-weight-bold">{{ profesionalElegido.name }}</h3>
-									<p class="text-primary mb-0 fs-5">{{ profesionalElegido.profession }}</p>
-									<div class="mt-4 badge bg-success-light text-success px-4 py-2 rounded-pill">
-										<i class="fas fa-check-circle me-2"></i>Disponible para esta atención
-									</div>
-								</div>
-								<p class="text-muted small">El profesional ha sido seleccionado previamente en el calendario.</p>
-							</div>
-						</div>
-					</div>
-
-					<!-- Step 4: Fecha/Hora -->
+					<!-- Step 4: Profesional -->
 					<div v-show="pasoActual === 4">
 						<div class="row justify-content-center">
-							<div class="col-md-8 text-center py-5">
-								<p class="mb-4 lead font-weight-bold">Fecha y Hora de la Cita</p>
-								<div class="card border-0 shadow-sm rounded-5 bg-light-gradient p-5 mb-4">
-									<div class="row align-items-center">
-										<div class="col-md-6 border-end">
-											<div class="mb-3 text-primary">
-												<i class="far fa-calendar-alt fa-3x"></i>
+							<div class="col-md-10">
+								<p class="mb-4 lead text-center font-weight-bold">Seleccionar Profesional</p>
+								
+								<div class="row">
+									<div v-for="prof in doctoresFiltradosPorCat" :key="prof.id" class="col-md-4 mb-3">
+										<div class="card h-100 border-0 shadow-sm rounded-4 selectable-card transition-all" :class="{ 'active': cita.professional_id == prof.id }" @click="seleccionarDoctor(prof)">
+											<div class="card-body text-center p-4">
+												<div class="avatar-circle mx-auto mb-3 bg-soft-primary d-flex align-items-center justify-content-center">
+													<i class="fas fa-user-md text-primary"></i>
+												</div>
+												<h6 class="mb-1 font-weight-bold text-dark">{{ prof.name }}</h6>
+												<small class="text-muted">{{ prof.profession }}</small>
 											</div>
-											<h4 class="mb-0 text-dark font-weight-bold">{{ fechaElegida }}</h4>
-											<p class="text-muted mb-0">Fecha seleccionada</p>
-										</div>
-										<div class="col-md-6">
-											<div class="mb-3 text-info">
-												<i class="far fa-clock fa-3x"></i>
-											</div>
-											<h4 class="mb-0 text-dark font-weight-bold">{{ horaLatam1(horaElegida.check_time) }} - {{ horaLatam1(horaElegida.departure_date) }}</h4>
-											<p class="text-muted mb-0">Horario reservado</p>
 										</div>
 									</div>
-								</div>
-								<div class="alert bg-soft-info border-0 text-info rounded-4">
-									<i class="fas fa-info-circle me-2"></i>Este horario ha sido bloqueado en el calendario para este paciente.
+									<div v-if="doctoresFiltradosPorCat.length === 0" class="col-12 text-center text-muted py-4">
+										<i class="fas fa-user-md fa-3x mb-3 text-light"></i>
+										<p>No hay profesionales disponibles para esta especialidad.</p>
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<!-- Step 5: Modalidad -->
+					<!-- Step 5: Fecha/Hora -->
 					<div v-show="pasoActual === 5">
+						<div class="row justify-content-center">
+							<div class="col-md-8">
+								<p class="mb-4 lead text-center font-weight-bold">Fecha y Hora de la Cita</p>
+								<div class="card border-0 shadow-sm rounded-4 bg-light p-4 mb-4">
+									<div class="row">
+										<div class="col-md-6 mb-3 mb-md-0">
+											<label class="form-label font-weight-bold text-muted small">Fecha de la Cita</label>
+											<input type="date" class="form-control form-control-lg rounded-pill px-4 border-0 shadow-sm" v-model="fechaManual" @change="buscarHorariosManual()">
+										</div>
+										<div class="col-md-6">
+											<label class="form-label font-weight-bold text-muted small">Horario Disponible</label>
+											<select class="form-select form-select-lg rounded-pill px-4 border-0 shadow-sm" v-model="horaManualId" @change="seleccionarHoraManual()">
+												<option value="">Seleccione un horario...</option>
+												<option v-for="hora in horariosDisponibles" :key="hora.id" :value="hora.id">{{ horaLatam1(hora.check_time) }} - {{ horaLatam1(hora.departure_date) }}</option>
+											</select>
+											<div v-if="cargandoHorarios" class="text-primary small mt-2"><i class="fas fa-spinner fa-spin"></i> Buscando horarios...</div>
+											<div v-else-if="horariosDisponibles.length === 0 && fechaManual" class="text-danger small mt-2"><i class="fas fa-exclamation-circle"></i> No hay horarios disponibles este día.</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Step 6: Modalidad -->
+					<div v-show="pasoActual === 6">
 						<div class="row justify-content-center">
 							<div class="col-md-10">
 								<p class="mb-4 lead text-center font-weight-bold">Modalidad de Atención</p>
@@ -199,8 +209,8 @@
 						</div>
 					</div>
 
-					<!-- Step 6: Pago -->
-					<div v-show="pasoActual === 6">
+					<!-- Step 7: Pago -->
+					<div v-show="pasoActual === 7">
 						<div class="row justify-content-center">
 							<div class="col-md-10">
 								<p class="mb-4 lead text-center font-weight-bold">Información de Pago y Notas</p>
@@ -322,8 +332,8 @@
 						</div>
 					</div>
 
-					<!-- Step 7: Confirmar -->
-					<div v-show="pasoActual === 7">
+					<!-- Step 8: Confirmar -->
+					<div v-show="pasoActual === 8">
 						<div class="row justify-content-center">
 							<div class="col-md-10">
 								<p class="mb-4 lead text-center font-weight-bold">Resumen de la Cita</p>
@@ -359,7 +369,7 @@
 													<i class="far fa-calendar-check fa-2x"></i>
 												</div>
 												<div>
-													<h6 class="mb-0 font-weight-bold">{{ fechaElegida }}</h6>
+													<h6 class="mb-0 font-weight-bold">{{ fechaManual }}</h6>
 													<small class="text-muted">Fecha asignada</small>
 												</div>
 											</div>
@@ -368,7 +378,7 @@
 													<i class="far fa-clock fa-2x"></i>
 												</div>
 												<div class="text-md-end">
-													<h6 class="mb-0 font-weight-bold">{{ horaLatam1(horaElegida.check_time) }} - {{ horaLatam1(horaElegida.departure_date) }}</h6>
+													<h6 class="mb-0 font-weight-bold">{{ horaLatam1(horaSeleccionada.check_time) }} - {{ horaLatam1(horaSeleccionada.departure_date) }}</h6>
 													<small class="text-muted">Horario reservado</small>
 												</div>
 											</div>
@@ -377,7 +387,7 @@
 										<div class="row Ticket-details">
 											<div class="col-md-4 mb-4">
 												<h6 class="font-weight-bold text-muted small text-uppercase mb-2">Profesional</h6>
-												<p class="mb-0 font-weight-bold">{{ profesionalElegido.name }}</p>
+												<p class="mb-0 font-weight-bold">{{ profesionalSeleccionado ? profesionalSeleccionado.name : '' }}</p>
 											</div>
 											<div class="col-md-4 mb-4">
 												<h6 class="font-weight-bold text-muted small text-uppercase mb-2">Modalidad</h6>
@@ -414,13 +424,13 @@
 							<button type="button" class="btn btn-light-danger btn-lg rounded-pill px-4 me-2" data-bs-dismiss="modal" v-if="pasoActual === 1">
 								Cancelar
 							</button>
-							<button type="button" v-if="pasoActual < 7" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm" @click="nextStep">
+							<button type="button" v-if="pasoActual < 8" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm" @click="nextStep">
 								Siguiente <i class="fas fa-arrow-right ms-2"></i>
 							</button>
-							<button type="submit" v-if="pasoActual === 7 && cita.vivo == 1" class="btn btn-success btn-lg rounded-pill px-5 shadow-sm">
+							<button type="submit" v-if="pasoActual === 8 && cita.vivo == 1" class="btn btn-success btn-lg rounded-pill px-5 shadow-sm">
 								<i class="fas fa-save me-2"></i> Registrar Cita
 							</button>
-							<div v-if="pasoActual === 7 && cita.vivo != 1" class="alert alert-danger mb-0 rounded-pill">
+							<div v-if="pasoActual === 8 && cita.vivo != 1" class="alert alert-danger mb-0 rounded-pill">
 								<i class="fas fa-cross me-2"></i> El paciente figura como fallecido.
 							</div>
 						</div>
@@ -612,18 +622,20 @@ import moment from 'moment'
 
 export default {
 	name: "ModalNuevaCita",
-	props:{ profesionalElegido: null, horaElegida: null , idUsuario:null, fechaElegida:null, idSede:null },
+	props:{ doctores: Array, profesionalElegido: null, horaElegida: null , idUsuario:null, fechaElegida:null, idSede:null },
 	data(){
 		return{
 			pasoActual: 1, listaPacientes: [], busquedaTexto: '', timerBusqueda: null,
+			fechaManual: '', horaManualId: '', horariosDisponibles: [], cargandoHorarios: false,
 			pasos: [
 				{ id: 1, label: 'Paciente', icon: 'fa-user' },
-				{ id: 2, label: 'Tipo', icon: 'fa-stethoscope' },
-				{ id: 3, label: 'Profesional', icon: 'fa-user-md' },
-				{ id: 4, label: 'Fecha/Hora', icon: 'fa-calendar-alt' },
-				{ id: 5, label: 'Modalidad', icon: 'fa-home' },
-				{ id: 6, label: 'Pago', icon: 'fa-dollar-sign' },
-				{ id: 7, label: 'Confirmar', icon: 'fa-check-circle' }
+				{ id: 2, label: 'Especialidad', icon: 'fa-stethoscope' },
+				{ id: 3, label: 'Servicio', icon: 'fa-list-alt' },
+				{ id: 4, label: 'Profesional', icon: 'fa-user-md' },
+				{ id: 5, label: 'Fecha/Hora', icon: 'fa-calendar-alt' },
+				{ id: 6, label: 'Modalidad', icon: 'fa-home' },
+				{ id: 7, label: 'Pago', icon: 'fa-dollar-sign' },
+				{ id: 8, label: 'Confirmar', icon: 'fa-check-circle' }
 			],
 			categorias: [
 				{ id: 2, label: 'Psicológica', desc: 'Sesión de terapia psicológica', icon: 'fa-brain' },
@@ -682,16 +694,14 @@ export default {
 		}
 	},
 	mounted(){
-		this.$parent.$on('limpiarDescuentos', this.limpiarInputs(false) );
+		this.$parent.$on('limpiarDescuentos', () => this.limpiarInputs(false) );
 		this.pedirMonedas();
 		this.fetchPacientes();
 		
 		const modal = document.getElementById('modalNuevaCita')
 		if (modal) {
 			modal.addEventListener('hidden.bs.modal', () => {
-				this.pasoActual = 1;
-				this.busquedaTexto = '';
-				this.fetchPacientes();
+				this.clearModal();
 			})
 		}
 	},
@@ -758,18 +768,32 @@ export default {
 					alertify.error('Debe seleccionar un tipo de consulta', 5);
 					return;
 				}
+			}
+			if (this.pasoActual === 3) {
 				if (!this.cita.type) {
 					alertify.error('Debe seleccionar un servicio específico', 5);
 					return;
 				}
 			}
+			if (this.pasoActual === 4) {
+				if (!this.cita.professional_id) {
+					alertify.error('Debe seleccionar un profesional', 5);
+					return;
+				}
+			}
 			if (this.pasoActual === 5) {
+				if (!this.cita.schedule_id || !this.horaManualId) {
+					alertify.error('Debe seleccionar un horario disponible', 5);
+					return;
+				}
+			}
+			if (this.pasoActual === 6) {
 				if (!this.cita.mode) {
 					alertify.error('Debe seleccionar una modalidad', 5);
 					return;
 				}
 			}
-			if (this.pasoActual < 7) this.pasoActual++;
+			if (this.pasoActual < 8) this.pasoActual++;
 		},
 		prevStep() {
 			if (this.pasoActual > 1) this.pasoActual--;
@@ -777,11 +801,19 @@ export default {
 		seleccionarCategoria(id) {
 			this.cita.clasification = id;
 			this.cita.type = '';
+			this.cita.professional_id = '';
+			this.cita.schedule_id = '';
 			this.precioDinamico();
+			this.nextStep();
 		},
 		seleccionarServicio(id) {
 			this.cita.type = id;
 			this.precioDinamico();
+			this.nextStep();
+		},
+		seleccionarDoctor(prof) {
+			this.cita.professional_id = prof.id;
+			this.buscarHorariosManual();
 			this.nextStep();
 		},
 		seleccionarModalidad(mode) {
@@ -803,8 +835,35 @@ export default {
 			if (mode == 3) return 'Domicilio';
 			return '';
 		},
-		horaLatam1(horita){ return moment(horita, 'HH:mm:ss').format('hh:mm') },
-		horaLatam2(horita){ return moment(horita, 'HH:mm:ss').format('hh:mm a') },
+		async buscarHorariosManual() {
+			if (!this.fechaManual || !this.cita.professional_id) return;
+			let diaManual = moment(this.fechaManual).format('d');
+			let diaSemana = this.dayWeek(diaManual - 1);
+			this.cargandoHorarios = true;
+			await this.axios.get(`/api/horarioCuadernoOcupado/${this.fechaManual}/${diaSemana}`)
+				.then(res => {
+					let solos = res.data.solos.filter(h => h.professional_id == this.cita.professional_id);
+					let invalidos = res.data.invalidos;
+					this.horariosDisponibles = solos.filter(h => !invalidos.find(i => i.schedule_id == h.id));
+					
+					// Preselect if horaManualId is still valid, else clear
+					if (!this.horariosDisponibles.find(h => h.id == this.horaManualId)) {
+						this.horaManualId = '';
+						this.cita.schedule_id = '';
+					}
+				})
+				.finally(() => this.cargandoHorarios = false);
+		},
+		seleccionarHoraManual() {
+			let horaSeleccionada = this.horariosDisponibles.find(h => h.id == this.horaManualId);
+			if (horaSeleccionada) {
+				this.cita.schedule_id = horaSeleccionada.id;
+			} else {
+				this.cita.schedule_id = '';
+			}
+		},
+		horaLatam1(horita){ if(!horita) return ''; return moment(horita, 'HH:mm:ss').format('hh:mm') },
+		horaLatam2(horita){ if(!horita) return ''; return moment(horita, 'HH:mm:ss').format('hh:mm a') },
 		precioDinamico(){
 			this.cita.price = 0;
 			if(this.cita.type =='') this.cita.price = 0;
@@ -876,9 +935,12 @@ export default {
 				formData.append('marital_status', this.cita.marital_status);
 				formData.append('instruction_degree', this.cita.instruction_degree);
 				formData.append('professional_id', this.cita.professional_id);
-				formData.append('schedule_id', this.horaElegida.id);
-				formData.append('check_time', this.horaElegida.check_time);
-				formData.append('date', this.fechaElegida);
+				
+				let horaSel = this.horariosDisponibles.find(h => h.id == this.horaManualId);
+				formData.append('schedule_id', this.horaManualId);
+				formData.append('check_time', horaSel ? horaSel.check_time : '');
+				formData.append('date', this.fechaManual);
+				
 				formData.append('clasification', this.cita.clasification);
 				formData.append('price', this.cita.price);
 				formData.append('type', this.cita.type); //nueva lista de servicios
@@ -939,6 +1001,9 @@ export default {
 		clearModal(){
 			this.pasoActual = 1;
 			this.busquedaTexto = '';
+			this.fechaManual = '';
+			this.horaManualId = '';
+			this.horariosDisponibles = [];
 			this.fetchPacientes();
 			this.cita.phone= '';
 			this.cita.dni= '';
@@ -1150,6 +1215,18 @@ export default {
 			this.tieneAdelanto=false; this.tieneDescuento=false; this.tieneRebaja=false;
 			this.descuentoRebaja=0; this.razonPorcentaje=''; this.razonRebaja=''
 		},
+		dayWeek (day) {
+			switch (day) {
+				case 0: return "Lunes"; break;
+				case 1: return "Martes"; break;
+				case 2: return "Miercoles"; break;
+				case 3: return "Jueves"; break;
+				case 4: return "Viernes"; break;
+				case 5: return "Sabado"; break;
+				case 6: return "Domingo"; break;
+				case -1: return "Domingo"; break;
+			}
+		},
 		dynamicPrice () {
 			if (document.getElementById('clasification').value &&
 				document.getElementById('type').value &&
@@ -1219,12 +1296,36 @@ export default {
 	},
 	watch:{
 		horaElegida(){
-			this.cita.professional_id = this.profesionalElegido.id;
-			this.cita.clasification = this.profesionalElegido.idProfesion;
+			if (this.horaElegida && this.profesionalElegido) {
+				this.cita.professional_id = this.profesionalElegido.id;
+				this.cita.clasification = this.profesionalElegido.idProfesion;
+				this.fechaManual = this.fechaElegida;
+				this.horaManualId = this.horaElegida.id;
+				this.cita.schedule_id = this.horaElegida.id;
+				this.horariosDisponibles = [this.horaElegida];
+			} else {
+				this.cita.professional_id = '';
+				this.cita.schedule_id = '';
+				this.fechaManual = moment().format('YYYY-MM-DD');
+				this.horaManualId = '';
+				this.horariosDisponibles = [];
+			}
 		}
 	},
 
 	computed:{
+		doctoresFiltradosPorCat() {
+			if (!this.doctores) return [];
+			if (!this.cita.clasification) return this.doctores;
+			return this.doctores.filter(d => d.idProfesion == this.cita.clasification || d.profession_id == this.cita.clasification);
+		},
+		horaSeleccionada() {
+			return this.horariosDisponibles.find(h => h.id == this.horaManualId) || {};
+		},
+		profesionalSeleccionado() {
+			if (!this.doctores) return {};
+			return this.doctores.find(d => d.id == this.cita.professional_id) || {};
+		},
 		filtro(){
 			if(this.cita.professional_id){
 				return this.horas.filter(hora=> hora.professional_id == cita.professional_id)         

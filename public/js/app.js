@@ -6829,6 +6829,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "ModalNuevaCita",
   props: {
+    doctores: Array,
     profesionalElegido: null,
     horaElegida: null,
     idUsuario: null,
@@ -6841,32 +6842,40 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       listaPacientes: [],
       busquedaTexto: '',
       timerBusqueda: null,
+      fechaManual: '',
+      horaManualId: '',
+      horariosDisponibles: [],
+      cargandoHorarios: false,
       pasos: [{
         id: 1,
         label: 'Paciente',
         icon: 'fa-user'
       }, {
         id: 2,
-        label: 'Tipo',
+        label: 'Especialidad',
         icon: 'fa-stethoscope'
       }, {
         id: 3,
+        label: 'Servicio',
+        icon: 'fa-list-alt'
+      }, {
+        id: 4,
         label: 'Profesional',
         icon: 'fa-user-md'
       }, {
-        id: 4,
+        id: 5,
         label: 'Fecha/Hora',
         icon: 'fa-calendar-alt'
       }, {
-        id: 5,
+        id: 6,
         label: 'Modalidad',
         icon: 'fa-home'
       }, {
-        id: 6,
+        id: 7,
         label: 'Pago',
         icon: 'fa-dollar-sign'
       }, {
-        id: 7,
+        id: 8,
         label: 'Confirmar',
         icon: 'fa-check-circle'
       }],
@@ -7002,15 +7011,15 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   mounted: function mounted() {
     var _this = this;
-    this.$parent.$on('limpiarDescuentos', this.limpiarInputs(false));
+    this.$parent.$on('limpiarDescuentos', function () {
+      return _this.limpiarInputs(false);
+    });
     this.pedirMonedas();
     this.fetchPacientes();
     var modal = document.getElementById('modalNuevaCita');
     if (modal) {
       modal.addEventListener('hidden.bs.modal', function () {
-        _this.pasoActual = 1;
-        _this.busquedaTexto = '';
-        _this.fetchPacientes();
+        _this.clearModal();
       });
     }
   },
@@ -7082,18 +7091,32 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe seleccionar un tipo de consulta', 5);
           return;
         }
+      }
+      if (this.pasoActual === 3) {
         if (!this.cita.type) {
           alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe seleccionar un servicio específico', 5);
           return;
         }
       }
+      if (this.pasoActual === 4) {
+        if (!this.cita.professional_id) {
+          alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe seleccionar un profesional', 5);
+          return;
+        }
+      }
       if (this.pasoActual === 5) {
+        if (!this.cita.schedule_id || !this.horaManualId) {
+          alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe seleccionar un horario disponible', 5);
+          return;
+        }
+      }
+      if (this.pasoActual === 6) {
         if (!this.cita.mode) {
           alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe seleccionar una modalidad', 5);
           return;
         }
       }
-      if (this.pasoActual < 7) this.pasoActual++;
+      if (this.pasoActual < 8) this.pasoActual++;
     },
     prevStep: function prevStep() {
       if (this.pasoActual > 1) this.pasoActual--;
@@ -7101,11 +7124,19 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     seleccionarCategoria: function seleccionarCategoria(id) {
       this.cita.clasification = id;
       this.cita.type = '';
+      this.cita.professional_id = '';
+      this.cita.schedule_id = '';
       this.precioDinamico();
+      this.nextStep();
     },
     seleccionarServicio: function seleccionarServicio(id) {
       this.cita.type = id;
       this.precioDinamico();
+      this.nextStep();
+    },
+    seleccionarDoctor: function seleccionarDoctor(prof) {
+      this.cita.professional_id = prof.id;
+      this.buscarHorariosManual();
       this.nextStep();
     },
     seleccionarModalidad: function seleccionarModalidad(mode) {
@@ -7131,18 +7162,76 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       if (mode == 3) return 'Domicilio';
       return '';
     },
+    buscarHorariosManual: function buscarHorariosManual() {
+      var _this4 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var diaManual, diaSemana;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              if (!(!_this4.fechaManual || !_this4.cita.professional_id)) {
+                _context.next = 2;
+                break;
+              }
+              return _context.abrupt("return");
+            case 2:
+              diaManual = moment__WEBPACK_IMPORTED_MODULE_2___default()(_this4.fechaManual).format('d');
+              diaSemana = _this4.dayWeek(diaManual - 1);
+              _this4.cargandoHorarios = true;
+              _context.next = 7;
+              return _this4.axios.get("/api/horarioCuadernoOcupado/".concat(_this4.fechaManual, "/").concat(diaSemana)).then(function (res) {
+                var solos = res.data.solos.filter(function (h) {
+                  return h.professional_id == _this4.cita.professional_id;
+                });
+                var invalidos = res.data.invalidos;
+                _this4.horariosDisponibles = solos.filter(function (h) {
+                  return !invalidos.find(function (i) {
+                    return i.schedule_id == h.id;
+                  });
+                });
+
+                // Preselect if horaManualId is still valid, else clear
+                if (!_this4.horariosDisponibles.find(function (h) {
+                  return h.id == _this4.horaManualId;
+                })) {
+                  _this4.horaManualId = '';
+                  _this4.cita.schedule_id = '';
+                }
+              })["finally"](function () {
+                return _this4.cargandoHorarios = false;
+              });
+            case 7:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee);
+      }))();
+    },
+    seleccionarHoraManual: function seleccionarHoraManual() {
+      var _this5 = this;
+      var horaSeleccionada = this.horariosDisponibles.find(function (h) {
+        return h.id == _this5.horaManualId;
+      });
+      if (horaSeleccionada) {
+        this.cita.schedule_id = horaSeleccionada.id;
+      } else {
+        this.cita.schedule_id = '';
+      }
+    },
     horaLatam1: function horaLatam1(horita) {
+      if (!horita) return '';
       return moment__WEBPACK_IMPORTED_MODULE_2___default()(horita, 'HH:mm:ss').format('hh:mm');
     },
     horaLatam2: function horaLatam2(horita) {
+      if (!horita) return '';
       return moment__WEBPACK_IMPORTED_MODULE_2___default()(horita, 'HH:mm:ss').format('hh:mm a');
     },
     precioDinamico: function precioDinamico() {
-      var _this4 = this;
+      var _this6 = this;
       this.cita.price = 0;
       if (this.cita.type == '') this.cita.price = 0;else {
         var precioPadre = this.precios.find(function (p) {
-          return p.id == _this4.cita.type;
+          return p.id == _this6.cita.type;
         });
         var precio = 0;
         var descuentoPorcentual;
@@ -7163,17 +7252,17 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     pedirMonedas: function pedirMonedas() {
-      var _this5 = this;
+      var _this7 = this;
       this.axios('/api/listarMonedas').then(function (resp) {
-        return _this5.monedas = resp.data;
+        return _this7.monedas = resp.data;
       });
     },
     insertar: function insertar(e) {
-      var _this6 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var config, formData;
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
+      var _this8 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var config, formData, horaSel;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
             case 0:
               e.preventDefault();
               config = {
@@ -7181,155 +7270,158 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   'content-type': 'multipart/form-data'
                 }
               };
-              if (!(_this6.cita.type_dni == 1 && (_this6.cita.dni == '' || _this6.cita.dni.length < 8))) {
-                _context.next = 6;
+              if (!(_this8.cita.type_dni == 1 && (_this8.cita.dni == '' || _this8.cita.dni.length < 8))) {
+                _context2.next = 6;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Todo paciente debe tener un DNI válido', 10);
-              _context.next = 90;
+              _context2.next = 91;
               break;
             case 6:
-              if (!(_this6.cita.type_dni != 1 && (_this6.cita.dni == '' || _this6.cita.dni.length < 8))) {
-                _context.next = 10;
+              if (!(_this8.cita.type_dni != 1 && (_this8.cita.dni == '' || _this8.cita.dni.length < 8))) {
+                _context2.next = 10;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Todo extranjero debe tener un documento de identidad válido', 10);
-              _context.next = 90;
+              _context2.next = 91;
               break;
             case 10:
-              if (!(_this6.cita.name == '' && _this6.cita.nombres == '')) {
-                _context.next = 14;
+              if (!(_this8.cita.name == '' && _this8.cita.nombres == '')) {
+                _context2.next = 14;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar apellidos y  nombres', 10);
-              _context.next = 90;
+              _context2.next = 91;
               break;
             case 14:
-              if (!(_this6.cita.phone == '')) {
-                _context.next = 18;
+              if (!(_this8.cita.phone == '')) {
+                _context2.next = 18;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar un celular', 10);
-              _context.next = 90;
+              _context2.next = 91;
               break;
             case 18:
-              if (_this6.cita.type) {
-                _context.next = 22;
+              if (_this8.cita.type) {
+                _context2.next = 22;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe seleccionar un tipo de servicio', 10);
-              _context.next = 90;
+              _context2.next = 91;
               break;
             case 22:
-              if (!(_this6.tieneDescuento && _this6.razonPorcentaje == '')) {
-                _context.next = 26;
+              if (!(_this8.tieneDescuento && _this8.razonPorcentaje == '')) {
+                _context2.next = 26;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Tiene que rellenarse un motivo de descuento', 10);
-              _context.next = 90;
+              _context2.next = 91;
               break;
             case 26:
-              if (!(_this6.tieneRebaja && _this6.razonRebaja == '')) {
-                _context.next = 30;
+              if (!(_this8.tieneRebaja && _this8.razonRebaja == '')) {
+                _context2.next = 30;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Tiene que rellenarse un motivo de rebaja', 10);
-              _context.next = 90;
+              _context2.next = 91;
               break;
             case 30:
-              if (!(_this6.descuentoAdelanto && _this6.razonAdelanto == '')) {
-                _context.next = 34;
+              if (!(_this8.descuentoAdelanto && _this8.razonAdelanto == '')) {
+                _context2.next = 34;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Tiene que rellenarse una fecha o razón del adelanto', 10);
-              _context.next = 90;
+              _context2.next = 91;
               break;
             case 34:
-              if (!(_this6.cita.contacto == '' || _this6.cita.contacto_celular == '' || _this6.cita.parentezco == '')) {
-                _context.next = 38;
+              if (!(_this8.cita.contacto == '' || _this8.cita.contacto_celular == '' || _this8.cita.parentezco == '')) {
+                _context2.next = 38;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar el contacto de emergencia', 10);
-              _context.next = 90;
+              _context2.next = 91;
               break;
             case 38:
-              if (!(_this6.cita.recomendation == '')) {
-                _context.next = 42;
+              if (!(_this8.cita.recomendation == '')) {
+                _context2.next = 42;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar  la referencia', 10);
-              _context.next = 90;
+              _context2.next = 91;
               break;
             case 42:
               formData = new FormData();
-              formData.append('dni', _this6.cita.dni);
-              formData.append('phone', _this6.cita.phone);
-              formData.append('name', _this6.cita.name.toUpperCase() || 'Sin apellidos');
-              formData.append('nombres', _this6.cita.nombres.toUpperCase() || '');
-              formData.append('email', _this6.cita.email);
-              formData.append('address', _this6.cita.address);
-              formData.append('department', _this6.cita.department);
-              formData.append('province', _this6.cita.province);
-              formData.append('district', _this6.cita.district);
-              formData.append('birth_date', _this6.cita.birth_date);
-              formData.append('gender', parseInt(_this6.cita.gender));
-              formData.append('occupation', _this6.cita.occupation);
-              formData.append('marital_status', _this6.cita.marital_status);
-              formData.append('instruction_degree', _this6.cita.instruction_degree);
-              formData.append('professional_id', _this6.cita.professional_id);
-              formData.append('schedule_id', _this6.horaElegida.id);
-              formData.append('check_time', _this6.horaElegida.check_time);
-              formData.append('date', _this6.fechaElegida);
-              formData.append('clasification', _this6.cita.clasification);
-              formData.append('price', _this6.cita.price);
-              formData.append('type', _this6.cita.type); //nueva lista de servicios
+              formData.append('dni', _this8.cita.dni);
+              formData.append('phone', _this8.cita.phone);
+              formData.append('name', _this8.cita.name.toUpperCase() || 'Sin apellidos');
+              formData.append('nombres', _this8.cita.nombres.toUpperCase() || '');
+              formData.append('email', _this8.cita.email);
+              formData.append('address', _this8.cita.address);
+              formData.append('department', _this8.cita.department);
+              formData.append('province', _this8.cita.province);
+              formData.append('district', _this8.cita.district);
+              formData.append('birth_date', _this8.cita.birth_date);
+              formData.append('gender', parseInt(_this8.cita.gender));
+              formData.append('occupation', _this8.cita.occupation);
+              formData.append('marital_status', _this8.cita.marital_status);
+              formData.append('instruction_degree', _this8.cita.instruction_degree);
+              formData.append('professional_id', _this8.cita.professional_id);
+              horaSel = _this8.horariosDisponibles.find(function (h) {
+                return h.id == _this8.horaManualId;
+              });
+              formData.append('schedule_id', _this8.horaManualId);
+              formData.append('check_time', horaSel ? horaSel.check_time : '');
+              formData.append('date', _this8.fechaManual);
+              formData.append('clasification', _this8.cita.clasification);
+              formData.append('price', _this8.cita.price);
+              formData.append('type', _this8.cita.type); //nueva lista de servicios
               //formData.append('patient_condition', this.cita.patient_condition); //El sistema evalúa la condición: nuevo o continuo, no es necesario pasar
-              formData.append('recomendation', _this6.cita.recomendation);
-              formData.append('recomendacion_comentario', _this6.cita.recomendacion_comentario);
-              formData.append('mode', _this6.cita.mode);
-              formData.append('link', _this6.cita.link);
-              formData.append('type_dni', _this6.cita.type_dni);
-              formData.append('contacto', _this6.cita.contacto);
-              formData.append('contacto_celular', _this6.cita.contacto_celular);
-              formData.append('parentezco', _this6.cita.parentezco);
-              formData.append('contacto2', _this6.cita.contacto2);
-              formData.append('contacto_celular2', _this6.cita.contacto_celular2);
-              formData.append('parentezco2', _this6.cita.parentezco2);
-              formData.append('continuo', _this6.precioNuevo ? '1' : 2); //this.cita.type_amount
-              formData.append('user_id', _this6.idUsuario);
+              formData.append('recomendation', _this8.cita.recomendation);
+              formData.append('recomendacion_comentario', _this8.cita.recomendacion_comentario);
+              formData.append('mode', _this8.cita.mode);
+              formData.append('link', _this8.cita.link);
+              formData.append('type_dni', _this8.cita.type_dni);
+              formData.append('contacto', _this8.cita.contacto);
+              formData.append('contacto_celular', _this8.cita.contacto_celular);
+              formData.append('parentezco', _this8.cita.parentezco);
+              formData.append('contacto2', _this8.cita.contacto2);
+              formData.append('contacto_celular2', _this8.cita.contacto_celular2);
+              formData.append('parentezco2', _this8.cita.parentezco2);
+              formData.append('continuo', _this8.precioNuevo ? '1' : 2); //this.cita.type_amount
+              formData.append('user_id', _this8.idUsuario);
               formData.append('formato_nuevo', 1);
               formData.append('etiqueta', $('#sltServicio option:selected').text());
-              formData.append('rebaja', _this6.descuentoRebaja);
-              formData.append('motivoRebaja', _this6.razonRebaja);
-              formData.append('descuento', _this6.descuentoPorcentaje);
-              formData.append('motivoDescuento', _this6.razonPorcentaje);
-              formData.append('new_status', _this6.cita.new_status);
-              formData.append('adelanto', _this6.descuentoAdelanto);
-              formData.append('razonAdelanto', _this6.razonAdelanto);
-              formData.append('monedaAdelanto', _this6.monedaAdelanto);
-              formData.append('idSede', _this6.idSede);
-              _context.next = 90;
-              return _this6.axios.post('/api/appointment', formData, config).then(function (response) {
+              formData.append('rebaja', _this8.descuentoRebaja);
+              formData.append('motivoRebaja', _this8.razonRebaja);
+              formData.append('descuento', _this8.descuentoPorcentaje);
+              formData.append('motivoDescuento', _this8.razonPorcentaje);
+              formData.append('new_status', _this8.cita.new_status);
+              formData.append('adelanto', _this8.descuentoAdelanto);
+              formData.append('razonAdelanto', _this8.razonAdelanto);
+              formData.append('monedaAdelanto', _this8.monedaAdelanto);
+              formData.append('idSede', _this8.idSede);
+              _context2.next = 91;
+              return _this8.axios.post('/api/appointment', formData, config).then(function (response) {
                 //Trabaja en api -> modelo (appointment)>store()
                 console.log(response.data);
-                _this6.closeModal();
-                _this6.cita.membresia = '';
-                _this6.$emit('actualizarListadoCitas', true);
+                _this8.closeModal();
+                _this8.cita.membresia = '';
+                _this8.$emit('actualizarListadoCitas', true);
                 //console.log(response.data.cita.id)
-                _this6.$swal({
+                _this8.$swal({
                   icon: 'success',
                   title: 'Cita registrada con éxito'
                 });
                 //this.$parent.listar()
-                _this6.clearModal();
+                _this8.clearModal();
               })["catch"](function (error) {
                 console.log(error);
               });
-            case 90:
+            case 91:
             case "end":
-              return _context.stop();
+              return _context2.stop();
           }
-        }, _callee);
+        }, _callee2);
       }))();
     },
     closeModal: function closeModal() {
@@ -7344,6 +7436,9 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     clearModal: function clearModal() {
       this.pasoActual = 1;
       this.busquedaTexto = '';
+      this.fechaManual = '';
+      this.horaManualId = '';
+      this.horariosDisponibles = [];
       this.fetchPacientes();
       this.cita.phone = '';
       this.cita.dni = '';
@@ -7397,7 +7492,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.monedaAdelanto = 1;
     },
     reniec: function reniec() {
-      var _this7 = this;
+      var _this9 = this;
       if (this.switchReciec === 0) return;
       this.switchReciec = 0;
       this.limpiarInputs(false);
@@ -7408,28 +7503,28 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         timer: 2500,
         timerProgressBar: true,
         didOpen: function didOpen() {
-          timerProgressBar: true, _this7.$swal.showLoading();
+          timerProgressBar: true, _this9.$swal.showLoading();
         }
       });
       this.axios.get("/api/buscarPacienteDB/" + this.cita.dni).then(function (res) {
         if (res.data.patient == null) {
           //Buscar en reniec, nuevo
-          if (_this7.cita.type_dni == 1) {
+          if (_this9.cita.type_dni == 1) {
             //window.axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
-            _this7.axios.get("/api/buscarDni/" + _this7.cita.dni).then(function (response) {
+            _this9.axios.get("/api/buscarDni/" + _this9.cita.dni).then(function (response) {
               console.log(response.data);
-              _this7.cita.name = "".concat(response.data.apellido_paterno, " ").concat(response.data.apellido_materno, " ").trim();
-              _this7.cita.nombres = "".concat(response.data.nombres.trim());
-              _this7.cita.vivo = 1;
+              _this9.cita.name = "".concat(response.data.apellido_paterno, " ").concat(response.data.apellido_materno, " ").trim();
+              _this9.cita.nombres = "".concat(response.data.nombres.trim());
+              _this9.cita.vivo = 1;
               if (response.data.apellido_paterno) {
-                _this7.patientNew = false;
-                _this7.$swal.fire({
+                _this9.patientNew = false;
+                _this9.$swal.fire({
                   icon: 'success',
                   title: 'Okey',
                   text: 'Paciente nuevo'
                 });
               } else {
-                _this7.$swal.fire({
+                _this9.$swal.fire({
                   icon: 'error',
                   title: 'Oops...',
                   text: 'DNI no encontrado!',
@@ -7443,7 +7538,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         } else {
           var _res$data$relacion$0$, _res$data$relacion$0$2, _res$data$relacion$0$3, _res$data$relacion$1$, _res$data$relacion$, _res$data$relacion$1$2, _res$data$relacion$2, _res$data$relacion$1$3, _res$data$relacion$3;
           //encontró en la DB
-          _this7.$swal.fire({
+          _this9.$swal.fire({
             title: 'Buscando paciente',
             timer: 10
           });
@@ -7454,49 +7549,49 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             for (var i = 0; i < cantDeudas; i++) {
               sumaDeudas += res.data.deudas[i].monto;
             }
-            _this7.alertaDeudas = true;
-            _this7.mensajeDeudas = "El paciente tiene <strong>".concat(cantDeudas == 1 ? '1 deuda' : cantDeudas + ' deudas', "</strong> de <strong>").concat(moment__WEBPACK_IMPORTED_MODULE_2___default()(res.data.deudas[0].fecha).fromNow(), "</strong> por un total de <strong>S/ ").concat(parseFloat(sumaDeudas).toFixed(2), "</strong>");
-          } else _this7.alertaDeudas = false;
+            _this9.alertaDeudas = true;
+            _this9.mensajeDeudas = "El paciente tiene <strong>".concat(cantDeudas == 1 ? '1 deuda' : cantDeudas + ' deudas', "</strong> de <strong>").concat(moment__WEBPACK_IMPORTED_MODULE_2___default()(res.data.deudas[0].fecha).fromNow(), "</strong> por un total de <strong>S/ ").concat(parseFloat(sumaDeudas).toFixed(2), "</strong>");
+          } else _this9.alertaDeudas = false;
           if (res.data.patient.faults != 0) {
-            _this7.$swal.fire({
+            _this9.$swal.fire({
               title: 'Atención, este paciente tiene ' + res.data.patient.faults + ' faltas'
             });
           }
-          _this7.cita.name = res.data.patient.name;
-          _this7.cita.nombres = res.data.patient.nombres;
-          _this7.cita.phone = res.data.patient.phone;
-          _this7.cita.email = res.data.patient.email;
-          _this7.cita.birth_date = res.data.patient.birth_date;
-          _this7.cita.marital_status = res.data.patient.marital_status;
-          _this7.cita.instruction_degree = res.data.patient.instruction_degree;
-          _this7.cita.gender = typeof parseInt(res.data.patient.gender) === 'number' && res.data.patient.gender !== null ? res.data.patient.gender : 2;
-          _this7.cita.occupation = res.data.patient.occupation;
-          _this7.cita.address = res.data.patient.address.address;
-          _this7.cita.department = res.data.patient.address.department;
-          _this7.cita.province = res.data.patient.address.province;
-          _this7.cita.district = res.data.patient.address.district;
-          _this7.cita.vivo = res.data.patient.vivo;
-          _this7.cita.contacto = (_res$data$relacion$0$ = res.data.relacion[0].name) !== null && _res$data$relacion$0$ !== void 0 ? _res$data$relacion$0$ : '';
-          _this7.cita.contacto_celular = (_res$data$relacion$0$2 = res.data.relacion[0].phone) !== null && _res$data$relacion$0$2 !== void 0 ? _res$data$relacion$0$2 : '';
-          _this7.cita.parentezco = (_res$data$relacion$0$3 = res.data.relacion[0].kinship) !== null && _res$data$relacion$0$3 !== void 0 ? _res$data$relacion$0$3 : '';
-          _this7.cita.contacto2 = (_res$data$relacion$1$ = (_res$data$relacion$ = res.data.relacion[1]) === null || _res$data$relacion$ === void 0 ? void 0 : _res$data$relacion$.name) !== null && _res$data$relacion$1$ !== void 0 ? _res$data$relacion$1$ : '';
-          _this7.cita.contacto_celular2 = (_res$data$relacion$1$2 = (_res$data$relacion$2 = res.data.relacion[1]) === null || _res$data$relacion$2 === void 0 ? void 0 : _res$data$relacion$2.phone) !== null && _res$data$relacion$1$2 !== void 0 ? _res$data$relacion$1$2 : '';
-          _this7.cita.parentezco2 = (_res$data$relacion$1$3 = (_res$data$relacion$3 = res.data.relacion[1]) === null || _res$data$relacion$3 === void 0 ? void 0 : _res$data$relacion$3.kinship) !== null && _res$data$relacion$1$3 !== void 0 ? _res$data$relacion$1$3 : '';
-          _this7.cita.etiqueta = res.data.patient.etiqueta;
-          _this7.cita.deudas = res.data.patient.deudas;
-          _this7.cita.prev_status = res.data.patient.new_status;
-          _this7.cita.club = res.data.patient.club;
-          _this7.cita.membresia = res.data.membresia;
-          _this7.cita.recomendation = res.data.patient.recomendation;
-          _this7.cita.recomendacion_comentario = res.data.patient.recomendacion_comentario;
-          _this7.patientNew = true;
-          _this7.moverProvincias(false);
-          _this7.moverDistritos();
+          _this9.cita.name = res.data.patient.name;
+          _this9.cita.nombres = res.data.patient.nombres;
+          _this9.cita.phone = res.data.patient.phone;
+          _this9.cita.email = res.data.patient.email;
+          _this9.cita.birth_date = res.data.patient.birth_date;
+          _this9.cita.marital_status = res.data.patient.marital_status;
+          _this9.cita.instruction_degree = res.data.patient.instruction_degree;
+          _this9.cita.gender = typeof parseInt(res.data.patient.gender) === 'number' && res.data.patient.gender !== null ? res.data.patient.gender : 2;
+          _this9.cita.occupation = res.data.patient.occupation;
+          _this9.cita.address = res.data.patient.address.address;
+          _this9.cita.department = res.data.patient.address.department;
+          _this9.cita.province = res.data.patient.address.province;
+          _this9.cita.district = res.data.patient.address.district;
+          _this9.cita.vivo = res.data.patient.vivo;
+          _this9.cita.contacto = (_res$data$relacion$0$ = res.data.relacion[0].name) !== null && _res$data$relacion$0$ !== void 0 ? _res$data$relacion$0$ : '';
+          _this9.cita.contacto_celular = (_res$data$relacion$0$2 = res.data.relacion[0].phone) !== null && _res$data$relacion$0$2 !== void 0 ? _res$data$relacion$0$2 : '';
+          _this9.cita.parentezco = (_res$data$relacion$0$3 = res.data.relacion[0].kinship) !== null && _res$data$relacion$0$3 !== void 0 ? _res$data$relacion$0$3 : '';
+          _this9.cita.contacto2 = (_res$data$relacion$1$ = (_res$data$relacion$ = res.data.relacion[1]) === null || _res$data$relacion$ === void 0 ? void 0 : _res$data$relacion$.name) !== null && _res$data$relacion$1$ !== void 0 ? _res$data$relacion$1$ : '';
+          _this9.cita.contacto_celular2 = (_res$data$relacion$1$2 = (_res$data$relacion$2 = res.data.relacion[1]) === null || _res$data$relacion$2 === void 0 ? void 0 : _res$data$relacion$2.phone) !== null && _res$data$relacion$1$2 !== void 0 ? _res$data$relacion$1$2 : '';
+          _this9.cita.parentezco2 = (_res$data$relacion$1$3 = (_res$data$relacion$3 = res.data.relacion[1]) === null || _res$data$relacion$3 === void 0 ? void 0 : _res$data$relacion$3.kinship) !== null && _res$data$relacion$1$3 !== void 0 ? _res$data$relacion$1$3 : '';
+          _this9.cita.etiqueta = res.data.patient.etiqueta;
+          _this9.cita.deudas = res.data.patient.deudas;
+          _this9.cita.prev_status = res.data.patient.new_status;
+          _this9.cita.club = res.data.patient.club;
+          _this9.cita.membresia = res.data.membresia;
+          _this9.cita.recomendation = res.data.patient.recomendation;
+          _this9.cita.recomendacion_comentario = res.data.patient.recomendacion_comentario;
+          _this9.patientNew = true;
+          _this9.moverProvincias(false);
+          _this9.moverDistritos();
         }
       })["catch"](function (err) {
         console.error(err);
       })["finally"](function (result) {
-        _this7.switchReciec = 1;
+        _this9.switchReciec = 1;
         document.querySelector(".btnReniec").classList.replace('btn-danger', 'btn-info');
       });
     },
@@ -7584,6 +7679,34 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.razonPorcentaje = '';
       this.razonRebaja = '';
     },
+    dayWeek: function dayWeek(day) {
+      switch (day) {
+        case 0:
+          return "Lunes";
+          break;
+        case 1:
+          return "Martes";
+          break;
+        case 2:
+          return "Miercoles";
+          break;
+        case 3:
+          return "Jueves";
+          break;
+        case 4:
+          return "Viernes";
+          break;
+        case 5:
+          return "Sabado";
+          break;
+        case 6:
+          return "Domingo";
+          break;
+        case -1:
+          return "Domingo";
+          break;
+      }
+    },
     dynamicPrice: function dynamicPrice() {
       if (document.getElementById('clasification').value && document.getElementById('type').value && document.getElementById('mode').value && document.getElementById('type_amount').value) {
         var casificationValue = parseInt(document.getElementById('clasification').value) - 1,
@@ -7598,50 +7721,50 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     listarPrecios: function listarPrecios() {
-      var _this8 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
-            case 0:
-              _context2.next = 2;
-              return _this8.axios.get('/api/listarPreciosTodos').then(function (response) {
-                return _this8.precios = response.data;
-              });
-            case 2:
-            case "end":
-              return _context2.stop();
-          }
-        }, _callee2);
-      }))();
-    },
-    listarDepartamentos: function listarDepartamentos() {
-      var _this9 = this;
+      var _this10 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
               _context3.next = 2;
-              return _this9.axios.get('/api/departamentos').then(function (response) {
-                _this9.ubigeo.departamentos = response.data['departamentos'];
-                _this9.ubigeo.provincias = response.data['provincias'];
-                _this9.ubigeo.distritos = response.data['distritos'];
-                _this9.provincias = _this9.ubigeo.provincias.filter(function (provincia) {
-                  return provincia.idDepa == 12;
-                });
-                _this9.distritos = _this9.ubigeo.distritos.filter(function (distrito) {
-                  return distrito.idProv == 103;
-                });
-                _this9.cita.department = 12;
-                _this9.cita.province = 103;
-                _this9.cita.district = 1006;
-                _this9.moverProvincias(false);
-                _this9.moverDistritos();
+              return _this10.axios.get('/api/listarPreciosTodos').then(function (response) {
+                return _this10.precios = response.data;
               });
             case 2:
             case "end":
               return _context3.stop();
           }
         }, _callee3);
+      }))();
+    },
+    listarDepartamentos: function listarDepartamentos() {
+      var _this11 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              _context4.next = 2;
+              return _this11.axios.get('/api/departamentos').then(function (response) {
+                _this11.ubigeo.departamentos = response.data['departamentos'];
+                _this11.ubigeo.provincias = response.data['provincias'];
+                _this11.ubigeo.distritos = response.data['distritos'];
+                _this11.provincias = _this11.ubigeo.provincias.filter(function (provincia) {
+                  return provincia.idDepa == 12;
+                });
+                _this11.distritos = _this11.ubigeo.distritos.filter(function (distrito) {
+                  return distrito.idProv == 103;
+                });
+                _this11.cita.department = 12;
+                _this11.cita.province = 103;
+                _this11.cita.district = 1006;
+                _this11.moverProvincias(false);
+                _this11.moverDistritos();
+              });
+            case 2:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4);
       }))();
     },
     moverProvincias: function moverProvincias(borrar) {
@@ -7680,11 +7803,44 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   watch: {
     horaElegida: function horaElegida() {
-      this.cita.professional_id = this.profesionalElegido.id;
-      this.cita.clasification = this.profesionalElegido.idProfesion;
+      if (this.horaElegida && this.profesionalElegido) {
+        this.cita.professional_id = this.profesionalElegido.id;
+        this.cita.clasification = this.profesionalElegido.idProfesion;
+        this.fechaManual = this.fechaElegida;
+        this.horaManualId = this.horaElegida.id;
+        this.cita.schedule_id = this.horaElegida.id;
+        this.horariosDisponibles = [this.horaElegida];
+      } else {
+        this.cita.professional_id = '';
+        this.cita.schedule_id = '';
+        this.fechaManual = moment__WEBPACK_IMPORTED_MODULE_2___default()().format('YYYY-MM-DD');
+        this.horaManualId = '';
+        this.horariosDisponibles = [];
+      }
     }
   },
   computed: {
+    doctoresFiltradosPorCat: function doctoresFiltradosPorCat() {
+      var _this12 = this;
+      if (!this.doctores) return [];
+      if (!this.cita.clasification) return this.doctores;
+      return this.doctores.filter(function (d) {
+        return d.idProfesion == _this12.cita.clasification || d.profession_id == _this12.cita.clasification;
+      });
+    },
+    horaSeleccionada: function horaSeleccionada() {
+      var _this13 = this;
+      return this.horariosDisponibles.find(function (h) {
+        return h.id == _this13.horaManualId;
+      }) || {};
+    },
+    profesionalSeleccionado: function profesionalSeleccionado() {
+      var _this14 = this;
+      if (!this.doctores) return {};
+      return this.doctores.find(function (d) {
+        return d.id == _this14.cita.professional_id;
+      }) || {};
+    },
     filtro: function filtro() {
       if (this.cita.professional_id) {
         return this.horas.filter(function (hora) {
@@ -9292,7 +9448,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       citaTemp: [],
       // Variables de Calendario Grid
       cargando: true,
-      horasGrid: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+      horasGrid: [8, 9, 10, 11, 12, 13, 14],
       horaInicioGrid: 8,
       pixelsPorMinuto: 1.5,
       filtroActual: 'Todos',
@@ -9333,9 +9489,12 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     },
     doctoresFiltrados: function doctoresFiltrados() {
       var _this = this;
-      if (this.filtroActual === 'Todos') return this.doctores;
-      return this.doctores.filter(function (d) {
+      var filtrados = this.doctores;
+      if (this.filtroActual !== 'Todos') filtrados = this.doctores.filter(function (d) {
         return d.profession === _this.filtroActual;
+      });
+      return filtrados.filter(function (d) {
+        return d.horarios && d.horarios.length > 0;
       });
     }
   },
@@ -9425,6 +9584,28 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
                     }
                   });
                 });
+
+                // Calcular horas max y min para el Grid
+                var minHora = 8;
+                var maxHora = 21;
+                if (_this3.horasSolas.length > 0) {
+                  var horasInicio = _this3.horasSolas.map(function (h) {
+                    return parseInt(h.check_time.split(':')[0]);
+                  });
+                  var horasFin = _this3.horasSolas.map(function (h) {
+                    return parseInt(h.departure_date.split(':')[0]) + (parseInt(h.departure_date.split(':')[1]) > 0 ? 1 : 0);
+                  });
+                  minHora = Math.min.apply(Math, _toConsumableArray(horasInicio));
+                  maxHora = Math.max.apply(Math, _toConsumableArray(horasFin));
+                  // Validar limites
+                  if (minHora < 0 || isNaN(minHora)) minHora = 8;
+                  if (maxHora > 24 || isNaN(maxHora)) maxHora = 21;
+                }
+                _this3.horaInicioGrid = minHora;
+                _this3.horasGrid = [];
+                for (var i = minHora; i <= maxHora; i++) {
+                  _this3.horasGrid.push(i);
+                }
               })["finally"](function () {
                 _this3.cargando = false;
               })["catch"](function () {
@@ -9630,6 +9811,11 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
           });
         }
       });
+    },
+    prepararNuevaCitaManual: function prepararNuevaCitaManual() {
+      this.profesionalElegido = null;
+      this.horaElegida = null;
+      this.$emit('limpiarDescuentos');
     },
     prepararAutomaticos: function prepararAutomaticos(indexProfesional, indexHorario) {
       this.profesionalElegido = this.doctores[indexProfesional];
@@ -10486,7 +10672,7 @@ var render = function render() {
       opacity: "0.1"
     }
   }), _vm._v(" "), _c("div", {
-    staticClass: "d-flex flex-wrap gap-2 justify-content-center pb-4"
+    staticClass: "d-flex flex-wrap gap-2 justify-content-left pb-4"
   }, [_vm.cita.status != 3 ? _c("button", {
     staticClass: "btn btn-action btn-outline-primary",
     attrs: {
@@ -10538,9 +10724,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-user-slash mr-2"
-  }), _vm._v(" No Asistió\n          ")]), _vm._v(" "), _c("div", {
-    staticClass: "w-100 d-flex justify-content-center gap-2 mt-2"
-  }, [_c("a", {
+  }), _vm._v(" No Asistió\n          ")]), _vm._v(" "), _c("a", {
     staticClass: "btn btn-action btn-outline-success",
     attrs: {
       href: _vm.getWhatsappLink(_vm.cita),
@@ -10555,8 +10739,8 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-phone-alt mr-2"
-  }), _vm._v(" Llamar\n            ")])]), _vm._v(" "), _c("div", {
-    staticClass: "w-100 d-flex justify-content-center gap-4 mt-3"
+  }), _vm._v(" Llamar\n            ")]), _vm._v(" "), _c("div", {
+    staticClass: "w-100 d-flex justify-content-left gap-4 mt-3"
   }, [_c("button", {
     staticClass: "btn btn-link text-muted p-0 small",
     attrs: {
@@ -12230,7 +12414,7 @@ var render = function render() {
       "class": step.icon
     })]), _vm._v(" "), _c("span", {
       staticClass: "step-label ms-2 d-none d-md-inline"
-    }, [_vm._v(_vm._s(step.label))]), _vm._v(" "), step.id < 7 ? _c("div", {
+    }, [_vm._v(_vm._s(step.label))]), _vm._v(" "), step.id < 8 ? _c("div", {
       staticClass: "step-connector mx-3 d-none d-lg-block"
     }) : _vm._e()]);
   }), 0), _vm._v(" "), _c("div", {
@@ -12321,7 +12505,7 @@ var render = function render() {
     staticClass: "col-md-10"
   }, [_c("p", {
     staticClass: "mb-3 lead text-center font-weight-bold"
-  }, [_vm._v("Tipo de Consulta")]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Tipo de Consulta (Especialidad)")]), _vm._v(" "), _c("div", {
     staticClass: "row mb-4"
   }, _vm._l(_vm.categorias, function (cat) {
     return _c("div", {
@@ -12356,11 +12540,24 @@ var render = function render() {
     }, [_vm.cita.clasification == cat.id ? _c("i", {
       staticClass: "fas fa-check-circle text-primary"
     }) : _vm._e()])])])]);
-  }), 0), _vm._v(" "), _vm.cita.clasification ? _c("div", {
+  }), 0)])])]), _vm._v(" "), _c("div", {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.pasoActual === 3,
+      expression: "pasoActual === 3"
+    }]
+  }, [_c("div", {
+    staticClass: "row justify-content-center"
+  }, [_c("div", {
+    staticClass: "col-md-10"
+  }, [_c("p", {
+    staticClass: "mb-3 lead text-center font-weight-bold"
+  }, [_vm._v("Seleccionar Servicio Específico")]), _vm._v(" "), _vm.cita.clasification ? _c("div", {
     staticClass: "card border-0 shadow-sm rounded-4 mb-4"
   }, [_c("div", {
     staticClass: "card-body p-4"
-  }, [_vm._m(4), _vm._v(" "), _c("div", {
+  }, [_c("div", {
     staticClass: "list-group list-group-flush rounded-4 overflow-hidden border"
   }, _vm._l(_vm.precios, function (precio) {
     return precio.idClasificacion == _vm.cita.clasification && precio.servicio == "1" && precio.id != 48 && precio.id != 49 && precio.activo == "1" ? _c("button", {
@@ -12384,58 +12581,136 @@ var render = function render() {
     directives: [{
       name: "show",
       rawName: "v-show",
-      value: _vm.pasoActual === 3,
-      expression: "pasoActual === 3"
-    }]
-  }, [_c("div", {
-    staticClass: "row justify-content-center"
-  }, [_c("div", {
-    staticClass: "col-md-8 text-center py-5"
-  }, [_c("p", {
-    staticClass: "mb-4 lead font-weight-bold"
-  }, [_vm._v("Profesional Asignado")]), _vm._v(" "), _c("div", {
-    staticClass: "professional-card p-5 bg-white shadow-sm rounded-5 mb-4 border transition-all"
-  }, [_vm._m(5), _vm._v(" "), _c("h3", {
-    staticClass: "mb-1 text-dark font-weight-bold"
-  }, [_vm._v(_vm._s(_vm.profesionalElegido.name))]), _vm._v(" "), _c("p", {
-    staticClass: "text-primary mb-0 fs-5"
-  }, [_vm._v(_vm._s(_vm.profesionalElegido.profession))]), _vm._v(" "), _vm._m(6)]), _vm._v(" "), _c("p", {
-    staticClass: "text-muted small"
-  }, [_vm._v("El profesional ha sido seleccionado previamente en el calendario.")])])])]), _vm._v(" "), _c("div", {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
       value: _vm.pasoActual === 4,
       expression: "pasoActual === 4"
     }]
   }, [_c("div", {
     staticClass: "row justify-content-center"
   }, [_c("div", {
-    staticClass: "col-md-8 text-center py-5"
+    staticClass: "col-md-10"
   }, [_c("p", {
-    staticClass: "mb-4 lead font-weight-bold"
-  }, [_vm._v("Fecha y Hora de la Cita")]), _vm._v(" "), _c("div", {
-    staticClass: "card border-0 shadow-sm rounded-5 bg-light-gradient p-5 mb-4"
-  }, [_c("div", {
-    staticClass: "row align-items-center"
-  }, [_c("div", {
-    staticClass: "col-md-6 border-end"
-  }, [_vm._m(7), _vm._v(" "), _c("h4", {
-    staticClass: "mb-0 text-dark font-weight-bold"
-  }, [_vm._v(_vm._s(_vm.fechaElegida))]), _vm._v(" "), _c("p", {
-    staticClass: "text-muted mb-0"
-  }, [_vm._v("Fecha seleccionada")])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-6"
-  }, [_vm._m(8), _vm._v(" "), _c("h4", {
-    staticClass: "mb-0 text-dark font-weight-bold"
-  }, [_vm._v(_vm._s(_vm.horaLatam1(_vm.horaElegida.check_time)) + " - " + _vm._s(_vm.horaLatam1(_vm.horaElegida.departure_date)))]), _vm._v(" "), _c("p", {
-    staticClass: "text-muted mb-0"
-  }, [_vm._v("Horario reservado")])])])]), _vm._v(" "), _vm._m(9)])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-4 lead text-center font-weight-bold"
+  }, [_vm._v("Seleccionar Profesional")]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_vm._l(_vm.doctoresFiltradosPorCat, function (prof) {
+    return _c("div", {
+      key: prof.id,
+      staticClass: "col-md-4 mb-3"
+    }, [_c("div", {
+      staticClass: "card h-100 border-0 shadow-sm rounded-4 selectable-card transition-all",
+      "class": {
+        active: _vm.cita.professional_id == prof.id
+      },
+      on: {
+        click: function click($event) {
+          return _vm.seleccionarDoctor(prof);
+        }
+      }
+    }, [_c("div", {
+      staticClass: "card-body text-center p-4"
+    }, [_vm._m(4, true), _vm._v(" "), _c("h6", {
+      staticClass: "mb-1 font-weight-bold text-dark"
+    }, [_vm._v(_vm._s(prof.name))]), _vm._v(" "), _c("small", {
+      staticClass: "text-muted"
+    }, [_vm._v(_vm._s(prof.profession))])])])]);
+  }), _vm._v(" "), _vm.doctoresFiltradosPorCat.length === 0 ? _c("div", {
+    staticClass: "col-12 text-center text-muted py-4"
+  }, [_c("i", {
+    staticClass: "fas fa-user-md fa-3x mb-3 text-light"
+  }), _vm._v(" "), _c("p", [_vm._v("No hay profesionales disponibles para esta especialidad.")])]) : _vm._e()], 2)])])]), _vm._v(" "), _c("div", {
     directives: [{
       name: "show",
       rawName: "v-show",
       value: _vm.pasoActual === 5,
       expression: "pasoActual === 5"
+    }]
+  }, [_c("div", {
+    staticClass: "row justify-content-center"
+  }, [_c("div", {
+    staticClass: "col-md-8"
+  }, [_c("p", {
+    staticClass: "mb-4 lead text-center font-weight-bold"
+  }, [_vm._v("Fecha y Hora de la Cita")]), _vm._v(" "), _c("div", {
+    staticClass: "card border-0 shadow-sm rounded-4 bg-light p-4 mb-4"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-md-6 mb-3 mb-md-0"
+  }, [_c("label", {
+    staticClass: "form-label font-weight-bold text-muted small"
+  }, [_vm._v("Fecha de la Cita")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.fechaManual,
+      expression: "fechaManual"
+    }],
+    staticClass: "form-control form-control-lg rounded-pill px-4 border-0 shadow-sm",
+    attrs: {
+      type: "date"
+    },
+    domProps: {
+      value: _vm.fechaManual
+    },
+    on: {
+      change: function change($event) {
+        return _vm.buscarHorariosManual();
+      },
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.fechaManual = $event.target.value;
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("label", {
+    staticClass: "form-label font-weight-bold text-muted small"
+  }, [_vm._v("Horario Disponible")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.horaManualId,
+      expression: "horaManualId"
+    }],
+    staticClass: "form-select form-select-lg rounded-pill px-4 border-0 shadow-sm",
+    on: {
+      change: [function ($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.horaManualId = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
+      }, function ($event) {
+        return _vm.seleccionarHoraManual();
+      }]
+    }
+  }, [_c("option", {
+    attrs: {
+      value: ""
+    }
+  }, [_vm._v("Seleccione un horario...")]), _vm._v(" "), _vm._l(_vm.horariosDisponibles, function (hora) {
+    return _c("option", {
+      key: hora.id,
+      domProps: {
+        value: hora.id
+      }
+    }, [_vm._v(_vm._s(_vm.horaLatam1(hora.check_time)) + " - " + _vm._s(_vm.horaLatam1(hora.departure_date)))]);
+  })], 2), _vm._v(" "), _vm.cargandoHorarios ? _c("div", {
+    staticClass: "text-primary small mt-2"
+  }, [_c("i", {
+    staticClass: "fas fa-spinner fa-spin"
+  }), _vm._v(" Buscando horarios...")]) : _vm.horariosDisponibles.length === 0 && _vm.fechaManual ? _c("div", {
+    staticClass: "text-danger small mt-2"
+  }, [_c("i", {
+    staticClass: "fas fa-exclamation-circle"
+  }), _vm._v(" No hay horarios disponibles este día.")]) : _vm._e()])])])])])]), _vm._v(" "), _c("div", {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.pasoActual === 6,
+      expression: "pasoActual === 6"
     }]
   }, [_c("div", {
     staticClass: "row justify-content-center"
@@ -12457,7 +12732,7 @@ var render = function render() {
         return _vm.seleccionarModalidad(1);
       }
     }
-  }, [_vm._m(10), _vm._v(" "), _c("h5", {
+  }, [_vm._m(5), _vm._v(" "), _c("h5", {
     staticClass: "font-weight-bold"
   }, [_vm._v("Presencial")]), _vm._v(" "), _c("p", {
     staticClass: "small text-muted mb-0"
@@ -12473,7 +12748,7 @@ var render = function render() {
         return _vm.seleccionarModalidad(2);
       }
     }
-  }, [_vm._m(11), _vm._v(" "), _c("h5", {
+  }, [_vm._m(6), _vm._v(" "), _c("h5", {
     staticClass: "font-weight-bold"
   }, [_vm._v("Virtual")]), _vm._v(" "), _c("p", {
     staticClass: "small text-muted mb-0"
@@ -12489,7 +12764,7 @@ var render = function render() {
         return _vm.seleccionarModalidad(3);
       }
     }
-  }, [_vm._m(12), _vm._v(" "), _c("h5", {
+  }, [_vm._m(7), _vm._v(" "), _c("h5", {
     staticClass: "font-weight-bold"
   }, [_vm._v("Domicilio")]), _vm._v(" "), _c("p", {
     staticClass: "small text-muted mb-0"
@@ -12499,7 +12774,7 @@ var render = function render() {
     staticClass: "card-body"
   }, [_c("div", {
     staticClass: "form-group mb-0"
-  }, [_vm._m(13), _vm._v(" "), _c("input", {
+  }, [_vm._m(8), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12524,8 +12799,8 @@ var render = function render() {
     directives: [{
       name: "show",
       rawName: "v-show",
-      value: _vm.pasoActual === 6,
-      expression: "pasoActual === 6"
+      value: _vm.pasoActual === 7,
+      expression: "pasoActual === 7"
     }]
   }, [_c("div", {
     staticClass: "row justify-content-center"
@@ -12539,7 +12814,7 @@ var render = function render() {
     staticClass: "col-md-6 mb-4"
   }, [_c("div", {
     staticClass: "card border-0 shadow-sm rounded-4 bg-white p-4 h-100"
-  }, [_vm._m(14), _vm._v(" "), _c("div", {
+  }, [_vm._m(9), _vm._v(" "), _c("div", {
     staticClass: "form-check form-switch mb-3 custom-switch"
   }, [_c("input", {
     directives: [{
@@ -12910,7 +13185,7 @@ var render = function render() {
     staticClass: "col-md-6 mb-4"
   }, [_c("div", {
     staticClass: "card border-0 shadow-sm rounded-4 bg-white p-4 h-100"
-  }, [_vm._m(15), _vm._v(" "), _c("div", {
+  }, [_vm._m(10), _vm._v(" "), _c("div", {
     staticClass: "form-group h-100 d-flex flex-column"
   }, [_c("textarea", {
     directives: [{
@@ -12993,8 +13268,8 @@ var render = function render() {
     directives: [{
       name: "show",
       rawName: "v-show",
-      value: _vm.pasoActual === 7,
-      expression: "pasoActual === 7"
+      value: _vm.pasoActual === 8,
+      expression: "pasoActual === 8"
     }]
   }, [_c("div", {
     staticClass: "row justify-content-center"
@@ -13004,7 +13279,7 @@ var render = function render() {
     staticClass: "mb-4 lead text-center font-weight-bold"
   }, [_vm._v("Resumen de la Cita")]), _vm._v(" "), _c("div", {
     staticClass: "ticket-container bg-white shadow-lg rounded-5 overflow-hidden border"
-  }, [_vm._m(16), _vm._v(" "), _c("div", {
+  }, [_vm._m(11), _vm._v(" "), _c("div", {
     staticClass: "ticket-body p-4 p-md-5"
   }, [_c("div", {
     staticClass: "row mb-5"
@@ -13030,17 +13305,17 @@ var render = function render() {
     staticClass: "row mb-5 bg-light rounded-4 p-4 mx-0"
   }, [_c("div", {
     staticClass: "col-md-6 mb-3 mb-md-0 d-flex align-items-center"
-  }, [_vm._m(17), _vm._v(" "), _c("div", [_c("h6", {
+  }, [_vm._m(12), _vm._v(" "), _c("div", [_c("h6", {
     staticClass: "mb-0 font-weight-bold"
-  }, [_vm._v(_vm._s(_vm.fechaElegida))]), _vm._v(" "), _c("small", {
+  }, [_vm._v(_vm._s(_vm.fechaManual))]), _vm._v(" "), _c("small", {
     staticClass: "text-muted"
   }, [_vm._v("Fecha asignada")])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 d-flex align-items-center justify-content-md-end"
-  }, [_vm._m(18), _vm._v(" "), _c("div", {
+  }, [_vm._m(13), _vm._v(" "), _c("div", {
     staticClass: "text-md-end"
   }, [_c("h6", {
     staticClass: "mb-0 font-weight-bold"
-  }, [_vm._v(_vm._s(_vm.horaLatam1(_vm.horaElegida.check_time)) + " - " + _vm._s(_vm.horaLatam1(_vm.horaElegida.departure_date)))]), _vm._v(" "), _c("small", {
+  }, [_vm._v(_vm._s(_vm.horaLatam1(_vm.horaSeleccionada.check_time)) + " - " + _vm._s(_vm.horaLatam1(_vm.horaSeleccionada.departure_date)))]), _vm._v(" "), _c("small", {
     staticClass: "text-muted"
   }, [_vm._v("Horario reservado")])])])]), _vm._v(" "), _c("div", {
     staticClass: "row Ticket-details"
@@ -13050,7 +13325,7 @@ var render = function render() {
     staticClass: "font-weight-bold text-muted small text-uppercase mb-2"
   }, [_vm._v("Profesional")]), _vm._v(" "), _c("p", {
     staticClass: "mb-0 font-weight-bold"
-  }, [_vm._v(_vm._s(_vm.profesionalElegido.name))])]), _vm._v(" "), _c("div", {
+  }, [_vm._v(_vm._s(_vm.profesionalSeleccionado ? _vm.profesionalSeleccionado.name : ""))])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-4 mb-4"
   }, [_c("h6", {
     staticClass: "font-weight-bold text-muted small text-uppercase mb-2"
@@ -13066,9 +13341,9 @@ var render = function render() {
     staticClass: "mb-0 font-weight-bold text-success"
   }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.cita.price).toFixed(2)))])])]), _vm._v(" "), _vm.cita.recomendacion_comentario ? _c("div", {
     staticClass: "notes-section mt-4 bg-soft-warning p-4 rounded-4 border-dashed border-warning"
-  }, [_vm._m(19), _vm._v(" "), _c("p", {
+  }, [_vm._m(14), _vm._v(" "), _c("p", {
     staticClass: "mb-0 small text-dark fst-italic"
-  }, [_vm._v(_vm._s(_vm.cita.recomendacion_comentario))])]) : _vm._e()]), _vm._v(" "), _vm._m(20)])])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v(_vm._s(_vm.cita.recomendacion_comentario))])]) : _vm._e()]), _vm._v(" "), _vm._m(15)])])])]), _vm._v(" "), _c("div", {
     staticClass: "modal-footer border-0 justify-content-between px-4 pb-4"
   }, [_c("div", [_vm.pasoActual > 1 ? _c("button", {
     staticClass: "btn btn-outline-secondary btn-lg rounded-pill px-4",
@@ -13088,7 +13363,7 @@ var render = function render() {
       type: "button",
       "data-bs-dismiss": "modal"
     }
-  }, [_vm._v("\r\n\t\t\t\t\t\t\t\tCancelar\r\n\t\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm.pasoActual < 7 ? _c("button", {
+  }, [_vm._v("\r\n\t\t\t\t\t\t\t\tCancelar\r\n\t\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm.pasoActual < 8 ? _c("button", {
     staticClass: "btn btn-primary btn-lg rounded-pill px-5 shadow-sm",
     attrs: {
       type: "button"
@@ -13098,14 +13373,14 @@ var render = function render() {
     }
   }, [_vm._v("\r\n\t\t\t\t\t\t\t\tSiguiente "), _c("i", {
     staticClass: "fas fa-arrow-right ms-2"
-  })]) : _vm._e(), _vm._v(" "), _vm.pasoActual === 7 && _vm.cita.vivo == 1 ? _c("button", {
+  })]) : _vm._e(), _vm._v(" "), _vm.pasoActual === 8 && _vm.cita.vivo == 1 ? _c("button", {
     staticClass: "btn btn-success btn-lg rounded-pill px-5 shadow-sm",
     attrs: {
       type: "submit"
     }
   }, [_c("i", {
     staticClass: "fas fa-save me-2"
-  }), _vm._v(" Registrar Cita\r\n\t\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm.pasoActual === 7 && _vm.cita.vivo != 1 ? _c("div", {
+  }), _vm._v(" Registrar Cita\r\n\t\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm.pasoActual === 8 && _vm.cita.vivo != 1 ? _c("div", {
     staticClass: "alert alert-danger mb-0 rounded-pill"
   }, [_c("i", {
     staticClass: "fas fa-cross me-2"
@@ -13124,9 +13399,9 @@ var render = function render() {
     staticClass: "modal-dialog modal-dialog-scrollable modal-xl"
   }, [_c("div", {
     staticClass: "modal-content"
-  }, [_vm._m(21), _vm._v(" "), _c("div", {
+  }, [_vm._m(16), _vm._v(" "), _c("div", {
     staticClass: "modal-body"
-  }, [_vm._m(22), _vm._v(" "), _c("div", {
+  }, [_vm._m(17), _vm._v(" "), _c("div", {
     staticClass: "card mb-3"
   }, [_c("div", {
     staticClass: "card-body"
@@ -13134,7 +13409,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col"
-  }, [_vm._m(23), _vm._v(" "), _c("select", {
+  }, [_vm._m(18), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13170,7 +13445,7 @@ var render = function render() {
     }
   }, [_vm._v("Pasaporte")])])]), _vm._v(" "), _c("div", {
     staticClass: "col"
-  }, [_vm._m(24), _vm._v(" "), _c("input", {
+  }, [_vm._m(19), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13271,7 +13546,7 @@ var render = function render() {
     staticClass: "fas fa-search"
   })])])]), _vm._v(" "), _c("div", {
     staticClass: "col-4"
-  }, [_vm._m(25), _vm._v(" "), _c("input", {
+  }, [_vm._m(20), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13296,7 +13571,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-4"
-  }, [_vm._m(26), _vm._v(" "), _c("input", {
+  }, [_vm._m(21), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13323,7 +13598,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(27), _vm._v(" "), _c("input", {
+  }, [_vm._m(22), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13347,7 +13622,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(28), _vm._v(" "), _c("select", {
+  }, [_vm._m(23), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13394,7 +13669,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(29), _vm._v(" "), _c("select", {
+  }, [_vm._m(24), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13443,7 +13718,7 @@ var render = function render() {
     }
   }, [_vm._v("Sin instrucción")])])]), _vm._v(" "), _c("div", {
     staticClass: "col"
-  }, [_vm._m(30), _vm._v(" "), _c("input", {
+  }, [_vm._m(25), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13471,7 +13746,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(31), _vm._v(" "), _c("select", {
+  }, [_vm._m(26), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13503,7 +13778,7 @@ var render = function render() {
     }, [_vm._v(_vm._s(departamento.departamento))]);
   }), 0)]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(32), _vm._v(" "), _c("select", {
+  }, [_vm._m(27), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13535,7 +13810,7 @@ var render = function render() {
     }, [_vm._v(_vm._s(provincia.provincia))]);
   }), 0)]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(33), _vm._v(" "), _c("select", {
+  }, [_vm._m(28), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13567,7 +13842,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(34), _vm._v(" "), _c("input", {
+  }, [_vm._m(29), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13593,7 +13868,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(35), _vm._v(" "), _c("select", {
+  }, [_vm._m(30), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13661,7 +13936,7 @@ var render = function render() {
         _vm.$set(_vm.cita, "email", $event.target.value);
       }
     }
-  })])])])]), _vm._v(" "), _vm._m(36), _vm._v(" "), _c("div", {
+  })])])])]), _vm._v(" "), _vm._m(31), _vm._v(" "), _c("div", {
     staticClass: "card"
   }, [_c("div", {
     staticClass: "card-body"
@@ -13669,7 +13944,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(37), _vm._v(" "), _c("input", {
+  }, [_vm._m(32), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13695,7 +13970,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(38), _vm._v(" "), _c("input", {
+  }, [_vm._m(33), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13721,7 +13996,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(39), _vm._v(" "), _c("input", {
+  }, [_vm._m(34), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13912,51 +14187,11 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("p", {
-    staticClass: "small text-muted mb-3 font-weight-bold"
-  }, [_c("i", {
-    staticClass: "fas fa-list me-2"
-  }), _vm._v("Seleccionar Servicio Específico")]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
   return _c("div", {
-    staticClass: "avatar-xl mx-auto mb-4 bg-soft-primary d-flex align-items-center justify-content-center rounded-circle border border-primary"
+    staticClass: "avatar-circle mx-auto mb-3 bg-soft-primary d-flex align-items-center justify-content-center"
   }, [_c("i", {
-    staticClass: "fas fa-user-md fa-4x text-primary"
+    staticClass: "fas fa-user-md text-primary"
   })]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "mt-4 badge bg-success-light text-success px-4 py-2 rounded-pill"
-  }, [_c("i", {
-    staticClass: "fas fa-check-circle me-2"
-  }), _vm._v("Disponible para esta atención\r\n\t\t\t\t\t\t\t\t\t")]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "mb-3 text-primary"
-  }, [_c("i", {
-    staticClass: "far fa-calendar-alt fa-3x"
-  })]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "mb-3 text-info"
-  }, [_c("i", {
-    staticClass: "far fa-clock fa-3x"
-  })]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "alert bg-soft-info border-0 text-info rounded-4"
-  }, [_c("i", {
-    staticClass: "fas fa-info-circle me-2"
-  }), _vm._v("Este horario ha sido bloqueado en el calendario para este paciente.\r\n\t\t\t\t\t\t\t\t")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -17627,7 +17862,20 @@ var render = function render() {
     attrs: {
       points: "22 4 12 14.01 9 11.01"
     }
-  })]), _vm._v("\n\t\t\t\t\t\tAtendido\n\t\t\t\t\t")])]), _vm._v(" "), _c("router-link", {
+  })]), _vm._v("\n\t\t\t\t\t\tAtendido\n\t\t\t\t\t")])]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-success font-weight-bold shadow-sm",
+    attrs: {
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#modalNuevaCita"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.prepararNuevaCitaManual();
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-plus"
+  }), _vm._v(" Nueva Cita")]), _vm._v(" "), _c("router-link", {
     staticClass: "btn btn-primary font-weight-bold shadow-sm",
     attrs: {
       to: "/recepcionista/paquetes"
@@ -17703,7 +17951,7 @@ var render = function render() {
   }, [_vm._v("No hay profesionales para mostrar el día de hoy.")]) : _vm._e()], 2)]), _vm._v(" "), _c("div", {
     staticClass: "calendar-body d-flex",
     staticStyle: {
-      height: "600px",
+      height: "100%",
       "overflow-y": "auto"
     },
     on: {
@@ -17820,7 +18068,7 @@ var render = function render() {
           right: "4px"
         }
       }, [_c("i", {
-        staticClass: "fas fa-wallet small",
+        staticClass: "fas fa-dollar-sign small",
         "class": horaOcup.payment && horaOcup.payment.pay_status == 1 ? "text-danger" : "text-success"
       })])])]);
     })], 2);
@@ -17853,6 +18101,7 @@ var render = function render() {
     }
   }, [_vm._v(_vm._s(_vm.tooltipData ? _vm.tooltipData.estado : ""))])]), _vm._v(" "), _c("ModalNuevaCita", {
     attrs: {
+      doctores: _vm.doctores,
       profesionalElegido: _vm.profesionalElegido,
       horaElegida: _vm.horaElegida,
       idUsuario: _vm.idUsuario,
@@ -17862,7 +18111,7 @@ var render = function render() {
     on: {
       actualizarListadoCitas: _vm.actualizarListadoCitas
     }
-  }), _vm._v(" "), _vm.cita ? _c("ModalAccionesCita", {
+  }), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("ModalAccionesCita", {
     attrs: {
       cita: _vm.cita,
       indiceElegido: _vm.indexElegido,
@@ -17876,12 +18125,12 @@ var render = function render() {
       buscarRecetas: _vm.buscarRecetas,
       tiemposEspera: _vm.abrirTiemposEspera
     }
-  }) : _vm._e(), _vm._v(" "), _vm.cita ? _c("modal-estado", {
+  }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("modal-estado", {
     attrs: {
       dataCit: _vm.cita,
       idUsuario: _vm.idUsuario
     }
-  }) : _vm._e(), _vm._v(" "), _vm.cita ? _c("pago-modal", {
+  }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("pago-modal", {
     attrs: {
       cita: _vm.cita,
       idUsuario: _vm.idUsuario,
@@ -17890,11 +18139,11 @@ var render = function render() {
     on: {
       actualizarAdelanto: _vm.actualizarAdelanto
     }
-  }) : _vm._e(), _vm._v(" "), _vm.cita ? _c("modal-patient", {
+  }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("modal-patient", {
     attrs: {
       dataCit: _vm.cita
     }
-  }) : _vm._e(), _vm._v(" "), _vm.cita ? _c("reprog-modal", {
+  }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("reprog-modal", {
     attrs: {
       dataCit: _vm.cita,
       idUsuario: _vm.idUsuario
@@ -17902,7 +18151,7 @@ var render = function render() {
     on: {
       ocultarCita: _vm.actualizarListadoCitas
     }
-  }) : _vm._e(), _vm._v(" "), _vm.cita ? _c("info-modal", {
+  }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("info-modal", {
     attrs: {
       dataCit: _vm.cita,
       precios: _vm.precios
@@ -20428,7 +20677,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.calendar-wrapper[data-v-992bc26a] { display: flex; flex-direction: column; border-radius: 8px; overflow: hidden; transform: translateZ(0);\n}\n.doctor-header[data-v-992bc26a],\n.doctor-column[data-v-992bc26a] {\n\tmin-width: 250px;\n\tmax-width: 250px;\n\tflex: 0 0 250px;\n}\n.time-slot-label[data-v-992bc26a] { height: 90px;\n} /* 60 minutos * 1.5px/min = 90px */\n.grid-line[data-v-992bc26a] { height: 90px; box-sizing: border-box;\n}\n.free-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; opacity: 0; cursor: pointer; transition: opacity 0.2s; background: rgba(28, 200, 138, 0.1); border-radius: 4px; box-sizing: border-box;}\n.free-slot[data-v-992bc26a]:hover { opacity: 1; border: 1px dashed #1cc88a;\n}\n.booked-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; cursor: pointer; transition: transform 0.1s; border-radius: 6px; overflow: hidden; background-color: rgba(248, 249, 252, 0.7);}\n.booked-slot[data-v-992bc26a]:hover { transform: scale(1.02); z-index: 10!important;\n}\n.booked-content[data-v-992bc26a] { padding: 4px; border-radius: 4px;\n}\n.doctors-header-container[data-v-992bc26a]::-webkit-scrollbar { display: none;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.calendar-wrapper[data-v-992bc26a] { display: flex; flex-direction: column; border-radius: 8px; overflow: hidden; transform: translateZ(0);\n}\n.doctor-header[data-v-992bc26a],\n.doctor-column[data-v-992bc26a] {\n\tmin-width: 250px;\n\tmax-width: 250px;\n\tflex: 0 0 250px;\n\tbackground-color: rgba(0,0,0,0.03);\n}\n.time-slot-label[data-v-992bc26a] { height: 90px;\n} /* 60 minutos * 1.5px/min = 90px */\n.grid-line[data-v-992bc26a] { height: 90px; box-sizing: border-box;\n}\n.free-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; opacity: 1; cursor: pointer; transition: opacity 0.2s, background 0.2s; background: #ffffff; border-radius: 4px; box-sizing: border-box; border: 1px solid rgba(0,0,0,0.05);\n}\n.free-slot[data-v-992bc26a]:hover { background: rgba(28, 200, 138, 0.1); border: 1px dashed #1cc88a;\n}\n.booked-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; cursor: pointer; transition: transform 0.1s; border-radius: 6px; overflow: hidden; background-color: rgba(248, 249, 252, 0.7);}\n.booked-slot[data-v-992bc26a]:hover { transform: scale(1.02); z-index: 10!important;\n}\n.booked-content[data-v-992bc26a] { padding: 4px; border-radius: 4px;\n}\n.doctors-header-container[data-v-992bc26a]::-webkit-scrollbar { display: none;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

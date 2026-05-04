@@ -26,3 +26,5 @@ storage/fonts/*
 cert.pem
 composer-show-laravel-framework.txt
 composer.lock.bak
+resources/js/components/recepcionista/components/citas/ModalNuevaCita.backup.vue
+resources/js/components/recepcionista/components/citas/VistaCuaderno.backup.vue

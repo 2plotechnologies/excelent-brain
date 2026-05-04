@@ -24,6 +24,7 @@
 						Atendido
 					</span>
 				</div>
+				<button class="btn btn-success font-weight-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevaCita" @click="prepararNuevaCitaManual()"><i class="fas fa-plus"></i> Nueva Cita</button>
 				<router-link to="/recepcionista/paquetes" class="btn btn-primary font-weight-bold shadow-sm"><i class="fas fa-box-open"></i> Paquetes</router-link>
 			</div>
 		</div>
@@ -67,7 +68,7 @@
 			</div>
 
 			<!-- Cuerpo del Calendario -->
-			<div class="calendar-body d-flex" style="height: 600px; overflow-y: auto;" @scroll="syncScroll">
+			<div class="calendar-body d-flex" style="height: 100%; overflow-y: auto;" @scroll="syncScroll">
 				<!-- Eje Y Horas -->
 				<div class="time-axis border-right bg-white" style="min-width: 60px;">
 					<div class="time-slot-label text-center text-muted small position-relative" v-for="hora in horasGrid" :key="'lbl-'+hora">
@@ -111,7 +112,7 @@
 								
 								<!-- Iconos estado -->
 								<div class="position-absolute" style="bottom: 2px; right: 4px;">
-									<i class="fas fa-wallet small" :class="horaOcup.payment && horaOcup.payment.pay_status == 1 ? 'text-danger':'text-success'"></i>
+									<i class="fas fa-dollar-sign small" :class="horaOcup.payment && horaOcup.payment.pay_status == 1 ? 'text-danger':'text-success'"></i>
 								</div>
 							</div>
 
@@ -132,10 +133,10 @@
 		</div>
 
 		<!-- Modales -->
-		<ModalNuevaCita :profesionalElegido="profesionalElegido" :horaElegida="horaElegida" :idUsuario="idUsuario" :fechaElegida='fecha' @actualizarListadoCitas="actualizarListadoCitas" :idSede="idSede"></ModalNuevaCita>
+		<ModalNuevaCita :doctores="doctores" :profesionalElegido="profesionalElegido" :horaElegida="horaElegida" :idUsuario="idUsuario" :fechaElegida='fecha' @actualizarListadoCitas="actualizarListadoCitas" :idSede="idSede"></ModalNuevaCita>
 		
 		<!-- Nuevo modal de acciones centralizado -->
-		<ModalAccionesCita v-if="cita" :cita="cita" :indiceElegido="indexElegido" :precios="precios"
+		<ModalAccionesCita v-if="cita && cita.id" :cita="cita" :indiceElegido="indexElegido" :precios="precios"
 			@changeMode="changeMode"
 			@openModal="distribuirAperturaModal"
 			@intercambiar="intercambiarHorario"
@@ -144,11 +145,11 @@
 			@tiemposEspera="abrirTiemposEspera"
 		/>
 
-    <modal-estado v-if="cita" :dataCit="cita" :idUsuario="idUsuario"></modal-estado>
-    <pago-modal v-if="cita" :cita="cita" :idUsuario="idUsuario" :idSede="idSede" @actualizarAdelanto="actualizarAdelanto"></pago-modal>
-		<modal-patient v-if="cita" :dataCit="cita"></modal-patient>
-    <reprog-modal v-if="cita" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="actualizarListadoCitas"></reprog-modal>
-		<info-modal v-if="cita" :dataCit="cita" :precios="precios"></info-modal>
+    <modal-estado v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario"></modal-estado>
+    <pago-modal v-if="cita && cita.id" :cita="cita" :idUsuario="idUsuario" :idSede="idSede" @actualizarAdelanto="actualizarAdelanto"></pago-modal>
+		<modal-patient v-if="cita && cita.id" :dataCit="cita"></modal-patient>
+    <reprog-modal v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="actualizarListadoCitas"></reprog-modal>
+		<info-modal v-if="cita && cita.id" :dataCit="cita" :precios="precios"></info-modal>
 		<modal-search-patient></modal-search-patient>
 		<ModalIntercambio :posibles="posibles" :primero="primero" @actualizar="actualizarListadoCitas"></ModalIntercambio>
 		
@@ -197,7 +198,7 @@
 			
 			// Variables de Calendario Grid
 			cargando: true,
-			horasGrid: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+			horasGrid: [8, 9, 10, 11, 12, 13, 14],
 			horaInicioGrid: 8,
 			pixelsPorMinuto: 1.5,
 			filtroActual: 'Todos',
@@ -212,8 +213,9 @@
 				return [...new Set(profesiones)];
 			},
 			doctoresFiltrados() {
-				if(this.filtroActual === 'Todos') return this.doctores;
-				return this.doctores.filter(d => d.profession === this.filtroActual);
+				let filtrados = this.doctores;
+				if(this.filtroActual !== 'Todos') filtrados = this.doctores.filter(d => d.profession === this.filtroActual);
+				return filtrados.filter(d => d.horarios && d.horarios.length > 0);
 			}
 		},
 		methods:{
@@ -265,6 +267,26 @@
 							}
 						})
 					})
+
+					// Calcular horas max y min para el Grid
+					let minHora = 8;
+					let maxHora = 21;
+					if (this.horasSolas.length > 0) {
+						let horasInicio = this.horasSolas.map(h => parseInt(h.check_time.split(':')[0]));
+						let horasFin = this.horasSolas.map(h => parseInt(h.departure_date.split(':')[0]) + (parseInt(h.departure_date.split(':')[1]) > 0 ? 1 : 0));
+						minHora = Math.min(...horasInicio);
+						maxHora = Math.max(...horasFin);
+						// Validar limites
+						if(minHora < 0 || isNaN(minHora)) minHora = 8;
+						if(maxHora > 24 || isNaN(maxHora)) maxHora = 21;
+					}
+					
+					this.horaInicioGrid = minHora;
+					this.horasGrid = [];
+					for (let i = minHora; i <= maxHora; i++) {
+						this.horasGrid.push(i);
+					}
+
 				}).finally(() => {
 					this.cargando = false;
 				}).catch(() => {
@@ -451,6 +473,11 @@
 						}
 				})
 			},
+			prepararNuevaCitaManual(){
+				this.profesionalElegido = null;
+				this.horaElegida = null;
+				this.$emit('limpiarDescuentos')
+			},
 			prepararAutomaticos(indexProfesional, indexHorario){
 				this.profesionalElegido = this.doctores[indexProfesional];
 				this.horaElegida = this.profesionalElegido.horarios[indexHorario];
@@ -527,11 +554,12 @@
 		min-width: 250px;
 		max-width: 250px;
 		flex: 0 0 250px;
+		background-color: rgba(0,0,0,0.03);
 	}
 	.time-slot-label { height: 90px; } /* 60 minutos * 1.5px/min = 90px */
 	.grid-line { height: 90px; box-sizing: border-box; }
-	.free-slot { position: absolute; width: calc(100% - 10px); left: 5px; opacity: 0; cursor: pointer; transition: opacity 0.2s; background: rgba(28, 200, 138, 0.1); border-radius: 4px; box-sizing: border-box;}
-	.free-slot:hover { opacity: 1; border: 1px dashed #1cc88a; }
+	.free-slot { position: absolute; width: calc(100% - 10px); left: 5px; opacity: 1; cursor: pointer; transition: opacity 0.2s, background 0.2s; background: #ffffff; border-radius: 4px; box-sizing: border-box; border: 1px solid rgba(0,0,0,0.05); }
+	.free-slot:hover { background: rgba(28, 200, 138, 0.1); border: 1px dashed #1cc88a; }
 	
 	.booked-slot { position: absolute; width: calc(100% - 10px); left: 5px; cursor: pointer; transition: transform 0.1s; border-radius: 6px; overflow: hidden; background-color: rgba(248, 249, 252, 0.7);}
 	.booked-slot:hover { transform: scale(1.02); z-index: 10!important; }
