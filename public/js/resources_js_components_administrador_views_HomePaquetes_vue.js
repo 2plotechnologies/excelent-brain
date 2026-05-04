@@ -55,6 +55,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       procesandoPago: false,
       guardandoReporte: false,
       editandoReporte: false,
+      monedas: [],
+      metodoPago: 1,
       formReporte: {
         resumen: '',
         logros: '',
@@ -99,6 +101,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   mounted: function mounted() {
     this.obtenerUsuarioYPaquetes();
+    this.cargarMonedas();
   },
   methods: {
     obtenerUsuarioYPaquetes: function obtenerUsuarioYPaquetes() {
@@ -182,17 +185,43 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         }, _callee2, null, [[4, 13, 16, 19]]);
       }))();
     },
+    cargarMonedas: function cargarMonedas() {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var response;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
+            case 0:
+              _context3.prev = 0;
+              _context3.next = 3;
+              return _this3.axios.get("/api/listarMonedas");
+            case 3:
+              response = _context3.sent;
+              _this3.monedas = response.data;
+              _context3.next = 10;
+              break;
+            case 7:
+              _context3.prev = 7;
+              _context3.t0 = _context3["catch"](0);
+              console.error("Error cargando monedas:", _context3.t0);
+            case 10:
+            case "end":
+              return _context3.stop();
+          }
+        }, _callee3, null, [[0, 7]]);
+      }))();
+    },
     cambiarPagina: function cambiarPagina(page) {
       if (page >= 1 && page <= this.pagination.last_page) {
         this.cargarPaquetes(page);
       }
     },
     filtrarPaquetes: function filtrarPaquetes() {
-      var _this3 = this;
+      var _this4 = this;
       // Debounce the search
       if (this.searchTimeout) clearTimeout(this.searchTimeout);
       this.searchTimeout = setTimeout(function () {
-        _this3.cargarPaquetes(1);
+        _this4.cargarPaquetes(1);
       }, 500);
     },
     setFiltroEstado: function setFiltroEstado(state) {
@@ -306,51 +335,52 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       return deuda / cuotas;
     },
     procesarPago: function procesarPago(cuota) {
-      var _this4 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var payload;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) switch (_context3.prev = _context3.next) {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
             case 0:
               if (confirm('¿Seguro que deseas registrar el pago de S/ ' + parseFloat(cuota.monto).toFixed(2) + '?')) {
-                _context3.next = 2;
+                _context4.next = 2;
                 break;
               }
-              return _context3.abrupt("return");
+              return _context4.abrupt("return");
             case 2:
-              _this4.procesandoPago = true;
-              _context3.prev = 3;
+              _this5.procesandoPago = true;
+              _context4.prev = 3;
               payload = {
                 idDeuda: cuota.id,
-                user_id: _this4.idUsuario,
+                user_id: _this5.idUsuario,
                 estado: 2,
                 observacion: 'Pago de cuota desde administrador',
-                nombre: _this4.paqueteSeleccionado.patient_name + ' ' + (_this4.paqueteSeleccionado.patient_nombres || ''),
+                nombre: _this5.paqueteSeleccionado.patient_name + ' ' + (_this5.paqueteSeleccionado.patient_nombres || ''),
                 precio: cuota.monto,
                 tipo: 8,
-                idMembresia: _this4.paqueteSeleccionado.id
+                idMembresia: _this5.paqueteSeleccionado.id,
+                idMoneda: _this5.metodoPago
               };
-              _context3.next = 7;
-              return _this4.axios.post('/api/pagarDeudaMembresia', payload);
+              _context4.next = 7;
+              return _this5.axios.post('/api/pagarDeudaMembresia', payload);
             case 7:
               cuota.estado = 2;
-              _this4.cargarPaquetes(_this4.pagination.current_page);
-              _context3.next = 15;
+              _this5.cargarPaquetes(_this5.pagination.current_page);
+              _context4.next = 15;
               break;
             case 11:
-              _context3.prev = 11;
-              _context3.t0 = _context3["catch"](3);
-              console.error(_context3.t0);
+              _context4.prev = 11;
+              _context4.t0 = _context4["catch"](3);
+              console.error(_context4.t0);
               alert('Ocurrió un error procesando el pago. Verifica tu conexión.');
             case 15:
-              _context3.prev = 15;
-              _this4.procesandoPago = false;
-              return _context3.finish(15);
+              _context4.prev = 15;
+              _this5.procesandoPago = false;
+              return _context4.finish(15);
             case 18:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
-        }, _callee3, null, [[3, 11, 15, 18]]);
+        }, _callee4, null, [[3, 11, 15, 18]]);
       }))();
     },
     abrirModalPago: function abrirModalPago(paquete) {
@@ -380,49 +410,49 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       modal.show();
     },
     guardarReporteExtra: function guardarReporteExtra() {
-      var _this5 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+      var _this6 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var payload, modalElement, modal;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
             case 0:
-              if (!(!_this5.formReporte.resumen || !_this5.formReporte.logros)) {
-                _context4.next = 3;
+              if (!(!_this6.formReporte.resumen || !_this6.formReporte.logros)) {
+                _context5.next = 3;
                 break;
               }
               alert('Por favor complete al menos el resumen y los logros.');
-              return _context4.abrupt("return");
+              return _context5.abrupt("return");
             case 3:
-              _this5.guardandoReporte = true;
-              _context4.prev = 4;
-              payload = _objectSpread(_objectSpread({}, _this5.formReporte), {}, {
-                membresia_id: _this5.paqueteSeleccionado.id
+              _this6.guardandoReporte = true;
+              _context5.prev = 4;
+              payload = _objectSpread(_objectSpread({}, _this6.formReporte), {}, {
+                membresia_id: _this6.paqueteSeleccionado.id
               });
-              _context4.next = 8;
-              return _this5.axios.post('/api/reporte-paquete-extra', payload);
+              _context5.next = 8;
+              return _this6.axios.post('/api/reporte-paquete-extra', payload);
             case 8:
               // Cerrar modal y recargar
               modalElement = document.getElementById('modalReporteExtra');
               modal = bootstrap.Modal.getInstance(modalElement);
               modal.hide();
-              _this5.cargarPaquetes(_this5.pagination.current_page);
+              _this6.cargarPaquetes(_this6.pagination.current_page);
               alert('Reporte guardado exitosamente.');
-              _context4.next = 19;
+              _context5.next = 19;
               break;
             case 15:
-              _context4.prev = 15;
-              _context4.t0 = _context4["catch"](4);
-              console.error(_context4.t0);
+              _context5.prev = 15;
+              _context5.t0 = _context5["catch"](4);
+              console.error(_context5.t0);
               alert('Ocurrió un error al guardar el reporte.');
             case 19:
-              _context4.prev = 19;
-              _this5.guardandoReporte = false;
-              return _context4.finish(19);
+              _context5.prev = 19;
+              _this6.guardandoReporte = false;
+              return _context5.finish(19);
             case 22:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
-        }, _callee4, null, [[4, 15, 19, 22]]);
+        }, _callee5, null, [[4, 15, 19, 22]]);
       }))();
     }
   }
@@ -1381,7 +1411,7 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "row mb-4"
   }, [_c("div", {
-    staticClass: "col-md-6 border-end"
+    staticClass: "col-md-4 border-end"
   }, [_c("p", {
     staticClass: "text-uppercase text-muted small fw-bold mb-1"
   }, [_vm._v("Paciente")]), _vm._v(" "), _c("div", {
@@ -1393,12 +1423,42 @@ var render = function render() {
   })]), _vm._v(" "), _c("h6", {
     staticClass: "mb-0 fw-bold"
   }, [_vm._v(_vm._s(_vm.paqueteSeleccionado.patient_name) + " " + _vm._s(_vm.paqueteSeleccionado.patient_nombres))])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-6 ps-4"
+    staticClass: "col-md-4 border-end ps-4"
   }, [_c("p", {
     staticClass: "text-uppercase text-muted small fw-bold mb-1"
   }, [_vm._v("Total Pendiente (Deuda)")]), _vm._v(" "), _c("h4", {
     staticClass: "mb-0 text-danger fw-bold"
-  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.paqueteSeleccionado.debe).toFixed(2)))])])]), _vm._v(" "), _c("h6", {
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.paqueteSeleccionado.debe).toFixed(2)))])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4 ps-4"
+  }, [_c("p", {
+    staticClass: "text-uppercase text-muted small fw-bold mb-1"
+  }, [_vm._v("Método de Pago")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.metodoPago,
+      expression: "metodoPago"
+    }],
+    staticClass: "form-select form-select-sm",
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.metodoPago = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
+      }
+    }
+  }, _vm._l(_vm.monedas, function (moneda) {
+    return _c("option", {
+      key: moneda.id,
+      domProps: {
+        value: moneda.id
+      }
+    }, [_vm._v(_vm._s(moneda.tipo))]);
+  }), 0)])]), _vm._v(" "), _c("h6", {
     staticClass: "fw-bold mb-3"
   }, [_vm._v("Desglose de Cuotas")]), _vm._v(" "), _c("div", {
     staticClass: "table-responsive bg-white rounded border"

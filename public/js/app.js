@@ -5811,6 +5811,7 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
   },
   data: function data() {
     return {
+      showCharts: true,
       dashData: {
         totalCitasHoy: 0,
         totalCitasPendientes: 0,
@@ -9962,6 +9963,21 @@ var render = function render() {
   }, [_vm._v(_vm._s(_vm.profesionalesCount))]), _vm._v(" "), _c("div", {
     staticClass: "text-xs text-muted mt-1"
   }, [_vm._v("Activos esta sem.")])]), _vm._v(" "), _vm._m(6)])])])]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mb-2"
+  }, [_vm._m(7), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm btn-toggle-charts",
+    on: {
+      click: function click($event) {
+        _vm.showCharts = !_vm.showCharts;
+      }
+    }
+  }, [_c("i", {
+    "class": _vm.showCharts ? "fas fa-eye-slash mr-1" : "fas fa-eye mr-1"
+  }), _vm._v("\n              " + _vm._s(_vm.showCharts ? "Ocultar" : "Mostrar") + "\n          ")])]), _vm._v(" "), _c("transition", {
+    attrs: {
+      name: "fade-slide"
+    }
+  }, [_vm.showCharts ? _c("div", {
     staticClass: "row mb-4"
   }, [_c("div", {
     staticClass: "col-md-4 mb-3 mb-md-0"
@@ -10035,7 +10051,7 @@ var render = function render() {
     }
   })], 1) : _c("div", {
     staticClass: "text-center text-muted d-flex h-100 align-items-center justify-content-center"
-  }, [_vm._v("Sin datos de tipos")])])])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Sin datos de tipos")])])])])]) : _vm._e()]), _vm._v(" "), _c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-12"
@@ -10130,12 +10146,12 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fas fa-sync-alt mr-1"
-    }), _vm._v(" Reprogramar")]) : _vm._e(), _vm._v(" "), _vm._m(7, true)])]);
+    }), _vm._v(" Reprogramar")]) : _vm._e(), _vm._v(" "), _vm._m(8, true)])]);
   }), 0)]) : _c("div", {
     staticClass: "text-center py-5 text-muted"
   }, [_c("p", {
     staticClass: "mb-0"
-  }, [_vm._v("No hay citas programadas para el día de hoy.")])])])])])])]);
+  }, [_vm._v("No hay citas programadas para el día de hoy.")])])])])])])], 1);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -10214,6 +10230,14 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fas fa-user-md text-secondary"
   })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h5", {
+    staticClass: "mb-0 font-weight-bold text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-chart-pie text-primary mr-2"
+  }), _vm._v(" Análisis de Citas\n          ")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -20188,7 +20212,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.icon-circle[data-v-26dd9e81] {\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  width: 2.75rem;\r\n  height: 2.75rem;\r\n  border-radius: 10px;\n}\n.card[data-v-26dd9e81] {\r\n  transition: all 0.3s cubic-bezier(.25,.8,.25,1);\n}\n.card[data-v-26dd9e81]:hover {\r\n  box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.icon-circle[data-v-26dd9e81] {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: 2.75rem;\n    height: 2.75rem;\n    border-radius: 10px;\n}\n.card[data-v-26dd9e81] {\n    transition: all 0.3s cubic-bezier(.25,.8,.25,1);\n}\n.card[data-v-26dd9e81]:hover {\n    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;\n}\n\n/* FAB BUTTON */\n.fab-toggle[data-v-26dd9e81] {\n    position: fixed;\n    bottom: 25px;\n    right: 25px;\n    width: 55px;\n    height: 55px;\n    border-radius: 50%;\n    border: none;\n    background: linear-gradient(135deg, #4e73df, #224abe);\n    color: white;\n    font-size: 20px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    z-index: 999;\n    cursor: pointer;\n    transition: all 0.3s ease;\n}\n.fab-toggle[data-v-26dd9e81]:hover {\n    transform: scale(1.1);\n    box-shadow: 0 10px 20px rgba(78, 115, 223, 0.3);\n}\n\n/* ANIMATION */\n.fade-slide-enter-active[data-v-26dd9e81],\n.fade-slide-leave-active[data-v-26dd9e81] {\n    transition: all 0.3s ease;\n}\n.fade-slide-enter-from[data-v-26dd9e81] {\n    opacity: 0;\n    transform: translateY(20px);\n}\n.fade-slide-leave-to[data-v-26dd9e81] {\n    opacity: 0;\n    transform: translateY(20px);\n}\n.btn-toggle-charts[data-v-26dd9e81] {\n    border: none;\n    background: #eef2ff;\n    color: #4e73df;\n    font-weight: 600;\n    border-radius: 20px;\n    padding: 6px 14px;\n    transition: all 0.25s ease;\n}\n.btn-toggle-charts[data-v-26dd9e81]:hover {\n    background: #4e73df;\n    color: #fff;\n    box-shadow: 0 4px 12px rgba(78, 115, 223, 0.25);\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

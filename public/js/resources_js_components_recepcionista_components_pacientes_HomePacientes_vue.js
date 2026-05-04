@@ -929,6 +929,7 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
   name: 'HomePacientes',
   data: function data() {
     return {
+      showCharts: false,
       dataPatients: [],
       queId: null,
       vistaActual: 'lista',
@@ -6894,6 +6895,21 @@ var render = function render() {
   }, [_c("i", {
     staticClass: "fas fa-box"
   }), _vm._v(" Nuevo Paquete")])], 1)]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mb-2"
+  }, [_vm._m(8), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm btn-toggle-charts",
+    on: {
+      click: function click($event) {
+        _vm.showCharts = !_vm.showCharts;
+      }
+    }
+  }, [_c("i", {
+    "class": _vm.showCharts ? "fas fa-eye-slash mr-1" : "fas fa-eye mr-1"
+  }), _vm._v("\n                " + _vm._s(_vm.showCharts ? "Ocultar" : "Mostrar") + "\n            ")])]), _vm._v(" "), _c("transition", {
+    attrs: {
+      name: "fade-slide"
+    }
+  }, [_vm.showCharts ? _c("div", {
     staticClass: "row mb-4"
   }, [_c("div", {
     staticClass: "col-md-6 mb-3 mb-md-0"
@@ -6953,7 +6969,7 @@ var render = function render() {
     staticClass: "text-center text-muted d-flex h-100 align-items-center justify-content-center pb-4"
   }, [_c("p", {
     staticClass: "mb-0"
-  }, [_vm._v("No hay datos suficientes")])]) : _vm._e()])])])]), _vm._v(" "), _c("p", {
+  }, [_vm._v("No hay datos suficientes")])]) : _vm._e()])])])]) : _vm._e()]), _vm._v(" "), _c("p", {
     staticClass: "mt-4 mb-3 font-weight-bold text-dark",
     staticStyle: {
       "font-size": "1.1rem"
@@ -6962,7 +6978,7 @@ var render = function render() {
     staticClass: "table-responsive custom-table-container"
   }, [_c("table", {
     staticClass: "table table-hover align-middle"
-  }, [_vm._m(8), _vm._v(" "), _c("tbody", _vm._l(_vm.busqueda, function (paciente, index) {
+  }, [_vm._m(9), _vm._v(" "), _c("tbody", _vm._l(_vm.busqueda, function (paciente, index) {
     return _c("tr", {
       key: index,
       staticClass: "patient-row"
@@ -6986,7 +7002,7 @@ var render = function render() {
       staticClass: "fas fa-cross me-1 text-muted"
     }) : _vm._e(), _vm._v("\n                    " + _vm._s((paciente.name + " " + (paciente.nombres || "")).trim().toLowerCase()) + "\n                  ")]), _vm._v(" "), _c("p", {
       staticClass: "text-xs text-secondary mb-0"
-    }, [_vm._v("\n                    " + _vm._s(_vm.calculateAge(paciente.birth_date)) + " años • " + _vm._s(paciente.gender == 1 ? "Masculino" : paciente.gender == 0 ? "Femenino" : "Other") + "\n                  ")])])])]), _vm._v(" "), _vm._m(9, true), _vm._v(" "), _c("td", {
+    }, [_vm._v("\n                    " + _vm._s(_vm.calculateAge(paciente.birth_date)) + " años • " + _vm._s(paciente.gender == 1 ? "Masculino" : paciente.gender == 0 ? "Femenino" : "Other") + "\n                  ")])])])]), _vm._v(" "), _vm._m(10, true), _vm._v(" "), _c("td", {
       staticClass: "text-center"
     }, [paciente.proximaCita && paciente.proximaCita.length > 0 ? _c("span", {
       staticClass: "text-xs font-weight-bold text-secondary"
@@ -7049,7 +7065,7 @@ var render = function render() {
       attrs: {
         "aria-labelledby": "dropdownMenu" + index
       }
-    }, [_vm._m(10, true), _vm._v(" "), _c("li", [_c("a", {
+    }, [_vm._m(11, true), _vm._v(" "), _c("li", [_c("a", {
       staticClass: "dropdown-item",
       attrs: {
         href: "#",
@@ -7127,7 +7143,7 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fas fa-traffic-light me-2"
-    }), _vm._v(" Estado de Actitud\n                      ")])]) : _vm._e(), _vm._v(" "), _vm._m(11, true), _vm._v(" "), _vm._m(12, true), _vm._v(" "), _c("li", [_c("a", {
+    }), _vm._v(" Estado de Actitud\n                      ")])]) : _vm._e(), _vm._v(" "), _vm._m(12, true), _vm._v(" "), _vm._m(13, true), _vm._v(" "), _c("li", [_c("a", {
       staticClass: "dropdown-item",
       attrs: {
         href: "#",
@@ -7212,7 +7228,7 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fa-solid fa-flask-vial me-2 text-primary"
     }), _vm._v(" Recetas\n                      ")])])])])])])]);
-  }), 0)])])]) : _c("DetallePaciente", {
+  }), 0)])])], 1) : _c("DetallePaciente", {
     attrs: {
       pacienteId: _vm.dataPaciente.id
     },
@@ -7309,7 +7325,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-dialog-centered"
   }, [_c("div", {
     staticClass: "modal-content border-0 shadow"
-  }, [_vm._m(13), _vm._v(" "), _c("div", {
+  }, [_vm._m(14), _vm._v(" "), _c("div", {
     staticClass: "modal-body pb-4"
   }, [_c("p", {
     staticClass: "text-secondary text-sm mb-3"
@@ -7434,6 +7450,14 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "far fa-credit-card"
   }), _vm._v(" Cobrar Deuda")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h5", {
+    staticClass: "mb-0 font-weight-bold text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-chart-pie text-primary mr-2"
+  }), _vm._v(" Análisis de Pacientes\n            ")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -12081,7 +12105,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.custom-table-container[data-v-f3308000] {\r\n  background: #fff;\r\n  border-radius: 12px;\r\n  box-shadow: 0 4px 20px rgba(0,0,0,0.05);\r\n  padding: 1rem;\n}\n.table thead th[data-v-f3308000] {\r\n  border-bottom: 1px solid #f0f2f5;\r\n  color: #8392ab;\r\n  font-weight: 700;\r\n  padding: 1rem 0.5rem;\n}\n.patient-row[data-v-f3308000] {\r\n  transition: all 0.2s ease;\n}\n.patient-row[data-v-f3308000]:hover {\r\n  background-color: #f8fafc !important;\n}\n.clickable-name[data-v-f3308000] {\r\n  cursor: pointer;\r\n  transition: color 0.2s;\n}\n.clickable-name[data-v-f3308000]:hover {\r\n  color: #1e60ff !important;\n}\n.avatar-circle[data-v-f3308000] {\r\n  width: 40px;\r\n  height: 40px;\r\n  border-radius: 50%;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-weight: 700;\r\n  font-size: 0.85rem;\r\n  color: #1e60ff;\n}\n.bg-primary-soft[data-v-f3308000] { background-color: #eaf2ff; color: #1e60ff;\n}\n.bg-success-soft[data-v-f3308000] { background-color: #e8fdf5; color: #10b981;\n}\n.bg-info-soft[data-v-f3308000] { background-color: #e0f2fe; color: #0ea5e9;\n}\n.bg-warning-soft[data-v-f3308000] { background-color: #fef6e5; color: #f59e0b;\n}\n.bg-danger-soft[data-v-f3308000] { background-color: #fbe3e4; color: #ef4444;\n}\n.badge-status-active[data-v-f3308000] {\r\n  background-color: #e8fdf5;\r\n  color: #10b981;\r\n  font-weight: 600;\r\n  padding: 0.5em 1em;\r\n  border-radius: 30px;\r\n  font-size: 0.75rem;\r\n  border: 1px solid rgba(16, 185, 129, 0.2);\n}\n.text-xs[data-v-f3308000] { font-size: 0.75rem !important;\n}\n.text-sm[data-v-f3308000] { font-size: 0.875rem !important;\n}\n.text-lg[data-v-f3308000] { font-size: 1.1rem !important;\n}\n.dropdown-item[data-v-f3308000] {\r\n  padding: 0.6rem 1rem;\r\n  font-size: 0.85rem;\r\n  font-weight: 500;\r\n  color: #4a5568;\r\n  display: flex;\r\n  align-items: center;\n}\n.dropdown-item[data-v-f3308000]:hover {\r\n  background-color: #f7fafc;\r\n  color: #1e60ff;\n}\n.dropdown-header[data-v-f3308000] {\r\n  font-size: 0.65rem;\r\n  text-transform: uppercase;\r\n  font-weight: 800;\r\n  color: #cbd5e0;\r\n  letter-spacing: 0.5px;\r\n  padding: 0.5rem 1rem;\n}\n.gap-2[data-v-f3308000] { gap: 0.5rem !important;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.custom-table-container[data-v-f3308000] {\r\n  background: #fff;\r\n  border-radius: 12px;\r\n  box-shadow: 0 4px 20px rgba(0,0,0,0.05);\r\n  padding: 1rem;\n}\n.table thead th[data-v-f3308000] {\r\n  border-bottom: 1px solid #f0f2f5;\r\n  color: #8392ab;\r\n  font-weight: 700;\r\n  padding: 1rem 0.5rem;\n}\n.patient-row[data-v-f3308000] {\r\n  transition: all 0.2s ease;\n}\n.patient-row[data-v-f3308000]:hover {\r\n  background-color: #f8fafc !important;\n}\n.clickable-name[data-v-f3308000] {\r\n  cursor: pointer;\r\n  transition: color 0.2s;\n}\n.clickable-name[data-v-f3308000]:hover {\r\n  color: #1e60ff !important;\n}\n.avatar-circle[data-v-f3308000] {\r\n  width: 40px;\r\n  height: 40px;\r\n  border-radius: 50%;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-weight: 700;\r\n  font-size: 0.85rem;\r\n  color: #1e60ff;\n}\n.bg-primary-soft[data-v-f3308000] { background-color: #eaf2ff; color: #1e60ff;\n}\n.bg-success-soft[data-v-f3308000] { background-color: #e8fdf5; color: #10b981;\n}\n.bg-info-soft[data-v-f3308000] { background-color: #e0f2fe; color: #0ea5e9;\n}\n.bg-warning-soft[data-v-f3308000] { background-color: #fef6e5; color: #f59e0b;\n}\n.bg-danger-soft[data-v-f3308000] { background-color: #fbe3e4; color: #ef4444;\n}\n.badge-status-active[data-v-f3308000] {\r\n  background-color: #e8fdf5;\r\n  color: #10b981;\r\n  font-weight: 600;\r\n  padding: 0.5em 1em;\r\n  border-radius: 30px;\r\n  font-size: 0.75rem;\r\n  border: 1px solid rgba(16, 185, 129, 0.2);\n}\n.text-xs[data-v-f3308000] { font-size: 0.75rem !important;\n}\n.text-sm[data-v-f3308000] { font-size: 0.875rem !important;\n}\n.text-lg[data-v-f3308000] { font-size: 1.1rem !important;\n}\n.dropdown-item[data-v-f3308000] {\r\n  padding: 0.6rem 1rem;\r\n  font-size: 0.85rem;\r\n  font-weight: 500;\r\n  color: #4a5568;\r\n  display: flex;\r\n  align-items: center;\n}\n.dropdown-item[data-v-f3308000]:hover {\r\n  background-color: #f7fafc;\r\n  color: #1e60ff;\n}\n.dropdown-header[data-v-f3308000] {\r\n  font-size: 0.65rem;\r\n  text-transform: uppercase;\r\n  font-weight: 800;\r\n  color: #cbd5e0;\r\n  letter-spacing: 0.5px;\r\n  padding: 0.5rem 1rem;\n}\n.gap-2[data-v-f3308000] { gap: 0.5rem !important;\n}\n.btn-toggle-charts[data-v-f3308000] {\r\n  border: none;\r\n  background: #eef2ff;\r\n  color: #4e73df;\r\n  font-weight: 600;\r\n  border-radius: 20px;\r\n  padding: 6px 14px;\r\n  transition: all 0.25s ease;\n}\n.btn-toggle-charts[data-v-f3308000]:hover {\r\n  background: #4e73df;\r\n  color: #fff;\r\n  box-shadow: 0 4px 12px rgba(78, 115, 223, 0.25);\n}\n.fade-slide-enter-active[data-v-f3308000],\r\n.fade-slide-leave-active[data-v-f3308000] {\r\n  transition: all 0.3s ease;\n}\n.fade-slide-enter-from[data-v-f3308000] {\r\n  opacity: 0;\r\n  transform: translateY(15px);\n}\n.fade-slide-leave-to[data-v-f3308000] {\r\n  opacity: 0;\r\n  transform: translateY(15px);\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

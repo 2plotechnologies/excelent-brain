@@ -44,6 +44,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
       tabActiva: 'fidelizacion',
       buscador: '',
       filtroEtiqueta: 'todos',
+      filtroFecha: null,
       // CRM Seguimiento data
       cargandoCRM: false,
       pacientesCRM: [],
@@ -119,7 +120,8 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
           return (item.paciente || '').toLowerCase().includes(t) || (item.profesional || '').toLowerCase().includes(t) || (item.servicio || '').toLowerCase().includes(t);
         });
         var coincideEstado = _this.filtroEtiqueta === 'todos' || item.etiqueta === _this.filtroEtiqueta;
-        return coincideTexto && coincideEstado;
+        var coincideFecha = !_this.filtroFecha || item.ultima_cita === _this.filtroFecha;
+        return coincideTexto && coincideEstado && coincideFecha;
       });
       if (!texto) {
         f = f.slice(0, 10);
@@ -715,7 +717,29 @@ var render = function render() {
         value: estado
       }
     }, [_vm._v(_vm._s(estado))]);
-  })], 2)])])])]), _vm._v(" "), _c("div", {
+  })], 2)]), _vm._v(" "), _c("div", {
+    staticClass: "col-lg-3"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.filtroFecha,
+      expression: "filtroFecha"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "date"
+    },
+    domProps: {
+      value: _vm.filtroFecha
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.filtroFecha = $event.target.value;
+      }
+    }
+  })])])])]), _vm._v(" "), _c("div", {
     staticClass: "card"
   }, [_c("div", {
     staticClass: "table-responsive"

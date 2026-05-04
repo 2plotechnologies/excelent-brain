@@ -9,12 +9,11 @@
 						<input type="date" class="form-control" @change="selectDate" v-model="fecha">
 					</div>
 					<div class="m-4 d-print-none">
-						<button class="btn btn-outline-success" @click="exportar()"><i class="fas fa-file-excel"></i> Exportar a Excel</button>
-						<!--<button class="btn btn-outline-primary" @click="membresias()" data-bs-target="#modalMembresias" data-bs-toggle="modal"><i class="fa-solid fa-arrow-up-right-dots"></i> Ingresar paquete</button>-->
-						<button data-bs-toggle="modal" data-bs-target="#pagoExtras" class="btn btn-outline-secondary ms-auto"><i class="fas fa-plus"></i> Ingresos extras</button>
-						<button data-bs-toggle="modal" data-bs-target="#egresosExtras" class="btn btn-outline-danger"><i class="fas fa-minus"></i> Egresos extras</button>
-						<button class="btn btn-outline-secondary " v-if="consultarFecha()" @click="verTicketCierre()"> <i class="fas fa-print"></i> Ticket de cierre</button>
-						<button class="btn btn-outline-secondary border-0" @click="actualizar()"> <i class="fas fa-sync"></i> Actualizar</button>
+						<button class="btn-premium btn-export" @click="exportar()"><i class="fas fa-file-excel"></i> Exportar</button>
+						<button data-bs-toggle="modal" data-bs-target="#pagoExtras" class="btn-premium btn-ingreso"><i class="fas fa-plus"></i> Ingresos</button>
+						<button data-bs-toggle="modal" data-bs-target="#egresosExtras" class="btn-premium btn-egreso"><i class="fas fa-minus"></i> Egresos</button>
+						<button class="btn-premium btn-print" v-if="consultarFecha()" @click="verTicketCierre()"> <i class="fas fa-print"></i> Ticket</button>
+						<button class="btn-premium btn-refresh" @click="actualizar()"> <i class="fas fa-sync"></i> Actualizar</button>
 						
 						
 					</div>
@@ -727,6 +726,45 @@ export default{
 }
 </script>
 <style scoped>
+.btn-premium {
+    padding: 0.5rem 1.2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.btn-premium i {
+    font-size: 0.9rem;
+}
+
+.btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-export { color: #10b981; border-color: #d1fae5; }
+.btn-export:hover { background: #10b981; color: white; }
+
+.btn-ingreso { color: #3b82f6; border-color: #dbeafe; }
+.btn-ingreso:hover { background: #3b82f6; color: white; }
+
+.btn-egreso { color: #ef4444; border-color: #fee2e2; }
+.btn-egreso:hover { background: #ef4444; color: white; }
+
+.btn-print { color: #6366f1; border-color: #e0e7ff; }
+.btn-print:hover { background: #6366f1; color: white; }
+
+.btn-refresh { color: #64748b; border-color: #f1f5f9; }
+.btn-refresh:hover { background: #64748b; color: white; }
+
 .table-pagos {
     border-collapse: separate;
     border-spacing: 0 10px;

@@ -122,38 +122,55 @@
             </div>
         </div>
 
-        <!-- CHARTS -->
-        <div class="row mb-4">
-            <div class="col-md-6 mb-3 mb-md-0">
-                <div class="card h-100 border-0 shadow-sm" style="border-radius:10px;">
-                    <div class="card-body" style="overflow: hidden;">
-                        <h6 class="font-weight-bold text-dark mb-4">Tipos de Atención</h6>
-                        <div style="position: relative; height: 100%; width: 100%;" v-if="tiposDataLoaded">
-                            <Doughnut :chart-data="donutObj" :chart-options="pieOptions" />
-                        </div>
-                        <div v-else class="text-center text-muted d-flex h-100 align-items-center justify-content-center pb-4">
-                            <p class="mb-0">No hay datos suficientes</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card h-100 border-0 shadow-sm" style="border-radius:10px;">
-                    <div class="card-body" style="overflow: hidden;">
-                        <h6 class="font-weight-bold text-dark mb-4">Estados de Pacientes</h6>
-                        <div 
-                          :style="{ height: '100%', position: 'relative', width: '100%' }"
-                          v-if="dashData.completadas !== undefined && (dashData.completadas + dashData.pendientes + dashData.canceladas + dashData.reprogramadas) > 0"
-                        >
-                            <Bar :chart-data="barObj" :chart-options="barOptions" />
-                        </div>
-                        <div v-else-if="dashData.completadas !== undefined" class="text-center text-muted d-flex h-100 align-items-center justify-content-center pb-4">
-                            <p class="mb-0">No hay datos suficientes</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- CHART HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0 font-weight-bold text-dark">
+                <i class="fas fa-chart-pie text-primary mr-2"></i> Análisis de Pacientes
+            </h5>
+
+            <button 
+              class="btn btn-sm btn-toggle-charts"
+              @click="showCharts = !showCharts"
+            >
+                <i :class="showCharts ? 'fas fa-eye-slash mr-1' : 'fas fa-eye mr-1'"></i>
+                {{ showCharts ? 'Ocultar' : 'Mostrar' }}
+            </button>
         </div>
+
+        <!-- CHARTS -->
+        <transition name="fade-slide">
+          <div class="row mb-4" v-if="showCharts">
+              <div class="col-md-6 mb-3 mb-md-0">
+                  <div class="card h-100 border-0 shadow-sm" style="border-radius:10px;">
+                      <div class="card-body" style="overflow: hidden;">
+                          <h6 class="font-weight-bold text-dark mb-4">Tipos de Atención</h6>
+                          <div style="position: relative; height: 100%; width: 100%;" v-if="tiposDataLoaded">
+                              <Doughnut :chart-data="donutObj" :chart-options="pieOptions" />
+                          </div>
+                          <div v-else class="text-center text-muted d-flex h-100 align-items-center justify-content-center pb-4">
+                              <p class="mb-0">No hay datos suficientes</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="card h-100 border-0 shadow-sm" style="border-radius:10px;">
+                      <div class="card-body" style="overflow: hidden;">
+                          <h6 class="font-weight-bold text-dark mb-4">Estados de Pacientes</h6>
+                          <div 
+                            :style="{ height: '100%', position: 'relative', width: '100%' }"
+                            v-if="dashData.completadas !== undefined && (dashData.completadas + dashData.pendientes + dashData.canceladas + dashData.reprogramadas) > 0"
+                          >
+                              <Bar :chart-data="barObj" :chart-options="barOptions" />
+                          </div>
+                          <div v-else-if="dashData.completadas !== undefined" class="text-center text-muted d-flex h-100 align-items-center justify-content-center pb-4">
+                              <p class="mb-0">No hay datos suficientes</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </transition>
 
 		<p class="mt-4 mb-3 font-weight-bold text-dark" style="font-size: 1.1rem;">Últimos pacientes registrados</p>
     
@@ -401,6 +418,7 @@ export default {
 
   data () {
     return {
+      showCharts:false,
       dataPatients: [], queId:null, vistaActual: 'lista',
       data: null, dataTriajes:null, linkGenerado: '',
       dashData: { pacientesActivos:0, nuevosDelMes:0, conCitaHoy:0, conDeuda:0, casosSOS:0, tasaRetencion:0, pendientes:0, completadas:0, canceladas:0, reprogramadas:0, tiposAtencion:[] },
@@ -763,4 +781,35 @@ export default {
 }
 
 .gap-2 { gap: 0.5rem !important; }
+
+.btn-toggle-charts {
+  border: none;
+  background: #eef2ff;
+  color: #4e73df;
+  font-weight: 600;
+  border-radius: 20px;
+  padding: 6px 14px;
+  transition: all 0.25s ease;
+}
+
+.btn-toggle-charts:hover {
+  background: #4e73df;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(78, 115, 223, 0.25);
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(15px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(15px);
+}
 </style>

@@ -37,7 +37,9 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       search: '',
       citaElegida: {},
       indiceElegido: -1,
-      precios: []
+      precios: [],
+      filtroFecha: null,
+      filtroPago: 'todos'
     };
   },
   mounted: function mounted() {
@@ -46,24 +48,47 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
   },
   computed: {
     filteredCitas: function filteredCitas() {
-      if (!this.search) return this.citas;
-      var s = this.search.toLowerCase();
-      return this.citas.filter(function (c) {
-        return c.appointment.patient.name.toLowerCase().includes(s) || c.appointment.patient.nombres && c.appointment.patient.nombres.toLowerCase().includes(s) || c.appointment.patient.dni.includes(s) || c.appointment.professional.name.toLowerCase().includes(s);
-      });
+      var _this = this;
+      var result = this.citas;
+
+      // Search filter
+      if (this.search) {
+        var s = this.search.toLowerCase();
+        result = result.filter(function (c) {
+          return c.appointment.patient.name.toLowerCase().includes(s) || c.appointment.patient.nombres && c.appointment.patient.nombres.toLowerCase().includes(s) || c.appointment.patient.dni.includes(s) || c.appointment.professional.name.toLowerCase().includes(s);
+        });
+      }
+
+      // Date filter
+      if (this.filtroFecha) {
+        result = result.filter(function (c) {
+          return _this.fechaISO(c.appointment.date) === _this.filtroFecha;
+        });
+      }
+
+      // Payment type filter
+      if (this.filtroPago !== 'todos') {
+        result = result.filter(function (c) {
+          var pay = c.appointment.payment;
+          if (_this.filtroPago === 'completo') return pay.pay_status == 2;
+          if (_this.filtroPago === 'adelanto') return pay.pay_status == 1 && pay.adelanto > 0;
+          return true;
+        });
+      }
+      return result;
     }
   },
   methods: {
     fetchLimbos: function fetchLimbos() {
-      var _this = this;
+      var _this2 = this;
       this.axios.get('/api/limbos').then(function (res) {
-        return _this.citas = res.data;
+        return _this2.citas = res.data;
       });
     },
     fetchPrecios: function fetchPrecios() {
-      var _this2 = this;
+      var _this3 = this;
       this.axios.get('/api/precio').then(function (res) {
-        return _this2.precios = res.data;
+        return _this3.precios = res.data;
       });
     },
     prepararDatos: function prepararDatos(cita) {
@@ -104,6 +129,10 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       if (payment.pay_status == 1 && advance > 0) return "Con Adelanto - S/ ".concat(advance);
       if (payment.pay_status == 3) return "Anulado - S/ ".concat(amount);
       return "Sin Pagar - S/ ".concat(amount);
+    },
+    resetFilters: function resetFilters() {
+      this.filtroFecha = null;
+      this.filtroPago = 'todos';
     }
   }
 });
@@ -157,7 +186,75 @@ var render = function render() {
     staticClass: "limbo-badge-counter"
   }, [_c("i", {
     staticClass: "fa-regular fa-question-circle"
-  }), _vm._v(" "), _c("span", [_vm._v(_vm._s(_vm.filteredCitas.length) + " citas en limbo")])])]), _vm._v(" "), _vm._m(0), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _c("span", [_vm._v(_vm._s(_vm.filteredCitas.length) + " citas en limbo")])])]), _vm._v(" "), _c("div", {
+    staticClass: "limbo-filters mb-3 d-flex gap-2 align-items-center"
+  }, [_c("div", {
+    staticClass: "filter-group"
+  }, [_c("label", {
+    staticClass: "small text-muted fw-bold text-uppercase mb-1 d-block"
+  }, [_vm._v("Filtrar por fecha")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.filtroFecha,
+      expression: "filtroFecha"
+    }],
+    staticClass: "form-control form-control-sm rounded-pill px-3",
+    attrs: {
+      type: "date"
+    },
+    domProps: {
+      value: _vm.filtroFecha
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.filtroFecha = $event.target.value;
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "filter-group"
+  }, [_c("label", {
+    staticClass: "small text-muted fw-bold text-uppercase mb-1 d-block"
+  }, [_vm._v("Tipo de pago")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.filtroPago,
+      expression: "filtroPago"
+    }],
+    staticClass: "form-select form-select-sm rounded-pill px-3",
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.filtroPago = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "todos"
+    }
+  }, [_vm._v("Todos los pagos")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "completo"
+    }
+  }, [_vm._v("Pagos completos")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "adelanto"
+    }
+  }, [_vm._v("Adelantos")])])]), _vm._v(" "), _vm.filtroFecha || _vm.filtroPago !== "todos" ? _c("button", {
+    staticClass: "btn btn-sm btn-light rounded-pill mt-4 px-3",
+    on: {
+      click: _vm.resetFilters
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times me-1"
+  }), _vm._v(" Limpiar\n\t\t")]) : _vm._e()]), _vm._v(" "), _vm._m(0), _vm._v(" "), _c("div", {
     staticClass: "limbo-main-card"
   }, [_vm._m(1), _vm._v(" "), _c("div", {
     staticClass: "limbo-list"

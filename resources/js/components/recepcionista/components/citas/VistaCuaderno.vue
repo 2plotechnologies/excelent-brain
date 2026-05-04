@@ -24,7 +24,10 @@
 						Atendido
 					</span>
 				</div>
-				<router-link to="/recepcionista/paquetes" class="btn btn-primary font-weight-bold shadow-sm"><i class="fas fa-box-open"></i> Paquetes</router-link>
+				<router-link to="/recepcionista/paquetes" class="btn btn-outline-primary font-weight-bold shadow-sm me-2"><i class="fas fa-box-open"></i> Paquetes</router-link>
+				<button class="btn btn-primary font-weight-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevaCita" @click="prepararNuevaCitaManual()">
+					<i class="fas fa-plus"></i> Nueva Cita
+				</button>
 			</div>
 		</div>
 
@@ -212,8 +215,12 @@
 				return [...new Set(profesiones)];
 			},
 			doctoresFiltrados() {
-				if(this.filtroActual === 'Todos') return this.doctores;
-				return this.doctores.filter(d => d.profession === this.filtroActual);
+				let list = this.doctores;
+				if(this.filtroActual !== 'Todos') {
+					list = list.filter(d => d.profession === this.filtroActual);
+				}
+				// Filtrar profesionales que no tienen horarios para este día
+				return list.filter(d => d.horarios && d.horarios.length > 0);
 			}
 		},
 		methods:{
@@ -265,11 +272,45 @@
 							}
 						})
 					})
+					
+					this.calcularRangoHoras();
 				}).finally(() => {
 					this.cargando = false;
 				}).catch(() => {
 					this.cargando = false;
 				})
+			},
+
+			calcularRangoHoras() {
+				let min = 8;
+				let max = 20;
+
+				const allTimes = [];
+				// Recoger todas las horas de inicio y fin
+				this.horasSolas.forEach(h => {
+					allTimes.push(parseInt(h.check_time.split(':')[0]));
+					allTimes.push(parseInt(h.departure_date.split(':')[0]));
+				});
+				this.horasMalas.forEach(h => {
+					if(h.schedule) {
+						allTimes.push(parseInt(h.schedule.check_time.split(':')[0]));
+						allTimes.push(parseInt(h.schedule.departure_date.split(':')[0]));
+					}
+				});
+
+				if(allTimes.length > 0) {
+					min = Math.min(...allTimes);
+					max = Math.max(...allTimes);
+					// Asegurar un rango mínimo
+					if(max - min < 4) max = min + 4;
+				}
+
+				this.horaInicioGrid = min;
+				let grid = [];
+				for(let i = min; i < max; i++) {
+					grid.push(i);
+				}
+				this.horasGrid = grid;
 			},
 
 			// ----- METODOS CALENDARIO -----
@@ -426,7 +467,7 @@
 			actualizarAdelanto(adelanto, citaId){
 				const cita = this.horasMalas.find(h => h.id === citaId || h.payment?.id === citaId);
 				if(cita && cita.payment){
-					cita.payment.price = parseFloat(cita.payment.price) - parseFloat(adelanto)
+					cita.payment.price = parseFloat(cita.payment.price || 0) - parseFloat(adelanto)
 					cita.payment.adelanto = parseFloat(cita.payment.adelanto || 0) + parseFloat(adelanto)
 				}
 			},
@@ -455,6 +496,11 @@
 				this.profesionalElegido = this.doctores[indexProfesional];
 				this.horaElegida = this.profesionalElegido.horarios[indexHorario];
 				this.$emit('limpiarDescuentos')
+			},
+			prepararNuevaCitaManual() {
+				this.profesionalElegido = null;
+				this.horaElegida = null;
+				this.$emit('limpiarDescuentos');
 			},
 			async listarPrecios(){
 				await this.axios.get('/api/listarPreciosTodos')
@@ -527,6 +573,8 @@
 		min-width: 250px;
 		max-width: 250px;
 		flex: 0 0 250px;
+		background-color: #f1f3f7;
+		background-image: repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.4) 15px, rgba(255,255,255,0.4) 30px);
 	}
 	.time-slot-label { height: 90px; } /* 60 minutos * 1.5px/min = 90px */
 	.grid-line { height: 90px; box-sizing: border-box; }

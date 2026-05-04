@@ -916,7 +916,7 @@ class ExtrasController extends Controller
 			$pagoExtra = new Extra_payment;
 				$pagoExtra->customer = $request->input('nombre');
 				$pagoExtra->price = $request->input('precio');
-				$pagoExtra->moneda = 1;
+				$pagoExtra->moneda = $request->input('idMoneda', 1);
 				$pagoExtra->voucher = '';
 				$pagoExtra->appointment_id = 0;
 				$pagoExtra->type = $request->input('tipo');

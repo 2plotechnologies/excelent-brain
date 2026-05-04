@@ -104,8 +104,24 @@
           </div>
       </div>
 
+      <!-- CHART HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0 font-weight-bold text-dark">
+                <i class="fas fa-chart-pie text-primary mr-2"></i> Análisis de Citas
+            </h5>
+
+            <button 
+                class="btn btn-sm btn-toggle-charts"
+                @click="showCharts = !showCharts"
+            >
+                <i :class="showCharts ? 'fas fa-eye-slash mr-1' : 'fas fa-eye mr-1'"></i>
+                {{ showCharts ? 'Ocultar' : 'Mostrar' }}
+            </button>
+        </div>
+
       <!-- CHARTS ROW -->
-      <div class="row mb-4">
+      <transition name="fade-slide">
+      <div class="row mb-4" v-if="showCharts">
           <!-- Estado Citas Hoy (Donut) -->
           <div class="col-md-4 mb-3 mb-md-0">
               <div class="card h-100 border-0 shadow-sm" style="border-radius:10px;">
@@ -145,6 +161,7 @@
               </div>
           </div>
       </div>
+      </transition>
 
       <!-- Citas del Dia List -->
       <div class="row">
@@ -214,6 +231,7 @@ export default {
   components: { Doughnut, Bar },
   data() {
       return {
+          showCharts: true,
           dashData: {
               totalCitasHoy: 0,
               totalCitasPendientes: 0,
@@ -367,18 +385,75 @@ export default {
 </script>
 
 <style scoped>
-.icon-circle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 10px;
-}
-.card {
-  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
-}
-.card:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
-}
+    .icon-circle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 10px;
+    }
+    .card {
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    }
+    .card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+    }
+
+    /* FAB BUTTON */
+    .fab-toggle {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        border: none;
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        color: white;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .fab-toggle:hover {
+        transform: scale(1.1);
+        box-shadow: 0 10px 20px rgba(78, 115, 223, 0.3);
+    }
+
+    /* ANIMATION */
+    .fade-slide-enter-active,
+    .fade-slide-leave-active {
+        transition: all 0.3s ease;
+    }
+
+    .fade-slide-enter-from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    .fade-slide-leave-to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    .btn-toggle-charts {
+        border: none;
+        background: #eef2ff;
+        color: #4e73df;
+        font-weight: 600;
+        border-radius: 20px;
+        padding: 6px 14px;
+        transition: all 0.25s ease;
+    }
+
+    .btn-toggle-charts:hover {
+        background: #4e73df;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(78, 115, 223, 0.25);
+    }
 </style>

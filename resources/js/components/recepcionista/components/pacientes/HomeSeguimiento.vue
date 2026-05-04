@@ -168,6 +168,9 @@
                 <option v-for="estado in estadosActuales" :key="estado" :value="estado">{{ estado }}</option>
               </select>
             </div>
+            <div class="col-lg-3">
+              <input type="date" v-model="filtroFecha" class="form-control">
+            </div>
           </div>
         </div>
       </div>
@@ -582,6 +585,7 @@ export default {
       tabActiva: 'fidelizacion',
       buscador: '',
       filtroEtiqueta: 'todos',
+      filtroFecha: null,
       
       // CRM Seguimiento data
       cargandoCRM: false,
@@ -650,7 +654,9 @@ export default {
 
         const coincideEstado = this.filtroEtiqueta === 'todos' || item.etiqueta === this.filtroEtiqueta;
 
-        return coincideTexto && coincideEstado;
+        const coincideFecha = !this.filtroFecha || item.ultima_cita === this.filtroFecha;
+
+        return coincideTexto && coincideEstado && coincideFecha;
       });
       
       if (!texto) {

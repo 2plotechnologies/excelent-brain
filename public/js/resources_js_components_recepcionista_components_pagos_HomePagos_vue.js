@@ -2519,7 +2519,7 @@ var render = function render() {
   })]), _vm._v(" "), _c("div", {
     staticClass: "m-4 d-print-none"
   }, [_c("button", {
-    staticClass: "btn btn-outline-success",
+    staticClass: "btn-premium btn-export",
     on: {
       click: function click($event) {
         return _vm.exportar();
@@ -2527,8 +2527,8 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-file-excel"
-  }), _vm._v(" Exportar a Excel")]), _vm._v(" "), _vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm.consultarFecha() ? _c("button", {
-    staticClass: "btn btn-outline-secondary",
+  }), _vm._v(" Exportar")]), _vm._v(" "), _vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm.consultarFecha() ? _c("button", {
+    staticClass: "btn-premium btn-print",
     on: {
       click: function click($event) {
         return _vm.verTicketCierre();
@@ -2536,8 +2536,8 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-print"
-  }), _vm._v(" Ticket de cierre")]) : _vm._e(), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-outline-secondary border-0",
+  }), _vm._v(" Ticket")]) : _vm._e(), _vm._v(" "), _c("button", {
+    staticClass: "btn-premium btn-refresh",
     on: {
       click: function click($event) {
         return _vm.actualizar();
@@ -3167,26 +3167,26 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("button", {
-    staticClass: "btn btn-outline-secondary ms-auto",
+    staticClass: "btn-premium btn-ingreso",
     attrs: {
       "data-bs-toggle": "modal",
       "data-bs-target": "#pagoExtras"
     }
   }, [_c("i", {
     staticClass: "fas fa-plus"
-  }), _vm._v(" Ingresos extras")]);
+  }), _vm._v(" Ingresos")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("button", {
-    staticClass: "btn btn-outline-danger",
+    staticClass: "btn-premium btn-egreso",
     attrs: {
       "data-bs-toggle": "modal",
       "data-bs-target": "#egresosExtras"
     }
   }, [_c("i", {
     staticClass: "fas fa-minus"
-  }), _vm._v(" Egresos extras")]);
+  }), _vm._v(" Egresos")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -4890,7 +4890,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.table-pagos[data-v-0725e1b0] {\r\n    border-collapse: separate;\r\n    border-spacing: 0 10px;\r\n    width: 100%;\n}\n.table-pagos thead th[data-v-0725e1b0] {\r\n    border: none !important;\r\n    color: #adb5bd !important;\r\n    font-weight: 500 !important;\r\n    font-size: 0.85rem !important;\r\n    padding: 10px 15px !important;\r\n    text-transform: capitalize;\r\n    background: transparent !important;\n}\n.table-pagos tbody tr[data-v-0725e1b0] {\r\n    background: white;\r\n    transition: all 0.2s ease;\r\n    box-shadow: 0 2px 5px rgba(0,0,0,0.02);\n}\n.table-pagos tbody tr[data-v-0725e1b0]:hover {\r\n    background: #fdfdfd;\r\n    box-shadow: 0 4px 10px rgba(0,0,0,0.04);\n}\n.table-pagos td[data-v-0725e1b0] {\r\n    padding: 12px 15px;\r\n    vertical-align: middle;\r\n    border-top: 1px solid #f1f3f5;\r\n    border-bottom: 1px solid #f1f3f5;\r\n    color: #495057;\n}\n.table-pagos td[data-v-0725e1b0]:first-child {\r\n    border-left: 1px solid #f1f3f5;\r\n    border-top-left-radius: 10px;\r\n    border-bottom-left-radius: 10px;\n}\n.table-pagos td[data-v-0725e1b0]:last-child {\r\n    border-right: 1px solid #f1f3f5;\r\n    border-top-right-radius: 10px;\r\n    border-bottom-right-radius: 10px;\n}\r\n\r\n/* Ticket style */\n.ticket-id[data-v-0725e1b0] {\r\n    color: #adb5bd;\r\n    font-size: 0.85rem;\r\n    font-weight: 500;\n}\r\n\r\n/* Hora style */\n.hora-txt[data-v-0725e1b0] {\r\n    font-weight: 700;\r\n    color: #212529;\n}\r\n\r\n/* Concepto */\n.concepto-container[data-v-0725e1b0] {\r\n    display: flex;\r\n    align-items: center;\n}\n.icon-box[data-v-0725e1b0] {\r\n    width: 36px;\r\n    height: 36px;\r\n    border-radius: 8px;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    margin-right: 12px;\r\n    font-size: 1.1rem;\n}\n.icon-cita[data-v-0725e1b0] { background-color: #e7fcf0; color: #2ecc71;\n}\n.icon-adelanto[data-v-0725e1b0] { background-color: #fff8e1; color: #ffc107;\n}\n.icon-cuota[data-v-0725e1b0] { background-color: #f3f0ff; color: #9b59b6;\n}\n.icon-egreso[data-v-0725e1b0] { background-color: #fff0f0; color: #e74c3c;\n}\n.icon-ingreso[data-v-0725e1b0] { background-color: #e8f5e9; color: #27ae60;\n}\n.icon-otros[data-v-0725e1b0] { background-color: #f0f4ff; color: #3498db;\n}\n.concepto-info .title[data-v-0725e1b0] {\r\n    display: block;\r\n    font-weight: 600;\r\n    color: #2c3e50;\r\n    margin-bottom: 2px;\r\n    text-transform: capitalize;\n}\n.concepto-info .subtitle[data-v-0725e1b0] {\r\n    display: block;\r\n    font-size: 0.75rem;\r\n    color: #95a5a6;\n}\r\n\r\n/* Badges */\n.badge-custom[data-v-0725e1b0] {\r\n    padding: 4px 12px;\r\n    border-radius: 12px;\r\n    font-weight: 600;\r\n    font-size: 0.7rem;\r\n    text-transform: capitalize;\r\n    display: inline-block;\n}\n.badge-cita[data-v-0725e1b0] { background-color: #e3f2fd; color: #1976d2;\n}\n.badge-adelanto[data-v-0725e1b0] { background-color: #fff3e0; color: #f57c00;\n}\n.badge-cuota[data-v-0725e1b0] { background-color: #e0f7fa; color: #00838f;\n}\n.badge-egreso[data-v-0725e1b0] { background-color: #ffebee; color: #c62828;\n}\n.badge-ingreso[data-v-0725e1b0] { background-color: #e8f5e9; color: #2e7d32;\n}\r\n\r\n/* Monto */\n.monto-txt[data-v-0725e1b0] {\r\n    font-weight: 700;\r\n    font-size: 0.95rem;\n}\n.monto-positivo[data-v-0725e1b0] { color: #2ecc71;\n}\n.monto-negativo[data-v-0725e1b0] { color: #e74c3c;\n}\r\n\r\n/* Actions */\n.btn-action[data-v-0725e1b0] {\r\n    color: #adb5bd;\r\n    background: transparent;\r\n    border: none;\r\n    padding: 5px 8px;\r\n    font-size: 1.1rem;\r\n    transition: all 0.2s;\n}\n.btn-action[data-v-0725e1b0]:hover {\r\n    color: #3498db;\n}\n.dropdown-action .dropdown-toggle[data-v-0725e1b0]::after {\r\n    display: none;\n}\n.dropdown-menu[data-v-0725e1b0] {\r\n    border: none;\r\n    box-shadow: 0 10px 25px rgba(0,0,0,0.1);\r\n    border-radius: 12px;\r\n    padding: 8px;\n}\n.dropdown-item[data-v-0725e1b0] {\r\n    border-radius: 8px;\r\n    padding: 8px 12px;\r\n    font-size: 0.9rem;\r\n    color: #495057;\n}\n.dropdown-item i[data-v-0725e1b0] {\r\n    width: 20px;\r\n    margin-right: 8px;\r\n    color: #adb5bd;\n}\n.dropdown-item[data-v-0725e1b0]:hover {\r\n    background-color: #f8f9fa;\r\n    color: #212529;\n}\n.dropdown-item:hover i[data-v-0725e1b0] {\r\n    color: #3498db;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.btn-premium[data-v-0725e1b0] {\r\n    padding: 0.5rem 1.2rem;\r\n    border-radius: 10px;\r\n    font-weight: 600;\r\n    font-size: 0.85rem;\r\n    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\r\n    border: 1px solid transparent;\r\n    display: inline-flex;\r\n    align-items: center;\r\n    gap: 0.5rem;\r\n    cursor: pointer;\r\n    background: white;\r\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);\n}\n.btn-premium i[data-v-0725e1b0] {\r\n    font-size: 0.9rem;\n}\n.btn-premium[data-v-0725e1b0]:hover {\r\n    transform: translateY(-2px);\r\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);\n}\n.btn-export[data-v-0725e1b0] { color: #10b981; border-color: #d1fae5;\n}\n.btn-export[data-v-0725e1b0]:hover { background: #10b981; color: white;\n}\n.btn-ingreso[data-v-0725e1b0] { color: #3b82f6; border-color: #dbeafe;\n}\n.btn-ingreso[data-v-0725e1b0]:hover { background: #3b82f6; color: white;\n}\n.btn-egreso[data-v-0725e1b0] { color: #ef4444; border-color: #fee2e2;\n}\n.btn-egreso[data-v-0725e1b0]:hover { background: #ef4444; color: white;\n}\n.btn-print[data-v-0725e1b0] { color: #6366f1; border-color: #e0e7ff;\n}\n.btn-print[data-v-0725e1b0]:hover { background: #6366f1; color: white;\n}\n.btn-refresh[data-v-0725e1b0] { color: #64748b; border-color: #f1f5f9;\n}\n.btn-refresh[data-v-0725e1b0]:hover { background: #64748b; color: white;\n}\n.table-pagos[data-v-0725e1b0] {\r\n    border-collapse: separate;\r\n    border-spacing: 0 10px;\r\n    width: 100%;\n}\n.table-pagos thead th[data-v-0725e1b0] {\r\n    border: none !important;\r\n    color: #adb5bd !important;\r\n    font-weight: 500 !important;\r\n    font-size: 0.85rem !important;\r\n    padding: 10px 15px !important;\r\n    text-transform: capitalize;\r\n    background: transparent !important;\n}\n.table-pagos tbody tr[data-v-0725e1b0] {\r\n    background: white;\r\n    transition: all 0.2s ease;\r\n    box-shadow: 0 2px 5px rgba(0,0,0,0.02);\n}\n.table-pagos tbody tr[data-v-0725e1b0]:hover {\r\n    background: #fdfdfd;\r\n    box-shadow: 0 4px 10px rgba(0,0,0,0.04);\n}\n.table-pagos td[data-v-0725e1b0] {\r\n    padding: 12px 15px;\r\n    vertical-align: middle;\r\n    border-top: 1px solid #f1f3f5;\r\n    border-bottom: 1px solid #f1f3f5;\r\n    color: #495057;\n}\n.table-pagos td[data-v-0725e1b0]:first-child {\r\n    border-left: 1px solid #f1f3f5;\r\n    border-top-left-radius: 10px;\r\n    border-bottom-left-radius: 10px;\n}\n.table-pagos td[data-v-0725e1b0]:last-child {\r\n    border-right: 1px solid #f1f3f5;\r\n    border-top-right-radius: 10px;\r\n    border-bottom-right-radius: 10px;\n}\r\n\r\n/* Ticket style */\n.ticket-id[data-v-0725e1b0] {\r\n    color: #adb5bd;\r\n    font-size: 0.85rem;\r\n    font-weight: 500;\n}\r\n\r\n/* Hora style */\n.hora-txt[data-v-0725e1b0] {\r\n    font-weight: 700;\r\n    color: #212529;\n}\r\n\r\n/* Concepto */\n.concepto-container[data-v-0725e1b0] {\r\n    display: flex;\r\n    align-items: center;\n}\n.icon-box[data-v-0725e1b0] {\r\n    width: 36px;\r\n    height: 36px;\r\n    border-radius: 8px;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    margin-right: 12px;\r\n    font-size: 1.1rem;\n}\n.icon-cita[data-v-0725e1b0] { background-color: #e7fcf0; color: #2ecc71;\n}\n.icon-adelanto[data-v-0725e1b0] { background-color: #fff8e1; color: #ffc107;\n}\n.icon-cuota[data-v-0725e1b0] { background-color: #f3f0ff; color: #9b59b6;\n}\n.icon-egreso[data-v-0725e1b0] { background-color: #fff0f0; color: #e74c3c;\n}\n.icon-ingreso[data-v-0725e1b0] { background-color: #e8f5e9; color: #27ae60;\n}\n.icon-otros[data-v-0725e1b0] { background-color: #f0f4ff; color: #3498db;\n}\n.concepto-info .title[data-v-0725e1b0] {\r\n    display: block;\r\n    font-weight: 600;\r\n    color: #2c3e50;\r\n    margin-bottom: 2px;\r\n    text-transform: capitalize;\n}\n.concepto-info .subtitle[data-v-0725e1b0] {\r\n    display: block;\r\n    font-size: 0.75rem;\r\n    color: #95a5a6;\n}\r\n\r\n/* Badges */\n.badge-custom[data-v-0725e1b0] {\r\n    padding: 4px 12px;\r\n    border-radius: 12px;\r\n    font-weight: 600;\r\n    font-size: 0.7rem;\r\n    text-transform: capitalize;\r\n    display: inline-block;\n}\n.badge-cita[data-v-0725e1b0] { background-color: #e3f2fd; color: #1976d2;\n}\n.badge-adelanto[data-v-0725e1b0] { background-color: #fff3e0; color: #f57c00;\n}\n.badge-cuota[data-v-0725e1b0] { background-color: #e0f7fa; color: #00838f;\n}\n.badge-egreso[data-v-0725e1b0] { background-color: #ffebee; color: #c62828;\n}\n.badge-ingreso[data-v-0725e1b0] { background-color: #e8f5e9; color: #2e7d32;\n}\r\n\r\n/* Monto */\n.monto-txt[data-v-0725e1b0] {\r\n    font-weight: 700;\r\n    font-size: 0.95rem;\n}\n.monto-positivo[data-v-0725e1b0] { color: #2ecc71;\n}\n.monto-negativo[data-v-0725e1b0] { color: #e74c3c;\n}\r\n\r\n/* Actions */\n.btn-action[data-v-0725e1b0] {\r\n    color: #adb5bd;\r\n    background: transparent;\r\n    border: none;\r\n    padding: 5px 8px;\r\n    font-size: 1.1rem;\r\n    transition: all 0.2s;\n}\n.btn-action[data-v-0725e1b0]:hover {\r\n    color: #3498db;\n}\n.dropdown-action .dropdown-toggle[data-v-0725e1b0]::after {\r\n    display: none;\n}\n.dropdown-menu[data-v-0725e1b0] {\r\n    border: none;\r\n    box-shadow: 0 10px 25px rgba(0,0,0,0.1);\r\n    border-radius: 12px;\r\n    padding: 8px;\n}\n.dropdown-item[data-v-0725e1b0] {\r\n    border-radius: 8px;\r\n    padding: 8px 12px;\r\n    font-size: 0.9rem;\r\n    color: #495057;\n}\n.dropdown-item i[data-v-0725e1b0] {\r\n    width: 20px;\r\n    margin-right: 8px;\r\n    color: #adb5bd;\n}\n.dropdown-item[data-v-0725e1b0]:hover {\r\n    background-color: #f8f9fa;\r\n    color: #212529;\n}\n.dropdown-item:hover i[data-v-0725e1b0] {\r\n    color: #3498db;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

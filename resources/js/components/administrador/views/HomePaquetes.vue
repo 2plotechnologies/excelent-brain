@@ -338,16 +338,22 @@
           <div class="modal-body p-4" v-if="paqueteSeleccionado">
             
             <div class="row mb-4">
-              <div class="col-md-6 border-end">
+              <div class="col-md-4 border-end">
                 <p class="text-uppercase text-muted small fw-bold mb-1">Paciente</p>
                 <div class="d-flex align-items-center">
                   <div class="bg-light rounded-circle p-2 me-2"><i class="fas fa-user text-primary"></i></div>
                   <h6 class="mb-0 fw-bold">{{ paqueteSeleccionado.patient_name }} {{ paqueteSeleccionado.patient_nombres }}</h6>
                 </div>
               </div>
-              <div class="col-md-6 ps-4">
+              <div class="col-md-4 border-end ps-4">
                 <p class="text-uppercase text-muted small fw-bold mb-1">Total Pendiente (Deuda)</p>
                 <h4 class="mb-0 text-danger fw-bold">S/ {{ parseFloat(paqueteSeleccionado.debe).toFixed(2) }}</h4>
+              </div>
+              <div class="col-md-4 ps-4">
+                <p class="text-uppercase text-muted small fw-bold mb-1">Método de Pago</p>
+                <select class="form-select form-select-sm" v-model="metodoPago">
+                  <option v-for="moneda in monedas" :key="moneda.id" :value="moneda.id">{{ moneda.tipo }}</option>
+                </select>
               </div>
             </div>
             
@@ -504,6 +510,8 @@ export default {
       procesandoPago: false,
       guardandoReporte: false,
       editandoReporte: false,
+      monedas: [],
+      metodoPago: 1,
       formReporte: {
         resumen: '',
         logros: '',
@@ -542,6 +550,7 @@ export default {
   },
   mounted() {
     this.obtenerUsuarioYPaquetes();
+    this.cargarMonedas();
   },
   methods: {
     async obtenerUsuarioYPaquetes() {
@@ -579,6 +588,14 @@ export default {
         console.error("Error cargando paquetes:", error);
       } finally {
         this.loading = false;
+      }
+    },
+    async cargarMonedas() {
+      try {
+        const response = await this.axios.get("/api/listarMonedas");
+        this.monedas = response.data;
+      } catch (error) {
+        console.error("Error cargando monedas:", error);
       }
     },
     cambiarPagina(page) {
@@ -687,7 +704,8 @@ export default {
           nombre: this.paqueteSeleccionado.patient_name + ' ' + (this.paqueteSeleccionado.patient_nombres || ''),
           precio: cuota.monto,
           tipo: 8, 
-          idMembresia: this.paqueteSeleccionado.id
+          idMembresia: this.paqueteSeleccionado.id,
+          idMoneda: this.metodoPago
         };
 
         await this.axios.post('/api/pagarDeudaMembresia', payload);

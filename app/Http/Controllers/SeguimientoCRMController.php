@@ -5,7 +5,9 @@ use App\Models\SeguimientoCRM;
 use App\Models\Patient;
 use App\Models\Appointment;
 use App\Models\Precio;
+use App\Models\ChatRecepcion;
 use Illuminate\Support\Facades\DB;
+//use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Http\Request;
 
@@ -118,6 +120,13 @@ class SeguimientoCRMController extends Controller
             "comentarios" => $request->comentarios,
             "numero_seguimiento" => $request->numero_seguimiento,
             "fecha" => $request->fecha
+        ]);
+
+        //Crear registro en tabla chat_recepcion.
+        ChatRecepcion::create([
+            "patient_id" => $request->patient_id,
+            "user_id" => auth()->user()->id,
+            "mensaje" => "Seguimiento #" . $request->numero_seguimiento . ": " . $request->respuesta . " - " . $request->proxima_accion . " - " . $request->comentarios . " - " . $request->canal,
         ]);
 
         return response()->json([

@@ -12,6 +12,25 @@
 			</div>
 		</div>
 
+		<!-- Filters Section -->
+		<div class="limbo-filters mb-3 d-flex gap-2 align-items-center">
+			<div class="filter-group">
+				<label class="small text-muted fw-bold text-uppercase mb-1 d-block">Filtrar por fecha</label>
+				<input v-model="filtroFecha" type="date" class="form-control form-control-sm rounded-pill px-3">
+			</div>
+			<div class="filter-group">
+				<label class="small text-muted fw-bold text-uppercase mb-1 d-block">Tipo de pago</label>
+				<select v-model="filtroPago" class="form-select form-select-sm rounded-pill px-3">
+					<option value="todos">Todos los pagos</option>
+					<option value="completo">Pagos completos</option>
+					<option value="adelanto">Adelantos</option>
+				</select>
+			</div>
+			<button class="btn btn-sm btn-light rounded-pill mt-4 px-3" @click="resetFilters" v-if="filtroFecha || filtroPago !== 'todos'">
+				<i class="fas fa-times me-1"></i> Limpiar
+			</button>
+		</div>
+
 		<!-- Info Banner -->
 		<div class="info-banner">
 			<div class="info-icon">
@@ -117,7 +136,9 @@ export default {
 			search: '',
 			citaElegida: {},
 			indiceElegido: -1,
-			precios: []
+			precios: [],
+			filtroFecha: null,
+			filtroPago: 'todos'
 		}
 	},
 	mounted() {
@@ -126,14 +147,35 @@ export default {
 	},
 	computed: {
 		filteredCitas() {
-			if (!this.search) return this.citas;
-			const s = this.search.toLowerCase();
-			return this.citas.filter(c => 
-				c.appointment.patient.name.toLowerCase().includes(s) ||
-				(c.appointment.patient.nombres && c.appointment.patient.nombres.toLowerCase().includes(s)) ||
-				c.appointment.patient.dni.includes(s) ||
-				c.appointment.professional.name.toLowerCase().includes(s)
-			);
+			let result = this.citas;
+
+			// Search filter
+			if (this.search) {
+				const s = this.search.toLowerCase();
+				result = result.filter(c => 
+					c.appointment.patient.name.toLowerCase().includes(s) ||
+					(c.appointment.patient.nombres && c.appointment.patient.nombres.toLowerCase().includes(s)) ||
+					c.appointment.patient.dni.includes(s) ||
+					c.appointment.professional.name.toLowerCase().includes(s)
+				);
+			}
+
+			// Date filter
+			if (this.filtroFecha) {
+				result = result.filter(c => this.fechaISO(c.appointment.date) === this.filtroFecha);
+			}
+
+			// Payment type filter
+			if (this.filtroPago !== 'todos') {
+				result = result.filter(c => {
+					const pay = c.appointment.payment;
+					if (this.filtroPago === 'completo') return pay.pay_status == 2;
+					if (this.filtroPago === 'adelanto') return pay.pay_status == 1 && pay.adelanto > 0;
+					return true;
+				});
+			}
+
+			return result;
 		}
 	},
 	methods: {
@@ -183,6 +225,10 @@ export default {
 			if (payment.pay_status == 1 && advance > 0) return `Con Adelanto - S/ ${advance}`;
 			if (payment.pay_status == 3) return `Anulado - S/ ${amount}`;
 			return `Sin Pagar - S/ ${amount}`;
+		},
+		resetFilters() {
+			this.filtroFecha = null;
+			this.filtroPago = 'todos';
 		}
 	}
 }
