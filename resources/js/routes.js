@@ -17,6 +17,7 @@ const HomeAdministrador = () => import('./components/administrador/views/HomeAdm
 const ShowProfessional = () => import('./components/administrador/views/ShowProfessional.vue');
 const HomePrecios = () => import('./components/administrador/views/HomePrecios.vue')
 const HomePaquetes = () => import('./components/administrador/views/HomePaquetes.vue')
+const NotasCredito = () => import('./components/administrador/views/NotasCredito.vue')
 const editarPacientesAdmin = () => import('./components/administrador/views/EditarPacientesAdmin.vue')
 const RecepcionistaReportesGerenciales = () => import('./components/administrador/views/reportes/ReportesGerenciales');
 
@@ -409,6 +410,11 @@ export const routes = [
         component: HomePaquetes
       },
       {
+        path: '/administrador/notas-credito',
+        name: 'notasCreditoAdmin',
+        component: NotasCredito
+      },
+      {
         path: '/administrador/usuarios-simples',
         name: 'usuariosSimples',
         component: HomeUsuarios
@@ -544,6 +550,11 @@ export const routes = [
         path: 'paquetes',
         name: 'paquetesRecepcionista',
         component: HomePaquetes
+      },
+      {
+        path: 'notas-credito',
+        name: 'notasCreditoRecep',
+        component: NotasCredito
       },
     ]
   },

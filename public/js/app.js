@@ -6648,7 +6648,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   data: function data() {
     return {
       data: null,
-      motivo: ''
+      motivo: '',
+      isProcessing: false
     };
   },
   methods: {
@@ -6656,6 +6657,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       if (document.querySelector(".status-appointment").value == 3 && this.motivo == '') {
         alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('<i class="fa-solid fa-skull-crossbones"></i> Debe ingresar un motivo para anular la cita', 'danger', 10);
       } else {
+        if (this.isProcessing) return;
+        this.isProcessing = true;
         if (document.querySelector(".status-appointment").value == 3) {
           this.data.schedule_id = null;
           this.updateStatuAppointment();
@@ -6685,6 +6688,13 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 _this.motivo = '';
               })["catch"](function (err) {
                 console.error(err);
+                _this.$swal({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Hubo un problema al actualizar la cita. Por favor, intente de nuevo.'
+                });
+              })["finally"](function () {
+                _this.isProcessing = false;
               });
             case 3:
             case "end":
@@ -8313,7 +8323,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       maximo: 15,
       monedas: [],
       neto: 0,
-      monto_adelanto: 0
+      monto_adelanto: 0,
+      isProcessing: false
     };
   },
   props: {
@@ -8334,7 +8345,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
+              if (!_this2.isProcessing) {
+                _context.next = 2;
+                break;
+              }
+              return _context.abrupt("return");
+            case 2:
+              _this2.isProcessing = true;
+              _context.next = 5;
               return _this2.axios.put("/api/pagarCita/".concat(_this2.dataCita.id), {
                 dataCita: _this2.dataCita,
                 caso: _this2.caso,
@@ -8373,8 +8391,15 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 }
               })["catch"](function (err) {
                 console.error(err);
+                _this2.$swal({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Hubo un problema al procesar el pago. Por favor, intente de nuevo.'
+                });
+              })["finally"](function () {
+                _this2.isProcessing = false;
               });
-            case 2:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -12120,16 +12145,19 @@ var render = function render() {
   }, [_c("button", {
     staticClass: "btn btn-action btn-primary w-100",
     attrs: {
-      type: "button"
+      type: "button",
+      disabled: _vm.isProcessing
     },
     on: {
       click: function click($event) {
         return _vm.update();
       }
     }
-  }, [_c("i", {
+  }, [_vm.isProcessing ? _c("span", [_c("i", {
+    staticClass: "fas fa-spinner fa-spin mr-2"
+  }), _vm._v(" Procesando...\n            ")]) : _c("span", [_c("i", {
     staticClass: "fas fa-redo-alt mr-2"
-  }), _vm._v(" Actualizar Estado\n          ")])])])])]);
+  }), _vm._v(" Actualizar Estado\n            ")])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -16580,16 +16608,19 @@ var render = function render() {
   }, [_vm.dataCita.payment.pay_status == 1 ? _c("button", {
     staticClass: "btn btn-action btn-primary w-100 mb-2",
     attrs: {
-      type: "button"
+      type: "button",
+      disabled: _vm.isProcessing
     },
     on: {
       click: function click($event) {
         return _vm.update();
       }
     }
-  }, [_c("i", {
+  }, [_vm.isProcessing ? _c("span", [_c("i", {
+    staticClass: "fas fa-spinner fa-spin mr-2"
+  }), _vm._v(" Procesando...\n            ")]) : _c("span", [_c("i", {
     staticClass: "fas fa-save mr-2"
-  }), _vm._v(" Guardar pago\n          ")]) : _vm._e(), _vm._v(" "), _vm.dataCita.payment.pay_status != 1 ? _c("a", {
+  }), _vm._v(" Guardar pago\n            ")])]) : _vm._e(), _vm._v(" "), _vm.dataCita.payment.pay_status != 1 ? _c("a", {
     staticClass: "btn btn-action btn-success w-100",
     attrs: {
       target: "_blank",
@@ -18415,6 +18446,9 @@ var HomePrecios = function HomePrecios() {
 var HomePaquetes = function HomePaquetes() {
   return __webpack_require__.e(/*! import() */ "resources_js_components_administrador_views_HomePaquetes_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./components/administrador/views/HomePaquetes.vue */ "./resources/js/components/administrador/views/HomePaquetes.vue"));
 };
+var NotasCredito = function NotasCredito() {
+  return __webpack_require__.e(/*! import() */ "resources_js_components_administrador_views_NotasCredito_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./components/administrador/views/NotasCredito.vue */ "./resources/js/components/administrador/views/NotasCredito.vue"));
+};
 var editarPacientesAdmin = function editarPacientesAdmin() {
   return __webpack_require__.e(/*! import() */ "resources_js_components_administrador_views_EditarPacientesAdmin_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./components/administrador/views/EditarPacientesAdmin.vue */ "./resources/js/components/administrador/views/EditarPacientesAdmin.vue"));
 };
@@ -18871,6 +18905,10 @@ var routes = [{
     name: 'paquetes',
     component: HomePaquetes
   }, {
+    path: '/administrador/notas-credito',
+    name: 'notasCreditoAdmin',
+    component: NotasCredito
+  }, {
     path: '/administrador/usuarios-simples',
     name: 'usuariosSimples',
     component: HomeUsuarios
@@ -18979,6 +19017,10 @@ var routes = [{
     path: 'paquetes',
     name: 'paquetesRecepcionista',
     component: HomePaquetes
+  }, {
+    path: 'notas-credito',
+    name: 'notasCreditoRecep',
+    component: NotasCredito
   }]
 }, {
   path: '/:pathMedia(.*)',
@@ -93159,7 +93201,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"axios","version":"0.21.4","de
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames not based on template
-/******/ 			if ({"resources_js_components_login_Login_vue":1,"resources_js_components_acceso_publico_AutoTriaje_vue":1,"resources_js_components_HomePage_vue":1,"resources_js_components_administrador_Main_vue":1,"resources_js_components_administrador_views_HomeAdministrador_vue":1,"resources_js_components_administrador_views_ShowProfessional_vue":1,"resources_js_components_administrador_views_HomePrecios_vue":1,"resources_js_components_administrador_views_HomePaquetes_vue":1,"resources_js_components_administrador_views_EditarPacientesAdmin_vue":1,"resources_js_components_administrador_views_reportes_ReportesGerenciales_vue":1,"resources_js_components_administrador_views_reportes_HomeRouterReportes_vue":1,"resources_js_components_administrador_views_reportes_HomeReportes_vue":1,"resources_js_components_administrador_views_reportes_ReporteMedicamentos_vue":1,"resources_js_components_administrador_views_reportes_ReportePacientes_vue":1,"resources_js_components_administrador_views_reportes_ReporteMensual_vue":1,"resources_js_components_administrador_views_reportes_ChartMensual_vue":1,"resources_js_components_profesional_views_Home_vue":1,"resources_js_components_profesional_components_consultas_HomeConsultas_vue":1,"resources_js_components_profesional_components_consultas_EvolucionesPage_vue":1,"resources_js_components_profesional_components_historia_HomeStories_vue":1,"resources_js_components_profesional_components_recursos_HomeRecursos_vue":1,"resources_js_components_profesional_components_recetas_HomeRecetas_vue":1,"resources_js_components_profesional_components_examenes_HomeExamen_vue":1,"resources_js_components_profesional_components_home_cartera_vue":1,"resources_js_components_profesional_components_consultas_PacientesSos_vue":1,"resources_js_components_profesional_components_examenes_Scr_vue":1,"resources_js_components_profesional_components_examenes_Burns_vue":1,"resources_js_components_profesional_components_examenes_ZungDep_vue":1,"resources_js_components_profesional_components_examenes_ZungAns_vue":1,"resources_js_components_profesional_components_examenes_Millon_vue":1,"resources_js_components_profesional_components_examenes_PHQ-9_vue":1,"resources_js_components_profesional_components_examenes_GAD-7_vue":1,"resources_js_components_profesional_components_examenes_BDI-2_vue":1,"resources_js_components_profesional_components_examenes_MCMI-II_vue":1,"resources_js_components_profesional_components_examenes_baron_vue":1,"resources_js_components_profesional_components_examenes_Eysenck-A_vue":1,"resources_js_components_profesional_components_examenes_Eysenck-B_vue":1,"resources_js_components_profesional_components_examenes_SRQ_vue":1,"resources_js_components_profesional_components_examenes_PHQ-15_vue":1,"resources_js_components_profesional_components_examenes_MDQ_vue":1,"resources_js_components_profesional_components_recetas_PrintReceta_vue":1,"resources_js_components_profesional_components_recetas_KairosTable_vue":1,"resources_js_components_profesional_components_kurame_HomeKurame_vue":1,"resources_js_components_profesional_components_dashboard_HomeDashboardProfesional_vue":1,"resources_js_components_interno_Home_vue":1,"resources_js_components_interno_HomePacientes_vue":1,"resources_js_components_recepcionista_components_dashboard_HomeDashboard_vue":1,"resources_js_components_recepcionista_Main_vue":1,"resources_js_components_recepcionista_components_Home_vue":1,"resources_js_components_recepcionista_components_profesionales_HomeProfesional_vue":1,"resources_js_components_recepcionista_components_pacientes_HomePacientes_vue":1,"resources_js_components_recepcionista_components_reportes_HomeReportes_vue":1,"resources_js_components_recepcionista_components_reportes_ReportesAvanzados_vue":1,"resources_js_components_recepcionista_components_reportes_ReportesDashboard_vue":1,"resources_js_components_recepcionista_components_pagos_HomePagos_vue":1,"resources_js_components_recepcionista_components_continuantes_HomeCont_vue":1,"resources_js_components_recepcionista_components_adicionales_HomeAdicionales_vue":1,"resources_js_components_recepcionista_components_adicionales_HomeCartera_vue":1,"resources_js_components_recepcionista_components_recordatorios_HomeRecordatorios_vue":1,"resources_js_components_recepcionista_components_citas_HomeLimbo_vue":1,"resources_js_components_recepcionista_components_pacientes_HomeSeguimiento_vue":1,"resources_js_components_usuarios_HomeUsuarios_vue":1,"resources_js_components_profesional_components_consultas_Voice_vue":1,"resources_js_components_layout_NotFound_vue":1,"resources_js_components_PatientTest_vue":1}[chunkId]) return "js/" + chunkId + ".js";
+/******/ 			if ({"resources_js_components_login_Login_vue":1,"resources_js_components_acceso_publico_AutoTriaje_vue":1,"resources_js_components_HomePage_vue":1,"resources_js_components_administrador_Main_vue":1,"resources_js_components_administrador_views_HomeAdministrador_vue":1,"resources_js_components_administrador_views_ShowProfessional_vue":1,"resources_js_components_administrador_views_HomePrecios_vue":1,"resources_js_components_administrador_views_HomePaquetes_vue":1,"resources_js_components_administrador_views_NotasCredito_vue":1,"resources_js_components_administrador_views_EditarPacientesAdmin_vue":1,"resources_js_components_administrador_views_reportes_ReportesGerenciales_vue":1,"resources_js_components_administrador_views_reportes_HomeRouterReportes_vue":1,"resources_js_components_administrador_views_reportes_HomeReportes_vue":1,"resources_js_components_administrador_views_reportes_ReporteMedicamentos_vue":1,"resources_js_components_administrador_views_reportes_ReportePacientes_vue":1,"resources_js_components_administrador_views_reportes_ReporteMensual_vue":1,"resources_js_components_administrador_views_reportes_ChartMensual_vue":1,"resources_js_components_profesional_views_Home_vue":1,"resources_js_components_profesional_components_consultas_HomeConsultas_vue":1,"resources_js_components_profesional_components_consultas_EvolucionesPage_vue":1,"resources_js_components_profesional_components_historia_HomeStories_vue":1,"resources_js_components_profesional_components_recursos_HomeRecursos_vue":1,"resources_js_components_profesional_components_recetas_HomeRecetas_vue":1,"resources_js_components_profesional_components_examenes_HomeExamen_vue":1,"resources_js_components_profesional_components_home_cartera_vue":1,"resources_js_components_profesional_components_consultas_PacientesSos_vue":1,"resources_js_components_profesional_components_examenes_Scr_vue":1,"resources_js_components_profesional_components_examenes_Burns_vue":1,"resources_js_components_profesional_components_examenes_ZungDep_vue":1,"resources_js_components_profesional_components_examenes_ZungAns_vue":1,"resources_js_components_profesional_components_examenes_Millon_vue":1,"resources_js_components_profesional_components_examenes_PHQ-9_vue":1,"resources_js_components_profesional_components_examenes_GAD-7_vue":1,"resources_js_components_profesional_components_examenes_BDI-2_vue":1,"resources_js_components_profesional_components_examenes_MCMI-II_vue":1,"resources_js_components_profesional_components_examenes_baron_vue":1,"resources_js_components_profesional_components_examenes_Eysenck-A_vue":1,"resources_js_components_profesional_components_examenes_Eysenck-B_vue":1,"resources_js_components_profesional_components_examenes_SRQ_vue":1,"resources_js_components_profesional_components_examenes_PHQ-15_vue":1,"resources_js_components_profesional_components_examenes_MDQ_vue":1,"resources_js_components_profesional_components_recetas_PrintReceta_vue":1,"resources_js_components_profesional_components_recetas_KairosTable_vue":1,"resources_js_components_profesional_components_kurame_HomeKurame_vue":1,"resources_js_components_profesional_components_dashboard_HomeDashboardProfesional_vue":1,"resources_js_components_interno_Home_vue":1,"resources_js_components_interno_HomePacientes_vue":1,"resources_js_components_recepcionista_components_dashboard_HomeDashboard_vue":1,"resources_js_components_recepcionista_Main_vue":1,"resources_js_components_recepcionista_components_Home_vue":1,"resources_js_components_recepcionista_components_profesionales_HomeProfesional_vue":1,"resources_js_components_recepcionista_components_pacientes_HomePacientes_vue":1,"resources_js_components_recepcionista_components_reportes_HomeReportes_vue":1,"resources_js_components_recepcionista_components_reportes_ReportesAvanzados_vue":1,"resources_js_components_recepcionista_components_reportes_ReportesDashboard_vue":1,"resources_js_components_recepcionista_components_pagos_HomePagos_vue":1,"resources_js_components_recepcionista_components_continuantes_HomeCont_vue":1,"resources_js_components_recepcionista_components_adicionales_HomeAdicionales_vue":1,"resources_js_components_recepcionista_components_adicionales_HomeCartera_vue":1,"resources_js_components_recepcionista_components_recordatorios_HomeRecordatorios_vue":1,"resources_js_components_recepcionista_components_citas_HomeLimbo_vue":1,"resources_js_components_recepcionista_components_pacientes_HomeSeguimiento_vue":1,"resources_js_components_usuarios_HomeUsuarios_vue":1,"resources_js_components_profesional_components_consultas_Voice_vue":1,"resources_js_components_layout_NotFound_vue":1,"resources_js_components_PatientTest_vue":1}[chunkId]) return "js/" + chunkId + ".js";
 /******/ 			// return url for filenames based on template
 /******/ 			return undefined;
 /******/ 		};

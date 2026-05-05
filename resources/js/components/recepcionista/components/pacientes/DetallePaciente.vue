@@ -377,65 +377,104 @@
 
       <!-- CITAS Y PAQUETES -->
       <div class="tab-pane fade" id="citas" role="tabpanel">
-        <div class="row">
-          <div class="col-md-12 mb-4">
-            <div class="card border">
+        
+        <!-- Paquetes Contratados Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-1">
+          <h6 class="font-weight-bold mb-0 text-dark d-flex align-items-center">
+            <i class="fas fa-cube text-primary me-2"></i> Paquetes Contratados
+          </h6>
+          <button class="btn btn-outline-secondary btn-sm bg-white text-dark shadow-sm border rounded">
+            <i class="fas fa-plus me-1"></i> Nuevo Paquete
+          </button>
+        </div>
+
+        <!-- Paquetes List -->
+        <div class="row mb-4">
+          <div class="col-md-6" v-for="mem in paciente.membresias" :key="mem.id">
+            <div class="card border rounded-3 mb-3 shadow-sm" style="border-color: #eef2f5 !important;">
               <div class="card-body p-4">
-                <h5 class="card-title font-weight-bold mb-4">Últimas Citas</h5>
-                <div class="table-responsive">
-                  <table class="table table-hover table-sm">
-                    <thead>
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Profesional</th>
-                        <th>Estado</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="cita in (paciente.appointments || []).slice(0, 10)" :key="cita.id">
-                        <td>{{ formatDate(cita.date) }}</td>
-                        <td>{{ cita.professional ? cita.professional.name : 'N/A' }}</td>
-                        <td>
-                          <span class="badge" :class="getStatusBadge(cita.status)">{{ getStatusName(cita.status) }}</span>
-                        </td>
-                      </tr>
-                      <tr v-if="!paciente.appointments || paciente.appointments.length == 0">
-                        <td colspan="3" class="text-center text-muted">No tiene citas</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                  <h6 class="font-weight-bold text-dark mb-0" style="font-size: 1.05rem;">{{ mem.precio ? mem.precio.descripcion : 'Paquete/Membresía' }}</h6>
+                  <span class="badge rounded-pill px-3 py-1" :class="mem.activo ? 'bg-success bg-opacity-10' : 'bg-secondary bg-opacity-10 text-secondary'" style="font-weight: 500;">
+                    {{ mem.activo ? 'Activo' : 'Inactivo' }}
+                  </span>
                 </div>
+                <p class="text-muted small mb-4">Vence: {{ formatOnlyDate(mem.fin) }}</p>
+
+                <div class="d-flex justify-content-between align-items-end mb-2">
+                  <span class="text-dark small" style="font-weight: 500;">Sesiones usadas</span>
+                  <span class="text-dark small font-weight-bold">{{ mem.sesiones_usadas || 0 }} / {{ mem.sesiones_totales || 6 }}</span>
+                </div>
+                
+                <div class="progress mb-2 rounded-pill" style="height: 6px;">
+                  <div class="progress-bar bg-primary" role="progressbar" :style="{ width: (((mem.sesiones_usadas || 0) / (mem.sesiones_totales || 6)) * 100) + '%' }"></div>
+                  <div class="progress-bar" role="progressbar" style="background-color: #fd7e14;" :style="{ width: (100 - (((mem.sesiones_usadas || 0) / (mem.sesiones_totales || 6)) * 100)) + '%' }"></div>
+                </div>
+                
+                <small class="text-muted" style="font-size: 0.75rem;">{{ (mem.sesiones_totales || 6) - (mem.sesiones_usadas || 0) }} sesiones restantes</small>
               </div>
             </div>
           </div>
-          <div class="col-md-12">
-            <div class="card border">
-              <div class="card-body p-4">
-                <h5 class="card-title font-weight-bold mb-4">Membresías / Paquetes</h5>
-                <div class="table-responsive">
-                  <table class="table table-hover table-sm">
-                    <thead>
-                      <tr>
-                        <th>Inicio</th>
-                        <th>Fin</th>
-                        <th>Precio</th>
-                        <th>Activo</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="mem in paciente.membresias" :key="mem.id">
-                        <td>{{ formatDate(mem.inicio) }}</td>
-                        <td>{{ formatDate(mem.fin) }}</td>
-                        <td>{{ mem.precio ? mem.precio.descripcion : 'N/A' }}</td>
-                        <td><span class="badge" :class="mem.activo ? 'bg-success' : 'bg-secondary'">{{ mem.activo ? 'ACTIVA' : 'INACTIVA' }}</span></td>
-                      </tr>
-                      <tr v-if="!paciente.membresias || paciente.membresias.length == 0">
-                        <td colspan="4" class="text-center text-muted">No tiene membresías</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+          <div v-if="!paciente.membresias || paciente.membresias.length == 0" class="col-12">
+            <div class="alert alert-light border text-center text-muted">
+              No tiene paquetes o membresías.
+            </div>
+          </div>
+        </div>
+
+        <!-- Historial de Citas Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-4">
+          <h6 class="font-weight-bold mb-0 text-dark d-flex align-items-center">
+            <i class="far fa-calendar-alt text-primary me-2"></i> Historial de Citas
+          </h6>
+        </div>
+
+        <!-- Historial de Citas Table -->
+        <div class="card border rounded-3 shadow-sm mb-4">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+                <thead class="bg-light">
+                  <tr>
+                    <th class="border-0 text-muted fw-normal py-3 ps-4" style="font-size: 0.85rem;">Fecha</th>
+                    <th class="border-0 text-muted fw-normal py-3" style="font-size: 0.85rem;">Tipo</th>
+                    <th class="border-0 text-muted fw-normal py-3" style="font-size: 0.85rem;">Profesional</th>
+                    <th class="border-0 text-muted fw-normal py-3" style="font-size: 0.85rem;">Estado</th>
+                    <th class="border-0 text-muted fw-normal py-3 pe-4" style="font-size: 0.85rem;">Notas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="cita in (paciente.appointments || [])" :key="cita.id">
+                    <td class="align-middle py-3 ps-4 border-bottom-0" style="border-bottom: 1px solid #f1f3f5 !important;">
+                      <div class="text-dark fw-bold" style="font-size: 0.9rem;">{{ formatOnlyDate(cita.date) }}</div>
+                      <div class="text-muted small">{{ formatOnlyTime(cita.hora) || formatOnlyTime(cita.date) }}</div>
+                    </td>
+                    <td class="align-middle py-3 text-dark border-bottom-0" style="border-bottom: 1px solid #f1f3f5 !important;">
+                      {{ cita.service ? cita.service.name : (cita.tipo_cita || 'Psicológica') }}
+                    </td>
+                    <td class="align-middle py-3 border-bottom-0" style="border-bottom: 1px solid #f1f3f5 !important;">
+                      <a href="#" class="text-primary text-decoration-none">{{ cita.professional ? cita.professional.name : 'N/A' }}</a>
+                    </td>
+                    <td class="align-middle py-3 border-bottom-0" style="border-bottom: 1px solid #f1f3f5 !important;">
+                      <span v-if="cita.status == 1 || cita.status == 'Confirmada'" class="badge bg-primary bg-opacity-10 rounded-pill fw-normal px-3 py-2" style="font-size: 0.8rem;">
+                        <i class="far fa-calendar-check me-1"></i> Confirmada
+                      </span>
+                      <span v-else-if="cita.status == 2 || cita.status == 'Completada'" class="badge bg-success bg-opacity-10 rounded-pill fw-normal px-3 py-2" style="font-size: 0.8rem;">
+                        <i class="fas fa-check-circle me-1"></i> Completada
+                      </span>
+                      <span v-else class="badge bg-secondary bg-opacity-10 rounded-pill fw-normal px-3 py-2" style="font-size: 0.8rem;">
+                        {{ getStatusName(cita.status) }}
+                      </span>
+                    </td>
+                    <td class="align-middle py-3 pe-4 text-muted border-bottom-0" style="border-bottom: 1px solid #f1f3f5 !important;">
+                      {{ cita.notas || cita.descripcion || cita.motivo || '—' }}
+                    </td>
+                  </tr>
+                  <tr v-if="!paciente.appointments || paciente.appointments.length == 0">
+                    <td colspan="5" class="text-center text-muted py-4">No tiene citas en el historial</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -1988,6 +2027,41 @@ export default {
       hours = hours % 12;
       hours = hours ? hours : 12; 
       return `${day} ${month} ${year} - ${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+    },
+    formatOnlyDate(date) {
+      if(!date) return '';
+      if (typeof date === 'string') {
+        const parts = date.split(' ')[0].split('T')[0].split('-');
+        if (parts.length === 3) {
+          const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+          return `${parts[2]} ${monthNames[parseInt(parts[1])-1]} ${parts[0]}`;
+        }
+      }
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return date;
+      const day = d.getDate().toString().padStart(2, '0');
+      const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+      const month = monthNames[d.getMonth()];
+      const year = d.getFullYear();
+      return `${day} ${month} ${year}`;
+    },
+    formatOnlyTime(timeStr) {
+      if(!timeStr) return '';
+      if (typeof timeStr === 'string' && timeStr.includes(':')) {
+        let parts = timeStr.split(' ');
+        let timePart = parts[0];
+        if (timeStr.includes('T')) {
+           timePart = timeStr.split('T')[1].split('.')[0];
+        }
+        let tParts = timePart.split(':');
+        let hours = parseInt(tParts[0]);
+        let minutes = tParts[1];
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        return `${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+      }
+      return '';
     },
     getCieNames(diagnosticString) {
       if(!diagnosticString) return 'Evaluación médica general';

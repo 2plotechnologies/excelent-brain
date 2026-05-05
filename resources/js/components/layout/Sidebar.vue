@@ -55,6 +55,12 @@
 									<span>Paquetes</span>
 							</router-link>
 						</li>
+						<li class="nav-item nav__list" @click="activeSidebar()">
+							<router-link  to="/administrador/notas-credito" class="nav-link">
+								<i class="fas fa-money-check-alt"></i>
+									<span>Notas de Crédito</span>
+							</router-link>
+						</li>
 						<!-- Nav Item - Dashboard -->
 						<li class="nav-item nav__list" @click="activeSidebar()">
 								<router-link to="/administrador/reportes/total" class="nav-link">
@@ -231,6 +237,13 @@
 						</div>
 
 						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link  to="/recepcionista/pacientes" class="nav-link">
+										<i class="fas fa-hospital-user"></i>
+										<span>Pacientes</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
 								<router-link  to="/recepcionista/home" class="nav-link">
 										<i class="fas fa-calendar-check"></i>
 										<span>Citas</span>
@@ -238,9 +251,58 @@
 						</li>
 
 						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link  to="/recepcionista/paquetes" class="nav-link">
+										<i class="fas fa-box-open"></i>
+										<span>Paquetes</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
 								<router-link  to="/recepcionista/pagos" class="nav-link">
 										<i class="fas fa-credit-card"></i>
-										<span>Pagos</span>
+										<span>Caja</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link  to="/recepcionista/notas-credito" class="nav-link">
+										<i class="fas fa-money-check-alt"></i>
+										<span>Notas de Crédito</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link  to="/recepcionista/pacientes/seguimiento" class="nav-link">
+										<i class="fa-solid fa-heart-circle-check"></i>
+										<span>Seguimiento</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link to="/recepcionista/limbo" class="nav-link">
+									<i class="fa-solid fa-satellite-dish"></i>
+										<span>Limbo</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link to="/recepcionista/pacientes-sos" class="nav-link">
+									<i class="fa-solid fa-skull-crossbones"></i>
+										<span>Pacientes S.O.S.</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
+							<router-link  to="/recepcionista/reportes-avanzados" class="nav-link">
+									<i class="fas fa-file-alt"></i>
+									<span>Reportes (Antiguos)</span>
+							</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link to="/recepcionista/reportes-estadisticos" class="nav-link">
+									<i class="fas fa-chart-pie"></i>
+										<span>Reportes</span>
 								</router-link>
 						</li>
 
@@ -254,27 +316,6 @@
 								<router-link  to="/recepcionista/cartera" class="nav-link">
 										<i class="fas fa-hospital-user"></i>
 										<span>Cartera de clientes</span>
-								</router-link>
-						</li>
-
-						<li class="nav-item nav__list" @click="activeSidebar()">
-								<router-link  to="/recepcionista/pacientes" class="nav-link">
-										<i class="fas fa-hospital-user"></i>
-										<span>Pacientes</span>
-								</router-link>
-						</li>
-
-						<li class="nav-item nav__list" @click="activeSidebar()">
-								<router-link  to="/recepcionista/paquetes" class="nav-link">
-										<i class="fas fa-box-open"></i>
-										<span>Paquetes</span>
-								</router-link>
-						</li>
-
-						<li class="nav-item nav__list" @click="activeSidebar()">
-								<router-link  to="/recepcionista/pacientes/seguimiento" class="nav-link">
-										<i class="fa-solid fa-heart-circle-check"></i>
-										<span>Seguimiento</span>
 								</router-link>
 						</li>
 
@@ -297,31 +338,7 @@
 									<span>Reportes</span>
 							</router-link>
 						</li> -->
-						<li class="nav-item nav__list" @click="activeSidebar()">
-							<router-link  to="/recepcionista/reportes-avanzados" class="nav-link">
-									<i class="fas fa-file-alt"></i>
-									<span>Reportes</span>
-							</router-link>
-						</li>
-						<!-- Nav Item - Dashboard -->
-						<li class="nav-item nav__list" @click="activeSidebar()">
-								<router-link to="/recepcionista/pacientes-sos" class="nav-link">
-									<i class="fa-solid fa-skull-crossbones"></i>
-										<span>Pacientes S.O.S.</span>
-								</router-link>
-						</li>
-						<li class="nav-item nav__list" @click="activeSidebar()">
-								<router-link to="/recepcionista/reportes-estadisticos" class="nav-link">
-									<i class="fas fa-chart-pie"></i>
-										<span>Reportes</span>
-								</router-link>
-						</li>
-						<li class="nav-item nav__list" @click="activeSidebar()">
-								<router-link to="/recepcionista/limbo" class="nav-link">
-									<i class="fa-solid fa-satellite-dish"></i>
-										<span>Limbo</span>
-								</router-link>
-						</li>
+
 						<li class="nav-item nav__list" @click="irPanelBaja()">
 							<a href="#!" class="nav-link">
 									<img  :src="require('/img/sunat_blanco.png')" style="width:18px">

@@ -155,63 +155,6 @@
 						</div>
 					</div>
 
-					<!-- Programación de Sesiones -->
-					<div class="mt-4 border-top pt-4">
-						<h6 class="fw-bold mb-3 d-flex align-items-center text-secondary">
-							<i class="fa-solid fa-clipboard-list me-2"></i> Programación de Sesiones
-						</h6>
-						<div class="row g-3" v-show="sesionesAcumuladas.length < cantSesiones">
-							<div class="col-12">
-								<div class="alert alert-info py-2 small mb-0 d-flex align-items-center">
-									<i class="fas fa-info-circle me-2"></i> Rellene los datos indispensables para autorrellenar las citas.
-								</div>
-							</div>
-							<div class="col-md-6">
-								<label class="form-label small text-muted mb-1">Seleccionar fecha</label>
-								<input type="date" class="form-control" v-model="nuevaFecha.fecha" @change="listarhorario()">
-							</div>
-							<div class="col-md-6">
-								<label class="form-label small text-muted mb-1">Horario</label>
-								<select class="form-select" id="sltProfesionalHorarioID" v-model="idHorario">
-									<option value="" disabled selected>Selecciona un horario</option>
-									<option v-for="hora in horarios" :key="hora.id" :value="hora.id">
-										{{ horaLatam1(hora.check_time) }} - {{ horaLatam2(hora.departure_date) }}
-									</option>
-								</select>
-							</div>
-							<div class="col-12 text-end mt-2">
-								<button class="btn btn-sm btn-outline-success" @click="agregarUnaCita()">
-									<i class="far fa-arrow-alt-circle-down me-1"></i> Agregar cita
-								</button>
-							</div>
-						</div>
-
-						<div class="mt-3" v-if="sesionesAcumuladas.length > 0">
-							<label class="form-label small text-muted fw-medium">Sesiones programadas ({{sesionesAcumuladas.length}} de {{cantSesiones}})</label>
-							<div class="table-responsive">
-								<table class="table table-sm table-hover align-middle border">
-									<thead class="table-light text-muted small">
-										<tr>
-											<th class="fw-medium px-3">N°</th>
-											<th class="fw-medium">Profesional</th>
-											<th class="fw-medium">Fecha y Hora</th>
-											<th class="fw-medium text-end px-3">Acción</th>
-										</tr>
-									</thead>
-									<tbody class="small">
-										<tr v-for="(sesion, index) in sesionesAcumuladas">
-											<td class="px-3">{{ index + 1 }}</td>
-											<td>{{ sesion.doctor }}</td>
-											<td>{{ fechaLatam(sesion.fecha) }} <br><span class="text-muted">{{ sesion.hora }}</span></td>
-											<td class="text-end px-3">
-												<button class="btn btn-sm btn-light text-danger border-0" @click="borrarSesionAcumulada(index)"><i class="fas fa-times"></i></button>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
 
 					<div class="mt-4">
 						<label class="form-label text-secondary small fw-medium mb-1">Comentarios adicionales</label>
@@ -292,17 +235,6 @@ export default {
 			const servidor = await fetch('/api/preciosMembresias')
 			this.precios = await servidor.json();
 		},
-		agregarUnaCita(){
-			
-			var selec = document.getElementById("sltDoctor");
-			var selectHora = document.getElementById("sltProfesionalHorarioID");
-
-			if( selec.value>0 && selectHora.value>0)
-				this.sesionesAcumuladas.push({ idHorario: this.idHorario, idProfesional: this.doctorSeleccionado, fecha: this.nuevaFecha.fecha, idPaciente: this.pacienteElegido.id, doctor: selec.options[selec.selectedIndex].text, hora: selectHora.options[selectHora.selectedIndex].text })
-			else
-				alertify.notify('<i class="fas fa-skull-crossbones"></i> Hay un dato no rellenado', 'danger', 10)
-
-		},
 		calcularFechas() {
 			this.fechas = [];
 			const precioBase = this.mostrarPrecio ;
@@ -348,9 +280,6 @@ export default {
 						
 				}
 			}
-		},
-		borrarSesionAcumulada(index){
-			this.sesionesAcumuladas.splice(index,1)
 		},
 		async guardar() {
 			if(!this.pacienteElegido.id) {

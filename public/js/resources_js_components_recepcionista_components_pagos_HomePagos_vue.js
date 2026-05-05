@@ -1466,18 +1466,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         }, _callee2);
       }))();
     },
-    agregarUnaCita: function agregarUnaCita() {
-      var selec = document.getElementById("sltDoctor");
-      var selectHora = document.getElementById("sltProfesionalHorarioID");
-      if (selec.value > 0 && selectHora.value > 0) this.sesionesAcumuladas.push({
-        idHorario: this.idHorario,
-        idProfesional: this.doctorSeleccionado,
-        fecha: this.nuevaFecha.fecha,
-        idPaciente: this.pacienteElegido.id,
-        doctor: selec.options[selec.selectedIndex].text,
-        hora: selectHora.options[selectHora.selectedIndex].text
-      });else alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fas fa-skull-crossbones"></i> Hay un dato no rellenado', 'danger', 10);
-    },
     calcularFechas: function calcularFechas() {
       this.fechas = [];
       var precioBase = this.mostrarPrecio;
@@ -1522,9 +1510,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           for (var i = editedIndex + 1; i < this.fechas.length; i++) this.fechas[i].monto = _montoRestante.toFixed(2);
         }
       }
-    },
-    borrarSesionAcumulada: function borrarSesionAcumulada(index) {
-      this.sesionesAcumuladas.splice(index, 1);
     },
     guardar: function guardar() {
       var _this3 = this;
@@ -4477,120 +4462,6 @@ var render = function render() {
   }, [_c("span", [_vm._v("Total Paquete")]), _vm._v(" "), _c("span", [_vm._v("S/ " + _vm._s(parseFloat(_vm.mostrarPrecio - _vm.membresia.descuento).toFixed(2)))])]), _vm._v(" "), _vm.membresia.cuotas > 1 ? _c("div", {
     staticClass: "d-flex justify-content-between small text-muted"
   }, [_c("span", [_vm._v("Cuota estimada")]), _vm._v(" "), _c("span", [_vm._v("S/ " + _vm._s((parseFloat(_vm.mostrarPrecio - _vm.membresia.descuento) / _vm.membresia.cuotas).toFixed(2)) + " × " + _vm._s(_vm.membresia.cuotas))])]) : _vm._e()])])]), _vm._v(" "), _c("div", {
-    staticClass: "mt-4 border-top pt-4"
-  }, [_vm._m(7), _vm._v(" "), _c("div", {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: _vm.sesionesAcumuladas.length < _vm.cantSesiones,
-      expression: "sesionesAcumuladas.length < cantSesiones"
-    }],
-    staticClass: "row g-3"
-  }, [_vm._m(8), _vm._v(" "), _c("div", {
-    staticClass: "col-md-6"
-  }, [_c("label", {
-    staticClass: "form-label small text-muted mb-1"
-  }, [_vm._v("Seleccionar fecha")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.nuevaFecha.fecha,
-      expression: "nuevaFecha.fecha"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "date"
-    },
-    domProps: {
-      value: _vm.nuevaFecha.fecha
-    },
-    on: {
-      change: function change($event) {
-        return _vm.listarhorario();
-      },
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.nuevaFecha, "fecha", $event.target.value);
-      }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-6"
-  }, [_c("label", {
-    staticClass: "form-label small text-muted mb-1"
-  }, [_vm._v("Horario")]), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.idHorario,
-      expression: "idHorario"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "sltProfesionalHorarioID"
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.idHorario = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
-      }
-    }
-  }, [_c("option", {
-    attrs: {
-      value: "",
-      disabled: "",
-      selected: ""
-    }
-  }, [_vm._v("Selecciona un horario")]), _vm._v(" "), _vm._l(_vm.horarios, function (hora) {
-    return _c("option", {
-      key: hora.id,
-      domProps: {
-        value: hora.id
-      }
-    }, [_vm._v("\n\t\t\t\t\t\t\t\t\t" + _vm._s(_vm.horaLatam1(hora.check_time)) + " - " + _vm._s(_vm.horaLatam2(hora.departure_date)) + "\n\t\t\t\t\t\t\t\t")]);
-  })], 2)]), _vm._v(" "), _c("div", {
-    staticClass: "col-12 text-end mt-2"
-  }, [_c("button", {
-    staticClass: "btn btn-sm btn-outline-success",
-    on: {
-      click: function click($event) {
-        return _vm.agregarUnaCita();
-      }
-    }
-  }, [_c("i", {
-    staticClass: "far fa-arrow-alt-circle-down me-1"
-  }), _vm._v(" Agregar cita\n\t\t\t\t\t\t\t")])])]), _vm._v(" "), _vm.sesionesAcumuladas.length > 0 ? _c("div", {
-    staticClass: "mt-3"
-  }, [_c("label", {
-    staticClass: "form-label small text-muted fw-medium"
-  }, [_vm._v("Sesiones programadas (" + _vm._s(_vm.sesionesAcumuladas.length) + " de " + _vm._s(_vm.cantSesiones) + ")")]), _vm._v(" "), _c("div", {
-    staticClass: "table-responsive"
-  }, [_c("table", {
-    staticClass: "table table-sm table-hover align-middle border"
-  }, [_vm._m(9), _vm._v(" "), _c("tbody", {
-    staticClass: "small"
-  }, _vm._l(_vm.sesionesAcumuladas, function (sesion, index) {
-    return _c("tr", [_c("td", {
-      staticClass: "px-3"
-    }, [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(sesion.doctor))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.fechaLatam(sesion.fecha)) + " "), _c("br"), _c("span", {
-      staticClass: "text-muted"
-    }, [_vm._v(_vm._s(sesion.hora))])]), _vm._v(" "), _c("td", {
-      staticClass: "text-end px-3"
-    }, [_c("button", {
-      staticClass: "btn btn-sm btn-light text-danger border-0",
-      on: {
-        click: function click($event) {
-          return _vm.borrarSesionAcumulada(index);
-        }
-      }
-    }, [_c("i", {
-      staticClass: "fas fa-times"
-    })])])]);
-  }), 0)])])]) : _vm._e()]), _vm._v(" "), _c("div", {
     staticClass: "mt-4"
   }, [_c("label", {
     staticClass: "form-label text-secondary small fw-medium mb-1"
@@ -4709,38 +4580,6 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fa-regular fa-calendar me-2"
   }), _vm._v(" Fechas de vencimiento de cuotas\n\t\t\t\t\t\t\t")]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("h6", {
-    staticClass: "fw-bold mb-3 d-flex align-items-center text-secondary"
-  }, [_c("i", {
-    staticClass: "fa-solid fa-clipboard-list me-2"
-  }), _vm._v(" Programación de Sesiones\n\t\t\t\t\t")]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "col-12"
-  }, [_c("div", {
-    staticClass: "alert alert-info py-2 small mb-0 d-flex align-items-center"
-  }, [_c("i", {
-    staticClass: "fas fa-info-circle me-2"
-  }), _vm._v(" Rellene los datos indispensables para autorrellenar las citas.\n\t\t\t\t\t\t\t")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("thead", {
-    staticClass: "table-light text-muted small"
-  }, [_c("tr", [_c("th", {
-    staticClass: "fw-medium px-3"
-  }, [_vm._v("N°")]), _vm._v(" "), _c("th", {
-    staticClass: "fw-medium"
-  }, [_vm._v("Profesional")]), _vm._v(" "), _c("th", {
-    staticClass: "fw-medium"
-  }, [_vm._v("Fecha y Hora")]), _vm._v(" "), _c("th", {
-    staticClass: "fw-medium text-end px-3"
-  }, [_vm._v("Acción")])])]);
 }];
 render._withStripped = true;
 

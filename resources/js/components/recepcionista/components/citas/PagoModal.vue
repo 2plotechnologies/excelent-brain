@@ -107,8 +107,13 @@
 				</div>
 
 				<div class="modal-footer border-0 px-4 pb-4 pt-2 d-flex justify-content-center gap-2" v-if="dataCita">
-					<button v-if="dataCita.payment.pay_status==1" @click="update()" type="button" class="btn btn-action btn-primary w-100 mb-2">
-            <i class="fas fa-save mr-2"></i> Guardar pago
+					<button v-if="dataCita.payment.pay_status==1" @click="update()" type="button" class="btn btn-action btn-primary w-100 mb-2" :disabled="isProcessing">
+            <span v-if="isProcessing">
+              <i class="fas fa-spinner fa-spin mr-2"></i> Procesando...
+            </span>
+            <span v-else>
+              <i class="fas fa-save mr-2"></i> Guardar pago
+            </span>
           </button>
 					<a target="_blank" :href="`/api/pdfCupon/${dataCita.id}?token=${token}`" v-if="dataCita.payment.pay_status != 1" class="btn btn-action btn-success w-100">
             <i class="fas fa-file-invoice-dollar mr-2"></i> Ver Cupón
@@ -127,7 +132,8 @@ import moment from 'moment'
 		data() {
 			return{
 				dataCita: null,
-				caso: {pago:1, moneda:1, comprobante:'', continuo: 1, user_id:-1, rebaja:0, motivoRebaja:''}, maximo:15, monedas:[], neto:0, monto_adelanto:0
+				caso: {pago:1, moneda:1, comprobante:'', continuo: 1, user_id:-1, rebaja:0, motivoRebaja:''}, maximo:15, monedas:[], neto:0, monto_adelanto:0,
+        isProcessing: false
 			}
 		},
 		props:{
@@ -139,6 +145,8 @@ import moment from 'moment'
 		},
 		methods:{
 			async update() {
+        if (this.isProcessing) return;
+        this.isProcessing = true;
 				await this.axios.put(`/api/pagarCita/${this.dataCita.id}`, {dataCita: this.dataCita, caso: this.caso, idSede:this.idSede})
 				.then(res => {
 					//console.log(res.data)
@@ -177,8 +185,16 @@ import moment from 'moment'
 					}
 				})
 				.catch(err => {
-					console.error(err)
+					console.error(err);
+          this.$swal({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un problema al procesar el pago. Por favor, intente de nuevo.'
+          });
 				})
+        .finally(() => {
+          this.isProcessing = false;
+        });
 			},
 			abrirCupon(){
 				window.open(`/api/pdfCupon/${this.dataCita.id}?token=${localStorage.getItem('token')}`, '_blank');

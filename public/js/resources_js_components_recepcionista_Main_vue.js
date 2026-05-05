@@ -450,6 +450,20 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "nav-link",
     attrs: {
+      to: "/administrador/notas-credito"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-money-check-alt"
+  }), _vm._v(" "), _c("span", [_vm._v("Notas de Crédito")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "nav-item nav__list",
+    on: {
+      click: function click($event) {
+        return _vm.activeSidebar();
+      }
+    }
+  }, [_c("router-link", {
+    staticClass: "nav-link",
+    attrs: {
       to: "/administrador/reportes/total"
     }
   }, [_c("i", {
@@ -677,53 +691,25 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "nav-link",
     attrs: {
-      to: "/recepcionista/home"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-calendar-check"
-  }), _vm._v(" "), _c("span", [_vm._v("Citas")])])], 1), _vm._v(" "), _c("li", {
-    staticClass: "nav-item nav__list",
-    on: {
-      click: function click($event) {
-        return _vm.activeSidebar();
-      }
-    }
-  }, [_c("router-link", {
-    staticClass: "nav-link",
-    attrs: {
-      to: "/recepcionista/pagos"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-credit-card"
-  }), _vm._v(" "), _c("span", [_vm._v("Pagos")])])], 1), _vm._v(" "), _c("li", {
-    staticClass: "nav-item nav__list",
-    on: {
-      click: function click($event) {
-        return _vm.activeSidebar();
-      }
-    }
-  }, [_c("router-link", {
-    staticClass: "nav-link",
-    attrs: {
-      to: "/recepcionista/cartera"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-hospital-user"
-  }), _vm._v(" "), _c("span", [_vm._v("Cartera de clientes")])])], 1), _vm._v(" "), _c("li", {
-    staticClass: "nav-item nav__list",
-    on: {
-      click: function click($event) {
-        return _vm.activeSidebar();
-      }
-    }
-  }, [_c("router-link", {
-    staticClass: "nav-link",
-    attrs: {
       to: "/recepcionista/pacientes"
     }
   }, [_c("i", {
     staticClass: "fas fa-hospital-user"
   }), _vm._v(" "), _c("span", [_vm._v("Pacientes")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "nav-item nav__list",
+    on: {
+      click: function click($event) {
+        return _vm.activeSidebar();
+      }
+    }
+  }, [_c("router-link", {
+    staticClass: "nav-link",
+    attrs: {
+      to: "/recepcionista/home"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-calendar-check"
+  }), _vm._v(" "), _c("span", [_vm._v("Citas")])])], 1), _vm._v(" "), _c("li", {
     staticClass: "nav-item nav__list",
     on: {
       click: function click($event) {
@@ -747,6 +733,34 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "nav-link",
     attrs: {
+      to: "/recepcionista/pagos"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-credit-card"
+  }), _vm._v(" "), _c("span", [_vm._v("Caja")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "nav-item nav__list",
+    on: {
+      click: function click($event) {
+        return _vm.activeSidebar();
+      }
+    }
+  }, [_c("router-link", {
+    staticClass: "nav-link",
+    attrs: {
+      to: "/recepcionista/notas-credito"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-money-check-alt"
+  }), _vm._v(" "), _c("span", [_vm._v("Notas de Crédito")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "nav-item nav__list",
+    on: {
+      click: function click($event) {
+        return _vm.activeSidebar();
+      }
+    }
+  }, [_c("router-link", {
+    staticClass: "nav-link",
+    attrs: {
       to: "/recepcionista/pacientes/seguimiento"
     }
   }, [_c("i", {
@@ -761,25 +775,11 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "nav-link",
     attrs: {
-      to: "/recepcionista/recordatorios"
+      to: "/recepcionista/limbo"
     }
   }, [_c("i", {
-    staticClass: "fas fa-laptop-medical"
-  }), _vm._v(" "), _c("span", [_vm._v("Gestor de datos")])])], 1), _vm._v(" "), _c("li", {
-    staticClass: "nav-item nav__list",
-    on: {
-      click: function click($event) {
-        return _vm.activeSidebar();
-      }
-    }
-  }, [_c("router-link", {
-    staticClass: "nav-link",
-    attrs: {
-      to: "/recepcionista/reportes-avanzados"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-file-alt"
-  }), _vm._v(" "), _c("span", [_vm._v("Reportes")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "fa-solid fa-satellite-dish"
+  }), _vm._v(" "), _c("span", [_vm._v("Limbo")])])], 1), _vm._v(" "), _c("li", {
     staticClass: "nav-item nav__list",
     on: {
       click: function click($event) {
@@ -803,6 +803,20 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "nav-link",
     attrs: {
+      to: "/recepcionista/reportes-avanzados"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-file-alt"
+  }), _vm._v(" "), _c("span", [_vm._v("Reportes (Antiguos)")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "nav-item nav__list",
+    on: {
+      click: function click($event) {
+        return _vm.activeSidebar();
+      }
+    }
+  }, [_c("router-link", {
+    staticClass: "nav-link",
+    attrs: {
       to: "/recepcionista/reportes-estadisticos"
     }
   }, [_c("i", {
@@ -817,11 +831,25 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "nav-link",
     attrs: {
-      to: "/recepcionista/limbo"
+      to: "/recepcionista/cartera"
     }
   }, [_c("i", {
-    staticClass: "fa-solid fa-satellite-dish"
-  }), _vm._v(" "), _c("span", [_vm._v("Limbo")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "fas fa-hospital-user"
+  }), _vm._v(" "), _c("span", [_vm._v("Cartera de clientes")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "nav-item nav__list",
+    on: {
+      click: function click($event) {
+        return _vm.activeSidebar();
+      }
+    }
+  }, [_c("router-link", {
+    staticClass: "nav-link",
+    attrs: {
+      to: "/recepcionista/recordatorios"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-laptop-medical"
+  }), _vm._v(" "), _c("span", [_vm._v("Gestor de datos")])])], 1), _vm._v(" "), _c("li", {
     staticClass: "nav-item nav__list",
     on: {
       click: function click($event) {

@@ -40,8 +40,13 @@
         </div>
 
         <div class="modal-footer border-0 px-4 pb-4 pt-2 d-flex justify-content-center">
-          <button @click="update()" type="button" class="btn btn-action btn-primary w-100">
-            <i class="fas fa-redo-alt mr-2"></i> Actualizar Estado
+          <button @click="update()" type="button" class="btn btn-action btn-primary w-100" :disabled="isProcessing">
+            <span v-if="isProcessing">
+              <i class="fas fa-spinner fa-spin mr-2"></i> Procesando...
+            </span>
+            <span v-else>
+              <i class="fas fa-redo-alt mr-2"></i> Actualizar Estado
+            </span>
           </button>
         </div>
       </div>
@@ -55,7 +60,7 @@ import alertify from 'alertifyjs';
     name: "modal_estado",
     data() {
       return{
-        data: null, motivo : ''
+        data: null, motivo : '', isProcessing: false
       }
     },
 
@@ -64,6 +69,9 @@ import alertify from 'alertifyjs';
 				if(document.querySelector(".status-appointment").value == 3 && this.motivo==''){
 					alertify.notify('<i class="fa-solid fa-skull-crossbones"></i> Debe ingresar un motivo para anular la cita' , 'danger', 10);
 				}else{
+          if (this.isProcessing) return;
+          this.isProcessing = true;
+          
 					if (document.querySelector(".status-appointment").value == 3) {
 						this.data.schedule_id = null;
 						this.updateStatuAppointment()
@@ -86,7 +94,15 @@ import alertify from 'alertifyjs';
         })
         .catch(err => {
             console.error(err)
-          })
+            this.$swal({
+              icon: 'error',
+              title: 'Error',
+              text: 'Hubo un problema al actualizar la cita. Por favor, intente de nuevo.'
+            })
+        })
+        .finally(() => {
+          this.isProcessing = false;
+        });
       },
 
 

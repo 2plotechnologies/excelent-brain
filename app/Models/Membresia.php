@@ -21,4 +21,9 @@ class Membresia extends Model
     {
         return $this->hasOne(ReportePaqueteExtra::class, 'membresia_id');
     }
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'idMembresia');
+    }
 }

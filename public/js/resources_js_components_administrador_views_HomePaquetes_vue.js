@@ -62,6 +62,21 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         logros: '',
         recomendaciones: '',
         proximos_pasos: ''
+      },
+      // Agendamiento de sesiones
+      doctores: [],
+      horariosDisponibles: [],
+      loadingHorarios: false,
+      guardandoCita: false,
+      procesandoEstado: false,
+      formProrrateo: {
+        observacion: ''
+      },
+      nuevaSesion: {
+        idProfesional: '',
+        fecha: new Date().toISOString().split('T')[0],
+        idHorario: '',
+        modalidad: '1'
       }
     };
   },
@@ -97,15 +112,26 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         totalDeuda: 0,
         totalCobrado: 0
       });
+    },
+    doctoresFiltrados: function doctoresFiltrados() {
+      var _this = this;
+      if (!this.paqueteSeleccionado || !this.doctores.length) return [];
+      // Usar == para evitar problemas de tipo (string vs int)
+      var filtrados = this.doctores.filter(function (doc) {
+        return doc.idProfesion == _this.paqueteSeleccionado.idClasificacion;
+      });
+      // Si por alguna razón el filtro no devuelve nada, mostramos todos para no bloquear al usuario
+      return filtrados.length > 0 ? filtrados : this.doctores;
     }
   },
   mounted: function mounted() {
     this.obtenerUsuarioYPaquetes();
     this.cargarMonedas();
+    this.cargarProfesionales();
   },
   methods: {
     obtenerUsuarioYPaquetes: function obtenerUsuarioYPaquetes() {
-      var _this = this;
+      var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         var res;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
@@ -113,10 +139,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 0:
               _context.prev = 0;
               _context.next = 3;
-              return _this.axios.get('/api/user');
+              return _this2.axios.get('/api/user');
             case 3:
               res = _context.sent;
-              _this.idUsuario = parseInt(res.data.user.id);
+              _this2.idUsuario = parseInt(res.data.user.id);
               _context.next = 10;
               break;
             case 7:
@@ -124,7 +150,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context.t0 = _context["catch"](0);
               console.warn("No se pudo obtener el usuario", _context.t0);
             case 10:
-              _this.cargarPaquetes();
+              _this2.cargarPaquetes();
             case 11:
             case "end":
               return _context.stop();
@@ -134,35 +160,35 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     cargarPaquetes: function cargarPaquetes() {
       var _arguments = arguments,
-        _this2 = this;
+        _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var page, response;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
               page = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : 1;
-              if (!_this2.loading) {
+              if (!_this3.loading) {
                 _context2.next = 3;
                 break;
               }
               return _context2.abrupt("return");
             case 3:
-              _this2.loading = true;
+              _this3.loading = true;
               _context2.prev = 4;
               _context2.next = 7;
-              return _this2.axios.get("/api/listarPaquetes", {
+              return _this3.axios.get("/api/listarPaquetes", {
                 params: {
                   page: page,
-                  busqueda: _this2.busqueda,
-                  estado: _this2.filtroEstado,
-                  tipo: _this2.filtroTipo
+                  busqueda: _this3.busqueda,
+                  estado: _this3.filtroEstado,
+                  tipo: _this3.filtroTipo
                 }
               });
             case 7:
               response = _context2.sent;
-              _this2.paquetesFiltrados = response.data.paquetes.data;
-              _this2.metricas = response.data.metricas;
-              _this2.pagination = {
+              _this3.paquetesFiltrados = response.data.paquetes.data;
+              _this3.metricas = response.data.metricas;
+              _this3.pagination = {
                 current_page: response.data.paquetes.current_page,
                 last_page: response.data.paquetes.last_page,
                 from: response.data.paquetes.from,
@@ -176,7 +202,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               console.error("Error cargando paquetes:", _context2.t0);
             case 16:
               _context2.prev = 16;
-              _this2.loading = false;
+              _this3.loading = false;
               return _context2.finish(16);
             case 19:
             case "end":
@@ -186,7 +212,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }))();
     },
     cargarMonedas: function cargarMonedas() {
-      var _this3 = this;
+      var _this4 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var response;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
@@ -194,10 +220,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 0:
               _context3.prev = 0;
               _context3.next = 3;
-              return _this3.axios.get("/api/listarMonedas");
+              return _this4.axios.get("/api/listarMonedas");
             case 3:
               response = _context3.sent;
-              _this3.monedas = response.data;
+              _this4.monedas = response.data;
               _context3.next = 10;
               break;
             case 7:
@@ -211,17 +237,183 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         }, _callee3, null, [[0, 7]]);
       }))();
     },
+    cargarProfesionales: function cargarProfesionales() {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var response;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              _context4.prev = 0;
+              _context4.next = 3;
+              return _this5.axios.get('/api/profesional');
+            case 3:
+              response = _context4.sent;
+              _this5.doctores = response.data;
+              _context4.next = 10;
+              break;
+            case 7:
+              _context4.prev = 7;
+              _context4.t0 = _context4["catch"](0);
+              console.error("Error cargando profesionales:", _context4.t0);
+            case 10:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4, null, [[0, 7]]);
+      }))();
+    },
+    abrirAgendarCita: function abrirAgendarCita(paquete) {
+      this.paqueteSeleccionado = paquete;
+      this.nuevaSesion = {
+        idProfesional: '',
+        fecha: new Date().toISOString().split('T')[0],
+        idHorario: '',
+        modalidad: '1'
+      };
+      this.horariosDisponibles = [];
+      var modal = new bootstrap.Modal(document.getElementById('modalAgendarSesion'));
+      modal.show();
+    },
+    cargarHorarios: function cargarHorarios() {
+      var _this6 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var response, schedulesInvalid, schedulesAll, diasSemana, fechaObj, diaNombre;
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              if (!(!_this6.nuevaSesion.idProfesional || !_this6.nuevaSesion.fecha)) {
+                _context5.next = 2;
+                break;
+              }
+              return _context5.abrupt("return");
+            case 2:
+              _this6.loadingHorarios = true;
+              _this6.horariosDisponibles = [];
+              _this6.nuevaSesion.idHorario = '';
+              _context5.prev = 5;
+              _context5.next = 8;
+              return _this6.axios.get("/api/horario/".concat(_this6.nuevaSesion.idProfesional));
+            case 8:
+              response = _context5.sent;
+              schedulesInvalid = response.data.schedulesInvalid;
+              schedulesAll = response.data.schedules; // Determinar el día de la semana en español para filtrar
+              diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+              fechaObj = new Date(_this6.nuevaSesion.fecha + 'T00:00:00');
+              diaNombre = diasSemana[fechaObj.getDay()]; // Filtrar horarios por el día y que no tengan cita
+              _this6.horariosDisponibles = schedulesAll.filter(function (h) {
+                if (h.day !== diaNombre) return false;
+
+                // Verificar si ya hay una cita en este horario para esta fecha
+                var ocupado = schedulesInvalid.some(function (inv) {
+                  return inv.schedule_id === h.id && inv.date === _this6.nuevaSesion.fecha && inv.status != 6;
+                });
+                return !ocupado;
+              });
+              _context5.next = 20;
+              break;
+            case 17:
+              _context5.prev = 17;
+              _context5.t0 = _context5["catch"](5);
+              console.error("Error cargando horarios:", _context5.t0);
+            case 20:
+              _context5.prev = 20;
+              _this6.loadingHorarios = false;
+              return _context5.finish(20);
+            case 23:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5, null, [[5, 17, 20, 23]]);
+      }))();
+    },
+    guardarCitaPaquete: function guardarCitaPaquete() {
+      var _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        var payload, response, modalElement, modal;
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
+            case 0:
+              if (_this7.nuevaSesion.idHorario) {
+                _context6.next = 2;
+                break;
+              }
+              return _context6.abrupt("return");
+            case 2:
+              _this7.guardandoCita = true;
+              _context6.prev = 3;
+              payload = {
+                professional_id: _this7.nuevaSesion.idProfesional,
+                date: _this7.nuevaSesion.fecha,
+                schedule_id: _this7.nuevaSesion.idHorario,
+                clasification: _this7.paqueteSeleccionado.idClasificacion,
+                type: _this7.paqueteSeleccionado.tipo,
+                patient_condition: 2,
+                // Continuante
+                mode: _this7.nuevaSesion.modalidad,
+                status: 1,
+                // Pendiente
+                patient_id: _this7.paqueteSeleccionado.patient_id,
+                idMembresia: _this7.paqueteSeleccionado.id,
+                price: 0,
+                user_id: _this7.idUsuario,
+                formato_nuevo: 1,
+                num_sesion: (_this7.paqueteSeleccionado.sesiones_usadas || 0) + 1
+              };
+              _context6.next = 7;
+              return _this7.axios.post('/api/agendarCitaPaquete', payload);
+            case 7:
+              response = _context6.sent;
+              if (response.data.cita) {
+                _this7.$swal({
+                  title: 'Cita agendada',
+                  text: 'La sesión se ha programado correctamente.',
+                  icon: 'success',
+                  timer: 2000,
+                  showConfirmButton: false
+                });
+
+                // Cerrar modal
+                modalElement = document.getElementById('modalAgendarSesion');
+                modal = bootstrap.Modal.getInstance(modalElement);
+                modal.hide();
+
+                // Recargar paquetes para actualizar contadores
+                _this7.cargarPaquetes(_this7.pagination.current_page);
+              }
+              _context6.next = 15;
+              break;
+            case 11:
+              _context6.prev = 11;
+              _context6.t0 = _context6["catch"](3);
+              console.error("Error al agendar cita:", _context6.t0);
+              alertify.error('Hubo un error al agendar la cita.');
+            case 15:
+              _context6.prev = 15;
+              _this7.guardandoCita = false;
+              return _context6.finish(15);
+            case 18:
+            case "end":
+              return _context6.stop();
+          }
+        }, _callee6, null, [[3, 11, 15, 18]]);
+      }))();
+    },
+    formatHora: function formatHora(hora) {
+      if (!hora) return '';
+      return hora.substring(0, 5);
+    },
     cambiarPagina: function cambiarPagina(page) {
       if (page >= 1 && page <= this.pagination.last_page) {
         this.cargarPaquetes(page);
       }
     },
     filtrarPaquetes: function filtrarPaquetes() {
-      var _this4 = this;
+      var _this8 = this;
       // Debounce the search
       if (this.searchTimeout) clearTimeout(this.searchTimeout);
       this.searchTimeout = setTimeout(function () {
-        _this4.cargarPaquetes(1);
+        _this8.cargarPaquetes(1);
       }, 500);
     },
     setFiltroEstado: function setFiltroEstado(state) {
@@ -313,6 +505,99 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           };
       }
     },
+    prepararProrrateo: function prepararProrrateo(paquete) {
+      this.paqueteSeleccionado = paquete;
+      this.formProrrateo.observacion = '';
+      var modal = new bootstrap.Modal(document.getElementById('modalProrratear'));
+      modal.show();
+    },
+    confirmarProrrateo: function confirmarProrrateo() {
+      var _this9 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+        var res, modal, _error$response;
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+          while (1) switch (_context7.prev = _context7.next) {
+            case 0:
+              _this9.procesandoEstado = true;
+              _context7.prev = 1;
+              _context7.next = 4;
+              return _this9.axios.post("/api/prorratearPaquete/".concat(_this9.paqueteSeleccionado.id), {
+                observaciones: _this9.formProrrateo.observacion
+              });
+            case 4:
+              res = _context7.sent;
+              modal = bootstrap.Modal.getInstance(document.getElementById('modalProrratear'));
+              if (modal) modal.hide();
+              Swal.fire({
+                icon: 'success',
+                title: 'Paquete prorrateado',
+                text: "Se gener\xF3 una nota de cr\xE9dito por S/ ".concat(parseFloat(res.data.dinero_a_favor).toFixed(2))
+              });
+              _this9.cargarPaquetes(_this9.pagination.current_page);
+              _context7.next = 14;
+              break;
+            case 11:
+              _context7.prev = 11;
+              _context7.t0 = _context7["catch"](1);
+              Swal.fire('Error', ((_error$response = _context7.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.error) || 'No se pudo prorratear', 'error');
+            case 14:
+              _context7.prev = 14;
+              _this9.procesandoEstado = false;
+              return _context7.finish(14);
+            case 17:
+            case "end":
+              return _context7.stop();
+          }
+        }, _callee7, null, [[1, 11, 14, 17]]);
+      }))();
+    },
+    cambiarEstado: function cambiarEstado(paquete, accion) {
+      var _this10 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+        var confirmacion, _error$response2;
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+          while (1) switch (_context8.prev = _context8.next) {
+            case 0:
+              _context8.next = 2;
+              return Swal.fire({
+                title: "\xBFSeguro que deseas ".concat(accion, " el paquete?"),
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, continuar',
+                cancelButtonText: 'Cancelar'
+              });
+            case 2:
+              confirmacion = _context8.sent;
+              if (confirmacion.isConfirmed) {
+                _context8.next = 5;
+                break;
+              }
+              return _context8.abrupt("return");
+            case 5:
+              _this10.procesandoEstado = true;
+              _context8.prev = 6;
+              _context8.next = 9;
+              return _this10.axios.post("/api/".concat(accion, "Paquete/").concat(paquete.id));
+            case 9:
+              Swal.fire('Éxito', "Paquete actualizado a ".concat(accion), 'success');
+              _this10.cargarPaquetes(_this10.pagination.current_page);
+              _context8.next = 16;
+              break;
+            case 13:
+              _context8.prev = 13;
+              _context8.t0 = _context8["catch"](6);
+              Swal.fire('Error', ((_error$response2 = _context8.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.error) || 'Error en la operación', 'error');
+            case 16:
+              _context8.prev = 16;
+              _this10.procesandoEstado = false;
+              return _context8.finish(16);
+            case 19:
+            case "end":
+              return _context8.stop();
+          }
+        }, _callee8, null, [[6, 13, 16, 19]]);
+      }))();
+    },
     verReporte: function verReporte(paquete) {
       window.open("/api/reportePaquete/".concat(paquete.id, "?token=").concat(this.$token), '_blank');
     },
@@ -335,52 +620,52 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       return deuda / cuotas;
     },
     procesarPago: function procesarPago(cuota) {
-      var _this5 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+      var _this11 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
         var payload;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
+        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+          while (1) switch (_context9.prev = _context9.next) {
             case 0:
               if (confirm('¿Seguro que deseas registrar el pago de S/ ' + parseFloat(cuota.monto).toFixed(2) + '?')) {
-                _context4.next = 2;
+                _context9.next = 2;
                 break;
               }
-              return _context4.abrupt("return");
+              return _context9.abrupt("return");
             case 2:
-              _this5.procesandoPago = true;
-              _context4.prev = 3;
+              _this11.procesandoPago = true;
+              _context9.prev = 3;
               payload = {
                 idDeuda: cuota.id,
-                user_id: _this5.idUsuario,
+                user_id: _this11.idUsuario,
                 estado: 2,
                 observacion: 'Pago de cuota desde administrador',
-                nombre: _this5.paqueteSeleccionado.patient_name + ' ' + (_this5.paqueteSeleccionado.patient_nombres || ''),
+                nombre: _this11.paqueteSeleccionado.patient_name + ' ' + (_this11.paqueteSeleccionado.patient_nombres || ''),
                 precio: cuota.monto,
                 tipo: 8,
-                idMembresia: _this5.paqueteSeleccionado.id,
-                idMoneda: _this5.metodoPago
+                idMembresia: _this11.paqueteSeleccionado.id,
+                idMoneda: _this11.metodoPago
               };
-              _context4.next = 7;
-              return _this5.axios.post('/api/pagarDeudaMembresia', payload);
+              _context9.next = 7;
+              return _this11.axios.post('/api/pagarDeudaMembresia', payload);
             case 7:
               cuota.estado = 2;
-              _this5.cargarPaquetes(_this5.pagination.current_page);
-              _context4.next = 15;
+              _this11.cargarPaquetes(_this11.pagination.current_page);
+              _context9.next = 15;
               break;
             case 11:
-              _context4.prev = 11;
-              _context4.t0 = _context4["catch"](3);
-              console.error(_context4.t0);
+              _context9.prev = 11;
+              _context9.t0 = _context9["catch"](3);
+              console.error(_context9.t0);
               alert('Ocurrió un error procesando el pago. Verifica tu conexión.');
             case 15:
-              _context4.prev = 15;
-              _this5.procesandoPago = false;
-              return _context4.finish(15);
+              _context9.prev = 15;
+              _this11.procesandoPago = false;
+              return _context9.finish(15);
             case 18:
             case "end":
-              return _context4.stop();
+              return _context9.stop();
           }
-        }, _callee4, null, [[3, 11, 15, 18]]);
+        }, _callee9, null, [[3, 11, 15, 18]]);
       }))();
     },
     abrirModalPago: function abrirModalPago(paquete) {
@@ -410,49 +695,49 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       modal.show();
     },
     guardarReporteExtra: function guardarReporteExtra() {
-      var _this6 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+      var _this12 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
         var payload, modalElement, modal;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
+        return _regeneratorRuntime().wrap(function _callee10$(_context10) {
+          while (1) switch (_context10.prev = _context10.next) {
             case 0:
-              if (!(!_this6.formReporte.resumen || !_this6.formReporte.logros)) {
-                _context5.next = 3;
+              if (!(!_this12.formReporte.resumen || !_this12.formReporte.logros)) {
+                _context10.next = 3;
                 break;
               }
               alert('Por favor complete al menos el resumen y los logros.');
-              return _context5.abrupt("return");
+              return _context10.abrupt("return");
             case 3:
-              _this6.guardandoReporte = true;
-              _context5.prev = 4;
-              payload = _objectSpread(_objectSpread({}, _this6.formReporte), {}, {
-                membresia_id: _this6.paqueteSeleccionado.id
+              _this12.guardandoReporte = true;
+              _context10.prev = 4;
+              payload = _objectSpread(_objectSpread({}, _this12.formReporte), {}, {
+                membresia_id: _this12.paqueteSeleccionado.id
               });
-              _context5.next = 8;
-              return _this6.axios.post('/api/reporte-paquete-extra', payload);
+              _context10.next = 8;
+              return _this12.axios.post('/api/reporte-paquete-extra', payload);
             case 8:
               // Cerrar modal y recargar
               modalElement = document.getElementById('modalReporteExtra');
               modal = bootstrap.Modal.getInstance(modalElement);
               modal.hide();
-              _this6.cargarPaquetes(_this6.pagination.current_page);
+              _this12.cargarPaquetes(_this12.pagination.current_page);
               alert('Reporte guardado exitosamente.');
-              _context5.next = 19;
+              _context10.next = 19;
               break;
             case 15:
-              _context5.prev = 15;
-              _context5.t0 = _context5["catch"](4);
-              console.error(_context5.t0);
+              _context10.prev = 15;
+              _context10.t0 = _context10["catch"](4);
+              console.error(_context10.t0);
               alert('Ocurrió un error al guardar el reporte.');
             case 19:
-              _context5.prev = 19;
-              _this6.guardandoReporte = false;
-              return _context5.finish(19);
+              _context10.prev = 19;
+              _this12.guardandoReporte = false;
+              return _context10.finish(19);
             case 22:
             case "end":
-              return _context5.stop();
+              return _context10.stop();
           }
-        }, _callee5, null, [[4, 15, 19, 22]]);
+        }, _callee10, null, [[4, 15, 19, 22]]);
       }))();
     }
   }
@@ -601,18 +886,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         }, _callee2);
       }))();
     },
-    agregarUnaCita: function agregarUnaCita() {
-      var selec = document.getElementById("sltDoctor");
-      var selectHora = document.getElementById("sltProfesionalHorarioID");
-      if (selec.value > 0 && selectHora.value > 0) this.sesionesAcumuladas.push({
-        idHorario: this.idHorario,
-        idProfesional: this.doctorSeleccionado,
-        fecha: this.nuevaFecha.fecha,
-        idPaciente: this.pacienteElegido.id,
-        doctor: selec.options[selec.selectedIndex].text,
-        hora: selectHora.options[selectHora.selectedIndex].text
-      });else alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fas fa-skull-crossbones"></i> Hay un dato no rellenado', 'danger', 10);
-    },
     calcularFechas: function calcularFechas() {
       this.fechas = [];
       var precioBase = this.mostrarPrecio;
@@ -657,9 +930,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           for (var i = editedIndex + 1; i < this.fechas.length; i++) this.fechas[i].monto = _montoRestante.toFixed(2);
         }
       }
-    },
-    borrarSesionAcumulada: function borrarSesionAcumulada(index) {
-      this.sesionesAcumuladas.splice(index, 1);
     },
     guardar: function guardar() {
       var _this3 = this;
@@ -1182,7 +1452,16 @@ var render = function render() {
       staticClass: "fas fa-exclamation-triangle"
     }), _vm._v(" " + _vm._s(paquete.cuotas_vencidas) + " cuota(s) vencida(s)\n              ")]) : _c("span", {
       staticClass: "text-success ms-2 badge bg-success-subtle text-success p-1 px-2 border border-success-subtle rounded-pill"
-    }, [_vm._v("Cuotas al día")])]), _vm._v(" "), paquete.debe > 0 ? _c("button", {
+    }, [_vm._v("Cuotas al día")])]), _vm._v(" "), paquete.estado === 2 && paquete.sesiones_usadas < paquete.total_sesiones ? _c("button", {
+      staticClass: "btn btn-sm btn-outline-primary fw-bold rounded-pill px-3 shadow-sm transition-all hover-lift",
+      on: {
+        click: function click($event) {
+          return _vm.abrirAgendarCita(paquete);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-calendar-plus me-1"
+    }), _vm._v(" Agendar sesión\n            ")]) : _vm._e(), _vm._v(" "), paquete.debe > 0 ? _c("button", {
       staticClass: "btn btn-light btn-sm shadow-sm action-btn outline-btn",
       on: {
         click: function click($event) {
@@ -1197,7 +1476,57 @@ var render = function render() {
       staticClass: "d-flex gap-3 small"
     }, [paquete.descuento > 0 ? _c("span", {
       staticClass: "text-success fw-bold"
-    }, [_vm._v("-" + _vm._s(paquete.descuento) + " desc.")]) : _vm._e(), _vm._v(" "), paquete.estado === 3 ? [!paquete.reporte_extra ? _c("a", {
+    }, [_vm._v("-" + _vm._s(paquete.descuento) + " desc.")]) : _vm._e(), _vm._v(" "), [1, 2].includes(paquete.estado) ? _c("div", {
+      staticClass: "dropdown ms-2"
+    }, [_c("button", {
+      staticClass: "btn btn-sm btn-outline-secondary dropdown-toggle",
+      attrs: {
+        type: "button",
+        "data-bs-toggle": "dropdown",
+        "aria-expanded": "false"
+      }
+    }, [_vm._v("\n                Cambiar Estado\n              ")]), _vm._v(" "), _c("ul", {
+      staticClass: "dropdown-menu shadow-sm"
+    }, [_c("li", [_c("a", {
+      staticClass: "dropdown-item",
+      attrs: {
+        href: "#"
+      },
+      on: {
+        click: function click($event) {
+          $event.preventDefault();
+          return _vm.prepararProrrateo(paquete);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-divide me-2 text-primary"
+    }), _vm._v("Prorratear")])]), _vm._v(" "), paquete.tipo_servicio === 0 || paquete.idClasificacion == 5 ? _c("li", [_c("a", {
+      staticClass: "dropdown-item",
+      attrs: {
+        href: "#"
+      },
+      on: {
+        click: function click($event) {
+          $event.preventDefault();
+          return _vm.cambiarEstado(paquete, "congelar");
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-snowflake me-2 text-info"
+    }), _vm._v("Congelar")])]) : _vm._e(), _vm._v(" "), _vm._m(5, true), _vm._v(" "), _c("li", [_c("a", {
+      staticClass: "dropdown-item text-danger",
+      attrs: {
+        href: "#"
+      },
+      on: {
+        click: function click($event) {
+          $event.preventDefault();
+          return _vm.cambiarEstado(paquete, "cancelar");
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-ban me-2"
+    }), _vm._v("Cancelar Paquete")])])])]) : _vm._e(), _vm._v(" "), paquete.estado === 3 ? [!paquete.reporte_extra ? _c("a", {
       staticClass: "text-warning text-decoration-none hover-link fw-bold",
       attrs: {
         href: "#"
@@ -1254,7 +1583,7 @@ var render = function render() {
       "class": _vm.activeHistories.includes(paquete.id) ? "fa-chevron-up" : "fa-chevron-down"
     })])]), _vm._v(" "), _vm.activeHistories.includes(paquete.id) ? _c("div", {
       staticClass: "appointment-history-box mt-3 p-3 bg-light rounded"
-    }, [_vm._m(5, true), _vm._v(" "), !paquete.historial_citas || paquete.historial_citas.length === 0 ? _c("div", {
+    }, [_vm._m(6, true), _vm._v(" "), !paquete.historial_citas || paquete.historial_citas.length === 0 ? _c("div", {
       staticClass: "text-muted small fst-italic"
     }, [_vm._v("\n            No hay citas.\n          ")]) : _c("div", {
       staticClass: "history-list-container"
@@ -1330,7 +1659,7 @@ var render = function render() {
       staticClass: "debt-card mb-3"
     }, [_c("div", {
       staticClass: "d-flex gap-3 align-items-start mb-2"
-    }, [_vm._m(6, true), _vm._v(" "), _c("div", {
+    }, [_vm._m(7, true), _vm._v(" "), _c("div", {
       staticClass: "flex-grow-1"
     }, [_c("div", {
       staticClass: "d-flex align-items-center gap-2 flex-wrap mb-1"
@@ -1750,7 +2079,320 @@ var render = function render() {
     }
   }, [_vm._v("Siguiente "), _c("i", {
     staticClass: "fas fa-chevron-right"
-  })])])], 2)])]) : _vm._e()], 1);
+  })])])], 2)])]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "modal fade",
+    attrs: {
+      id: "modalAgendarSesion",
+      tabindex: "-1",
+      "aria-hidden": "true"
+    }
+  }, [_c("div", {
+    staticClass: "modal-dialog modal-dialog-centered"
+  }, [_c("div", {
+    staticClass: "modal-content border-0 shadow-lg"
+  }, [_vm._m(8), _vm._v(" "), _c("div", {
+    staticClass: "modal-body p-4"
+  }, [_vm.paqueteSeleccionado ? _c("div", {
+    staticClass: "mb-4 p-3 bg-light rounded-3 border border-light-subtle"
+  }, [_c("div", {
+    staticClass: "small text-muted text-uppercase fw-bold mb-1"
+  }, [_vm._v("Paquete")]), _vm._v(" "), _c("div", {
+    staticClass: "fw-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.paqueteSeleccionado.paquete_nombre))]), _vm._v(" "), _c("div", {
+    staticClass: "small text-muted mt-1"
+  }, [_c("i", {
+    staticClass: "far fa-user me-1"
+  }), _vm._v(" " + _vm._s(_vm.paqueteSeleccionado.patient_name) + " " + _vm._s(_vm.paqueteSeleccionado.patient_nombres) + "\n            ")])]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
+  }, [_c("div", {
+    staticClass: "col-12"
+  }, [_vm._m(9), _vm._v(" "), _c("div", {
+    staticClass: "input-group"
+  }, [_vm._m(10), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.nuevaSesion.idProfesional,
+      expression: "nuevaSesion.idProfesional"
+    }],
+    staticClass: "form-select border-start-0",
+    on: {
+      change: [function ($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.nuevaSesion, "idProfesional", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }, _vm.cargarHorarios]
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "",
+      disabled: ""
+    }
+  }, [_vm._v(_vm._s(_vm.doctores.length ? "Seleccione un profesional" : "Cargando profesionales..."))]), _vm._v(" "), _vm._l(_vm.doctoresFiltrados, function (doc) {
+    return _c("option", {
+      key: doc.id,
+      domProps: {
+        value: doc.id
+      }
+    }, [_vm._v(_vm._s(doc.name || doc.nombre))]);
+  })], 2)])]), _vm._v(" "), _c("div", {
+    staticClass: "col-12"
+  }, [_vm._m(11), _vm._v(" "), _c("div", {
+    staticClass: "input-group"
+  }, [_vm._m(12), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.nuevaSesion.fecha,
+      expression: "nuevaSesion.fecha"
+    }],
+    staticClass: "form-control border-start-0",
+    attrs: {
+      type: "date"
+    },
+    domProps: {
+      value: _vm.nuevaSesion.fecha
+    },
+    on: {
+      change: _vm.cargarHorarios,
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.nuevaSesion, "fecha", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-12"
+  }, [_vm._m(13), _vm._v(" "), _c("div", {
+    staticClass: "input-group"
+  }, [_vm._m(14), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.nuevaSesion.idHorario,
+      expression: "nuevaSesion.idHorario"
+    }],
+    staticClass: "form-select border-start-0",
+    attrs: {
+      disabled: !_vm.nuevaSesion.idProfesional || !_vm.nuevaSesion.fecha
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.nuevaSesion, "idHorario", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "",
+      disabled: ""
+    }
+  }, [_vm._v("Seleccione un horario")]), _vm._v(" "), _vm._l(_vm.horariosDisponibles, function (hora) {
+    return _c("option", {
+      key: hora.id,
+      domProps: {
+        value: hora.id
+      }
+    }, [_vm._v("\n                    " + _vm._s(_vm.formatHora(hora.check_time)) + " - " + _vm._s(_vm.formatHora(hora.departure_date)) + "\n                  ")]);
+  })], 2)]), _vm._v(" "), _vm.loadingHorarios ? _c("div", {
+    staticClass: "small text-primary mt-1"
+  }, [_c("i", {
+    staticClass: "fas fa-spinner fa-spin me-1"
+  }), _vm._v(" Buscando disponibilidad...\n              ")]) : _vm.horariosDisponibles.length === 0 && _vm.nuevaSesion.fecha && _vm.nuevaSesion.idProfesional ? _c("div", {
+    staticClass: "small text-danger mt-1"
+  }, [_c("i", {
+    staticClass: "fas fa-info-circle me-1"
+  }), _vm._v(" No hay horarios disponibles para esta fecha.\n              ")]) : _vm._e()]), _vm._v(" "), _c("div", {
+    staticClass: "col-12"
+  }, [_c("label", {
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Modalidad")]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex gap-3 mt-1"
+  }, [_c("div", {
+    staticClass: "form-check custom-radio"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.nuevaSesion.modalidad,
+      expression: "nuevaSesion.modalidad"
+    }],
+    staticClass: "form-check-input",
+    attrs: {
+      type: "radio",
+      value: "1",
+      id: "modPresencial"
+    },
+    domProps: {
+      checked: _vm._q(_vm.nuevaSesion.modalidad, "1")
+    },
+    on: {
+      change: function change($event) {
+        return _vm.$set(_vm.nuevaSesion, "modalidad", "1");
+      }
+    }
+  }), _vm._v(" "), _c("label", {
+    staticClass: "form-check-label",
+    attrs: {
+      "for": "modPresencial"
+    }
+  }, [_vm._v("Presencial")])]), _vm._v(" "), _c("div", {
+    staticClass: "form-check custom-radio"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.nuevaSesion.modalidad,
+      expression: "nuevaSesion.modalidad"
+    }],
+    staticClass: "form-check-input",
+    attrs: {
+      type: "radio",
+      value: "2",
+      id: "modVirtual"
+    },
+    domProps: {
+      checked: _vm._q(_vm.nuevaSesion.modalidad, "2")
+    },
+    on: {
+      change: function change($event) {
+        return _vm.$set(_vm.nuevaSesion, "modalidad", "2");
+      }
+    }
+  }), _vm._v(" "), _c("label", {
+    staticClass: "form-check-label",
+    attrs: {
+      "for": "modVirtual"
+    }
+  }, [_vm._v("Virtual")])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer border-0 p-4 pt-0"
+  }, [_c("button", {
+    staticClass: "btn btn-light rounded-pill px-4",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Cancelar")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary rounded-pill px-4 shadow",
+    attrs: {
+      type: "button",
+      disabled: !_vm.nuevaSesion.idHorario || _vm.guardandoCita
+    },
+    on: {
+      click: _vm.guardarCitaPaquete
+    }
+  }, [_vm.guardandoCita ? _c("i", {
+    staticClass: "fas fa-spinner fa-spin me-2"
+  }) : _c("i", {
+    staticClass: "fas fa-save me-2"
+  }), _vm._v("\n            Confirmar Cita\n          ")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "modal fade",
+    attrs: {
+      id: "modalProrratear",
+      tabindex: "-1",
+      "aria-hidden": "true"
+    }
+  }, [_c("div", {
+    staticClass: "modal-dialog modal-dialog-centered"
+  }, [_c("div", {
+    staticClass: "modal-content border-0 shadow-lg"
+  }, [_vm._m(15), _vm._v(" "), _vm.paqueteSeleccionado ? _c("div", {
+    staticClass: "modal-body p-4"
+  }, [_c("p", {
+    staticClass: "text-muted small mb-4"
+  }, [_vm._v("Esta acción cancelará las citas y cuotas pendientes, y calculará el saldo a favor del paciente basándose en las sesiones que ya consumió.")]), _vm._v(" "), _c("div", {
+    staticClass: "bg-light p-3 rounded mb-3"
+  }, [_c("div", {
+    staticClass: "d-flex justify-content-between mb-2"
+  }, [_c("span", {
+    staticClass: "text-muted small"
+  }, [_vm._v("Monto Total del Paquete")]), _vm._v(" "), _c("span", {
+    staticClass: "fw-bold"
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.paqueteSeleccionado.monto).toFixed(2)))])]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-between mb-2"
+  }, [_c("span", {
+    staticClass: "text-muted small"
+  }, [_vm._v("Sesiones Totales")]), _vm._v(" "), _c("span", {
+    staticClass: "fw-bold"
+  }, [_vm._v(_vm._s(_vm.paqueteSeleccionado.total_sesiones))])]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-between mb-2"
+  }, [_c("span", {
+    staticClass: "text-muted small"
+  }, [_vm._v("Costo por Sesión")]), _vm._v(" "), _c("span", {
+    staticClass: "fw-bold"
+  }, [_vm._v("S/ " + _vm._s((parseFloat(_vm.paqueteSeleccionado.monto) / Math.max(_vm.paqueteSeleccionado.total_sesiones, 1)).toFixed(2)))])]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-between mb-2"
+  }, [_c("span", {
+    staticClass: "text-muted small"
+  }, [_vm._v("Sesiones Usadas")]), _vm._v(" "), _c("span", {
+    staticClass: "fw-bold text-danger"
+  }, [_vm._v(_vm._s(_vm.paqueteSeleccionado.sesiones_usadas))])]), _vm._v(" "), _c("hr", {
+    staticClass: "border-secondary opacity-25"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-between mb-2"
+  }, [_c("span", {
+    staticClass: "text-muted small"
+  }, [_vm._v("Total Pagado")]), _vm._v(" "), _c("span", {
+    staticClass: "fw-bold text-success"
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.paqueteSeleccionado.pagado || 0).toFixed(2)))])]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-between"
+  }, [_c("span", {
+    staticClass: "fw-bold"
+  }, [_vm._v("Saldo a Devolver")]), _vm._v(" "), _c("span", {
+    staticClass: "fw-bold fs-5 text-primary"
+  }, [_vm._v("\n                S/ " + _vm._s(Math.max(0, parseFloat(_vm.paqueteSeleccionado.pagado || 0) - parseFloat(_vm.paqueteSeleccionado.monto) / Math.max(_vm.paqueteSeleccionado.total_sesiones, 1) * _vm.paqueteSeleccionado.sesiones_usadas).toFixed(2)) + "\n              ")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3"
+  }, [_c("label", {
+    staticClass: "form-label small fw-bold text-muted"
+  }, [_vm._v("Observaciones")]), _vm._v(" "), _c("textarea", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.formProrrateo.observacion,
+      expression: "formProrrateo.observacion"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      rows: "2",
+      placeholder: "Opcional..."
+    },
+    domProps: {
+      value: _vm.formProrrateo.observacion
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.formProrrateo, "observacion", $event.target.value);
+      }
+    }
+  })])]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer border-0 p-4 pt-0"
+  }, [_c("button", {
+    staticClass: "btn btn-light rounded-pill px-4",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Cancelar")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary rounded-pill px-4 shadow",
+    attrs: {
+      type: "button",
+      disabled: _vm.procesandoEstado
+    },
+    on: {
+      click: _vm.confirmarProrrateo
+    }
+  }, [_vm.procesandoEstado ? _c("i", {
+    staticClass: "fas fa-spinner fa-spin me-2"
+  }) : _vm._e(), _vm._v(" Confirmar Prorrateo\n          ")])])])])])], 1);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -1799,6 +2441,12 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
+  return _c("li", [_c("hr", {
+    staticClass: "dropdown-divider"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
   return _c("h6", {
     staticClass: "fw-bold mb-3 small text-dark"
   }, [_c("i", {
@@ -1811,6 +2459,88 @@ var staticRenderFns = [function () {
     staticClass: "debt-icon"
   }, [_c("i", {
     staticClass: "fas fa-user-times"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modal-header border-0 pb-0 px-4 pt-4"
+  }, [_c("h5", {
+    staticClass: "modal-title fw-bold text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-calendar-plus text-primary me-2"
+  }), _vm._v(" Agendar Sesión\n          ")]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal",
+      "aria-label": "Close"
+    }
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Profesional "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-end-0"
+  }, [_c("i", {
+    staticClass: "fas fa-user-md text-muted"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Fecha "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-end-0"
+  }, [_c("i", {
+    staticClass: "far fa-calendar-alt text-muted"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Horario Disponible "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-end-0"
+  }, [_c("i", {
+    staticClass: "far fa-clock text-muted"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modal-header border-0 pb-0 px-4 pt-4"
+  }, [_c("h5", {
+    staticClass: "modal-title fw-bold text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-divide text-primary me-2"
+  }), _vm._v(" Prorratear Paquete\n          ")]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal",
+      "aria-label": "Close"
+    }
   })]);
 }];
 render._withStripped = true;
@@ -2239,120 +2969,6 @@ var render = function render() {
   }, [_c("span", [_vm._v("Total Paquete")]), _vm._v(" "), _c("span", [_vm._v("S/ " + _vm._s(parseFloat(_vm.mostrarPrecio - _vm.membresia.descuento).toFixed(2)))])]), _vm._v(" "), _vm.membresia.cuotas > 1 ? _c("div", {
     staticClass: "d-flex justify-content-between small text-muted"
   }, [_c("span", [_vm._v("Cuota estimada")]), _vm._v(" "), _c("span", [_vm._v("S/ " + _vm._s((parseFloat(_vm.mostrarPrecio - _vm.membresia.descuento) / _vm.membresia.cuotas).toFixed(2)) + " × " + _vm._s(_vm.membresia.cuotas))])]) : _vm._e()])])]), _vm._v(" "), _c("div", {
-    staticClass: "mt-4 border-top pt-4"
-  }, [_vm._m(7), _vm._v(" "), _c("div", {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: _vm.sesionesAcumuladas.length < _vm.cantSesiones,
-      expression: "sesionesAcumuladas.length < cantSesiones"
-    }],
-    staticClass: "row g-3"
-  }, [_vm._m(8), _vm._v(" "), _c("div", {
-    staticClass: "col-md-6"
-  }, [_c("label", {
-    staticClass: "form-label small text-muted mb-1"
-  }, [_vm._v("Seleccionar fecha")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.nuevaFecha.fecha,
-      expression: "nuevaFecha.fecha"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "date"
-    },
-    domProps: {
-      value: _vm.nuevaFecha.fecha
-    },
-    on: {
-      change: function change($event) {
-        return _vm.listarhorario();
-      },
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.nuevaFecha, "fecha", $event.target.value);
-      }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-6"
-  }, [_c("label", {
-    staticClass: "form-label small text-muted mb-1"
-  }, [_vm._v("Horario")]), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.idHorario,
-      expression: "idHorario"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "sltProfesionalHorarioID"
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.idHorario = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
-      }
-    }
-  }, [_c("option", {
-    attrs: {
-      value: "",
-      disabled: "",
-      selected: ""
-    }
-  }, [_vm._v("Selecciona un horario")]), _vm._v(" "), _vm._l(_vm.horarios, function (hora) {
-    return _c("option", {
-      key: hora.id,
-      domProps: {
-        value: hora.id
-      }
-    }, [_vm._v("\n\t\t\t\t\t\t\t\t\t" + _vm._s(_vm.horaLatam1(hora.check_time)) + " - " + _vm._s(_vm.horaLatam2(hora.departure_date)) + "\n\t\t\t\t\t\t\t\t")]);
-  })], 2)]), _vm._v(" "), _c("div", {
-    staticClass: "col-12 text-end mt-2"
-  }, [_c("button", {
-    staticClass: "btn btn-sm btn-outline-success",
-    on: {
-      click: function click($event) {
-        return _vm.agregarUnaCita();
-      }
-    }
-  }, [_c("i", {
-    staticClass: "far fa-arrow-alt-circle-down me-1"
-  }), _vm._v(" Agregar cita\n\t\t\t\t\t\t\t")])])]), _vm._v(" "), _vm.sesionesAcumuladas.length > 0 ? _c("div", {
-    staticClass: "mt-3"
-  }, [_c("label", {
-    staticClass: "form-label small text-muted fw-medium"
-  }, [_vm._v("Sesiones programadas (" + _vm._s(_vm.sesionesAcumuladas.length) + " de " + _vm._s(_vm.cantSesiones) + ")")]), _vm._v(" "), _c("div", {
-    staticClass: "table-responsive"
-  }, [_c("table", {
-    staticClass: "table table-sm table-hover align-middle border"
-  }, [_vm._m(9), _vm._v(" "), _c("tbody", {
-    staticClass: "small"
-  }, _vm._l(_vm.sesionesAcumuladas, function (sesion, index) {
-    return _c("tr", [_c("td", {
-      staticClass: "px-3"
-    }, [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(sesion.doctor))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.fechaLatam(sesion.fecha)) + " "), _c("br"), _c("span", {
-      staticClass: "text-muted"
-    }, [_vm._v(_vm._s(sesion.hora))])]), _vm._v(" "), _c("td", {
-      staticClass: "text-end px-3"
-    }, [_c("button", {
-      staticClass: "btn btn-sm btn-light text-danger border-0",
-      on: {
-        click: function click($event) {
-          return _vm.borrarSesionAcumulada(index);
-        }
-      }
-    }, [_c("i", {
-      staticClass: "fas fa-times"
-    })])])]);
-  }), 0)])])]) : _vm._e()]), _vm._v(" "), _c("div", {
     staticClass: "mt-4"
   }, [_c("label", {
     staticClass: "form-label text-secondary small fw-medium mb-1"
@@ -2471,38 +3087,6 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fa-regular fa-calendar me-2"
   }), _vm._v(" Fechas de vencimiento de cuotas\n\t\t\t\t\t\t\t")]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("h6", {
-    staticClass: "fw-bold mb-3 d-flex align-items-center text-secondary"
-  }, [_c("i", {
-    staticClass: "fa-solid fa-clipboard-list me-2"
-  }), _vm._v(" Programación de Sesiones\n\t\t\t\t\t")]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "col-12"
-  }, [_c("div", {
-    staticClass: "alert alert-info py-2 small mb-0 d-flex align-items-center"
-  }, [_c("i", {
-    staticClass: "fas fa-info-circle me-2"
-  }), _vm._v(" Rellene los datos indispensables para autorrellenar las citas.\n\t\t\t\t\t\t\t")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("thead", {
-    staticClass: "table-light text-muted small"
-  }, [_c("tr", [_c("th", {
-    staticClass: "fw-medium px-3"
-  }, [_vm._v("N°")]), _vm._v(" "), _c("th", {
-    staticClass: "fw-medium"
-  }, [_vm._v("Profesional")]), _vm._v(" "), _c("th", {
-    staticClass: "fw-medium"
-  }, [_vm._v("Fecha y Hora")]), _vm._v(" "), _c("th", {
-    staticClass: "fw-medium text-end px-3"
-  }, [_vm._v("Acción")])])]);
 }];
 render._withStripped = true;
 

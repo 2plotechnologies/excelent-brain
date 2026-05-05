@@ -9,6 +9,8 @@ use App\Models\Extra_payment;
 use App\Models\Patient;
 use App\Models\Professional;
 use App\Models\ReportePaqueteExtra;
+use App\Models\Payment;
+use App\Models\NotaCredito;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
@@ -23,7 +25,12 @@ class PaqueteController extends Controller
 
         $query = Membresia::where('membresias.activo', 1)
             ->whereNotNull('membresias.patient_id')
-            ->with('reporte_extra')
+            ->with(['reporte_extra', 'appointments' => function($q) {
+                $q->where('status', '!=', 6); // Omitir cancelados si es necesario
+            }])
+            ->withCount(['appointments as sesiones_programadas' => function($q) {
+                $q->where('status', '!=', 6);
+            }])
             ->join('patients as pt', 'pt.id', '=', 'membresias.patient_id')
             ->join('precios as p', 'p.id', '=', 'membresias.tipo')
             ->leftJoin('users as u', 'u.id', '=', 'membresias.user_id')
@@ -117,10 +124,24 @@ class PaqueteController extends Controller
             $firstAppt = $citas->last();
             $membresia->professional = $firstAppt && $firstAppt->professional ? $firstAppt->professional->name : '';
             
+            // Evaluación dinámica de estados:
+            if ($membresia->estado == 1) { // Inactivo/Pendiente
+                if ($membresia->pagado > 0 || $citas->count() > 0) {
+                    $membresia->estado = 2; // Pasa a Activo
+                    Membresia::where('id', $membresia->id)->update(['estado' => 2]);
+                }
+            } elseif ($membresia->estado == 2) { // Activo
+                $sesionesEfectivas = $citas->where('status', 2)->count();
+                if ($membresia->total_sesiones > 0 && $sesionesEfectivas >= $membresia->total_sesiones && floatval($membresia->pagado) >= floatval($membresia->monto)) {
+                    $membresia->estado = 3; // Completado
+                    Membresia::where('id', $membresia->id)->update(['estado' => 3]);
+                }
+            }
+
             switch($membresia->estado) {
-                case 1: $membresia->status_name = 'Pendiente'; break;
+                case 1: $membresia->status_name = 'Inactivo'; break;
                 case 2: $membresia->status_name = 'Activo'; break;
-                case 3: $membresia->status_name = 'Completado'; break;
+                case 3: $membresia->status_name = 'Concluido'; break;
                 case 4: $membresia->status_name = 'Prorrateado'; break;
                 case 5: $membresia->status_name = 'Congelado'; break;
                 case 6: $membresia->status_name = 'Cancelado'; break;
@@ -259,5 +280,148 @@ class PaqueteController extends Controller
 
         $pdf = PDF::loadView('admin.pdf_reporte_paquete', $data);
         return $pdf->download('reporte_paquete.pdf');
+    }
+
+    public function agendarCitaPaquete(Request $request)
+    {
+        try {
+            $cita = Appointment::create([
+                'date' => $request->input('date'),
+                'patient_condition' => $request->input('patient_condition', 2), 
+                'type' => $request->input('type'),
+                'mode' => $request->input('mode', 1),
+                'status' => $request->input('status', 1),
+                'clasification' => $request->input('clasification'),
+                'professional_id' => $request->input('professional_id'),
+                'patient_id' => $request->input('patient_id'),
+                'schedule_id' => $request->input('schedule_id'),
+                'formato_nuevo' => $request->input('formato_nuevo', 1),
+                'byDoctor' => 0,
+                'num_sesion' => $request->input('num_sesion'),
+                'idMembresia' => $request->input('idMembresia')
+            ]);
+
+            // Crear el pago ficticio para la cita
+            Payment::create([
+                'observation' => '',
+                'bank' => '',
+                'voucher' => '',
+                'pay_status' => 1,
+                'price' => 0,
+                'appointment_id' => $cita->id,
+                'continuo' => 2,
+                'user_id' => $request->input('user_id'),
+                'rebaja' => 0,
+                'motivoRebaja' => 'Agendado desde paquete',
+                'descuento' => 0,
+                'motivoDescuento' => ''
+            ]);
+
+            return response()->json(['cita' => $cita, 'estado' => 'ok']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function prorratearPaquete(Request $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $membresia = Membresia::findOrFail($id);
+            $precio = DB::table('precios')->where('id', $membresia->tipo)->first();
+            
+            if (!$precio || $precio->sesiones <= 0) {
+                return response()->json(['error' => 'No se puede prorratear porque no se definió el número de sesiones.'], 400);
+            }
+
+            // Cancelar citas futuras o pendientes (1 = Agendado, 4 = Reprogramado)
+            Appointment::where('idMembresia', $id)
+                ->whereIn('status', [1, 4])
+                ->update(['status' => 3]); // 3 = Anulado
+
+            // Anular deudas pendientes
+            DB::table('deudas')
+                ->where('idMembresia', $id)
+                ->where('estado', 1) // Pendiente
+                ->update(['activo' => 0]);
+
+            // Calcular sesiones efectivas (status 2 = Atendido)
+            $sesiones_efectivas = Appointment::where('idMembresia', $id)
+                ->where('status', 2)
+                ->count();
+
+            // Costo por sesión
+            $costo_por_sesion = floatval($membresia->monto) / floatval($precio->sesiones);
+            
+            // Total pagado
+            $total_pagado = Extra_payment::where('idMembresia', $id)
+                ->where('activo', 1)
+                ->sum('price');
+
+            // Dinero a favor
+            $dinero_a_favor = $total_pagado - ($costo_por_sesion * $sesiones_efectivas);
+
+            if ($dinero_a_favor > 0) {
+                NotaCredito::create([
+                    'patient_id' => $membresia->patient_id,
+                    'idMembresia_origen' => $id,
+                    'monto_original' => $dinero_a_favor,
+                    'monto_disponible' => $dinero_a_favor,
+                    'estado' => 1, // Disponible
+                    'observaciones' => $request->input('observaciones', 'Prorrateo de paquete'),
+                    'fecha_emision' => Carbon::now()->format('Y-m-d')
+                ]);
+            }
+
+            $membresia->estado = 4; // Prorrateado
+            $membresia->save();
+
+            DB::commit();
+            return response()->json(['message' => 'Paquete prorrateado correctamente', 'dinero_a_favor' => $dinero_a_favor]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function cancelarPaquete(Request $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $membresia = Membresia::findOrFail($id);
+            
+            // Cancelar citas pendientes
+            Appointment::where('idMembresia', $id)
+                ->whereIn('status', [1, 4])
+                ->update(['status' => 3]);
+
+            // Anular deudas pendientes
+            DB::table('deudas')
+                ->where('idMembresia', $id)
+                ->where('estado', 1)
+                ->update(['activo' => 0]);
+
+            $membresia->estado = 6; // Cancelado
+            $membresia->save();
+
+            DB::commit();
+            return response()->json(['message' => 'Paquete cancelado correctamente']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function congelarPaquete(Request $request, $id)
+    {
+        try {
+            $membresia = Membresia::findOrFail($id);
+            $membresia->estado = 5; // Congelado
+            $membresia->save();
+
+            return response()->json(['message' => 'Paquete congelado correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

@@ -200,6 +200,13 @@
                 </span>
                 <span v-else class="text-success ms-2 badge bg-success-subtle text-success p-1 px-2 border border-success-subtle rounded-pill">Cuotas al día</span>
               </div>
+              <button 
+                v-if="paquete.estado === 2 && (paquete.sesiones_usadas < paquete.total_sesiones)"
+                class="btn btn-sm btn-outline-primary fw-bold rounded-pill px-3 shadow-sm transition-all hover-lift"
+                @click="abrirAgendarCita(paquete)"
+              >
+                <i class="fas fa-calendar-plus me-1"></i> Agendar sesión
+              </button>
               <button class="btn btn-light btn-sm shadow-sm action-btn outline-btn" 
                 v-if="paquete.debe > 0" 
                 @click="abrirModalPago(paquete)">
@@ -213,6 +220,19 @@
             <div class="d-flex gap-3 small">
               <span class="text-success fw-bold" v-if="paquete.descuento > 0">-{{ paquete.descuento }} desc.</span>
               
+              <!-- Dropdown Cambio de Estado -->
+              <div class="dropdown ms-2" v-if="[1, 2].includes(paquete.estado)">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Cambiar Estado
+                </button>
+                <ul class="dropdown-menu shadow-sm">
+                  <li><a class="dropdown-item" href="#" @click.prevent="prepararProrrateo(paquete)"><i class="fas fa-divide me-2 text-primary"></i>Prorratear</a></li>
+                  <li v-if="paquete.tipo_servicio === 0 || paquete.idClasificacion == 5"><a class="dropdown-item" href="#" @click.prevent="cambiarEstado(paquete, 'congelar')"><i class="fas fa-snowflake me-2 text-info"></i>Congelar</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item text-danger" href="#" @click.prevent="cambiarEstado(paquete, 'cancelar')"><i class="fas fa-ban me-2"></i>Cancelar Paquete</a></li>
+                </ul>
+              </div>
+
               <template v-if="paquete.estado === 3">
                 <a v-if="!paquete.reporte_extra" href="#" class="text-warning text-decoration-none hover-link fw-bold" @click.prevent="abrirModalReporte(paquete)">
                   <i class="fas fa-plus-circle me-1"></i> Añadir reporte
@@ -471,6 +491,159 @@
         </ul>
       </nav>
     </div>
+
+    <!-- Modal Agendar Sesión -->
+    <div class="modal fade" id="modalAgendarSesion" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+          <div class="modal-header border-0 pb-0 px-4 pt-4">
+            <h5 class="modal-title fw-bold text-dark">
+              <i class="fas fa-calendar-plus text-primary me-2"></i> Agendar Sesión
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            <div v-if="paqueteSeleccionado" class="mb-4 p-3 bg-light rounded-3 border border-light-subtle">
+              <div class="small text-muted text-uppercase fw-bold mb-1">Paquete</div>
+              <div class="fw-bold text-dark">{{ paqueteSeleccionado.paquete_nombre }}</div>
+              <div class="small text-muted mt-1">
+                <i class="far fa-user me-1"></i> {{ paqueteSeleccionado.patient_name }} {{ paqueteSeleccionado.patient_nombres }}
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <!-- Profesional -->
+              <div class="col-12">
+                <label class="form-label small fw-bold text-muted text-uppercase">Profesional <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0"><i class="fas fa-user-md text-muted"></i></span>
+                  <select class="form-select border-start-0" v-model="nuevaSesion.idProfesional" @change="cargarHorarios">
+                    <option value="" disabled>{{ doctores.length ? 'Seleccione un profesional' : 'Cargando profesionales...' }}</option>
+                    <option v-for="doc in doctoresFiltrados" :key="doc.id" :value="doc.id">{{ doc.name || doc.nombre }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Fecha -->
+              <div class="col-12">
+                <label class="form-label small fw-bold text-muted text-uppercase">Fecha <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0"><i class="far fa-calendar-alt text-muted"></i></span>
+                  <input type="date" class="form-control border-start-0" v-model="nuevaSesion.fecha" @change="cargarHorarios">
+                </div>
+              </div>
+
+              <!-- Horario -->
+              <div class="col-12">
+                <label class="form-label small fw-bold text-muted text-uppercase">Horario Disponible <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0"><i class="far fa-clock text-muted"></i></span>
+                  <select class="form-select border-start-0" v-model="nuevaSesion.idHorario" :disabled="!nuevaSesion.idProfesional || !nuevaSesion.fecha">
+                    <option value="" disabled>Seleccione un horario</option>
+                    <option v-for="hora in horariosDisponibles" :key="hora.id" :value="hora.id">
+                      {{ formatHora(hora.check_time) }} - {{ formatHora(hora.departure_date) }}
+                    </option>
+                  </select>
+                </div>
+                <div v-if="loadingHorarios" class="small text-primary mt-1">
+                  <i class="fas fa-spinner fa-spin me-1"></i> Buscando disponibilidad...
+                </div>
+                <div v-else-if="horariosDisponibles.length === 0 && nuevaSesion.fecha && nuevaSesion.idProfesional" class="small text-danger mt-1">
+                  <i class="fas fa-info-circle me-1"></i> No hay horarios disponibles para esta fecha.
+                </div>
+              </div>
+
+              <!-- Modalidad -->
+              <div class="col-12">
+                <label class="form-label small fw-bold text-muted text-uppercase">Modalidad</label>
+                <div class="d-flex gap-3 mt-1">
+                  <div class="form-check custom-radio">
+                    <input class="form-check-input" type="radio" v-model="nuevaSesion.modalidad" value="1" id="modPresencial">
+                    <label class="form-check-label" for="modPresencial">Presencial</label>
+                  </div>
+                  <div class="form-check custom-radio">
+                    <input class="form-check-input" type="radio" v-model="nuevaSesion.modalidad" value="2" id="modVirtual">
+                    <label class="form-check-label" for="modVirtual">Virtual</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-0 p-4 pt-0">
+            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+            <button 
+              type="button" 
+              class="btn btn-primary rounded-pill px-4 shadow" 
+              @click="guardarCitaPaquete"
+              :disabled="!nuevaSesion.idHorario || guardandoCita"
+            >
+              <i v-if="guardandoCita" class="fas fa-spinner fa-spin me-2"></i>
+              <i v-else class="fas fa-save me-2"></i>
+              Confirmar Cita
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Prorratear -->
+    <div class="modal fade" id="modalProrratear" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+          <div class="modal-header border-0 pb-0 px-4 pt-4">
+            <h5 class="modal-title fw-bold text-dark">
+              <i class="fas fa-divide text-primary me-2"></i> Prorratear Paquete
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4" v-if="paqueteSeleccionado">
+            <p class="text-muted small mb-4">Esta acción cancelará las citas y cuotas pendientes, y calculará el saldo a favor del paciente basándose en las sesiones que ya consumió.</p>
+            
+            <div class="bg-light p-3 rounded mb-3">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted small">Monto Total del Paquete</span>
+                <span class="fw-bold">S/ {{ parseFloat(paqueteSeleccionado.monto).toFixed(2) }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted small">Sesiones Totales</span>
+                <span class="fw-bold">{{ paqueteSeleccionado.total_sesiones }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted small">Costo por Sesión</span>
+                <span class="fw-bold">S/ {{ (parseFloat(paqueteSeleccionado.monto) / Math.max(paqueteSeleccionado.total_sesiones, 1)).toFixed(2) }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted small">Sesiones Usadas</span>
+                <span class="fw-bold text-danger">{{ paqueteSeleccionado.sesiones_usadas }}</span>
+              </div>
+              <hr class="border-secondary opacity-25">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted small">Total Pagado</span>
+                <span class="fw-bold text-success">S/ {{ parseFloat(paqueteSeleccionado.pagado || 0).toFixed(2) }}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span class="fw-bold">Saldo a Devolver</span>
+                <span class="fw-bold fs-5 text-primary">
+                  S/ {{ Math.max(0, parseFloat(paqueteSeleccionado.pagado || 0) - (parseFloat(paqueteSeleccionado.monto) / Math.max(paqueteSeleccionado.total_sesiones, 1) * paqueteSeleccionado.sesiones_usadas)).toFixed(2) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-muted">Observaciones</label>
+              <textarea class="form-control" v-model="formProrrateo.observacion" rows="2" placeholder="Opcional..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer border-0 p-4 pt-0">
+            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary rounded-pill px-4 shadow" @click="confirmarProrrateo" :disabled="procesandoEstado">
+              <i v-if="procesandoEstado" class="fas fa-spinner fa-spin me-2"></i> Confirmar Prorrateo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -517,6 +690,19 @@ export default {
         logros: '',
         recomendaciones: '',
         proximos_pasos: ''
+      },
+      // Agendamiento de sesiones
+      doctores: [],
+      horariosDisponibles: [],
+      loadingHorarios: false,
+      guardandoCita: false,
+      procesandoEstado: false,
+      formProrrateo: { observacion: '' },
+      nuevaSesion: {
+        idProfesional: '',
+        fecha: new Date().toISOString().split('T')[0],
+        idHorario: '',
+        modalidad: '1'
       }
     };
   },
@@ -546,11 +732,19 @@ export default {
         acc.totalCobrado += parseFloat(deuda.pagado || 0);
         return acc;
       }, { totalDeudores: 0, totalDeuda: 0, totalCobrado: 0 });
+    },
+    doctoresFiltrados() {
+      if (!this.paqueteSeleccionado || !this.doctores.length) return [];
+      // Usar == para evitar problemas de tipo (string vs int)
+      const filtrados = this.doctores.filter(doc => doc.idProfesion == this.paqueteSeleccionado.idClasificacion);
+      // Si por alguna razón el filtro no devuelve nada, mostramos todos para no bloquear al usuario
+      return filtrados.length > 0 ? filtrados : this.doctores;
     }
   },
   mounted() {
     this.obtenerUsuarioYPaquetes();
     this.cargarMonedas();
+    this.cargarProfesionales();
   },
   methods: {
     async obtenerUsuarioYPaquetes() {
@@ -597,6 +791,112 @@ export default {
       } catch (error) {
         console.error("Error cargando monedas:", error);
       }
+    },
+    async cargarProfesionales() {
+      try {
+        const response = await this.axios.get('/api/profesional');
+        this.doctores = response.data;
+      } catch (error) {
+        console.error("Error cargando profesionales:", error);
+      }
+    },
+    abrirAgendarCita(paquete) {
+      this.paqueteSeleccionado = paquete;
+      this.nuevaSesion = {
+        idProfesional: '',
+        fecha: new Date().toISOString().split('T')[0],
+        idHorario: '',
+        modalidad: '1'
+      };
+      this.horariosDisponibles = [];
+      const modal = new bootstrap.Modal(document.getElementById('modalAgendarSesion'));
+      modal.show();
+    },
+    async cargarHorarios() {
+      if (!this.nuevaSesion.idProfesional || !this.nuevaSesion.fecha) return;
+      
+      this.loadingHorarios = true;
+      this.horariosDisponibles = [];
+      this.nuevaSesion.idHorario = '';
+
+      try {
+        const response = await this.axios.get(`/api/horario/${this.nuevaSesion.idProfesional}`);
+        const schedulesInvalid = response.data.schedulesInvalid;
+        const schedulesAll = response.data.schedules;
+        
+        // Determinar el día de la semana en español para filtrar
+        const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+        const fechaObj = new Date(this.nuevaSesion.fecha + 'T00:00:00');
+        const diaNombre = diasSemana[fechaObj.getDay()];
+
+        // Filtrar horarios por el día y que no tengan cita
+        this.horariosDisponibles = schedulesAll.filter(h => {
+          if (h.day !== diaNombre) return false;
+          
+          // Verificar si ya hay una cita en este horario para esta fecha
+          const ocupado = schedulesInvalid.some(inv => 
+            inv.schedule_id === h.id && inv.date === this.nuevaSesion.fecha && inv.status != 6
+          );
+          
+          return !ocupado;
+        });
+      } catch (error) {
+        console.error("Error cargando horarios:", error);
+      } finally {
+        this.loadingHorarios = false;
+      }
+    },
+    async guardarCitaPaquete() {
+      if (!this.nuevaSesion.idHorario) return;
+
+      this.guardandoCita = true;
+      try {
+        const payload = {
+          professional_id: this.nuevaSesion.idProfesional,
+          date: this.nuevaSesion.fecha,
+          schedule_id: this.nuevaSesion.idHorario,
+          clasification: this.paqueteSeleccionado.idClasificacion,
+          type: this.paqueteSeleccionado.tipo,
+          patient_condition: 2, // Continuante
+          mode: this.nuevaSesion.modalidad,
+          status: 1, // Pendiente
+          patient_id: this.paqueteSeleccionado.patient_id,
+          idMembresia: this.paqueteSeleccionado.id,
+          price: 0,
+          user_id: this.idUsuario,
+          formato_nuevo: 1,
+          num_sesion: (this.paqueteSeleccionado.sesiones_usadas || 0) + 1
+        };
+
+        const response = await this.axios.post('/api/agendarCitaPaquete', payload);
+        
+        if (response.data.cita) {
+          this.$swal({
+            title: 'Cita agendada',
+            text: 'La sesión se ha programado correctamente.',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+          });
+          
+          // Cerrar modal
+          const modalElement = document.getElementById('modalAgendarSesion');
+          const modal = bootstrap.Modal.getInstance(modalElement);
+          modal.hide();
+          
+          // Recargar paquetes para actualizar contadores
+          this.cargarPaquetes(this.pagination.current_page);
+        }
+      } catch (error) {
+        console.error("Error al agendar cita:", error);
+        alertify.error('Hubo un error al agendar la cita.');
+      } finally {
+        this.guardandoCita = false;
+      }
+    },
+    formatHora(hora) {
+      if (!hora) return '';
+      return hora.substring(0, 5);
     },
     cambiarPagina(page) {
       if (page >= 1 && page <= this.pagination.last_page) {
@@ -668,6 +968,54 @@ export default {
         case 3: return { text: 'Anulado', class: 'bg-danger text-white' };
         case 4: return { text: 'Reprogramado', class: 'bg-info text-dark' };
         default: return { text: 'Otro', class: 'bg-secondary text-white' };
+      }
+    },
+    prepararProrrateo(paquete) {
+      this.paqueteSeleccionado = paquete;
+      this.formProrrateo.observacion = '';
+      const modal = new bootstrap.Modal(document.getElementById('modalProrratear'));
+      modal.show();
+    },
+    async confirmarProrrateo() {
+      this.procesandoEstado = true;
+      try {
+        const res = await this.axios.post(`/api/prorratearPaquete/${this.paqueteSeleccionado.id}`, {
+          observaciones: this.formProrrateo.observacion
+        });
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalProrratear'));
+        if (modal) modal.hide();
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Paquete prorrateado',
+          text: `Se generó una nota de crédito por S/ ${parseFloat(res.data.dinero_a_favor).toFixed(2)}`,
+        });
+        this.cargarPaquetes(this.pagination.current_page);
+      } catch (error) {
+        Swal.fire('Error', error.response?.data?.error || 'No se pudo prorratear', 'error');
+      } finally {
+        this.procesandoEstado = false;
+      }
+    },
+    async cambiarEstado(paquete, accion) {
+      const confirmacion = await Swal.fire({
+        title: `¿Seguro que deseas ${accion} el paquete?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, continuar',
+        cancelButtonText: 'Cancelar'
+      });
+      if (!confirmacion.isConfirmed) return;
+      
+      this.procesandoEstado = true;
+      try {
+        await this.axios.post(`/api/${accion}Paquete/${paquete.id}`);
+        Swal.fire('Éxito', `Paquete actualizado a ${accion}`, 'success');
+        this.cargarPaquetes(this.pagination.current_page);
+      } catch (error) {
+        Swal.fire('Error', error.response?.data?.error || 'Error en la operación', 'error');
+      } finally {
+        this.procesandoEstado = false;
       }
     },
     verReporte(paquete) {

@@ -10,6 +10,34 @@ class Appointment extends Model
     use HasFactory;
     protected $fillable=['date','type','patient_condition','link','mode','status','clasification','recomendation', 'hora_inicio', 'hora_fin', 'duracion', 'professional_id','patient_id','schedule_id', 'formato_nuevo', 'byDoctor', 'idMembresia', 'recomendacion_comentario', 'num_sesion', 'attention', 'entrance'];
 		
+    protected static function booted()
+    {
+        static::saved(function ($appointment) {
+            if ($appointment->idMembresia) {
+                $membresia = \App\Models\Membresia::find($appointment->idMembresia);
+                if ($membresia) {
+                    if ($membresia->estado == 1) {
+                        $membresia->estado = 2; // Activo
+                        $membresia->save();
+                    } elseif ($membresia->estado == 2) {
+                        $citas = \App\Models\Appointment::where('idMembresia', $membresia->id)->get();
+                        $sesionesEfectivas = $citas->where('status', 2)->count();
+                    
+                    $precio = \Illuminate\Support\Facades\DB::table('precios')->where('id', $membresia->tipo)->first();
+                    $total_sesiones = $precio ? $precio->sesiones : 0;
+                    
+                    $pagado = \App\Models\Extra_payment::where('idMembresia', $membresia->id)->where('activo', 1)->sum('price');
+                    
+                    if ($total_sesiones > 0 && $sesionesEfectivas >= $total_sesiones && floatval($pagado) >= floatval($membresia->monto)) {
+                        $membresia->estado = 3; // Completado
+                        $membresia->save();
+                    }
+                }
+            }
+        }
+    });
+}
+
     //Relación inversa de uno a muchos Patient-Appointment
     public function patient() {
         return $this->belongsTo("App\Models\Patient");

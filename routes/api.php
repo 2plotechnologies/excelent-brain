@@ -247,10 +247,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('insertarSeguimiento', [ExtrasController::class, 'insertarSeguimiento']);
         Route::get('pedirHistorialSeguimientos/{id}', [ExtrasController::class, 'pedirHistorialSeguimientos']);
         Route::get('listarPaquetes', [PaqueteController::class, 'listarPaquetes']);
+        Route::post('agendarCitaPaquete', [PaqueteController::class, 'agendarCitaPaquete']);
+        Route::post('prorratearPaquete/{id}', [PaqueteController::class, 'prorratearPaquete']);
+        Route::post('cancelarPaquete/{id}', [PaqueteController::class, 'cancelarPaquete']);
+        Route::post('congelarPaquete/{id}', [PaqueteController::class, 'congelarPaquete']);
+
+        // Notas de Credito
+        Route::get('notas-credito', [App\Http\Controllers\NotaCreditoController::class, 'index']);
+        Route::post('notas-credito/{id}/devolver', [App\Http\Controllers\NotaCreditoController::class, 'devolverDinero']);
+        Route::post('notas-credito/{id}/usar', [App\Http\Controllers\NotaCreditoController::class, 'usarNota']);
 
         //Reportes paquetes extra
         Route::get('reportePaquete/{id}', [PaqueteController::class, 'pdfReportePaquete']);
         Route::get('reportes-paquetes-extra/{membresia_id}', [PaqueteController::class, 'getReportesPaquetesExtra']);
+        Route::post('reporte-paquete-extra', [PaqueteController::class, 'guardarReporteExtra']);
         Route::post('reporte-paquete-extra', [PaqueteController::class, 'storeReportePaqueteExtra']);
 
     });
