@@ -24,7 +24,7 @@
 						Atendido
 					</span>
 				</div>
-				<button class="btn btn-success font-weight-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevaCita" @click="prepararNuevaCitaManual()"><i class="fas fa-plus"></i> Nueva Cita</button>
+				<button class="btn btn-primary font-weight-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevaCita" @click="prepararNuevaCitaManual()"><i class="fas fa-plus"></i> Nueva Cita</button>
 				<router-link to="/recepcionista/paquetes" class="btn btn-primary font-weight-bold shadow-sm"><i class="fas fa-box-open"></i> Paquetes</router-link>
 			</div>
 		</div>

@@ -17,6 +17,11 @@
             <h4 class="mb-1 font-weight-bold d-flex align-items-center gap-2">
               {{ paciente.name }} {{ paciente.nombres }}
               <span class="badge bg-success" style="font-size: 0.6rem; vertical-align: middle;" v-if="paciente.activo || paciente.activo_sn"><i class="fas fa-heart"></i> Activo</span>
+              <!--Mostrar etiquetas de comportamiendo aqui (Desde semaforo)-->
+              <span class="badge border bg-warning text-white" v-for="sem in paciente.semaforo_estados.slice(0, 5)" :key="sem.id" style="font-size: 0.6rem; vertical-align: middle;">
+                <i class="fas fa-tag text-white me-1"></i> {{ getEstadoNombre(sem.codigo) }}
+              </span>
+
             </h4>
             <div class="text-muted small">
               <span v-if="paciente.birth_date" class="me-3">{{ getAge(paciente.birth_date) }} años - {{ getGender(paciente.gender) }}</span>
@@ -353,7 +358,7 @@
                         Hobbies e Intereses
                       </h6>
                       <div class="d-flex flex-wrap gap-2" v-if="getHobbies(paciente.hobbies).length > 0">
-                        <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-3 py-2" v-for="(hobbie, index) in getHobbies(paciente.hobbies)" :key="index">
+                        <span class="badge bg-info bg-opacity-10 border text-white border-info border-opacity-25 px-3 py-2" v-for="(hobbie, index) in getHobbies(paciente.hobbies)" :key="index">
                           {{ hobbie }}
                         </span>
                       </div>
@@ -1249,29 +1254,61 @@
 
       <!-- DOCUMENTOS -->
       <div class="tab-pane fade" id="documentos" role="tabpanel">
-        <div class="card border">
-          <div class="card-body p-4">
-             <h5 class="card-title font-weight-bold mb-4">Archivos y Documentos</h5>
-             <table class="table table-sm table-hover align-middle">
-               <thead class="bg-light">
-                 <tr>
-                   <th class="p-2 rounded-start border-bottom-0">Nombre del archivo</th>
-                   <th class="p-2 border-bottom-0">Fecha de Subida</th>
-                   <th class="p-2 border-bottom-0 rounded-end text-center">Acción</th>
-                 </tr>
-               </thead>
-               <tbody>
-                 <tr v-for="doc in (paciente.archivos_list || [])" :key="doc.id">
-                   <td class="p-2"><i class="far fa-file-pdf text-danger me-2"></i> {{ doc.nombre }}</td>
-                   <td class="p-2 text-muted small">{{ doc.fecha || formatDate(doc.created_at) }}</td>
-                   <td class="p-2 text-center"><a :href="'/storage/archivos/' + doc.archivo" target="_blank" class="btn btn-sm btn-light border"><i class="fas fa-external-link-alt"></i></a></td>
-                 </tr>
-                 <tr v-if="!paciente.archivos_list || paciente.archivos_list.length == 0">
-                    <td colspan="3" class="text-center text-muted py-3">No existen documentos adjuntos</td>
-                 </tr>
-               </tbody>
-             </table>
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+          <div>
+            <h5 class="mb-0 font-weight-bold d-flex align-items-center text-dark">
+              <i class="fas fa-paperclip text-primary me-2"></i> Documentos Adjuntos
+            </h5>
+            <p class="text-muted small mb-0 mt-1">Órdenes de examen, resultados y otros documentos</p>
           </div>
+          <button class="btn btn-primary rounded px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalSubirDocumento">
+            <i class="fas fa-upload me-1"></i> Subir Documento
+          </button>
+        </div>
+
+        <!-- Filtros -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          <button type="button" class="btn btn-sm rounded-pill px-3" :class="filtroDocumento === 'Todos' ? 'btn-primary' : 'btn-light border text-muted'" @click.prevent="filtroDocumento = 'Todos'">Todos</button>
+          <button type="button" class="btn btn-sm rounded-pill px-3" :class="filtroDocumento === 'orden' ? 'btn-light bg-white border text-dark' : 'btn-light border text-muted'" @click.prevent="filtroDocumento = 'orden'">Órdenes</button>
+          <button type="button" class="btn btn-sm rounded-pill px-3" :class="filtroDocumento === 'resultado' ? 'btn-light bg-white border text-dark' : 'btn-light border text-muted'" @click.prevent="filtroDocumento = 'resultado'">Resultados</button>
+          <button type="button" class="btn btn-sm rounded-pill px-3" :class="filtroDocumento === 'referencias' ? 'btn-light bg-white border text-dark' : 'btn-light border text-muted'" @click.prevent="filtroDocumento = 'referencias'">Referencias</button>
+          <button type="button" class="btn btn-sm rounded-pill px-3" :class="filtroDocumento === 'consentimiento' ? 'btn-light bg-white border text-dark' : 'btn-light border text-muted'" @click.prevent="filtroDocumento = 'consentimiento'">Consentimientos</button>
+          <button type="button" class="btn btn-sm rounded-pill px-3" :class="filtroDocumento === 'recetas' ? 'btn-light bg-white border text-dark' : 'btn-light border text-muted'" @click.prevent="filtroDocumento = 'recetas'">Recetas</button>
+          <button type="button" class="btn btn-sm rounded-pill px-3" :class="filtroDocumento === 'otro' ? 'btn-light bg-white border text-dark' : 'btn-light border text-muted'" @click.prevent="filtroDocumento = 'otro'">Otros</button>
+        </div>
+
+        <div class="row g-3" v-if="documentosFiltrados.length > 0">
+          <div class="col-md-6 col-lg-4" v-for="doc in documentosFiltrados" :key="doc.id">
+            <div class="card h-100 border-light shadow-sm" style="border-radius: 12px; background-color: #fcfcfc;">
+              <div class="card-body p-4">
+                <div class="d-flex align-items-start mb-3">
+                  <div class="rounded bg-light text-secondary border d-flex justify-content-center align-items-center me-3 flex-shrink-0" style="width: 45px; height: 45px; background-color: #f1f3f5 !important;">
+                    <i class="far fa-file-alt fs-5"></i>
+                  </div>
+                  <div style="min-width: 0;">
+                    <h6 class="mb-1 text-dark text-truncate" :title="doc.nombre">{{ doc.nombre }}</h6>
+                    <span class="badge rounded-pill" :class="getBadgeClassDocumento(doc.tipo)">{{ getTipoDocumentoNombre(doc.tipo) }}</span>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center small text-muted mb-3">
+                  <span><i class="far fa-calendar-alt me-1"></i> {{ formatDate(doc.created_at || doc.fecha) }}</span>
+                  <!-- <span><i class="fas fa-hdd me-1"></i> -- KB</span> -->
+                </div>
+                <div class="d-flex gap-2">
+                  <a :href="'/storage/archivos/' + doc.archivo" target="_blank" class="btn btn-light btn-sm flex-grow-1 border shadow-sm text-dark bg-white rounded-pill">
+                    <i class="fas fa-eye me-1"></i> Ver
+                  </a>
+                  <a :href="'/storage/archivos/' + doc.archivo" download target="_blank" class="btn btn-light btn-sm flex-grow-1 border shadow-sm text-dark bg-white rounded-pill">
+                    <i class="fas fa-download me-1"></i> Descargar
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else class="alert alert-light text-center border p-5 mt-3 rounded-lg">
+          <i class="far fa-folder-open text-muted mb-3 fs-1"></i>
+          <h6 class="text-muted">No existen documentos adjuntos en esta categoría.</h6>
         </div>
       </div>
 
@@ -1563,6 +1600,47 @@
       </div>
     </div>
     
+    <!-- Modal Subir Documento -->
+    <div class="modal fade" id="modalSubirDocumento" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-lg">
+          <div class="modal-header border-bottom-0 bg-light">
+            <h5 class="modal-title font-weight-bold">
+              <i class="fas fa-upload text-primary me-2"></i> Subir Documento
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4 bg-light">
+            <form @submit.prevent="subirNuevoDocumento">
+              <div class="mb-3">
+                <label class="form-label font-weight-bold small text-dark">Archivo <span class="text-danger">*</span></label>
+                <input type="file" class="form-control" id="fileInputDocumento" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label font-weight-bold small text-dark">Tipo de Documento <span class="text-danger">*</span></label>
+                <select class="form-select" v-model="nuevoDocumentoTipo" required>
+                  <option value="" disabled>Seleccione el tipo...</option>
+                  <option value="orden">Orden de Examen</option>
+                  <option value="resultado">Resultado de Laboratorio/Imagen</option>
+                  <option value="referencias">Referencia/Contrarreferencia</option>
+                  <option value="consentimiento">Consentimiento Informado</option>
+                  <option value="recetas">Receta Externa</option>
+                  <option value="otro">Otro Documento</option>
+                </select>
+              </div>
+              <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                <button type="button" class="btn btn-light border px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary px-4" :disabled="subiendoDocumento">
+                  <span v-if="subiendoDocumento" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Subir Documento
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <!-- Modal Ver AutoTriaje -->
     <modal-ver-auto-triaje :patient-id="paciente.id"></modal-ver-auto-triaje>
   </div>
@@ -1616,7 +1694,10 @@ export default {
         contactos_emergencia: ''
       },
       planSeguridadSeleccionado: null,
-      savingPlanSeguridad: false
+      savingPlanSeguridad: false,
+      filtroDocumento: 'Todos',
+      nuevoDocumentoTipo: '',
+      subiendoDocumento: false
     }
   },
   computed: {
@@ -1682,6 +1763,11 @@ export default {
         });
       }
       return exams;
+    },
+    documentosFiltrados() {
+      if (!this.paciente.archivos_list) return [];
+      if (this.filtroDocumento === 'Todos') return this.paciente.archivos_list;
+      return this.paciente.archivos_list.filter(d => d.tipo === this.filtroDocumento);
     }
   },
   methods: {
@@ -2000,6 +2086,69 @@ export default {
         return Array.isArray(parsed) ? parsed : [];
       } catch(e) {
         return [];
+      }
+    },
+    getTipoDocumentoNombre(tipo) {
+      const tipos = {
+        'orden': 'Orden de Examen',
+        'resultado': 'Resultado de Laboratorio',
+        'referencias': 'Referencia/Contrarreferencia',
+        'consentimiento': 'Consentimiento Informado',
+        'recetas': 'Receta Externa',
+        'otro': 'Otro Documento'
+      };
+      return tipos[tipo] || 'Documento';
+    },
+    getBadgeClassDocumento(tipo) {
+      const classes = {
+        'orden': 'bg-primary bg-opacity-10 border border-primary border-opacity-25',
+        'resultado': 'bg-success bg-opacity-10 border border-success border-opacity-25',
+        'referencias': 'bg-info bg-opacity-10 border border-info border-opacity-25',
+        'consentimiento': 'bg-warning bg-opacity-10 border border-warning border-opacity-25',
+        'recetas': 'bg-secondary bg-opacity-10 border border-secondary border-opacity-25',
+        'otro': 'bg-light text-dark border'
+      };
+      return classes[tipo] || classes['otro'];
+    },
+    async subirNuevoDocumento() {
+      const fileInput = document.getElementById('fileInputDocumento');
+      if (!fileInput.files.length) {
+        this.$swal.fire('Error', 'Seleccione un archivo', 'warning');
+        return;
+      }
+      this.subiendoDocumento = true;
+      try {
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        formData.append('idPaciente', this.paciente.id);
+        formData.append('idProfesional', this.$attrs.idUser || -1); 
+        formData.append('tipo', this.nuevoDocumentoTipo);
+
+        const response = await this.axios.post('/api/subirArchivo', formData);
+        
+        if (!this.paciente.archivos_list) {
+          this.$set(this.paciente, 'archivos_list', []);
+        }
+        
+        this.paciente.archivos_list.unshift(response.data);
+
+        fileInput.value = '';
+        this.nuevoDocumentoTipo = '';
+        
+        $('#modalSubirDocumento').modal('hide');
+        this.$swal.fire({
+          icon: 'success',
+          title: 'Documento subido',
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000
+        });
+      } catch (error) {
+        console.error(error);
+        this.$swal.fire('Error', 'No se pudo subir el archivo. Puede que exceda el tamaño permitido (10MB) o el formato no sea válido.', 'error');
+      } finally {
+        this.subiendoDocumento = false;
       }
     }
   },

@@ -17176,14 +17176,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fa-regular fa-calendar-days text-secondary"
-  }), _vm._v(" Calendario\n\t\t\t\t\t\t\t")]), _vm._v(" "), _c("router-link", {
-    staticClass: "btn btn-light border d-flex align-items-center gap-2 text-decoration-none text-dark",
-    attrs: {
-      to: "/recepcionista/paquetes"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-box text-secondary"
-  }), _vm._v(" Paquetes\n\t\t\t\t\t\t\t")]), _vm._v(" "), _c("button", {
+  }), _vm._v(" Calendario\n\t\t\t\t\t\t\t")]), _vm._v(" "), _c("button", {
     staticClass: "btn btn-light border d-flex align-items-center gap-2",
     on: {
       click: function click($event) {
@@ -17192,16 +17185,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-chart-bar text-secondary"
-  }), _vm._v(" Reportes\n\t\t\t\t\t\t\t")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-primary d-flex align-items-center gap-2",
-    on: {
-      click: function click($event) {
-        return _vm.irATab("book-tab");
-      }
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-plus"
-  }), _vm._v(" Nueva Cita\n\t\t\t\t\t\t\t")])], 1)]), _vm._v(" "), _vm._m(1), _vm._v(" "), _c("div", {
+  }), _vm._v(" Reportes\n\t\t\t\t\t\t\t")])])]), _vm._v(" "), _vm._m(1), _vm._v(" "), _c("div", {
     staticClass: "tab-content",
     attrs: {
       id: "myTabContent"
@@ -17863,7 +17847,7 @@ var render = function render() {
       points: "22 4 12 14.01 9 11.01"
     }
   })]), _vm._v("\n\t\t\t\t\t\tAtendido\n\t\t\t\t\t")])]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-success font-weight-bold shadow-sm",
+    staticClass: "btn btn-primary font-weight-bold shadow-sm",
     attrs: {
       "data-bs-toggle": "modal",
       "data-bs-target": "#modalNuevaCita"

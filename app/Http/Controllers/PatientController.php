@@ -792,32 +792,36 @@ class PatientController extends Controller
 				'file'          => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240',
 				'idPaciente'    => 'required|integer',
 				'idProfesional' => 'required|integer',
+				'tipo'          => 'nullable|string'
 			]);
 
 			$file     = $request->file('file');
 			// Use mime-detected extension — do NOT trust client-supplied name/extension
 			$fileName = time() . '_' . uniqid() . '.' . $file->extension();
-			// Store outside public/ so files are not directly accessible via URL
-			$file->storeAs('archivos', $fileName);
+			
+			// Move file to public/storage/archivos so it's accessible via URL
+			$file->move(public_path('storage/archivos'), $fileName);
 
 			$archivo = DB::table('archivos')->insertGetId([
 				'patient_id' => $request->get('idPaciente'),
 				'nombre'     => $file->getClientOriginalName(),
 				'archivo'    => $fileName,
 				'user_id'    => $request->get('idProfesional'),
+				'tipo'       => $request->get('tipo') ?? 'otro',
 			]);
 
 			return response()->json([
 				'archivo' => $fileName,
 				'fecha'   => Carbon::now(),
 				'nombre'  => $file->getClientOriginalName(),
+				'tipo'    => $request->get('tipo') ?? 'otro',
 				'id'      => $archivo,
 			]);
 		}
 
 		public function pedirArchivos(Request $request){
 			//var_dump($request->all()); die();
-			$archivos = DB::table('archivos')->where('patient_id', $request->get('idPaciente'))->get();
+			$archivos = DB::table('archivos')->where('patient_id', $request->get('idPaciente'))->orderBy('id', 'desc')->get();
 			return $archivos;
 		}
 		public function pedirArchivosTriaje(Request $request){

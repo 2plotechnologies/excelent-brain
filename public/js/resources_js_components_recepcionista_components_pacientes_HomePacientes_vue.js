@@ -382,7 +382,10 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         contactos_emergencia: ''
       },
       planSeguridadSeleccionado: null,
-      savingPlanSeguridad: false
+      savingPlanSeguridad: false,
+      filtroDocumento: 'Todos',
+      nuevoDocumentoTipo: '',
+      subiendoDocumento: false
     };
   },
   computed: {
@@ -451,6 +454,14 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         });
       }
       return exams;
+    },
+    documentosFiltrados: function documentosFiltrados() {
+      var _this = this;
+      if (!this.paciente.archivos_list) return [];
+      if (this.filtroDocumento === 'Todos') return this.paciente.archivos_list;
+      return this.paciente.archivos_list.filter(function (d) {
+        return d.tipo === _this.filtroDocumento;
+      });
     }
   },
   methods: {
@@ -478,28 +489,28 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       };
     },
     guardarPlanSeguridad: function guardarPlanSeguridad() {
-      var _this = this;
+      var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         var payload, response;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
               _context.prev = 0;
-              _this.savingPlanSeguridad = true;
+              _this2.savingPlanSeguridad = true;
               payload = _objectSpread({
-                patient_id: _this.paciente.id
-              }, _this.nuevoPlanSeguridad);
+                patient_id: _this2.paciente.id
+              }, _this2.nuevoPlanSeguridad);
               _context.next = 5;
               return axios.post('/api/plan-seguridad', payload);
             case 5:
               response = _context.sent;
               if (response.data && response.data.plan) {
-                if (!_this.paciente.planes_seguridad) {
-                  _this.paciente.planes_seguridad = [];
+                if (!_this2.paciente.planes_seguridad) {
+                  _this2.paciente.planes_seguridad = [];
                 }
-                _this.paciente.planes_seguridad.unshift(response.data.plan);
+                _this2.paciente.planes_seguridad.unshift(response.data.plan);
                 $('#modalPlanSeguridad').modal('hide');
-                _this.$swal.fire({
+                _this2.$swal.fire({
                   icon: 'success',
                   title: 'Éxito',
                   text: 'Plan de seguridad guardado correctamente',
@@ -513,14 +524,14 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
               _context.prev = 9;
               _context.t0 = _context["catch"](0);
               console.error(_context.t0);
-              _this.$swal.fire({
+              _this2.$swal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: 'No se pudo guardar el plan de seguridad'
               });
             case 13:
               _context.prev = 13;
-              _this.savingPlanSeguridad = false;
+              _this2.savingPlanSeguridad = false;
               return _context.finish(13);
             case 16:
             case "end":
@@ -540,20 +551,20 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       });
     },
     fetchPatientDetails: function fetchPatientDetails() {
-      var _this2 = this;
+      var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var res;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              _this2.loading = true;
+              _this3.loading = true;
               _context2.prev = 1;
               _context2.next = 4;
-              return _this2.axios.get("/api/patient/".concat(_this2.pacienteId, "/full-details"));
+              return _this3.axios.get("/api/patient/".concat(_this3.pacienteId, "/full-details"));
             case 4:
               res = _context2.sent;
-              _this2.paciente = res.data;
-              _this2.buildTimeline();
+              _this3.paciente = res.data;
+              _this3.buildTimeline();
               _context2.next = 12;
               break;
             case 9:
@@ -562,7 +573,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
               console.error(_context2.t0);
             case 12:
               _context2.prev = 12;
-              _this2.loading = false;
+              _this3.loading = false;
               return _context2.finish(12);
             case 15:
             case "end":
@@ -572,14 +583,14 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       }))();
     },
     buildTimeline: function buildTimeline() {
-      var _this3 = this;
+      var _this4 = this;
       var activities = [];
       if (this.paciente.appointments) {
         this.paciente.appointments.forEach(function (a) {
           activities.push({
             type: 'Cita',
             date: a.date + (a.hora ? 'T' + a.hora : ''),
-            desc: "Cita / Estado: ".concat(_this3.getStatusName(a.status)),
+            desc: "Cita / Estado: ".concat(_this4.getStatusName(a.status)),
             profesional: a.professional ? a.professional.name : '',
             timestamp: new Date(a.date).getTime()
           });
@@ -718,13 +729,13 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       return "".concat(day, " ").concat(month, " ").concat(year, " - ").concat(hours.toString().padStart(2, '0'), ":").concat(minutes, " ").concat(ampm);
     },
     getCieNames: function getCieNames(diagnosticString) {
-      var _this4 = this;
+      var _this5 = this;
       if (!diagnosticString) return 'Evaluación médica general';
       try {
         var parsed = JSON.parse(diagnosticString);
         if (Array.isArray(parsed) && this.ciesData && this.ciesData.length > 0) {
           var names = parsed.map(function (code) {
-            var found = _this4.ciesData.find(function (c) {
+            var found = _this5.ciesData.find(function (c) {
               return c.id == code;
             });
             return found ? "".concat(found.code, " - ").concat(found.description) : code;
@@ -780,30 +791,30 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       };
     },
     guardarFichaSeguimiento: function guardarFichaSeguimiento() {
-      var _this5 = this;
+      var _this6 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var payload, res;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              _this5.savingFicha = true;
+              _this6.savingFicha = true;
               _context3.prev = 1;
               payload = {
-                patient_id: _this5.paciente.id,
-                professional_id: _this5.nuevaFicha.professional_id,
-                tipo: _this5.nuevaFicha.tipo,
-                frecuencia: _this5.nuevaFicha.frecuencia,
-                motivo: _this5.nuevaFicha.motivo,
-                recomendaciones: JSON.stringify(_this5.nuevaFicha.recomendaciones),
-                interconsultas: _this5.nuevaFicha.interconsultas
+                patient_id: _this6.paciente.id,
+                professional_id: _this6.nuevaFicha.professional_id,
+                tipo: _this6.nuevaFicha.tipo,
+                frecuencia: _this6.nuevaFicha.frecuencia,
+                motivo: _this6.nuevaFicha.motivo,
+                recomendaciones: JSON.stringify(_this6.nuevaFicha.recomendaciones),
+                interconsultas: _this6.nuevaFicha.interconsultas
               };
               _context3.next = 5;
-              return _this5.axios.post('/api/ficha-seguimiento', payload);
+              return _this6.axios.post('/api/ficha-seguimiento', payload);
             case 5:
               res = _context3.sent;
-              _this5.$swal('Éxito', 'Ficha de seguimiento guardada correctamente.', 'success');
-              _this5.fichaView = 'historica';
-              _this5.nuevaFicha = {
+              _this6.$swal('Éxito', 'Ficha de seguimiento guardada correctamente.', 'success');
+              _this6.fichaView = 'historica';
+              _this6.nuevaFicha = {
                 tipo: '',
                 frecuencia: '',
                 motivo: '',
@@ -811,7 +822,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
                 interconsultas: [],
                 recomendaciones: []
               };
-              _this5.fetchPatientDetails(); // Refresh patient data to load new ficha.
+              _this6.fetchPatientDetails(); // Refresh patient data to load new ficha.
               _context3.next = 17;
               break;
             case 12:
@@ -819,10 +830,10 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
               _context3.t0 = _context3["catch"](1);
               console.error(_context3.t0);
               console.error(_context3.t0.response.data);
-              _this5.$swal('Error', 'Ocurrió un error al guardar la ficha.', 'error');
+              _this6.$swal('Error', 'Ocurrió un error al guardar la ficha.', 'error');
             case 17:
               _context3.prev = 17;
-              _this5.savingFicha = false;
+              _this6.savingFicha = false;
               return _context3.finish(17);
             case 20:
             case "end":
@@ -844,16 +855,97 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       } catch (e) {
         return [];
       }
+    },
+    getTipoDocumentoNombre: function getTipoDocumentoNombre(tipo) {
+      var tipos = {
+        'orden': 'Orden de Examen',
+        'resultado': 'Resultado de Laboratorio',
+        'referencias': 'Referencia/Contrarreferencia',
+        'consentimiento': 'Consentimiento Informado',
+        'recetas': 'Receta Externa',
+        'otro': 'Otro Documento'
+      };
+      return tipos[tipo] || 'Documento';
+    },
+    getBadgeClassDocumento: function getBadgeClassDocumento(tipo) {
+      var classes = {
+        'orden': 'bg-primary bg-opacity-10 border border-primary border-opacity-25',
+        'resultado': 'bg-success bg-opacity-10 border border-success border-opacity-25',
+        'referencias': 'bg-info bg-opacity-10 border border-info border-opacity-25',
+        'consentimiento': 'bg-warning bg-opacity-10 border border-warning border-opacity-25',
+        'recetas': 'bg-secondary bg-opacity-10 border border-secondary border-opacity-25',
+        'otro': 'bg-light text-dark border'
+      };
+      return classes[tipo] || classes['otro'];
+    },
+    subirNuevoDocumento: function subirNuevoDocumento() {
+      var _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var fileInput, formData, response;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              fileInput = document.getElementById('fileInputDocumento');
+              if (fileInput.files.length) {
+                _context4.next = 4;
+                break;
+              }
+              _this7.$swal.fire('Error', 'Seleccione un archivo', 'warning');
+              return _context4.abrupt("return");
+            case 4:
+              _this7.subiendoDocumento = true;
+              _context4.prev = 5;
+              formData = new FormData();
+              formData.append('file', fileInput.files[0]);
+              formData.append('idPaciente', _this7.paciente.id);
+              formData.append('idProfesional', _this7.$attrs.idUser || -1);
+              formData.append('tipo', _this7.nuevoDocumentoTipo);
+              _context4.next = 13;
+              return _this7.axios.post('/api/subirArchivo', formData);
+            case 13:
+              response = _context4.sent;
+              if (!_this7.paciente.archivos_list) {
+                _this7.$set(_this7.paciente, 'archivos_list', []);
+              }
+              _this7.paciente.archivos_list.unshift(response.data);
+              fileInput.value = '';
+              _this7.nuevoDocumentoTipo = '';
+              $('#modalSubirDocumento').modal('hide');
+              _this7.$swal.fire({
+                icon: 'success',
+                title: 'Documento subido',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+              });
+              _context4.next = 26;
+              break;
+            case 22:
+              _context4.prev = 22;
+              _context4.t0 = _context4["catch"](5);
+              console.error(_context4.t0);
+              _this7.$swal.fire('Error', 'No se pudo subir el archivo. Puede que exceda el tamaño permitido (10MB) o el formato no sea válido.', 'error');
+            case 26:
+              _context4.prev = 26;
+              _this7.subiendoDocumento = false;
+              return _context4.finish(26);
+            case 29:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4, null, [[5, 22, 26, 29]]);
+      }))();
     }
   },
   mounted: function mounted() {
-    var _this6 = this;
+    var _this8 = this;
     this.fetchPatientDetails();
     this.axios.get('/api/cies/a').then(function (res) {
-      _this6.ciesData = res.data;
+      _this8.ciesData = res.data;
     });
     this.axios.get('/api/professional').then(function (res) {
-      _this6.professionalsList = res.data;
+      _this8.professionalsList = res.data;
     })["catch"](function (err) {
       return console.error(err);
     });
@@ -3468,7 +3560,18 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-heart"
-  }), _vm._v(" Activo")]) : _vm._e()]), _vm._v(" "), _c("div", {
+  }), _vm._v(" Activo")]) : _vm._e(), _vm._v(" "), _vm._l(_vm.paciente.semaforo_estados.slice(0, 5), function (sem) {
+    return _c("span", {
+      key: sem.id,
+      staticClass: "badge border bg-warning text-white",
+      staticStyle: {
+        "font-size": "0.6rem",
+        "vertical-align": "middle"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-tag text-white me-1"
+    }), _vm._v(" " + _vm._s(_vm.getEstadoNombre(sem.codigo)) + "\n            ")]);
+  })], 2), _vm._v(" "), _c("div", {
     staticClass: "text-muted small"
   }, [_vm.paciente.birth_date ? _c("span", {
     staticClass: "me-3"
@@ -3755,7 +3858,7 @@ var render = function render() {
   }, _vm._l(_vm.getHobbies(_vm.paciente.hobbies), function (hobbie, index) {
     return _c("span", {
       key: index,
-      staticClass: "badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-3 py-2"
+      staticClass: "badge bg-info bg-opacity-10 border text-white border-info border-opacity-25 px-3 py-2"
     }, [_vm._v("\n                        " + _vm._s(hobbie) + "\n                      ")]);
   }), 0) : _c("div", [_c("small", {
     staticClass: "text-muted"
@@ -5237,40 +5340,151 @@ var render = function render() {
       id: "documentos",
       role: "tabpanel"
     }
-  }, [_c("div", {
-    staticClass: "card border"
-  }, [_c("div", {
-    staticClass: "card-body p-4"
-  }, [_c("h5", {
-    staticClass: "card-title font-weight-bold mb-4"
-  }, [_vm._v("Archivos y Documentos")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-sm table-hover align-middle"
-  }, [_vm._m(66), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.archivos_list || [], function (doc) {
-    return _c("tr", {
-      key: doc.id
-    }, [_c("td", {
-      staticClass: "p-2"
-    }, [_c("i", {
-      staticClass: "far fa-file-pdf text-danger me-2"
-    }), _vm._v(" " + _vm._s(doc.nombre))]), _vm._v(" "), _c("td", {
-      staticClass: "p-2 text-muted small"
-    }, [_vm._v(_vm._s(doc.fecha || _vm.formatDate(doc.created_at)))]), _vm._v(" "), _c("td", {
-      staticClass: "p-2 text-center"
+  }, [_vm._m(66), _vm._v(" "), _c("div", {
+    staticClass: "d-flex flex-wrap gap-2 mb-4"
+  }, [_c("button", {
+    staticClass: "btn btn-sm rounded-pill px-3",
+    "class": _vm.filtroDocumento === "Todos" ? "btn-primary" : "btn-light border text-muted",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        _vm.filtroDocumento = "Todos";
+      }
+    }
+  }, [_vm._v("Todos")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm rounded-pill px-3",
+    "class": _vm.filtroDocumento === "orden" ? "btn-light bg-white border text-dark" : "btn-light border text-muted",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        _vm.filtroDocumento = "orden";
+      }
+    }
+  }, [_vm._v("Órdenes")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm rounded-pill px-3",
+    "class": _vm.filtroDocumento === "resultado" ? "btn-light bg-white border text-dark" : "btn-light border text-muted",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        _vm.filtroDocumento = "resultado";
+      }
+    }
+  }, [_vm._v("Resultados")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm rounded-pill px-3",
+    "class": _vm.filtroDocumento === "referencias" ? "btn-light bg-white border text-dark" : "btn-light border text-muted",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        _vm.filtroDocumento = "referencias";
+      }
+    }
+  }, [_vm._v("Referencias")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm rounded-pill px-3",
+    "class": _vm.filtroDocumento === "consentimiento" ? "btn-light bg-white border text-dark" : "btn-light border text-muted",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        _vm.filtroDocumento = "consentimiento";
+      }
+    }
+  }, [_vm._v("Consentimientos")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm rounded-pill px-3",
+    "class": _vm.filtroDocumento === "recetas" ? "btn-light bg-white border text-dark" : "btn-light border text-muted",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        _vm.filtroDocumento = "recetas";
+      }
+    }
+  }, [_vm._v("Recetas")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm rounded-pill px-3",
+    "class": _vm.filtroDocumento === "otro" ? "btn-light bg-white border text-dark" : "btn-light border text-muted",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        _vm.filtroDocumento = "otro";
+      }
+    }
+  }, [_vm._v("Otros")])]), _vm._v(" "), _vm.documentosFiltrados.length > 0 ? _c("div", {
+    staticClass: "row g-3"
+  }, _vm._l(_vm.documentosFiltrados, function (doc) {
+    return _c("div", {
+      key: doc.id,
+      staticClass: "col-md-6 col-lg-4"
+    }, [_c("div", {
+      staticClass: "card h-100 border-light shadow-sm",
+      staticStyle: {
+        "border-radius": "12px",
+        "background-color": "#fcfcfc"
+      }
+    }, [_c("div", {
+      staticClass: "card-body p-4"
+    }, [_c("div", {
+      staticClass: "d-flex align-items-start mb-3"
+    }, [_vm._m(67, true), _vm._v(" "), _c("div", {
+      staticStyle: {
+        "min-width": "0"
+      }
+    }, [_c("h6", {
+      staticClass: "mb-1 text-dark text-truncate",
+      attrs: {
+        title: doc.nombre
+      }
+    }, [_vm._v(_vm._s(doc.nombre))]), _vm._v(" "), _c("span", {
+      staticClass: "badge rounded-pill",
+      "class": _vm.getBadgeClassDocumento(doc.tipo)
+    }, [_vm._v(_vm._s(_vm.getTipoDocumentoNombre(doc.tipo)))])])]), _vm._v(" "), _c("div", {
+      staticClass: "d-flex justify-content-between align-items-center small text-muted mb-3"
+    }, [_c("span", [_c("i", {
+      staticClass: "far fa-calendar-alt me-1"
+    }), _vm._v(" " + _vm._s(_vm.formatDate(doc.created_at || doc.fecha)))])]), _vm._v(" "), _c("div", {
+      staticClass: "d-flex gap-2"
     }, [_c("a", {
-      staticClass: "btn btn-sm btn-light border",
+      staticClass: "btn btn-light btn-sm flex-grow-1 border shadow-sm text-dark bg-white rounded-pill",
       attrs: {
         href: "/storage/archivos/" + doc.archivo,
         target: "_blank"
       }
     }, [_c("i", {
-      staticClass: "fas fa-external-link-alt"
-    })])])]);
-  }), _vm._v(" "), !_vm.paciente.archivos_list || _vm.paciente.archivos_list.length == 0 ? _c("tr", [_c("td", {
-    staticClass: "text-center text-muted py-3",
-    attrs: {
-      colspan: "3"
-    }
-  }, [_vm._v("No existen documentos adjuntos")])]) : _vm._e()], 2)])])])]), _vm._v(" "), _c("div", {
+      staticClass: "fas fa-eye me-1"
+    }), _vm._v(" Ver\n                ")]), _vm._v(" "), _c("a", {
+      staticClass: "btn btn-light btn-sm flex-grow-1 border shadow-sm text-dark bg-white rounded-pill",
+      attrs: {
+        href: "/storage/archivos/" + doc.archivo,
+        download: "",
+        target: "_blank"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-download me-1"
+    }), _vm._v(" Descargar\n                ")])])])])]);
+  }), 0) : _c("div", {
+    staticClass: "alert alert-light text-center border p-5 mt-3 rounded-lg"
+  }, [_c("i", {
+    staticClass: "far fa-folder-open text-muted mb-3 fs-1"
+  }), _vm._v(" "), _c("h6", {
+    staticClass: "text-muted"
+  }, [_vm._v("No existen documentos adjuntos en esta categoría.")])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
     attrs: {
       id: "finanzas",
@@ -5284,7 +5498,7 @@ var render = function render() {
     staticClass: "card-title font-weight-bold mb-4"
   }, [_vm._v("Deudas y Cuentas")]), _vm._v(" "), _c("table", {
     staticClass: "table table-sm table-hover"
-  }, [_vm._m(67), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.deudas_financieras || [], function (deuda) {
+  }, [_vm._m(68), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.deudas_financieras || [], function (deuda) {
     return _c("tr", {
       key: deuda.id
     }, [_c("td", {
@@ -5304,7 +5518,7 @@ var render = function render() {
     attrs: {
       colspan: "4"
     }
-  }, [_vm._v("No presenta deudas")])]) : _vm._e()], 2)])])])]), _vm._v(" "), _vm._m(68)]), _vm._v(" "), _c("div", {
+  }, [_vm._v("No presenta deudas")])]) : _vm._e()], 2)])])])]), _vm._v(" "), _vm._m(69)]), _vm._v(" "), _c("div", {
     staticClass: "modal fade",
     attrs: {
       id: "modalDetalleFicha",
@@ -5316,7 +5530,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-lg modal-dialog-centered"
   }, [_c("div", {
     staticClass: "modal-content border-0 shadow-lg rounded-lg"
-  }, [_vm._m(69), _vm._v(" "), _vm.fichaSeleccionada ? _c("div", {
+  }, [_vm._m(70), _vm._v(" "), _vm.fichaSeleccionada ? _c("div", {
     staticClass: "modal-body p-4"
   }, [_c("div", {
     staticClass: "row mb-4 g-3"
@@ -5364,7 +5578,7 @@ var render = function render() {
     staticClass: "mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.fichaSeleccionada.motivo))])])])]), _vm._v(" "), _vm.fichaSeleccionada.interconsultas && _vm.fichaSeleccionada.interconsultas.length > 0 ? _c("div", {
     staticClass: "mb-4"
-  }, [_vm._m(70), _vm._v(" "), _vm._l(_vm.fichaSeleccionada.interconsultas, function (inter, idx) {
+  }, [_vm._m(71), _vm._v(" "), _vm._l(_vm.fichaSeleccionada.interconsultas, function (inter, idx) {
     return _c("div", {
       key: idx,
       staticClass: "card border-0 bg-light shadow-sm mb-2"
@@ -5381,7 +5595,7 @@ var render = function render() {
     }), _vm._v(" " + _vm._s(_vm.getProfessionalName(inter.professional_id)))])]), _vm._v(" "), inter.motivo ? _c("p", {
       staticClass: "mb-0 small text-dark mt-2"
     }, [_c("strong", [_vm._v("Motivo:")]), _vm._v(" " + _vm._s(inter.motivo))]) : _vm._e()])]);
-  })], 2) : _vm._e(), _vm._v(" "), _vm.getRecomendacionesParsed(_vm.fichaSeleccionada.recomendaciones).length > 0 ? _c("div", [_vm._m(71), _vm._v(" "), _c("div", {
+  })], 2) : _vm._e(), _vm._v(" "), _vm.getRecomendacionesParsed(_vm.fichaSeleccionada.recomendaciones).length > 0 ? _c("div", [_vm._m(72), _vm._v(" "), _c("div", {
     staticClass: "d-flex flex-wrap gap-2"
   }, _vm._l(_vm.getRecomendacionesParsed(_vm.fichaSeleccionada.recomendaciones), function (rec, idx) {
     return _c("span", {
@@ -5390,7 +5604,7 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fas fa-check me-1"
     }), _vm._v(" " + _vm._s(rec) + "\n              ")]);
-  }), 0)]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm._m(72)])])]), _vm._v(" "), _c("div", {
+  }), 0)]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm._m(73)])])]), _vm._v(" "), _c("div", {
     staticClass: "modal fade",
     attrs: {
       id: "modalPlanSeguridad",
@@ -5401,7 +5615,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-lg modal-dialog-centered"
   }, [_c("div", {
     staticClass: "modal-content border-0 shadow-lg rounded-lg"
-  }, [_vm._m(73), _vm._v(" "), _c("div", {
+  }, [_vm._m(74), _vm._v(" "), _c("div", {
     staticClass: "modal-body p-4 bg-light"
   }, [_c("form", {
     on: {
@@ -5414,7 +5628,7 @@ var render = function render() {
     staticClass: "row g-3"
   }, [_c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(74), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(75), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5438,7 +5652,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(75), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(76), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5462,7 +5676,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(76), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(77), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5486,7 +5700,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(77), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(78), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5510,7 +5724,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(78), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(79), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5534,7 +5748,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(79), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(80), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5558,7 +5772,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-12"
-  }, [_vm._m(80), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(81), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5613,7 +5827,7 @@ var render = function render() {
     staticClass: "modal-content border-0 shadow-lg rounded-lg"
   }, [_c("div", {
     staticClass: "modal-header border-bottom-0 bg-light d-flex align-items-center"
-  }, [_vm._m(81), _vm._v(" "), _vm.planSeguridadSeleccionado ? _c("div", {
+  }, [_vm._m(82), _vm._v(" "), _vm.planSeguridadSeleccionado ? _c("div", {
     staticClass: "ms-auto me-3 small text-muted"
   }, [_vm._v("\n             Creado: " + _vm._s(_vm.formatDate(_vm.planSeguridadSeleccionado.fecha)) + "\n          ")]) : _vm._e(), _vm._v(" "), _c("button", {
     staticClass: "btn-close m-0",
@@ -5630,7 +5844,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(82), _vm._v(" "), _c("div", {
+  }, [_vm._m(83), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -5641,7 +5855,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(83), _vm._v(" "), _c("div", {
+  }, [_vm._m(84), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -5652,7 +5866,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(84), _vm._v(" "), _c("div", {
+  }, [_vm._m(85), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -5663,7 +5877,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(85), _vm._v(" "), _c("div", {
+  }, [_vm._m(86), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -5674,7 +5888,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(86), _vm._v(" "), _c("div", {
+  }, [_vm._m(87), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -5685,7 +5899,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(87), _vm._v(" "), _c("div", {
+  }, [_vm._m(88), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -5696,7 +5910,7 @@ var render = function render() {
     staticClass: "col-12"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(88), _vm._v(" "), _c("div", {
+  }, [_vm._m(89), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -5723,7 +5937,100 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-download me-1"
-  }), _vm._v(" Descargar PDF\n          ")])])])])]), _vm._v(" "), _c("modal-ver-auto-triaje", {
+  }), _vm._v(" Descargar PDF\n          ")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "modal fade",
+    attrs: {
+      id: "modalSubirDocumento",
+      tabindex: "-1",
+      "aria-hidden": "true"
+    }
+  }, [_c("div", {
+    staticClass: "modal-dialog modal-dialog-centered"
+  }, [_c("div", {
+    staticClass: "modal-content border-0 shadow-lg rounded-lg"
+  }, [_vm._m(90), _vm._v(" "), _c("div", {
+    staticClass: "modal-body p-4 bg-light"
+  }, [_c("form", {
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.subirNuevoDocumento.apply(null, arguments);
+      }
+    }
+  }, [_vm._m(91), _vm._v(" "), _c("div", {
+    staticClass: "mb-3"
+  }, [_vm._m(92), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.nuevoDocumentoTipo,
+      expression: "nuevoDocumentoTipo"
+    }],
+    staticClass: "form-select",
+    attrs: {
+      required: ""
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.nuevoDocumentoTipo = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "",
+      disabled: ""
+    }
+  }, [_vm._v("Seleccione el tipo...")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "orden"
+    }
+  }, [_vm._v("Orden de Examen")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "resultado"
+    }
+  }, [_vm._v("Resultado de Laboratorio/Imagen")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "referencias"
+    }
+  }, [_vm._v("Referencia/Contrarreferencia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "consentimiento"
+    }
+  }, [_vm._v("Consentimiento Informado")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "recetas"
+    }
+  }, [_vm._v("Receta Externa")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "otro"
+    }
+  }, [_vm._v("Otro Documento")])])]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-end gap-2 mt-4 pt-3 border-top"
+  }, [_c("button", {
+    staticClass: "btn btn-light border px-4",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Cancelar")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary px-4",
+    attrs: {
+      type: "submit",
+      disabled: _vm.subiendoDocumento
+    }
+  }, [_vm.subiendoDocumento ? _c("span", {
+    staticClass: "spinner-border spinner-border-sm me-2",
+    attrs: {
+      role: "status",
+      "aria-hidden": "true"
+    }
+  }) : _vm._e(), _vm._v("\n                Subir Documento\n              ")])])])])])])]), _vm._v(" "), _c("modal-ver-auto-triaje", {
     attrs: {
       "patient-id": _vm.paciente.id
     }
@@ -6444,15 +6751,36 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", {
-    staticClass: "bg-light"
-  }, [_c("tr", [_c("th", {
-    staticClass: "p-2 rounded-start border-bottom-0"
-  }, [_vm._v("Nombre del archivo")]), _vm._v(" "), _c("th", {
-    staticClass: "p-2 border-bottom-0"
-  }, [_vm._v("Fecha de Subida")]), _vm._v(" "), _c("th", {
-    staticClass: "p-2 border-bottom-0 rounded-end text-center"
-  }, [_vm._v("Acción")])])]);
+  return _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mb-4 mt-2"
+  }, [_c("div", [_c("h5", {
+    staticClass: "mb-0 font-weight-bold d-flex align-items-center text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-paperclip text-primary me-2"
+  }), _vm._v(" Documentos Adjuntos\n          ")]), _vm._v(" "), _c("p", {
+    staticClass: "text-muted small mb-0 mt-1"
+  }, [_vm._v("Órdenes de examen, resultados y otros documentos")])]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary rounded px-3 shadow-sm",
+    attrs: {
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#modalSubirDocumento"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-upload me-1"
+  }), _vm._v(" Subir Documento\n        ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "rounded bg-light text-secondary border d-flex justify-content-center align-items-center me-3 flex-shrink-0",
+    staticStyle: {
+      width: "45px",
+      height: "45px",
+      "background-color": "#f1f3f5 !important"
+    }
+  }, [_c("i", {
+    staticClass: "far fa-file-alt fs-5"
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -6708,6 +7036,48 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "far fa-smile-beam text-warning me-2"
   }), _vm._v(" 7. Razones para vivir")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modal-header border-bottom-0 bg-light"
+  }, [_c("h5", {
+    staticClass: "modal-title font-weight-bold"
+  }, [_c("i", {
+    staticClass: "fas fa-upload text-primary me-2"
+  }), _vm._v(" Subir Documento\n          ")]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal",
+      "aria-label": "Close"
+    }
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mb-3"
+  }, [_c("label", {
+    staticClass: "form-label font-weight-bold small text-dark"
+  }, [_vm._v("Archivo "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]), _vm._v(" "), _c("input", {
+    staticClass: "form-control",
+    attrs: {
+      type: "file",
+      id: "fileInputDocumento",
+      required: ""
+    }
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label font-weight-bold small text-dark"
+  }, [_vm._v("Tipo de Documento "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
 }];
 render._withStripped = true;
 

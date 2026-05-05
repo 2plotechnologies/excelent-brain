@@ -21,15 +21,16 @@
 							<button class="btn btn-light border d-flex align-items-center gap-2" @click="irATab('book-tab')">
 									<i class="fa-regular fa-calendar-days text-secondary"></i> Calendario
 							</button>
-							<router-link to="/recepcionista/paquetes" class="btn btn-light border d-flex align-items-center gap-2 text-decoration-none text-dark">
+
+							<!--router-link to="/recepcionista/paquetes" class="btn btn-light border d-flex align-items-center gap-2 text-decoration-none text-dark">
 									<i class="fas fa-box text-secondary"></i> Paquetes
-							</router-link>
+							</router-link-->
 							<button class="btn btn-light border d-flex align-items-center gap-2" @click="mostrarReportes()">
 									<i class="fas fa-chart-bar text-secondary"></i> Reportes
 							</button>
-							<button class="btn btn-primary d-flex align-items-center gap-2" @click="irATab('book-tab')">
+							<!--button class="btn btn-primary d-flex align-items-center gap-2" @click="irATab('book-tab')">
 									<i class="fas fa-plus"></i> Nueva Cita
-							</button>
+							</button-->
 					</div>
 			</div>
 

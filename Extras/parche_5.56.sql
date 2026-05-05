@@ -1,0 +1,1 @@
+ALTER TABLE archivos add tipo VARCHAR(50) DEFAULT 'otros' NULL AFTER fecha;
