@@ -173,7 +173,6 @@ export default {
   },
   watch: {
     patientId: {
-      immediate: true,
       handler(newVal) {
         if (newVal) {
           this.fetchRespuestas()

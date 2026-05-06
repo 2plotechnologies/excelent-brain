@@ -1079,6 +1079,8 @@ class PatientController extends Controller
 			$patient->zung_depressions = DB::table('zung_depressions')->where('patient_id', $id)->get();
 			$patient->millons = DB::table('millons')->where('patient_id', $id)->get();
 
+			$patient->has_autotriaje = DB::table('patient_questionnaire_answers')->where('patient_id', $id)->exists();
+
 			return response()->json($patient);
 		}
 }

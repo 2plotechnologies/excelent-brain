@@ -44,7 +44,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   watch: {
     patientId: {
-      immediate: true,
       handler: function handler(newVal) {
         if (newVal) {
           this.fetchRespuestas();
@@ -4600,7 +4599,15 @@ var render = function render() {
     staticClass: "col-12 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2"
   }, [_vm._m(30), _vm._v(" "), _c("div", {
     staticClass: "d-flex gap-2"
-  }, [_vm._m(31), _vm._v(" "), _c("button", {
+  }, [_vm.paciente.has_autotriaje ? _c("button", {
+    staticClass: "btn btn-info btn-sm rounded-pill shadow-sm px-3 text-white",
+    attrs: {
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#modalVerAutoTriaje"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-eye me-1"
+  }), _vm._v(" Ver autotriaje\n            ")]) : _vm._e(), _vm._v(" "), _c("button", {
     staticClass: "btn btn-primary btn-sm rounded-pill shadow-sm px-3",
     attrs: {
       "data-bs-toggle": "modal",
@@ -4626,7 +4633,7 @@ var render = function render() {
       staticClass: "card-body p-4"
     }, [_c("div", {
       staticClass: "d-flex mb-4"
-    }, [_vm._m(32, true), _vm._v(" "), _c("div", [_c("h6", {
+    }, [_vm._m(31, true), _vm._v(" "), _c("div", [_c("h6", {
       staticClass: "font-weight-bold mb-1 text-dark"
     }, [_vm._v("Triaje " + _vm._s(_vm.getTriajeReferencia(tr.referencia)))]), _vm._v(" "), _c("div", {
       staticClass: "small text-muted"
@@ -4780,7 +4787,7 @@ var render = function render() {
     staticClass: "text-muted"
   }, [_vm._v("No existen registros de triaje para este paciente.")])])]), _vm._v(" "), _c("div", {
     staticClass: "col-12"
-  }, [_vm._m(33), _vm._v(" "), _c("div", {
+  }, [_vm._m(32), _vm._v(" "), _c("div", {
     staticClass: "card border"
   }, [_c("div", {
     staticClass: "card-body p-4"
@@ -4801,7 +4808,7 @@ var render = function render() {
     staticClass: "col-12 mt-4"
   }, [_c("div", {
     staticClass: "d-flex justify-content-between align-items-center mb-3"
-  }, [_vm._m(34), _vm._v(" "), _c("div", {
+  }, [_vm._m(33), _vm._v(" "), _c("div", {
     staticClass: "d-flex gap-2"
   }, [_c("button", {
     staticClass: "btn btn-primary btn-sm rounded-pill shadow-sm px-3 fw-bold",
@@ -4827,7 +4834,7 @@ var render = function render() {
       staticClass: "d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2"
     }, [_c("div", {
       staticClass: "d-flex align-items-center"
-    }, [_vm._m(35, true), _vm._v(" "), _c("div", [_c("h6", {
+    }, [_vm._m(34, true), _vm._v(" "), _c("div", [_c("h6", {
       staticClass: "font-weight-bold mb-1 text-dark"
     }, [_vm._v("Plan de Seguridad - " + _vm._s(_vm.paciente.name) + " " + _vm._s(_vm.paciente.nombres))]), _vm._v(" "), _c("div", {
       staticClass: "small text-muted"
@@ -4863,7 +4870,7 @@ var render = function render() {
       staticClass: "bg-white p-3 rounded border h-100 shadow-sm"
     }, [_c("div", {
       staticClass: "d-flex justify-content-between align-items-center mb-3"
-    }, [_vm._m(36, true), _vm._v(" "), _c("span", {
+    }, [_vm._m(35, true), _vm._v(" "), _c("span", {
       staticClass: "badge bg-light text-muted rounded-circle"
     }, [_vm._v(_vm._s(_vm.countItems(plan.senales_advertencia)))])]), _vm._v(" "), _c("ul", {
       staticClass: "list-unstyled small text-dark mb-0 ps-2",
@@ -4883,7 +4890,7 @@ var render = function render() {
       staticClass: "bg-white p-3 rounded border h-100 shadow-sm"
     }, [_c("div", {
       staticClass: "d-flex justify-content-between align-items-center mb-3"
-    }, [_vm._m(37, true), _vm._v(" "), _c("span", {
+    }, [_vm._m(36, true), _vm._v(" "), _c("span", {
       staticClass: "badge bg-light text-muted rounded-circle"
     }, [_vm._v(_vm._s(_vm.countItems(plan.estrategias)))])]), _vm._v(" "), _c("ul", {
       staticClass: "list-unstyled small text-dark mb-0 ps-2",
@@ -4903,7 +4910,7 @@ var render = function render() {
       staticClass: "bg-white p-3 rounded border h-100 shadow-sm"
     }, [_c("div", {
       staticClass: "d-flex justify-content-between align-items-center mb-3"
-    }, [_vm._m(38, true), _vm._v(" "), _c("span", {
+    }, [_vm._m(37, true), _vm._v(" "), _c("span", {
       staticClass: "badge bg-light text-muted rounded-circle"
     }, [_vm._v(_vm._s(_vm.countItems(plan.razones_vivir)))])]), _vm._v(" "), _c("ul", {
       staticClass: "list-unstyled small text-dark mb-0 ps-2",
@@ -4937,7 +4944,7 @@ var render = function render() {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-12 mb-4"
-  }, [_vm._m(39), _vm._v(" "), _c("p", {
+  }, [_vm._m(38), _vm._v(" "), _c("p", {
     staticClass: "text-muted small mb-4"
   }, [_vm._v("Registre el plan de tratamiento recomendado al paciente.")]), _vm._v(" "), _c("div", {
     staticClass: "row g-4"
@@ -4953,7 +4960,7 @@ var render = function render() {
         _vm.fichaView = "nueva";
       }
     }
-  }, [_vm._m(40)])]), _vm._v(" "), _c("div", {
+  }, [_vm._m(39)])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border rounded-lg hover-shadow transition",
@@ -4967,7 +4974,7 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "card-body text-center p-5"
-  }, [_vm._m(41), _vm._v(" "), _c("h5", {
+  }, [_vm._m(40), _vm._v(" "), _c("h5", {
     staticClass: "font-weight-bold text-dark mb-2"
   }, [_vm._v("Ficha Histórica")]), _vm._v(" "), _c("p", {
     staticClass: "text-muted small mb-0"
@@ -4996,7 +5003,7 @@ var render = function render() {
         return _vm.guardarFichaSeguimiento.apply(null, arguments);
       }
     }
-  }, [_vm._m(42), _vm._v(" "), _c("div", {
+  }, [_vm._m(41), _vm._v(" "), _c("div", {
     staticClass: "mb-4 bg-white p-3 border rounded shadow-sm"
   }, [_c("label", {
     staticClass: "form-label small text-muted"
@@ -5043,7 +5050,7 @@ var render = function render() {
     attrs: {
       value: "Otro"
     }
-  }, [_vm._v("Otro")])])]), _vm._v(" "), _vm._m(43), _vm._v(" "), _c("div", {
+  }, [_vm._v("Otro")])])]), _vm._v(" "), _vm._m(42), _vm._v(" "), _c("div", {
     staticClass: "mb-4 bg-white p-3 border rounded shadow-sm"
   }, [_c("div", {
     staticClass: "mb-3"
@@ -5114,7 +5121,7 @@ var render = function render() {
         _vm.$set(_vm.nuevaFicha, "motivo", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _vm._m(44), _vm._v(" "), _c("div", {
+  })])]), _vm._v(" "), _vm._m(43), _vm._v(" "), _c("div", {
     staticClass: "mb-4 bg-white p-3 border rounded shadow-sm d-flex align-items-center justify-content-between flex-wrap gap-2"
   }, [_c("div", {
     staticClass: "d-flex align-items-center"
@@ -5156,7 +5163,7 @@ var render = function render() {
     }, [_vm._v(_vm._s(prof.name))]);
   })], 2)]), _vm._v(" "), _c("span", {
     staticClass: "badge bg-light text-muted border"
-  }, [_vm._v("Asignado automáticamente")])]), _vm._v(" "), _vm._m(45), _vm._v(" "), _c("div", {
+  }, [_vm._v("Asignado automáticamente")])]), _vm._v(" "), _vm._m(44), _vm._v(" "), _c("div", {
     staticClass: "mb-4 bg-white p-3 border rounded shadow-sm"
   }, [_vm._l(_vm.nuevaFicha.interconsultas, function (item, index) {
     return _c("div", {
@@ -5312,7 +5319,7 @@ var render = function render() {
     on: {
       click: _vm.limpiarInterconsulta
     }
-  }, [_vm._v("Cancelar")]) : _vm._e()], 2), _vm._v(" "), _vm._m(46), _vm._v(" "), _c("div", {
+  }, [_vm._v("Cancelar")]) : _vm._e()], 2), _vm._v(" "), _vm._m(45), _vm._v(" "), _c("div", {
     staticClass: "mb-4 bg-white p-3 border rounded shadow-sm"
   }, [_c("div", {
     staticClass: "mb-3"
@@ -5508,7 +5515,7 @@ var render = function render() {
       staticClass: "card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-2"
     }, [_c("div", {
       staticClass: "d-flex align-items-center"
-    }, [_vm._m(47, true), _vm._v(" "), _c("div", [_c("h6", {
+    }, [_vm._m(46, true), _vm._v(" "), _c("div", [_c("h6", {
       staticClass: "font-weight-bold text-dark mb-1"
     }, [_vm._v("Ficha " + _vm._s(_vm.paciente.fichas_seguimiento.length - index))]), _vm._v(" "), _c("div", {
       staticClass: "small text-muted"
@@ -5607,7 +5614,7 @@ var render = function render() {
       value: _vm.activePill === "recetas",
       expression: "activePill === 'recetas'"
     }]
-  }, [_vm._m(48), _vm._v(" "), _vm.paciente.prescriptions && _vm.paciente.prescriptions.length > 0 ? _c("div", _vm._l(_vm.paciente.prescriptions, function (receta) {
+  }, [_vm._m(47), _vm._v(" "), _vm.paciente.prescriptions && _vm.paciente.prescriptions.length > 0 ? _c("div", _vm._l(_vm.paciente.prescriptions, function (receta) {
     return _c("div", {
       key: receta.id,
       staticClass: "card border border-light shadow-sm mb-4",
@@ -5621,7 +5628,7 @@ var render = function render() {
       staticClass: "d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2"
     }, [_c("div", {
       staticClass: "d-flex align-items-center"
-    }, [_vm._m(49, true), _vm._v(" "), _c("div", [_c("h6", {
+    }, [_vm._m(48, true), _vm._v(" "), _c("div", [_c("h6", {
       staticClass: "mb-0 font-weight-bold text-dark fs-5"
     }, [_vm._v("Receta Médica")]), _vm._v(" "), _c("div", {
       staticClass: "small text-muted mt-1"
@@ -5704,11 +5711,11 @@ var render = function render() {
       value: _vm.activePill === "ordenes",
       expression: "activePill === 'ordenes'"
     }]
-  }, [_vm._m(50), _vm._v(" "), _vm.allMedicalExams && _vm.allMedicalExams.length > 0 ? _c("div", [_c("div", {
+  }, [_vm._m(49), _vm._v(" "), _vm.allMedicalExams && _vm.allMedicalExams.length > 0 ? _c("div", [_c("div", {
     staticClass: "table-responsive"
   }, [_c("table", {
     staticClass: "table table-hover align-middle"
-  }, [_vm._m(51), _vm._v(" "), _c("tbody", _vm._l(_vm.allMedicalExams, function (examData, idx) {
+  }, [_vm._m(50), _vm._v(" "), _c("tbody", _vm._l(_vm.allMedicalExams, function (examData, idx) {
     return _c("tr", {
       key: idx
     }, [_c("td", [_vm._v(_vm._s(_vm.formatDate(examData.date)))]), _vm._v(" "), _c("td", {
@@ -5745,7 +5752,7 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "row"
-  }, [_vm._m(52), _vm._v(" "), _vm._l(_vm.allTests, function (t, index) {
+  }, [_vm._m(51), _vm._v(" "), _vm._l(_vm.allTests, function (t, index) {
     return _c("div", {
       key: t.testName + "_" + (t.id || index),
       staticClass: "col-md-6 col-lg-4 mb-4"
@@ -5767,11 +5774,11 @@ var render = function render() {
       staticClass: "card-body bg-light position-relative"
     }, [_c("div", {
       staticClass: "mb-3"
-    }, [_vm._m(53, true), _vm._v(" "), _c("strong", {
+    }, [_vm._m(52, true), _vm._v(" "), _c("strong", {
       staticClass: "text-dark"
     }, [_vm._v(_vm._s(_vm.formatDate(t.created_at || t.fecha)))])]), _vm._v(" "), t.score || t.total || t.result ? _c("div", {
       staticClass: "mb-0"
-    }, [_vm._m(54, true), _vm._v(" "), _c("span", {
+    }, [_vm._m(53, true), _vm._v(" "), _c("span", {
       staticClass: "badge bg-success rounded-pill px-3 py-2",
       staticStyle: {
         "font-size": "0.9rem"
@@ -5783,10 +5790,10 @@ var render = function render() {
         right: "-15px",
         "font-size": "5rem"
       }
-    })]), _vm._v(" "), _vm._m(55, true)])]);
+    })]), _vm._v(" "), _vm._m(54, true)])]);
   }), _vm._v(" "), _vm.allTests.length === 0 ? _c("div", {
     staticClass: "col-12"
-  }, [_vm._m(56)]) : _vm._e()], 2)]), _vm._v(" "), _c("div", {
+  }, [_vm._m(55)]) : _vm._e()], 2)]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
     "class": {
       "show active": _vm.activeTab === "documentos"
@@ -5795,7 +5802,7 @@ var render = function render() {
       id: "documentos",
       role: "tabpanel"
     }
-  }, [_vm._m(57), _vm._v(" "), _c("div", {
+  }, [_vm._m(56), _vm._v(" "), _c("div", {
     staticClass: "d-flex flex-wrap gap-2 mb-4"
   }, [_c("button", {
     staticClass: "btn btn-sm rounded-pill px-3",
@@ -5897,7 +5904,7 @@ var render = function render() {
       staticClass: "card-body p-4"
     }, [_c("div", {
       staticClass: "d-flex align-items-start mb-3"
-    }, [_vm._m(58, true), _vm._v(" "), _c("div", {
+    }, [_vm._m(57, true), _vm._v(" "), _c("div", {
       staticStyle: {
         "min-width": "0"
       }
@@ -5959,7 +5966,7 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "card-body p-4"
-  }, [_vm._m(59), _vm._v(" "), _c("div", {
+  }, [_vm._m(58), _vm._v(" "), _c("div", {
     staticClass: "fw-bold",
     staticStyle: {
       "font-size": "1.5rem",
@@ -5974,7 +5981,7 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "card-body p-4"
-  }, [_vm._m(60), _vm._v(" "), _c("div", {
+  }, [_vm._m(59), _vm._v(" "), _c("div", {
     staticClass: "fw-bold",
     staticStyle: {
       "font-size": "1.5rem",
@@ -5989,13 +5996,13 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "card-body p-4"
-  }, [_vm._m(61), _vm._v(" "), _c("div", {
+  }, [_vm._m(60), _vm._v(" "), _c("div", {
     staticClass: "fw-bold",
     staticStyle: {
       "font-size": "1.5rem",
       color: "#198754"
     }
-  }, [_vm._v("\n                S/ " + _vm._s(_vm.paciente.total_pagado ? parseFloat(_vm.paciente.total_pagado).toFixed(2) : "0.00") + "\n              ")])])])])]), _vm._v(" "), _vm._m(62), _vm._v(" "), _c("div", {
+  }, [_vm._v("\n                S/ " + _vm._s(_vm.paciente.total_pagado ? parseFloat(_vm.paciente.total_pagado).toFixed(2) : "0.00") + "\n              ")])])])])]), _vm._v(" "), _vm._m(61), _vm._v(" "), _c("div", {
     staticClass: "card border-0 rounded-3 shadow-sm mb-4"
   }, [_c("div", {
     staticClass: "card-body p-0"
@@ -6006,7 +6013,7 @@ var render = function render() {
     staticStyle: {
       "font-size": "0.9rem"
     }
-  }, [_vm._m(63), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.pagos_historial || [], function (pago) {
+  }, [_vm._m(62), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.pagos_historial || [], function (pago) {
     return _c("tr", {
       key: pago.payment_id,
       staticStyle: {
@@ -6065,7 +6072,7 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fas fa-clock me-1"
     }), _vm._v(" Pendiente\n                    ")])])]);
-  }), _vm._v(" "), !_vm.paciente.pagos_historial || _vm.paciente.pagos_historial.length === 0 ? _c("tr", [_vm._m(64)]) : _vm._e()], 2)])])])])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), !_vm.paciente.pagos_historial || _vm.paciente.pagos_historial.length === 0 ? _c("tr", [_vm._m(63)]) : _vm._e()], 2)])])])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
     "class": {
       "show active": _vm.activeTab === "convenios"
@@ -6074,7 +6081,7 @@ var render = function render() {
       id: "convenios",
       role: "tabpanel"
     }
-  }, [_vm._m(65)])]), _vm._v(" "), _c("div", {
+  }, [_vm._m(64)])]), _vm._v(" "), _c("div", {
     staticClass: "modal fade",
     attrs: {
       id: "modalDetalleFicha",
@@ -6086,7 +6093,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-lg modal-dialog-centered"
   }, [_c("div", {
     staticClass: "modal-content border-0 shadow-lg rounded-lg"
-  }, [_vm._m(66), _vm._v(" "), _vm.fichaSeleccionada ? _c("div", {
+  }, [_vm._m(65), _vm._v(" "), _vm.fichaSeleccionada ? _c("div", {
     staticClass: "modal-body p-4"
   }, [_c("div", {
     staticClass: "row mb-4 g-3"
@@ -6134,7 +6141,7 @@ var render = function render() {
     staticClass: "mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.fichaSeleccionada.motivo))])])])]), _vm._v(" "), _vm.fichaSeleccionada.interconsultas && _vm.fichaSeleccionada.interconsultas.length > 0 ? _c("div", {
     staticClass: "mb-4"
-  }, [_vm._m(67), _vm._v(" "), _vm._l(_vm.fichaSeleccionada.interconsultas, function (inter, idx) {
+  }, [_vm._m(66), _vm._v(" "), _vm._l(_vm.fichaSeleccionada.interconsultas, function (inter, idx) {
     return _c("div", {
       key: idx,
       staticClass: "card border-0 bg-light shadow-sm mb-2"
@@ -6151,7 +6158,7 @@ var render = function render() {
     }), _vm._v(" " + _vm._s(_vm.getProfessionalName(inter.professional_id)))])]), _vm._v(" "), inter.motivo ? _c("p", {
       staticClass: "mb-0 small text-dark mt-2"
     }, [_c("strong", [_vm._v("Motivo:")]), _vm._v(" " + _vm._s(inter.motivo))]) : _vm._e()])]);
-  })], 2) : _vm._e(), _vm._v(" "), _vm.getRecomendacionesParsed(_vm.fichaSeleccionada.recomendaciones).length > 0 ? _c("div", [_vm._m(68), _vm._v(" "), _c("div", {
+  })], 2) : _vm._e(), _vm._v(" "), _vm.getRecomendacionesParsed(_vm.fichaSeleccionada.recomendaciones).length > 0 ? _c("div", [_vm._m(67), _vm._v(" "), _c("div", {
     staticClass: "d-flex flex-wrap gap-2"
   }, _vm._l(_vm.getRecomendacionesParsed(_vm.fichaSeleccionada.recomendaciones), function (rec, idx) {
     return _c("span", {
@@ -6160,7 +6167,7 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fas fa-check me-1"
     }), _vm._v(" " + _vm._s(rec) + "\n              ")]);
-  }), 0)]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm._m(69)])])]), _vm._v(" "), _c("div", {
+  }), 0)]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm._m(68)])])]), _vm._v(" "), _c("div", {
     staticClass: "modal fade",
     attrs: {
       id: "modalPlanSeguridad",
@@ -6171,7 +6178,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-lg modal-dialog-centered"
   }, [_c("div", {
     staticClass: "modal-content border-0 shadow-lg rounded-lg"
-  }, [_vm._m(70), _vm._v(" "), _c("div", {
+  }, [_vm._m(69), _vm._v(" "), _c("div", {
     staticClass: "modal-body p-4 bg-light"
   }, [_c("form", {
     on: {
@@ -6184,7 +6191,7 @@ var render = function render() {
     staticClass: "row g-3"
   }, [_c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(71), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(70), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -6208,7 +6215,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(72), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(71), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -6232,7 +6239,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(73), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(72), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -6256,7 +6263,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(74), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(73), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -6280,7 +6287,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(75), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(74), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -6304,7 +6311,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(76), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(75), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -6328,7 +6335,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-12"
-  }, [_vm._m(77), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(76), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -6383,7 +6390,7 @@ var render = function render() {
     staticClass: "modal-content border-0 shadow-lg rounded-lg"
   }, [_c("div", {
     staticClass: "modal-header border-bottom-0 bg-light d-flex align-items-center"
-  }, [_vm._m(78), _vm._v(" "), _vm.planSeguridadSeleccionado ? _c("div", {
+  }, [_vm._m(77), _vm._v(" "), _vm.planSeguridadSeleccionado ? _c("div", {
     staticClass: "ms-auto me-3 small text-muted"
   }, [_vm._v("\n             Creado: " + _vm._s(_vm.formatDate(_vm.planSeguridadSeleccionado.fecha)) + "\n          ")]) : _vm._e(), _vm._v(" "), _c("button", {
     staticClass: "btn-close m-0",
@@ -6400,7 +6407,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(79), _vm._v(" "), _c("div", {
+  }, [_vm._m(78), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -6411,7 +6418,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(80), _vm._v(" "), _c("div", {
+  }, [_vm._m(79), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -6422,7 +6429,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(81), _vm._v(" "), _c("div", {
+  }, [_vm._m(80), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -6433,7 +6440,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(82), _vm._v(" "), _c("div", {
+  }, [_vm._m(81), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -6444,7 +6451,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(83), _vm._v(" "), _c("div", {
+  }, [_vm._m(82), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -6455,7 +6462,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(84), _vm._v(" "), _c("div", {
+  }, [_vm._m(83), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -6466,7 +6473,7 @@ var render = function render() {
     staticClass: "col-12"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(85), _vm._v(" "), _c("div", {
+  }, [_vm._m(84), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -6504,7 +6511,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-dialog-centered"
   }, [_c("div", {
     staticClass: "modal-content border-0 shadow-lg rounded-lg"
-  }, [_vm._m(86), _vm._v(" "), _c("div", {
+  }, [_vm._m(85), _vm._v(" "), _c("div", {
     staticClass: "modal-body p-4 bg-light"
   }, [_c("form", {
     on: {
@@ -6513,9 +6520,9 @@ var render = function render() {
         return _vm.subirNuevoDocumento.apply(null, arguments);
       }
     }
-  }, [_vm._m(87), _vm._v(" "), _c("div", {
+  }, [_vm._m(86), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(88), _vm._v(" "), _c("select", {
+  }, [_vm._m(87), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -6586,11 +6593,11 @@ var render = function render() {
       role: "status",
       "aria-hidden": "true"
     }
-  }) : _vm._e(), _vm._v("\n                Subir Documento\n              ")])])])])])])]), _vm._v(" "), _c("modal-ver-auto-triaje", {
+  }) : _vm._e(), _vm._v("\n                Subir Documento\n              ")])])])])])])]), _vm._v(" "), _vm.paciente.has_autotriaje ? _c("modal-ver-auto-triaje", {
     attrs: {
       "patient-id": _vm.paciente.id
     }
-  })], 1);
+  }) : _vm._e()], 1);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -6883,18 +6890,6 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fas fa-clipboard-check text-primary me-2"
   }), _vm._v(" Registro de Triajes")]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("button", {
-    staticClass: "btn btn-info btn-sm rounded-pill shadow-sm px-3 text-white",
-    attrs: {
-      "data-bs-toggle": "modal",
-      "data-bs-target": "#modalVerAutoTriaje"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-eye me-1"
-  }), _vm._v(" Ver autotriaje\n            ")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -12901,7 +12896,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.rounded-lg[data-v-60e3f8e3] { border-radius: 1rem !important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.rounded-lg[data-v-60e3f8e3] { border-radius: 1rem !important;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

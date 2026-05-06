@@ -668,7 +668,7 @@
           <div class="col-12 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h5 class="card-title font-weight-bold mb-0"><i class="fas fa-clipboard-check text-primary me-2"></i> Registro de Triajes</h5>
             <div class="d-flex gap-2">
-              <button class="btn btn-info btn-sm rounded-pill shadow-sm px-3 text-white" data-bs-toggle="modal" data-bs-target="#modalVerAutoTriaje">
+              <button v-if="paciente.has_autotriaje" class="btn btn-info btn-sm rounded-pill shadow-sm px-3 text-white" data-bs-toggle="modal" data-bs-target="#modalVerAutoTriaje">
                 <i class="fas fa-eye me-1"></i> Ver autotriaje
               </button>
               <button class="btn btn-primary btn-sm rounded-pill shadow-sm px-3" data-bs-toggle="modal" data-bs-target="#modalTriaje" @click="$emit('abrirTriaje', paciente)">
@@ -1787,7 +1787,7 @@
     </div>
     
     <!-- Modal Ver AutoTriaje -->
-    <modal-ver-auto-triaje :patient-id="paciente.id"></modal-ver-auto-triaje>
+    <modal-ver-auto-triaje v-if="paciente.has_autotriaje" :patient-id="paciente.id"></modal-ver-auto-triaje>
   </div>
 </template>
 
