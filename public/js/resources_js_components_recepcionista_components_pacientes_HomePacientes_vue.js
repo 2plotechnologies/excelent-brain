@@ -810,6 +810,38 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         this.nuevaFicha.recomendaciones.push(val);
       }
     },
+    getEvolutionColor: function getEvolutionColor(evo) {
+      if (!evo.typeEvolution) return '#6c757d';
+      var id = evo.typeEvolution.id;
+      // Map according to reference image:
+      if (id == 1) return '#e74c3c'; // Psiquiatrica - Red
+      if (id == 2) return '#fd7e14'; // Psicológica - Orange
+      if (id == 3) return '#27ae60'; // Certificado - Green
+      if (id == 5) return '#0d6efd'; // Membresía - Blue
+      if (id == 6) return '#20c997'; // Nutrición - Teal
+      return '#6c757d'; // Default
+    },
+    getEvolutionTypeLabel: function getEvolutionTypeLabel(evo) {
+      if (evo.typeEvolution) return evo.typeEvolution.clasificacion;
+      return 'Evolución';
+    },
+    formatLongDate: function formatLongDate(date) {
+      if (!date) return '';
+      try {
+        var d = new Date(date + 'T12:00:00');
+        var options = {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        };
+        var formatted = d.toLocaleDateString('es-ES', options);
+        // Capitalize first letter and "De" if needed
+        return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+      } catch (e) {
+        return date;
+      }
+    },
     agregarInterconsulta: function agregarInterconsulta() {
       if (!this.tempInterconsulta.tipo || !this.tempInterconsulta.professional_id) return;
       this.nuevaFicha.interconsultas.push(_objectSpread({}, this.tempInterconsulta));
@@ -4241,43 +4273,89 @@ var render = function render() {
     staticStyle: {
       "white-space": "pre-wrap"
     }
-  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.plan))])])])])])])]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm._m(36), _vm._v(" "), _c("div", {
-    staticClass: "card border"
-  }, [_c("div", {
-    staticClass: "card-body p-0"
-  }, [_c("div", {
-    staticClass: "list-group list-group-flush"
-  }, [_vm._l(_vm.paciente.medical_evolutions, function (evo) {
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.plan))])])])])])])]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm._m(36), _vm._v(" "), _vm.paciente.medical_evolutions && _vm.paciente.medical_evolutions.length > 0 ? _c("div", {
+    staticClass: "alert alert-success bg-opacity-10 border-0 py-2 px-3 mb-3 small d-flex align-items-center rounded-lg"
+  }, [_c("i", {
+    staticClass: "fas fa-bell me-2 text-success"
+  }), _vm._v(" "), _vm._m(37)]) : _vm._e(), _vm._v(" "), _vm.paciente.medical_evolutions && _vm.paciente.medical_evolutions.length > 0 ? _c("div", {
+    staticClass: "row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4"
+  }, _vm._l(_vm.paciente.medical_evolutions, function (evo) {
     return _c("div", {
       key: evo.id,
-      staticClass: "list-group-item p-4"
+      staticClass: "col"
     }, [_c("div", {
-      staticClass: "d-flex justify-content-between align-items-start mb-2"
+      staticClass: "card h-100 border-0 shadow-sm rounded-lg evolution-card overflow-hidden"
     }, [_c("div", {
+      staticClass: "p-2 px-3 text-white d-flex justify-content-between align-items-center",
+      style: {
+        backgroundColor: _vm.getEvolutionColor(evo)
+      }
+    }, [_c("span", {
+      staticClass: "font-weight-bold small",
+      staticStyle: {
+        "letter-spacing": "0.3px"
+      }
+    }, [_vm._v("\n                " + _vm._s(_vm.formatLongDate(evo.date)) + " \n                "), _c("span", {
+      staticClass: "opacity-75 ms-1",
+      staticStyle: {
+        "font-weight": "normal"
+      }
+    }, [_vm._v("(#" + _vm._s(evo.id) + ")")])])]), _vm._v(" "), _c("div", {
+      staticClass: "card-body p-3 d-flex flex-column"
+    }, [_c("div", {
+      staticClass: "mb-2"
+    }, [_c("small", {
+      staticClass: "text-muted d-block text-uppercase font-weight-bold",
+      staticStyle: {
+        "font-size": "0.65rem",
+        "letter-spacing": "0.5px"
+      }
+    }, [_vm._v("Clase")]), _vm._v(" "), _c("div", {
       staticClass: "d-flex align-items-center"
-    }, [_vm._m(37, true), _vm._v(" "), _c("div", [_c("h6", {
-      staticClass: "mb-0 font-weight-bold text-dark"
-    }, [_vm._v(_vm._s(evo.professional ? evo.professional.name : "Profesional Médico"))]), _vm._v(" "), _c("small", {
-      staticClass: "text-muted"
-    }, [_c("i", {
-      staticClass: "far fa-clock me-1"
-    }), _vm._v(" " + _vm._s(_vm.formatDateTime(evo.date, evo.hora)))])])])]), _vm._v(" "), _c("div", {
-      staticClass: "mt-3 ms-2 ms-sm-5 ps-sm-2"
+    }, [_c("span", {
+      staticClass: "small text-dark font-weight-bold"
+    }, [_vm._v(_vm._s(_vm.getEvolutionTypeLabel(evo)))])])]), _vm._v(" "), _c("div", {
+      staticClass: "mb-2"
+    }, [_c("small", {
+      staticClass: "text-muted d-block text-uppercase font-weight-bold",
+      staticStyle: {
+        "font-size": "0.65rem",
+        "letter-spacing": "0.5px"
+      }
+    }, [_vm._v("Profesional")]), _vm._v(" "), _c("span", {
+      staticClass: "small text-dark"
+    }, [_vm._v(_vm._s(evo.professional ? evo.professional.name : "N/A"))])]), _vm._v(" "), _c("div", {
+      staticClass: "mb-3"
+    }, [_c("small", {
+      staticClass: "text-muted d-block text-uppercase font-weight-bold",
+      staticStyle: {
+        "font-size": "0.65rem",
+        "letter-spacing": "0.5px"
+      }
+    }, [_vm._v("Diagnóstico")]), _vm._v(" "), _c("p", {
+      staticClass: "small text-dark mb-0 text-truncate-3",
+      staticStyle: {
+        "line-height": "1.5",
+        "white-space": "pre-wrap"
+      }
+    }, [_vm._v(_vm._s(evo.content || evo.descripcion))])]), _vm._v(" "), evo.plan ? _c("div", {
+      staticClass: "mt-auto pt-2"
+    }, [_c("div", {
+      staticClass: "p-2 bg-light rounded border-start border-3 border-warning"
     }, [_vm._m(38, true), _vm._v(" "), _c("p", {
-      staticClass: "small text-muted mb-3",
+      staticClass: "small text-muted mb-0 text-truncate-2",
       staticStyle: {
+        "font-style": "italic",
         "white-space": "pre-wrap"
       }
-    }, [_vm._v(_vm._s(evo.content || evo.descripcion))]), _vm._v(" "), evo.plan ? _c("div", {
-      staticClass: "p-3 bg-light rounded text-dark small border-start border-warning border-3 mb-3"
-    }, [_vm._m(39, true), _c("br"), _vm._v(" "), _c("span", {
-      staticStyle: {
-        "white-space": "pre-wrap"
-      }
-    }, [_vm._v(_vm._s(evo.plan))])]) : _vm._e()])]);
-  }), _vm._v(" "), !_vm.paciente.medical_evolutions || _vm.paciente.medical_evolutions.length == 0 ? _c("div", {
-    staticClass: "p-4 text-center text-muted"
-  }, [_vm._v("\n              Aún no cuenta con evoluciones de seguimiento cronológico.\n            ")]) : _vm._e()], 2)])])]), _vm._v(" "), _c("div", {
+    }, [_vm._v(_vm._s(evo.plan))])])]) : _vm._e(), _vm._v(" "), _vm._m(39, true)])])]);
+  }), 0) : _c("div", {
+    staticClass: "card border border-dashed p-5 text-center text-muted rounded-lg mb-4"
+  }, [_c("i", {
+    staticClass: "fas fa-folder-open fs-1 mb-3 opacity-25"
+  }), _vm._v(" "), _c("p", {
+    staticClass: "mb-0"
+  }, [_vm._v("Aún no cuenta con evoluciones de seguimiento cronológico.")])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
     attrs: {
       id: "triaje",
@@ -6598,36 +6676,41 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("h6", {
-    staticClass: "font-weight-bold mb-3 mt-4 text-dark px-2"
+    staticClass: "font-weight-bold mb-3 mt-4 text-dark px-2 d-flex align-items-center"
   }, [_c("i", {
     staticClass: "fas fa-clipboard-list text-primary me-2"
-  }), _vm._v(" Evoluciones de Seguimiento")]);
+  }), _vm._v(" Evoluciones de Seguimiento\n      ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "text-success"
+  }, [_vm._v("Está apreciando "), _c("strong", [_vm._v("todos")]), _vm._v(" los registros de evoluciones.")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("small", {
+    staticClass: "text-warning d-block font-weight-bold",
+    staticStyle: {
+      "font-size": "0.65rem"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-stethoscope me-1"
+  }), _vm._v(" TRATAMIENTO / PLAN")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "bg-light text-success border rounded-circle d-flex align-items-center justify-content-center me-3",
+    staticClass: "mt-3"
+  }, [_c("button", {
+    staticClass: "btn btn-outline-secondary btn-sm rounded px-3 py-1 text-dark bg-white border shadow-xs",
     staticStyle: {
-      width: "40px",
-      height: "40px"
+      "font-size": "0.75rem",
+      width: "fit-content"
     }
   }, [_c("i", {
-    staticClass: "fas fa-file-medical"
-  })]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("p", {
-    staticClass: "small text-dark mb-1"
-  }, [_c("strong", [_vm._v("Diagnóstico y Resumen de Sesión:")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("strong", {
-    staticClass: "text-warning"
-  }, [_c("i", {
-    staticClass: "fas fa-stethoscope me-1"
-  }), _vm._v(" Tratamiento / Plan:")]);
+    staticClass: "fas fa-plus-square me-1 text-muted"
+  }), _vm._v(" Agregar seguimiento\n                ")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -12631,7 +12714,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.nav-tabs .nav-link[data-v-36e64d45] {\r\n  color: #6c757d;\r\n  border: none;\r\n  font-size: 14px;\r\n  border-bottom: 2px solid transparent;\r\n  padding: 0.75rem 1rem;\n}\n.nav-tabs .nav-link.active[data-v-36e64d45] {\r\n  color: #0d6efd;\r\n  background-color: transparent;\r\n  border-color: transparent transparent #0d6efd;\n}\n.nav-tabs .nav-link[data-v-36e64d45]:hover {\r\n  border-color: transparent transparent #dee2e6;\n}\n.timeline[data-v-36e64d45] {\r\n  position: relative;\r\n  border-left: 2px solid #e9ecef;\r\n  padding-left: 1.5rem;\n}\n.timeline-item[data-v-36e64d45] {\r\n  position: relative;\n}\n.timeline-item[data-v-36e64d45]::before {\r\n  content: '';\r\n  position: absolute;\r\n  left: -30px;\r\n  top: 5px;\r\n  width: 14px;\r\n  height: 14px;\r\n  border-radius: 50%;\r\n  background-color: #0d6efd;\r\n  border: 2px solid #fff;\r\n  box-shadow: 0 0 0 1px #0d6efd;\n}\n.content-timeline[data-v-36e64d45] {\r\n  max-height: 400px;\r\n  overflow-y: auto;\r\n  padding-right: 10px;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.nav-tabs .nav-link[data-v-36e64d45] {\r\n  color: #6c757d;\r\n  border: none;\r\n  font-size: 14px;\r\n  border-bottom: 2px solid transparent;\r\n  padding: 0.75rem 1rem;\n}\n.nav-tabs .nav-link.active[data-v-36e64d45] {\r\n  color: #0d6efd;\r\n  background-color: transparent;\r\n  border-color: transparent transparent #0d6efd;\n}\n.nav-tabs .nav-link[data-v-36e64d45]:hover {\r\n  border-color: transparent transparent #dee2e6;\n}\n.timeline[data-v-36e64d45] {\r\n  position: relative;\r\n  border-left: 2px solid #e9ecef;\r\n  padding-left: 1.5rem;\n}\n.timeline-item[data-v-36e64d45] {\r\n  position: relative;\n}\n.timeline-item[data-v-36e64d45]::before {\r\n  content: '';\r\n  position: absolute;\r\n  left: -30px;\r\n  top: 5px;\r\n  width: 14px;\r\n  height: 14px;\r\n  border-radius: 50%;\r\n  background-color: #0d6efd;\r\n  border: 2px solid #fff;\r\n  box-shadow: 0 0 0 1px #0d6efd;\n}\n.content-timeline[data-v-36e64d45] {\r\n  max-height: 400px;\r\n  overflow-y: auto;\r\n  padding-right: 10px;\n}\n.evolution-card[data-v-36e64d45] {\r\n  transition: all 0.3s ease;\n}\n.evolution-card[data-v-36e64d45]:hover {\r\n  transform: translateY(-5px);\r\n  shadow: 0 10px 20px rgba(0,0,0,0.1) !important;\n}\n.text-truncate-3[data-v-36e64d45] {\r\n  display: -webkit-box;\r\n  -webkit-line-clamp: 3;\r\n  -webkit-box-orient: vertical;  \r\n  overflow: hidden;\n}\n.text-truncate-2[data-v-36e64d45] {\r\n  display: -webkit-box;\r\n  -webkit-line-clamp: 2;\r\n  -webkit-box-orient: vertical;  \r\n  overflow: hidden;\n}\n.shadow-xs[data-v-36e64d45] {\r\n  box-shadow: 0 1px 2px rgba(0,0,0,0.05);\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

@@ -599,39 +599,65 @@
           </div>
         </div>
 
-        <h6 class="font-weight-bold mb-3 mt-4 text-dark px-2"><i class="fas fa-clipboard-list text-primary me-2"></i> Evoluciones de Seguimiento</h6>
-        <div class="card border">
-          <div class="card-body p-0">
-            <div class="list-group list-group-flush">
-              <div v-for="evo in paciente.medical_evolutions" :key="evo.id" class="list-group-item p-4">
-                <div class="d-flex justify-content-between align-items-start mb-2">
+        <h6 class="font-weight-bold mb-3 mt-4 text-dark px-2 d-flex align-items-center">
+          <i class="fas fa-clipboard-list text-primary me-2"></i> Evoluciones de Seguimiento
+        </h6>
+
+        <!-- Notification Alert -->
+        <div class="alert alert-success bg-opacity-10 border-0 py-2 px-3 mb-3 small d-flex align-items-center rounded-lg" v-if="paciente.medical_evolutions && paciente.medical_evolutions.length > 0">
+          <i class="fas fa-bell me-2 text-success"></i>
+          <span class="text-success">Está apreciando <strong>todos</strong> los registros de evoluciones.</span>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4" v-if="paciente.medical_evolutions && paciente.medical_evolutions.length > 0">
+          <div v-for="evo in paciente.medical_evolutions" :key="evo.id" class="col">
+            <div class="card h-100 border-0 shadow-sm rounded-lg evolution-card overflow-hidden">
+              <!-- Colored Header -->
+              <div class="p-2 px-3 text-white d-flex justify-content-between align-items-center" :style="{ backgroundColor: getEvolutionColor(evo) }">
+                <span class="font-weight-bold small" style="letter-spacing: 0.3px;">
+                  {{ formatLongDate(evo.date) }} 
+                  <span class="opacity-75 ms-1" style="font-weight: normal;">(#{{ evo.id }})</span>
+                </span>
+              </div>
+              
+              <div class="card-body p-3 d-flex flex-column">
+                <div class="mb-2">
+                  <small class="text-muted d-block text-uppercase font-weight-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;">Clase</small>
                   <div class="d-flex align-items-center">
-                    <div class="bg-light text-success border rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                      <i class="fas fa-file-medical"></i>
-                    </div>
-                    <div>
-                      <h6 class="mb-0 font-weight-bold text-dark">{{ evo.professional ? evo.professional.name : 'Profesional Médico' }}</h6>
-                      <small class="text-muted"><i class="far fa-clock me-1"></i> {{ formatDateTime(evo.date, evo.hora) }}</small>
-                    </div>
+                    <span class="small text-dark font-weight-bold">{{ getEvolutionTypeLabel(evo) }}</span>
                   </div>
                 </div>
                 
-                <div class="mt-3 ms-2 ms-sm-5 ps-sm-2">
-                  <p class="small text-dark mb-1"><strong>Diagnóstico y Resumen de Sesión:</strong></p>
-                  <p class="small text-muted mb-3" style="white-space: pre-wrap;">{{ evo.content || evo.descripcion }}</p>
-                  
-                  <div v-if="evo.plan" class="p-3 bg-light rounded text-dark small border-start border-warning border-3 mb-3">
-                    <strong class="text-warning"><i class="fas fa-stethoscope me-1"></i> Tratamiento / Plan:</strong><br/>
-                    <span style="white-space: pre-wrap;">{{ evo.plan }}</span>
+                <div class="mb-2">
+                  <small class="text-muted d-block text-uppercase font-weight-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;">Profesional</small>
+                  <span class="small text-dark">{{ evo.professional ? evo.professional.name : 'N/A' }}</span>
+                </div>
+                
+                <div class="mb-3">
+                  <small class="text-muted d-block text-uppercase font-weight-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;">Diagnóstico</small>
+                  <p class="small text-dark mb-0 text-truncate-3" style="line-height: 1.5; white-space: pre-wrap;">{{ evo.content || evo.descripcion }}</p>
+                </div>
+
+                <div v-if="evo.plan" class="mt-auto pt-2">
+                  <div class="p-2 bg-light rounded border-start border-3 border-warning">
+                     <small class="text-warning d-block font-weight-bold" style="font-size: 0.65rem;"><i class="fas fa-stethoscope me-1"></i> TRATAMIENTO / PLAN</small>
+                     <p class="small text-muted mb-0 text-truncate-2" style="font-style: italic; white-space: pre-wrap;">{{ evo.plan }}</p>
                   </div>
                 </div>
-              </div>
 
-              <div v-if="!paciente.medical_evolutions || paciente.medical_evolutions.length == 0" class="p-4 text-center text-muted">
-                Aún no cuenta con evoluciones de seguimiento cronológico.
+                <div class="mt-3">
+                  <button class="btn btn-outline-secondary btn-sm rounded px-3 py-1 text-dark bg-white border shadow-xs" style="font-size: 0.75rem; width: fit-content;">
+                    <i class="fas fa-plus-square me-1 text-muted"></i> Agregar seguimiento
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+
+        <div v-else class="card border border-dashed p-5 text-center text-muted rounded-lg mb-4">
+          <i class="fas fa-folder-open fs-1 mb-3 opacity-25"></i>
+          <p class="mb-0">Aún no cuenta con evoluciones de seguimiento cronológico.</p>
         </div>
 
       </div>
@@ -2105,6 +2131,33 @@ export default {
         this.nuevaFicha.recomendaciones.push(val);
       }
     },
+    getEvolutionColor(evo) {
+      if (!evo.typeEvolution) return '#6c757d';
+      const id = evo.typeEvolution.id;
+      // Map according to reference image:
+      if (id == 1) return '#e74c3c'; // Psiquiatrica - Red
+      if (id == 2) return '#fd7e14'; // Psicológica - Orange
+      if (id == 3) return '#27ae60'; // Certificado - Green
+      if (id == 5) return '#0d6efd'; // Membresía - Blue
+      if (id == 6) return '#20c997'; // Nutrición - Teal
+      return '#6c757d'; // Default
+    },
+    getEvolutionTypeLabel(evo) {
+      if (evo.typeEvolution) return evo.typeEvolution.clasificacion;
+      return 'Evolución';
+    },
+    formatLongDate(date) {
+      if (!date) return '';
+      try {
+        const d = new Date(date + 'T12:00:00');
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        let formatted = d.toLocaleDateString('es-ES', options);
+        // Capitalize first letter and "De" if needed
+        return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+      } catch (e) {
+        return date;
+      }
+    },
     agregarInterconsulta() {
       if (!this.tempInterconsulta.tipo || !this.tempInterconsulta.professional_id) return;
       this.nuevaFicha.interconsultas.push({ ...this.tempInterconsulta });
@@ -2283,5 +2336,27 @@ export default {
   max-height: 400px;
   overflow-y: auto;
   padding-right: 10px;
+}
+.evolution-card {
+  transition: all 0.3s ease;
+}
+.evolution-card:hover {
+  transform: translateY(-5px);
+  shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+.text-truncate-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+}
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+}
+.shadow-xs {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 </style>
