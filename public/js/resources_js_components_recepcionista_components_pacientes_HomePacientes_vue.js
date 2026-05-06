@@ -7103,7 +7103,11 @@ var staticRenderFns = [function () {
     staticClass: "mb-0 font-weight-bold d-flex align-items-center text-dark"
   }, [_c("i", {
     staticClass: "fas fa-file-invoice text-primary me-2"
-  }), _vm._v(" Órdenes Médicas\n            ")])]);
+  }), _vm._v(" Órdenes Médicas\n            ")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary rounded-pill px-3 shadow-sm btn-sm"
+  }, [_c("i", {
+    staticClass: "fas fa-plus me-1"
+  }), _vm._v(" Nueva Orden\n            ")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;

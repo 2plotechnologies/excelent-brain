@@ -1231,6 +1231,9 @@
               <h5 class="mb-0 font-weight-bold d-flex align-items-center text-dark">
                 <i class="fas fa-file-invoice text-primary me-2"></i> Órdenes Médicas
               </h5>
+              <button class="btn btn-primary rounded-pill px-3 shadow-sm btn-sm">
+                <i class="fas fa-plus me-1"></i> Nueva Orden
+              </button>
             </div>
 
             <div v-if="allMedicalExams && allMedicalExams.length > 0">
