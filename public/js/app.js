@@ -6684,6 +6684,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 console.log("actualizado", res.data);
                 _this.closeModal();
                 _this.$swal('Cita editada con éxito');
+                _this.$emit('actualizar');
                 //this.$parent.searchHistoria()
                 _this.motivo = '';
               })["catch"](function (err) {
@@ -8389,6 +8390,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   _this2.dataCita.payment.price = parseFloat(_this2.dataCita.payment.price) - parseFloat(_this2.caso.monto_adelanto);
                   _this2.$emit('actualizarAdelanto', _this2.caso.monto_adelanto, _this2.dataCita.id);
                 }
+                _this2.$emit('actualizar');
               })["catch"](function (err) {
                 console.error(err);
                 _this2.$swal({
@@ -17504,11 +17506,15 @@ var render = function render() {
       idUsuario: _vm.idUsuario
     },
     on: {
-      actualizarAdelanto: _vm.actualizarAdelantoTable
+      actualizarAdelanto: _vm.actualizarAdelantoTable,
+      actualizar: _vm.listar
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita ? _c("modal-estado", {
     attrs: {
       dataCit: _vm.cita
+    },
+    on: {
+      actualizar: _vm.listar
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita ? _c("modal-patient", {
     attrs: {
@@ -18144,6 +18150,9 @@ var render = function render() {
     attrs: {
       dataCit: _vm.cita,
       idUsuario: _vm.idUsuario
+    },
+    on: {
+      actualizar: _vm.actualizarListadoCitas
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("pago-modal", {
     attrs: {
@@ -18152,7 +18161,8 @@ var render = function render() {
       idSede: _vm.idSede
     },
     on: {
-      actualizarAdelanto: _vm.actualizarAdelanto
+      actualizarAdelanto: _vm.actualizarAdelanto,
+      actualizar: _vm.actualizarListadoCitas
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("modal-patient", {
     attrs: {

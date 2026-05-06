@@ -181,7 +181,7 @@ export default {
         console.log(res)
         this.closeModal()
         this.$swal('Datos de paciente actualizado con éxito')
-
+        this.$emit('actualizar')
       })
       .catch(err => {
         console.error(err)        

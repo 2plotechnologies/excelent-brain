@@ -344,12 +344,13 @@
       @volver="vistaActual = 'lista'" 
       @editarPaciente="dataPaciente = $event" 
       @abrirTriaje="dataProps($event)"
+      ref="detallePaciente"
     />
 
-		<ModalEdicionPaciente :dataPatient="dataPaciente"></ModalEdicionPaciente>
+		<ModalEdicionPaciente :dataPatient="dataPaciente" @actualizar="getPatients"></ModalEdicionPaciente>
     <modal-recetas v-if="data" :dataPatient="data"></modal-recetas>
     <modal-faltas v-if="data" :dataPatient="data"></modal-faltas>
-    <modal-triaje v-if="data" :dataPatient="data" :profesionales="profesionales"></modal-triaje>
+    <modal-triaje v-if="data" :dataPatient="data" :profesionales="profesionales" @actualizar="getPatients"></modal-triaje>
 		<modal-ver-triajes-viejos v-if="dataTriajes" :triajes="dataTriajes"></modal-ver-triajes-viejos>
 		<ModalVerReprogramacionesViejos :reprogramaciones="reprogramaciones"></ModalVerReprogramacionesViejos>
     <modal-new-patient @cargarPacienteSimpleNuevo="getPatients"></modal-new-patient>
@@ -545,6 +546,18 @@ export default {
             this.busqueda.push(el);
           //}
         })
+
+        // Si hay un paciente seleccionado en detalle, actualizar su referencia.
+        if (this.dataPaciente && this.dataPaciente.id) {
+          const updated = this.dataPatients.find(p => p.id === this.dataPaciente.id);
+          if (updated) {
+            this.prepararPaciente(updated);
+          }
+        }
+
+        if (this.$refs.detallePaciente) {
+          this.$refs.detallePaciente.fetchPatientDetails();
+        }
 
       })
       .catch(err => {

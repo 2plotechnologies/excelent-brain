@@ -1008,6 +1008,8 @@ class PatientController extends Controller
 				},
 				'appointments.professional',
 				'appointments.medical_exams',
+				'appointments.payment',
+				'appointments.precio',
 				'medical_evolutions' => function ($q) {
 					$q->orderBy('date', 'desc');
 				},
@@ -1021,7 +1023,7 @@ class PatientController extends Controller
 				return response()->json(['error' => 'Patient not found'], 404);
 			}
 
-			// Additional Data via DB queries or other models
+			// Additional Data via DB queries or other models.
 			if($patient->address) {
 				$patient->departamento = DB::table('ubdepartamento')->where('idDepa', $patient->address->department)->first()->departamento;
 				$patient->provincia = DB::table('ubprovincia')->where('idProv', $patient->address->province)->first()->provincia;
@@ -1033,6 +1035,27 @@ class PatientController extends Controller
 			$patient->planes_seguridad = DB::table('planes_seguridad')->where('patient_id', $id)->orderBy('fecha', 'desc')->get();
 			$patient->semaforo_estados = DB::table('semaforo')->where('patient_id', $id)->orderBy('registro', 'desc')->get();
 			$patient->deudas_financieras = DB::table('deudas')->where('patient_id', $id)->orderBy('fecha', 'desc')->get();
+
+			// Financial summary for Finanzas tab
+			$pagosHistorial = DB::table('payments as p')
+				->join('appointments as a', 'a.id', '=', 'p.appointment_id')
+				->leftJoin('precios as pr', 'pr.id', '=', 'a.type')
+				->where('a.patient_id', $id)
+				->orderBy('a.date', 'desc')
+				->select('a.date', 'pr.descripcion as concepto', 'p.payment_method as metodo_id', 'p.price as monto', 'p.pay_status as estado', 'p.id as payment_id')
+				->get();
+			$patient->pagos_historial = $pagosHistorial;
+
+			$deudaTotal = $patient->deudas_financieras->where('estado', 1)->sum('monto');
+			$pagosPendientes = $patient->deudas_financieras->where('estado', 1)->count();
+			$totalPagado = DB::table('payments as p')
+				->join('appointments as a', 'a.id', '=', 'p.appointment_id')
+				->where('a.patient_id', $id)
+				->where('p.pay_status', 2)
+				->sum('p.price');
+			$patient->deuda_total = $deudaTotal;
+			$patient->pagos_pendientes = $pagosPendientes;
+			$patient->total_pagado = $totalPagado;
 			$patient->archivos_list = DB::table('archivos')->where('patient_id', $id)->get();
 			$patient->archivos_triaje = DB::table('triaje_archivo')->where('patient_id', $id)->get();
 			$patient->faltas_historial = DB::table('faltas as f')

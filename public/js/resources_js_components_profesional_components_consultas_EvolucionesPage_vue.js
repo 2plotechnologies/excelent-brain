@@ -2309,6 +2309,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 console.log(res);
                 _this.closeModal();
                 _this.$swal('Datos de paciente actualizado con éxito');
+                _this.$emit('actualizar');
               })["catch"](function (err) {
                 console.error(err);
               });

@@ -41,39 +41,39 @@
     <!-- Nav tabs -->
     <ul class="nav nav-tabs mb-4 px-2" id="patientTabs" role="tablist" style="border-bottom: 0;">
       <li class="nav-item" role="presentation">
-        <button class="nav-link active font-weight-bold small text-dark" id="resumen-tab" data-bs-toggle="tab" data-bs-target="#resumen" type="button" role="tab" >Resumen</button>
+        <button class="nav-link font-weight-bold small text-dark" :class="{ active: activeTab === 'resumen' }" @click="activeTab = 'resumen'" type="button" role="tab" >Resumen</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" id="datos-tab" data-bs-toggle="tab" data-bs-target="#datos" type="button" role="tab" >Datos Personales</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'datos' }" @click="activeTab = 'datos'" type="button" role="tab" >Datos Personales</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" id="citas-tab" data-bs-toggle="tab" data-bs-target="#citas" type="button" role="tab" >Citas & Paquetes</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'citas' }" @click="activeTab = 'citas'" type="button" role="tab" >Citas & Paquetes</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" id="historial-tab" data-bs-toggle="tab" data-bs-target="#historial" type="button" role="tab" >Historial Clínico <span v-if="paciente.medical_evolutions">({{ paciente.medical_evolutions.length }})</span></button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'historial' }" @click="activeTab = 'historial'" type="button" role="tab" >Historial Clínico <span v-if="paciente.medical_evolutions">({{ paciente.medical_evolutions.length }})</span></button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" id="triaje-tab" data-bs-toggle="tab" data-bs-target="#triaje" type="button" role="tab" >Triaje & Seguridad</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'triaje' }" @click="activeTab = 'triaje'" type="button" role="tab" >Triaje & Seguridad</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" id="seguimiento-tab" data-bs-toggle="tab" data-bs-target="#seguimiento" type="button" role="tab" >
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'seguimiento' }" @click="activeTab = 'seguimiento'" type="button" role="tab" >
           <i class="fas fa-clipboard-list me-1"></i> Ficha de Seguimiento
         </button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" id="recetas-tab" data-bs-toggle="tab" data-bs-target="#recetas" type="button" role="tab" >Recetas & Órdenes</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'recetas' }" @click="activeTab = 'recetas'" type="button" role="tab" >Recetas & Órdenes</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" id="pruebas-tab" data-bs-toggle="tab" data-bs-target="#pruebas" type="button" role="tab" >Pruebas Psicológicas</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'pruebas' }" @click="activeTab = 'pruebas'" type="button" role="tab" >Pruebas Psicológicas</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" id="documentos-tab" data-bs-toggle="tab" data-bs-target="#documentos" type="button" role="tab">Documentos</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'documentos' }" @click="activeTab = 'documentos'" type="button" role="tab">Documentos</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" id="convenios-tab" data-bs-toggle="tab" data-bs-target="#convenios" type="button" role="tab" >Convenios</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'convenios' }" @click="activeTab = 'convenios'" type="button" role="tab" >Convenios</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" id="finanzas-tab" data-bs-toggle="tab" data-bs-target="#finanzas" type="button" role="tab" >Finanzas</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'finanzas' }" @click="activeTab = 'finanzas'" type="button" role="tab" >Finanzas</button>
       </li>
     </ul>
 
@@ -88,7 +88,7 @@
     <!-- Tab panes -->
     <div class="tab-content px-2" id="patientTabsContent" v-else>
       <!-- RESUMEN -->
-      <div class="tab-pane fade show active" id="resumen" role="tabpanel">
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'resumen' }" id="resumen" role="tabpanel">
         <div class="row">
           <div class="col-md-4">
             <div class="card shadow-sm border rounded-lg mb-3">
@@ -148,7 +148,7 @@
       </div>
 
       <!-- DATOS PERSONALES -->
-      <div class="tab-pane fade" id="datos" role="tabpanel">
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'datos' }" id="datos" role="tabpanel">
         <div class="position-relative">
 
           <!-- BOTÓN EDITAR -->
@@ -376,7 +376,7 @@
       </div>
 
       <!-- CITAS Y PAQUETES -->
-      <div class="tab-pane fade" id="citas" role="tabpanel">
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'citas' }" id="citas" role="tabpanel">
         
         <!-- Paquetes Contratados Header -->
         <div class="d-flex justify-content-between align-items-center mb-3 mt-1">
@@ -481,7 +481,7 @@
       </div>
 
       <!-- HISTORIAL Medico -->
-      <div class="tab-pane fade" id="historial" role="tabpanel">
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'historial' }" id="historial" role="tabpanel">
         
         <!-- Accordions for Initial Evaluations -->
         <div class="accordion mb-4 bg-white shadow-sm rounded-lg" id="accordionInitialHistories" v-if="paciente.initial_psychological_history || paciente.initial_psychiatric_history">
@@ -663,7 +663,7 @@
       </div>
 
       <!-- TRIAJE -->
-      <div class="tab-pane fade" id="triaje" role="tabpanel">
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'triaje' }" id="triaje" role="tabpanel">
         <div class="row">
           <div class="col-12 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h5 class="card-title font-weight-bold mb-0"><i class="fas fa-clipboard-check text-primary me-2"></i> Registro de Triajes</h5>
@@ -901,7 +901,7 @@
       </div>
 
       <!-- FICHA DE SEGUIMIENTO -->
-      <div class="tab-pane fade" id="seguimiento" role="tabpanel">
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'seguimiento' }" id="seguimiento" role="tabpanel">
         <div class="row" v-if="fichaView === 'botones'">
           <div class="col-12 mb-4">
             <h5 class="card-title font-weight-bold mb-1"><i class="fas fa-clipboard-list text-primary me-2"></i> Ficha de Seguimiento</h5>
@@ -1140,7 +1140,7 @@
       </div>
 
       <!-- RECETAS -->
-      <div class="tab-pane fade" id="recetas" role="tabpanel">
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'recetas' }" id="recetas" role="tabpanel">
         
         <!-- Tabs for Recetas and Ordenes -->
         <ul class="nav nav-pills mb-4" id="recetasOrdenesTabs" role="tablist">
@@ -1273,7 +1273,7 @@
       </div>
 
       <!-- PRUEBAS PSICOLOGICAS -->
-      <div class="tab-pane fade" id="pruebas" role="tabpanel">
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'pruebas' }" id="pruebas" role="tabpanel">
         <div class="row">
           <div class="col-12 mb-3">
              <h5 class="card-title font-weight-bold"><i class="fas fa-brain text-primary me-2"></i> Pruebas Psicológicas Aplicadas</h5>
@@ -1318,7 +1318,7 @@
       </div>
 
       <!-- DOCUMENTOS -->
-      <div class="tab-pane fade" id="documentos" role="tabpanel">
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'documentos' }" id="documentos" role="tabpanel">
         <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
           <div>
             <h5 class="mb-0 font-weight-bold d-flex align-items-center text-dark">
@@ -1378,37 +1378,117 @@
       </div>
 
       <!-- FINANZAS -->
-      <div class="tab-pane fade" id="finanzas" role="tabpanel">
-        <div class="card border">
-          <div class="card-body p-4">
-             <h5 class="card-title font-weight-bold mb-4">Deudas y Cuentas</h5>
-             <table class="table table-sm table-hover">
-                <thead class="bg-light">
-                  <tr>
-                    <th class="p-2 border-bottom-0 text-muted">Fecha</th>
-                    <th class="p-2 border-bottom-0 text-muted">Detalles</th>
-                    <th class="p-2 border-bottom-0 text-muted">Monto</th>
-                    <th class="p-2 border-bottom-0 text-muted">Estado</th>
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'finanzas' }" id="finanzas" role="tabpanel">
+
+        <!-- Summary Cards -->
+        <div class="row g-3 mb-4">
+          <!-- Deuda Total -->
+          <div class="col-md-4">
+            <div class="card border rounded-3 shadow-sm" style="border-color: #eef2f5 !important;">
+              <div class="card-body p-4">
+                <div class="text-muted small mb-2 d-flex align-items-center gap-2">
+                  <i class="fas fa-dollar-sign text-muted"></i> Deuda Total
+                </div>
+                <div class="fw-bold" style="font-size: 1.5rem; color: #198754;">
+                  S/ {{ paciente.deuda_total ? parseFloat(paciente.deuda_total).toFixed(2) : '0.00' }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagos Pendientes -->
+          <div class="col-md-4">
+            <div class="card border rounded-3 shadow-sm" style="border-color: #eef2f5 !important;">
+              <div class="card-body p-4">
+                <div class="text-muted small mb-2 d-flex align-items-center gap-2">
+                  <i class="far fa-calendar-alt text-muted"></i> Pagos Pendientes
+                </div>
+                <div class="fw-bold" style="font-size: 1.5rem; color: #212529;">
+                  {{ paciente.pagos_pendientes || 0 }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Pagado -->
+          <div class="col-md-4">
+            <div class="card border rounded-3 shadow-sm" style="border-color: #eef2f5 !important;">
+              <div class="card-body p-4">
+                <div class="text-muted small mb-2 d-flex align-items-center gap-2">
+                  <i class="far fa-credit-card text-muted"></i> Total Pagado
+                </div>
+                <div class="fw-bold" style="font-size: 1.5rem; color: #198754;">
+                  S/ {{ paciente.total_pagado ? parseFloat(paciente.total_pagado).toFixed(2) : '0.00' }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historial de Pagos -->
+        <div class="d-flex align-items-center mb-3">
+          <i class="far fa-credit-card text-primary me-2"></i>
+          <h6 class="font-weight-bold mb-0 text-dark">Historial de Pagos</h6>
+        </div>
+
+        <div class="card border-0 rounded-3 shadow-sm mb-4">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+                <thead>
+                  <tr style="border-bottom: 1px solid #f1f3f5;">
+                    <th class="border-0 text-muted fw-normal py-3 ps-4" style="font-size: 0.85rem;">Fecha</th>
+                    <th class="border-0 text-muted fw-normal py-3" style="font-size: 0.85rem;">Concepto</th>
+                    <th class="border-0 text-muted fw-normal py-3" style="font-size: 0.85rem;">Método</th>
+                    <th class="border-0 text-muted fw-normal py-3 text-end" style="font-size: 0.85rem;">Monto</th>
+                    <th class="border-0 text-muted fw-normal py-3 pe-4" style="font-size: 0.85rem;">Estado</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="deuda in (paciente.deudas_financieras || [])" :key="deuda.id">
-                    <td class="p-2 text-dark">{{ formatDate(deuda.fecha) }}</td>
-                    <td class="p-2 text-muted">{{ deuda.observacion || 'Atención' }}</td>
-                    <td class="p-2 text-dark font-weight-bold">S/ {{ deuda.monto }}</td>
-                    <td class="p-2"><span class="badge" :class="deuda.estado ? 'bg-danger' : 'bg-success'">{{ deuda.estado ? 'Pendiente' : 'Pagado' }}</span></td>
+                  <tr v-for="pago in (paciente.pagos_historial || [])" :key="pago.payment_id" style="border-bottom: 1px solid #f8f9fa;">
+                    <td class="align-middle py-3 ps-4">
+                      <span class="text-dark">{{ formatOnlyDate(pago.date) }}</span>
+                    </td>
+                    <td class="align-middle py-3 fw-bold text-dark">
+                      {{ pago.concepto || 'Consulta' }}
+                    </td>
+                    <td class="align-middle py-3 text-muted">
+                      {{ getPaymentMethodName(pago.metodo_id) }}
+                    </td>
+                    <td class="align-middle py-3 text-end text-dark">
+                      S/ {{ pago.monto ? parseFloat(pago.monto).toFixed(2) : '0.00' }}
+                    </td>
+                    <td class="align-middle py-3 pe-4">
+                      <span v-if="pago.estado == 2 || pago.estado == null" class="badge rounded-pill px-3 py-2" style="background-color: #d1fae5; color: #065f46; font-weight: 500; font-size: 0.78rem;">
+                        <i class="fas fa-check-circle me-1"></i> Pagado
+                      </span>
+                      <span v-else-if="pago.estado == 1" class="badge rounded-pill px-3 py-2" style="background-color: #fef3c7; color: #92400e; font-weight: 500; font-size: 0.78rem;">
+                        <i class="fas fa-clock me-1"></i> Sin pagar
+                      </span>
+                      <span v-else-if="pago.estado == 3" class="badge rounded-pill px-3 py-2" style="background-color: #fee2e2; color: #991b1b; font-weight: 500; font-size: 0.78rem;">
+                        <i class="fas fa-times-circle me-1"></i> Anulado
+                      </span>
+                      <span v-else class="badge rounded-pill px-3 py-2" style="background-color: #fef3c7; color: #92400e; font-weight: 500; font-size: 0.78rem;">
+                        <i class="fas fa-clock me-1"></i> Pendiente
+                      </span>
+                    </td>
                   </tr>
-                  <tr v-if="!paciente.deudas_financieras || paciente.deudas_financieras.length == 0">
-                    <td colspan="4" class="text-center text-muted py-3">No presenta deudas</td>
+                  <tr v-if="!paciente.pagos_historial || paciente.pagos_historial.length === 0">
+                    <td colspan="5" class="text-center text-muted py-5">
+                      <i class="far fa-folder-open mb-2 d-block" style="font-size: 2rem; opacity: 0.3;"></i>
+                      No hay historial de pagos registrado.
+                    </td>
                   </tr>
                 </tbody>
-             </table>
+              </table>
+            </div>
           </div>
         </div>
+
       </div>
 
       <!-- CONVENIOS -->
-      <div class="tab-pane fade" id="convenios" role="tabpanel">
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'convenios' }" id="convenios" role="tabpanel">
         <div class="card border-0 shadow-sm" style="border-radius: 12px; background-color: #fcfcfc;">
           <div class="card-body p-5 text-center">
              <div class="mb-4">
@@ -1730,6 +1810,7 @@ export default {
       paciente: {},
       loading: true,
       timelineActivity: [],
+      activeTab: 'resumen',
       activePill: 'recetas',
       ciesData: [],
       fichaView: 'botones',
@@ -2145,6 +2226,11 @@ export default {
     getEvolutionTypeLabel(evo) {
       if (evo.typeEvolution) return evo.typeEvolution.clasificacion;
       return 'Evolución';
+    },
+    getPaymentMethodName(id) {
+      const methods = ['Efectivo', 'Depósito bancario', 'POS', 'Aplicativo Yape', 'Banco: BCP', 'Banco: BBVA', 'Banco: Interbank', 'Banco: Nación', 'Banco: Scotiabank', 'Aplicativo Plin', 'Open pay'];
+      if (!id) return '—';
+      return methods[id - 1] || `Método ${id}`;
     },
     formatLongDate(date) {
       if (!date) return '';

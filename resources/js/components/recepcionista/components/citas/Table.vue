@@ -76,7 +76,7 @@
 							
 							<!-- <div class="d-flex justify-content-start" style="flex-shrink: 0;">
 									<button data-bs-toggle="modal" data-bs-target="#addCitaModal" class="btn btn-outline-success"><i class="fas fa-plus"></i> Crear nueva Cita</button>
-									<modal-cita :profes="profesionales" :horas="horarios" @emitIdProf="listarhorario" @emitDate="fechaEmit" :idUsuario="idUsuario"></modal-cita>
+									<modal-cita :profes="profesionales" :horas="horarios" @emitIdProf="listarhorario" @emitDate="fechaEmit" :idUsuario="idUsuario" @actualizarListadoCitas="listar"></modal-cita>
 							</div> -->
 
 							
@@ -260,8 +260,8 @@
 
     </div>
 
-    <pago-modal v-if="cita" :cita="cita" :idUsuario="idUsuario" @actualizarAdelanto="actualizarAdelantoTable"></pago-modal>
-    <modal-estado  v-if="cita" :dataCit="cita"></modal-estado>
+    <pago-modal v-if="cita" :cita="cita" :idUsuario="idUsuario" @actualizarAdelanto="actualizarAdelantoTable" @actualizar="listar"></pago-modal>
+    <modal-estado  v-if="cita" :dataCit="cita" @actualizar="listar"></modal-estado>
     <modal-patient v-if="cita" :dataCit="cita"></modal-patient>
     <info-modal v-if="cita" :dataCit="cita" :precios="precios"></info-modal>
     <reprog-modal v-if="cita" :dataCit="cita" :idUsuario="idUsuario"></reprog-modal>

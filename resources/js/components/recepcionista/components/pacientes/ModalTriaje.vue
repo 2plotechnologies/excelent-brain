@@ -179,9 +179,10 @@ export default {
 						cancelButtonText: 'No, salir'
 					}).then((result) => {
 						if (result.isConfirmed) {
-							//abrir en una nueva ventana el PDF
+							//abrir en una nueva ventana el PDF.
 							window.open("/api/triajePDF/"+res.data['mensaje']+"?token="+localStorage.getItem('token'), "_blank");
 						}
+						this.$emit('actualizar')
 					})
 				}else{
 					this.$swal.fire({title: 'Hubo un error, reintenta luego', icon:'error'})

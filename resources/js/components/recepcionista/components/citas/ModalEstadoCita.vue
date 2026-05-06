@@ -89,6 +89,7 @@ import alertify from 'alertifyjs';
           console.log("actualizado",res.data)
           this.closeModal()
           this.$swal('Cita editada con éxito')
+          this.$emit('actualizar')
           //this.$parent.searchHistoria()
           this.motivo=''
         })

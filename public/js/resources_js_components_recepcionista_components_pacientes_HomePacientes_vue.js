@@ -353,6 +353,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       paciente: {},
       loading: true,
       timelineActivity: [],
+      activeTab: 'resumen',
       activePill: 'recetas',
       ciesData: [],
       fichaView: 'botones',
@@ -824,6 +825,11 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     getEvolutionTypeLabel: function getEvolutionTypeLabel(evo) {
       if (evo.typeEvolution) return evo.typeEvolution.clasificacion;
       return 'Evolución';
+    },
+    getPaymentMethodName: function getPaymentMethodName(id) {
+      var methods = ['Efectivo', 'Depósito bancario', 'POS', 'Aplicativo Yape', 'Banco: BCP', 'Banco: BBVA', 'Banco: Interbank', 'Banco: Nación', 'Banco: Scotiabank', 'Aplicativo Plin', 'Open pay'];
+      if (!id) return '—';
+      return methods[id - 1] || "M\xE9todo ".concat(id);
     },
     formatLongDate: function formatLongDate(date) {
       if (!date) return '';
@@ -1325,6 +1331,19 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
                   _this3.busqueda.push(el);
                   //}
                 });
+
+                // Si hay un paciente seleccionado en detalle, actualizar su referencia.
+                if (_this3.dataPaciente && _this3.dataPaciente.id) {
+                  var updated = _this3.dataPatients.find(function (p) {
+                    return p.id === _this3.dataPaciente.id;
+                  });
+                  if (updated) {
+                    _this3.prepararPaciente(updated);
+                  }
+                }
+                if (_this3.$refs.detallePaciente) {
+                  _this3.$refs.detallePaciente.fetchPatientDetails();
+                }
               })["catch"](function (err) {
                 console.error(err);
               });
@@ -1866,6 +1885,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 console.log(res);
                 _this.closeModal();
                 _this.$swal('Datos de paciente actualizado con éxito');
+                _this.$emit('actualizar');
               })["catch"](function (err) {
                 console.error(err);
               });
@@ -2410,9 +2430,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                     cancelButtonText: 'No, salir'
                   }).then(function (result) {
                     if (result.isConfirmed) {
-                      //abrir en una nueva ventana el PDF
+                      //abrir en una nueva ventana el PDF.
                       window.open("/api/triajePDF/" + res.data['mensaje'] + "?token=" + localStorage.getItem('token'), "_blank");
                     }
+                    _this.$emit('actualizar');
                   });
                 } else {
                   _this.$swal.fire({
@@ -3672,23 +3693,220 @@ var render = function render() {
       id: "patientTabs",
       role: "tablist"
     }
-  }, [_vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _vm._m(2), _vm._v(" "), _c("li", {
+  }, [_c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-dark",
+    "class": {
+      active: _vm.activeTab === "resumen"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "resumen";
+      }
+    }
+  }, [_vm._v("Resumen")])]), _vm._v(" "), _c("li", {
     staticClass: "nav-item",
     attrs: {
       role: "presentation"
     }
   }, [_c("button", {
     staticClass: "nav-link font-weight-bold small text-muted",
+    "class": {
+      active: _vm.activeTab === "datos"
+    },
     attrs: {
-      id: "historial-tab",
-      "data-bs-toggle": "tab",
-      "data-bs-target": "#historial",
       type: "button",
       role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "datos";
+      }
     }
-  }, [_vm._v("Historial Clínico "), _vm.paciente.medical_evolutions ? _c("span", [_vm._v("(" + _vm._s(_vm.paciente.medical_evolutions.length) + ")")]) : _vm._e()])]), _vm._v(" "), _vm._m(3), _vm._v(" "), _vm._m(4), _vm._v(" "), _vm._m(5), _vm._v(" "), _vm._m(6), _vm._v(" "), _vm._m(7), _vm._v(" "), _vm._m(8), _vm._v(" "), _vm._m(9)]), _vm._v(" "), _vm.loading ? _c("div", {
+  }, [_vm._v("Datos Personales")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    "class": {
+      active: _vm.activeTab === "citas"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "citas";
+      }
+    }
+  }, [_vm._v("Citas & Paquetes")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    "class": {
+      active: _vm.activeTab === "historial"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "historial";
+      }
+    }
+  }, [_vm._v("Historial Clínico "), _vm.paciente.medical_evolutions ? _c("span", [_vm._v("(" + _vm._s(_vm.paciente.medical_evolutions.length) + ")")]) : _vm._e()])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    "class": {
+      active: _vm.activeTab === "triaje"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "triaje";
+      }
+    }
+  }, [_vm._v("Triaje & Seguridad")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    "class": {
+      active: _vm.activeTab === "seguimiento"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "seguimiento";
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-clipboard-list me-1"
+  }), _vm._v(" Ficha de Seguimiento\n      ")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    "class": {
+      active: _vm.activeTab === "recetas"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "recetas";
+      }
+    }
+  }, [_vm._v("Recetas & Órdenes")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    "class": {
+      active: _vm.activeTab === "pruebas"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "pruebas";
+      }
+    }
+  }, [_vm._v("Pruebas Psicológicas")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    "class": {
+      active: _vm.activeTab === "documentos"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "documentos";
+      }
+    }
+  }, [_vm._v("Documentos")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    "class": {
+      active: _vm.activeTab === "convenios"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "convenios";
+      }
+    }
+  }, [_vm._v("Convenios")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    "class": {
+      active: _vm.activeTab === "finanzas"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "finanzas";
+      }
+    }
+  }, [_vm._v("Finanzas")])])]), _vm._v(" "), _vm.loading ? _c("div", {
     staticClass: "text-center my-5"
-  }, [_vm._m(10), _vm._v(" "), _c("p", {
+  }, [_vm._m(0), _vm._v(" "), _c("p", {
     staticClass: "mt-2 text-muted"
   }, [_vm._v("Cargando información completa del paciente...")])]) : _c("div", {
     staticClass: "tab-content px-2",
@@ -3696,7 +3914,10 @@ var render = function render() {
       id: "patientTabsContent"
     }
   }, [_c("div", {
-    staticClass: "tab-pane fade show active",
+    staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "resumen"
+    },
     attrs: {
       id: "resumen",
       role: "tabpanel"
@@ -3709,7 +3930,7 @@ var render = function render() {
     staticClass: "card shadow-sm border rounded-lg mb-3"
   }, [_c("div", {
     staticClass: "card-body"
-  }, [_vm._m(11), _vm._v(" "), _vm.proximaCita ? _c("div", [_c("h5", {
+  }, [_vm._m(1), _vm._v(" "), _vm.proximaCita ? _c("div", [_c("h5", {
     staticClass: "mb-1 text-dark"
   }, [_vm._v(_vm._s(_vm.formatDateTime(_vm.proximaCita.date, _vm.proximaCita.hora)))]), _vm._v(" "), _vm.proximaCita.professional ? _c("p", {
     staticClass: "small text-muted mb-0"
@@ -3719,7 +3940,7 @@ var render = function render() {
     staticClass: "card shadow-sm border rounded-lg mb-3"
   }, [_c("div", {
     staticClass: "card-body"
-  }, [_vm._m(12), _vm._v(" "), _vm.ultimaEvolucion ? _c("div", [_c("p", {
+  }, [_vm._m(2), _vm._v(" "), _vm.ultimaEvolucion ? _c("div", [_c("p", {
     staticClass: "small text-muted mb-1"
   }, [_vm._v(_vm._s(_vm.formatDate(_vm.ultimaEvolucion.date)) + " - Dr. " + _vm._s(_vm.ultimaEvolucion.professional ? _vm.ultimaEvolucion.professional.name : ""))]), _vm._v(" "), _c("p", {
     staticClass: "small mb-0"
@@ -3731,7 +3952,7 @@ var render = function render() {
     staticClass: "card shadow-sm border rounded-lg h-100"
   }, [_c("div", {
     staticClass: "card-body p-4"
-  }, [_vm._m(13), _vm._v(" "), _c("div", {
+  }, [_vm._m(3), _vm._v(" "), _c("div", {
     staticClass: "timeline ms-3 mt-3 content-timeline"
   }, [_vm._l(_vm.timelineActivity.slice(0, 5), function (item, index) {
     return _c("div", {
@@ -3754,6 +3975,9 @@ var render = function render() {
     staticClass: "text-muted small"
   }, [_vm._v("\n                  No hay actividad reciente.\n                ")]) : _vm._e()], 2)])])])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "datos"
+    },
     attrs: {
       id: "datos",
       role: "tabpanel"
@@ -3787,7 +4011,7 @@ var render = function render() {
     staticClass: "card border-0 shadow-sm h-100"
   }, [_c("div", {
     staticClass: "card-body"
-  }, [_vm._m(14), _vm._v(" "), _c("div", {
+  }, [_vm._m(4), _vm._v(" "), _c("div", {
     staticClass: "mb-2"
   }, [_c("small", {
     staticClass: "text-muted d-block"
@@ -3821,7 +4045,7 @@ var render = function render() {
     staticClass: "card border-0 shadow-sm h-100"
   }, [_c("div", {
     staticClass: "card-body"
-  }, [_vm._m(15), _vm._v(" "), _c("div", {
+  }, [_vm._m(5), _vm._v(" "), _c("div", {
     staticClass: "mb-2"
   }, [_c("small", {
     staticClass: "text-muted d-block"
@@ -3857,7 +4081,7 @@ var render = function render() {
     staticClass: "card border-0 shadow-sm h-100"
   }, [_c("div", {
     staticClass: "card-body"
-  }, [_vm._m(16), _vm._v(" "), _vm.paciente.relative && _vm.paciente.relative.length ? _c("div", _vm._l(_vm.paciente.relative, function (rel) {
+  }, [_vm._m(6), _vm._v(" "), _vm.paciente.relative && _vm.paciente.relative.length ? _c("div", _vm._l(_vm.paciente.relative, function (rel) {
     return _c("div", {
       directives: [{
         name: "show",
@@ -3887,7 +4111,7 @@ var render = function render() {
     staticClass: "card border-0 shadow-sm h-100"
   }, [_c("div", {
     staticClass: "card-body"
-  }, [_vm._m(17), _vm._v(" "), _c("div", {
+  }, [_vm._m(7), _vm._v(" "), _c("div", {
     staticClass: "mb-2"
   }, [_c("small", {
     staticClass: "text-muted d-block"
@@ -3907,7 +4131,7 @@ var render = function render() {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-md-6 mb-3 mb-md-0"
-  }, [_vm._m(18), _vm._v(" "), _vm.paciente.semaforo_estados && _vm.paciente.semaforo_estados.length > 0 ? _c("div", {
+  }, [_vm._m(8), _vm._v(" "), _vm.paciente.semaforo_estados && _vm.paciente.semaforo_estados.length > 0 ? _c("div", {
     staticClass: "d-flex flex-wrap gap-2"
   }, _vm._l(_vm.paciente.semaforo_estados.slice(0, 5), function (sem) {
     return _c("span", {
@@ -3920,7 +4144,7 @@ var render = function render() {
     staticClass: "text-muted"
   }, [_vm._v("No hay etiquetas de comportamiento registradas.")])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(19), _vm._v(" "), _vm.getHobbies(_vm.paciente.hobbies).length > 0 ? _c("div", {
+  }, [_vm._m(9), _vm._v(" "), _vm.getHobbies(_vm.paciente.hobbies).length > 0 ? _c("div", {
     staticClass: "d-flex flex-wrap gap-2"
   }, _vm._l(_vm.getHobbies(_vm.paciente.hobbies), function (hobbie, index) {
     return _c("span", {
@@ -3931,11 +4155,14 @@ var render = function render() {
     staticClass: "text-muted"
   }, [_vm._v("No hay hobbies registrados.")])])])])])])])])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "citas"
+    },
     attrs: {
       id: "citas",
       role: "tabpanel"
     }
-  }, [_vm._m(20), _vm._v(" "), _c("div", {
+  }, [_vm._m(10), _vm._v(" "), _c("div", {
     staticClass: "row mb-4"
   }, [_vm._l(_vm.paciente.membresias, function (mem) {
     return _c("div", {
@@ -4006,7 +4233,7 @@ var render = function render() {
     staticClass: "col-12"
   }, [_c("div", {
     staticClass: "alert alert-light border text-center text-muted"
-  }, [_vm._v("\n            No tiene paquetes o membresías.\n          ")])]) : _vm._e()], 2), _vm._v(" "), _vm._m(21), _vm._v(" "), _c("div", {
+  }, [_vm._v("\n            No tiene paquetes o membresías.\n          ")])]) : _vm._e()], 2), _vm._v(" "), _vm._m(11), _vm._v(" "), _c("div", {
     staticClass: "card border rounded-3 shadow-sm mb-4"
   }, [_c("div", {
     staticClass: "card-body p-0"
@@ -4017,7 +4244,7 @@ var render = function render() {
     staticStyle: {
       "font-size": "0.9rem"
     }
-  }, [_vm._m(22), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.appointments || [], function (cita) {
+  }, [_vm._m(12), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.appointments || [], function (cita) {
     return _c("tr", {
       key: cita.id
     }, [_c("td", {
@@ -4084,6 +4311,9 @@ var render = function render() {
     }
   }, [_vm._v("No tiene citas en el historial")])]) : _vm._e()], 2)])])])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "historial"
+    },
     attrs: {
       id: "historial",
       role: "tabpanel"
@@ -4128,27 +4358,27 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(23), _vm._v(" "), _c("p", {
+  }, [_vm._m(13), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychological_history.illness))])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(24), _vm._v(" "), _c("p", {
+  }, [_vm._m(14), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychological_history.antecedent))])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(25), _vm._v(" "), _c("p", {
+  }, [_vm._m(15), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychological_history.dynamic))])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(26), _vm._v(" "), _c("p", {
+  }, [_vm._m(16), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychological_history.attitude))])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(27), _vm._v(" "), _c("div", {
+  }, [_vm._m(17), _vm._v(" "), _c("div", {
     staticClass: "p-2 rounded bg-white border border-light small text-dark mt-1 shadow-sm"
   }, [_vm._v("\n                  " + _vm._s(_vm.paciente.initial_psychological_history.dx) + "\n                ")])]), _vm._v(" "), _c("div", {
     staticClass: "mb-0 bg-light p-3 border rounded"
-  }, [_vm._m(28), _vm._v(" "), _c("p", {
+  }, [_vm._m(18), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark",
     staticStyle: {
       "white-space": "pre-wrap"
@@ -4190,19 +4420,19 @@ var render = function render() {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-md-6 mb-3"
-  }, [_vm._m(29), _vm._v(" "), _c("p", {
+  }, [_vm._m(19), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.general_antecedent))])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 mb-3"
-  }, [_vm._m(30), _vm._v(" "), _c("p", {
+  }, [_vm._m(20), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.main_signs_symptoms))])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 mb-3"
-  }, [_vm._m(31), _vm._v(" "), _c("p", {
+  }, [_vm._m(21), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.illness))])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 mb-3"
-  }, [_vm._m(32), _vm._v(" "), _c("p", {
+  }, [_vm._m(22), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.apc))])]), _vm._v(" "), _c("div", {
     staticClass: "col-12 mt-2"
@@ -4258,26 +4488,26 @@ var render = function render() {
     staticClass: "small text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.insight))])])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 mb-3"
-  }, [_vm._m(33), _vm._v(" "), _c("p", {
+  }, [_vm._m(23), _vm._v(" "), _c("p", {
     staticClass: "small mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.diagnostic_problems))])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 mb-3"
-  }, [_vm._m(34), _vm._v(" "), _c("div", {
+  }, [_vm._m(24), _vm._v(" "), _c("div", {
     staticClass: "p-2 rounded bg-white border border-light small text-dark shadow-sm"
   }, [_vm._v("\n                     " + _vm._s(_vm.paciente.initial_psychiatric_history.diagnostic) + "\n                  ")])]), _vm._v(" "), _c("div", {
     staticClass: "col-12 mt-2"
   }, [_c("div", {
     staticClass: "bg-light p-3 border rounded text-dark"
-  }, [_vm._m(35), _vm._v(" "), _c("p", {
+  }, [_vm._m(25), _vm._v(" "), _c("p", {
     staticClass: "small mb-0",
     staticStyle: {
       "white-space": "pre-wrap"
     }
-  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.plan))])])])])])])]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm._m(36), _vm._v(" "), _vm.paciente.medical_evolutions && _vm.paciente.medical_evolutions.length > 0 ? _c("div", {
+  }, [_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.plan))])])])])])])]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm._m(26), _vm._v(" "), _vm.paciente.medical_evolutions && _vm.paciente.medical_evolutions.length > 0 ? _c("div", {
     staticClass: "alert alert-success bg-opacity-10 border-0 py-2 px-3 mb-3 small d-flex align-items-center rounded-lg"
   }, [_c("i", {
     staticClass: "fas fa-bell me-2 text-success"
-  }), _vm._v(" "), _vm._m(37)]) : _vm._e(), _vm._v(" "), _vm.paciente.medical_evolutions && _vm.paciente.medical_evolutions.length > 0 ? _c("div", {
+  }), _vm._v(" "), _vm._m(27)]) : _vm._e(), _vm._v(" "), _vm.paciente.medical_evolutions && _vm.paciente.medical_evolutions.length > 0 ? _c("div", {
     staticClass: "row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4"
   }, _vm._l(_vm.paciente.medical_evolutions, function (evo) {
     return _c("div", {
@@ -4342,13 +4572,13 @@ var render = function render() {
       staticClass: "mt-auto pt-2"
     }, [_c("div", {
       staticClass: "p-2 bg-light rounded border-start border-3 border-warning"
-    }, [_vm._m(38, true), _vm._v(" "), _c("p", {
+    }, [_vm._m(28, true), _vm._v(" "), _c("p", {
       staticClass: "small text-muted mb-0 text-truncate-2",
       staticStyle: {
         "font-style": "italic",
         "white-space": "pre-wrap"
       }
-    }, [_vm._v(_vm._s(evo.plan))])])]) : _vm._e(), _vm._v(" "), _vm._m(39, true)])])]);
+    }, [_vm._v(_vm._s(evo.plan))])])]) : _vm._e(), _vm._v(" "), _vm._m(29, true)])])]);
   }), 0) : _c("div", {
     staticClass: "card border border-dashed p-5 text-center text-muted rounded-lg mb-4"
   }, [_c("i", {
@@ -4357,6 +4587,9 @@ var render = function render() {
     staticClass: "mb-0"
   }, [_vm._v("Aún no cuenta con evoluciones de seguimiento cronológico.")])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "triaje"
+    },
     attrs: {
       id: "triaje",
       role: "tabpanel"
@@ -4365,9 +4598,9 @@ var render = function render() {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-12 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2"
-  }, [_vm._m(40), _vm._v(" "), _c("div", {
+  }, [_vm._m(30), _vm._v(" "), _c("div", {
     staticClass: "d-flex gap-2"
-  }, [_vm._m(41), _vm._v(" "), _c("button", {
+  }, [_vm._m(31), _vm._v(" "), _c("button", {
     staticClass: "btn btn-primary btn-sm rounded-pill shadow-sm px-3",
     attrs: {
       "data-bs-toggle": "modal",
@@ -4393,7 +4626,7 @@ var render = function render() {
       staticClass: "card-body p-4"
     }, [_c("div", {
       staticClass: "d-flex mb-4"
-    }, [_vm._m(42, true), _vm._v(" "), _c("div", [_c("h6", {
+    }, [_vm._m(32, true), _vm._v(" "), _c("div", [_c("h6", {
       staticClass: "font-weight-bold mb-1 text-dark"
     }, [_vm._v("Triaje " + _vm._s(_vm.getTriajeReferencia(tr.referencia)))]), _vm._v(" "), _c("div", {
       staticClass: "small text-muted"
@@ -4547,7 +4780,7 @@ var render = function render() {
     staticClass: "text-muted"
   }, [_vm._v("No existen registros de triaje para este paciente.")])])]), _vm._v(" "), _c("div", {
     staticClass: "col-12"
-  }, [_vm._m(43), _vm._v(" "), _c("div", {
+  }, [_vm._m(33), _vm._v(" "), _c("div", {
     staticClass: "card border"
   }, [_c("div", {
     staticClass: "card-body p-4"
@@ -4568,7 +4801,7 @@ var render = function render() {
     staticClass: "col-12 mt-4"
   }, [_c("div", {
     staticClass: "d-flex justify-content-between align-items-center mb-3"
-  }, [_vm._m(44), _vm._v(" "), _c("div", {
+  }, [_vm._m(34), _vm._v(" "), _c("div", {
     staticClass: "d-flex gap-2"
   }, [_c("button", {
     staticClass: "btn btn-primary btn-sm rounded-pill shadow-sm px-3 fw-bold",
@@ -4594,7 +4827,7 @@ var render = function render() {
       staticClass: "d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2"
     }, [_c("div", {
       staticClass: "d-flex align-items-center"
-    }, [_vm._m(45, true), _vm._v(" "), _c("div", [_c("h6", {
+    }, [_vm._m(35, true), _vm._v(" "), _c("div", [_c("h6", {
       staticClass: "font-weight-bold mb-1 text-dark"
     }, [_vm._v("Plan de Seguridad - " + _vm._s(_vm.paciente.name) + " " + _vm._s(_vm.paciente.nombres))]), _vm._v(" "), _c("div", {
       staticClass: "small text-muted"
@@ -4630,7 +4863,7 @@ var render = function render() {
       staticClass: "bg-white p-3 rounded border h-100 shadow-sm"
     }, [_c("div", {
       staticClass: "d-flex justify-content-between align-items-center mb-3"
-    }, [_vm._m(46, true), _vm._v(" "), _c("span", {
+    }, [_vm._m(36, true), _vm._v(" "), _c("span", {
       staticClass: "badge bg-light text-muted rounded-circle"
     }, [_vm._v(_vm._s(_vm.countItems(plan.senales_advertencia)))])]), _vm._v(" "), _c("ul", {
       staticClass: "list-unstyled small text-dark mb-0 ps-2",
@@ -4650,7 +4883,7 @@ var render = function render() {
       staticClass: "bg-white p-3 rounded border h-100 shadow-sm"
     }, [_c("div", {
       staticClass: "d-flex justify-content-between align-items-center mb-3"
-    }, [_vm._m(47, true), _vm._v(" "), _c("span", {
+    }, [_vm._m(37, true), _vm._v(" "), _c("span", {
       staticClass: "badge bg-light text-muted rounded-circle"
     }, [_vm._v(_vm._s(_vm.countItems(plan.estrategias)))])]), _vm._v(" "), _c("ul", {
       staticClass: "list-unstyled small text-dark mb-0 ps-2",
@@ -4670,7 +4903,7 @@ var render = function render() {
       staticClass: "bg-white p-3 rounded border h-100 shadow-sm"
     }, [_c("div", {
       staticClass: "d-flex justify-content-between align-items-center mb-3"
-    }, [_vm._m(48, true), _vm._v(" "), _c("span", {
+    }, [_vm._m(38, true), _vm._v(" "), _c("span", {
       staticClass: "badge bg-light text-muted rounded-circle"
     }, [_vm._v(_vm._s(_vm.countItems(plan.razones_vivir)))])]), _vm._v(" "), _c("ul", {
       staticClass: "list-unstyled small text-dark mb-0 ps-2",
@@ -4693,6 +4926,9 @@ var render = function render() {
     staticClass: "text-muted"
   }, [_vm._v("No existen planes de seguridad registrados para este paciente.")])])])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "seguimiento"
+    },
     attrs: {
       id: "seguimiento",
       role: "tabpanel"
@@ -4701,7 +4937,7 @@ var render = function render() {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-12 mb-4"
-  }, [_vm._m(49), _vm._v(" "), _c("p", {
+  }, [_vm._m(39), _vm._v(" "), _c("p", {
     staticClass: "text-muted small mb-4"
   }, [_vm._v("Registre el plan de tratamiento recomendado al paciente.")]), _vm._v(" "), _c("div", {
     staticClass: "row g-4"
@@ -4717,7 +4953,7 @@ var render = function render() {
         _vm.fichaView = "nueva";
       }
     }
-  }, [_vm._m(50)])]), _vm._v(" "), _c("div", {
+  }, [_vm._m(40)])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border rounded-lg hover-shadow transition",
@@ -4731,7 +4967,7 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "card-body text-center p-5"
-  }, [_vm._m(51), _vm._v(" "), _c("h5", {
+  }, [_vm._m(41), _vm._v(" "), _c("h5", {
     staticClass: "font-weight-bold text-dark mb-2"
   }, [_vm._v("Ficha Histórica")]), _vm._v(" "), _c("p", {
     staticClass: "text-muted small mb-0"
@@ -4760,7 +4996,7 @@ var render = function render() {
         return _vm.guardarFichaSeguimiento.apply(null, arguments);
       }
     }
-  }, [_vm._m(52), _vm._v(" "), _c("div", {
+  }, [_vm._m(42), _vm._v(" "), _c("div", {
     staticClass: "mb-4 bg-white p-3 border rounded shadow-sm"
   }, [_c("label", {
     staticClass: "form-label small text-muted"
@@ -4807,7 +5043,7 @@ var render = function render() {
     attrs: {
       value: "Otro"
     }
-  }, [_vm._v("Otro")])])]), _vm._v(" "), _vm._m(53), _vm._v(" "), _c("div", {
+  }, [_vm._v("Otro")])])]), _vm._v(" "), _vm._m(43), _vm._v(" "), _c("div", {
     staticClass: "mb-4 bg-white p-3 border rounded shadow-sm"
   }, [_c("div", {
     staticClass: "mb-3"
@@ -4878,7 +5114,7 @@ var render = function render() {
         _vm.$set(_vm.nuevaFicha, "motivo", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _vm._m(54), _vm._v(" "), _c("div", {
+  })])]), _vm._v(" "), _vm._m(44), _vm._v(" "), _c("div", {
     staticClass: "mb-4 bg-white p-3 border rounded shadow-sm d-flex align-items-center justify-content-between flex-wrap gap-2"
   }, [_c("div", {
     staticClass: "d-flex align-items-center"
@@ -4920,7 +5156,7 @@ var render = function render() {
     }, [_vm._v(_vm._s(prof.name))]);
   })], 2)]), _vm._v(" "), _c("span", {
     staticClass: "badge bg-light text-muted border"
-  }, [_vm._v("Asignado automáticamente")])]), _vm._v(" "), _vm._m(55), _vm._v(" "), _c("div", {
+  }, [_vm._v("Asignado automáticamente")])]), _vm._v(" "), _vm._m(45), _vm._v(" "), _c("div", {
     staticClass: "mb-4 bg-white p-3 border rounded shadow-sm"
   }, [_vm._l(_vm.nuevaFicha.interconsultas, function (item, index) {
     return _c("div", {
@@ -5076,7 +5312,7 @@ var render = function render() {
     on: {
       click: _vm.limpiarInterconsulta
     }
-  }, [_vm._v("Cancelar")]) : _vm._e()], 2), _vm._v(" "), _vm._m(56), _vm._v(" "), _c("div", {
+  }, [_vm._v("Cancelar")]) : _vm._e()], 2), _vm._v(" "), _vm._m(46), _vm._v(" "), _c("div", {
     staticClass: "mb-4 bg-white p-3 border rounded shadow-sm"
   }, [_c("div", {
     staticClass: "mb-3"
@@ -5272,7 +5508,7 @@ var render = function render() {
       staticClass: "card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-2"
     }, [_c("div", {
       staticClass: "d-flex align-items-center"
-    }, [_vm._m(57, true), _vm._v(" "), _c("div", [_c("h6", {
+    }, [_vm._m(47, true), _vm._v(" "), _c("div", [_c("h6", {
       staticClass: "font-weight-bold text-dark mb-1"
     }, [_vm._v("Ficha " + _vm._s(_vm.paciente.fichas_seguimiento.length - index))]), _vm._v(" "), _c("div", {
       staticClass: "small text-muted"
@@ -5304,6 +5540,9 @@ var render = function render() {
     staticClass: "text-muted"
   }, [_vm._v("No hay fichas históricas registradas para este paciente.")])])]) : _vm._e()]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "recetas"
+    },
     attrs: {
       id: "recetas",
       role: "tabpanel"
@@ -5368,7 +5607,7 @@ var render = function render() {
       value: _vm.activePill === "recetas",
       expression: "activePill === 'recetas'"
     }]
-  }, [_vm._m(58), _vm._v(" "), _vm.paciente.prescriptions && _vm.paciente.prescriptions.length > 0 ? _c("div", _vm._l(_vm.paciente.prescriptions, function (receta) {
+  }, [_vm._m(48), _vm._v(" "), _vm.paciente.prescriptions && _vm.paciente.prescriptions.length > 0 ? _c("div", _vm._l(_vm.paciente.prescriptions, function (receta) {
     return _c("div", {
       key: receta.id,
       staticClass: "card border border-light shadow-sm mb-4",
@@ -5382,7 +5621,7 @@ var render = function render() {
       staticClass: "d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2"
     }, [_c("div", {
       staticClass: "d-flex align-items-center"
-    }, [_vm._m(59, true), _vm._v(" "), _c("div", [_c("h6", {
+    }, [_vm._m(49, true), _vm._v(" "), _c("div", [_c("h6", {
       staticClass: "mb-0 font-weight-bold text-dark fs-5"
     }, [_vm._v("Receta Médica")]), _vm._v(" "), _c("div", {
       staticClass: "small text-muted mt-1"
@@ -5465,11 +5704,11 @@ var render = function render() {
       value: _vm.activePill === "ordenes",
       expression: "activePill === 'ordenes'"
     }]
-  }, [_vm._m(60), _vm._v(" "), _vm.allMedicalExams && _vm.allMedicalExams.length > 0 ? _c("div", [_c("div", {
+  }, [_vm._m(50), _vm._v(" "), _vm.allMedicalExams && _vm.allMedicalExams.length > 0 ? _c("div", [_c("div", {
     staticClass: "table-responsive"
   }, [_c("table", {
     staticClass: "table table-hover align-middle"
-  }, [_vm._m(61), _vm._v(" "), _c("tbody", _vm._l(_vm.allMedicalExams, function (examData, idx) {
+  }, [_vm._m(51), _vm._v(" "), _c("tbody", _vm._l(_vm.allMedicalExams, function (examData, idx) {
     return _c("tr", {
       key: idx
     }, [_c("td", [_vm._v(_vm._s(_vm.formatDate(examData.date)))]), _vm._v(" "), _c("td", {
@@ -5497,13 +5736,16 @@ var render = function render() {
     staticClass: "text-muted"
   }, [_vm._v("No hay órdenes de exámenes registradas")])])])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "pruebas"
+    },
     attrs: {
       id: "pruebas",
       role: "tabpanel"
     }
   }, [_c("div", {
     staticClass: "row"
-  }, [_vm._m(62), _vm._v(" "), _vm._l(_vm.allTests, function (t, index) {
+  }, [_vm._m(52), _vm._v(" "), _vm._l(_vm.allTests, function (t, index) {
     return _c("div", {
       key: t.testName + "_" + (t.id || index),
       staticClass: "col-md-6 col-lg-4 mb-4"
@@ -5525,11 +5767,11 @@ var render = function render() {
       staticClass: "card-body bg-light position-relative"
     }, [_c("div", {
       staticClass: "mb-3"
-    }, [_vm._m(63, true), _vm._v(" "), _c("strong", {
+    }, [_vm._m(53, true), _vm._v(" "), _c("strong", {
       staticClass: "text-dark"
     }, [_vm._v(_vm._s(_vm.formatDate(t.created_at || t.fecha)))])]), _vm._v(" "), t.score || t.total || t.result ? _c("div", {
       staticClass: "mb-0"
-    }, [_vm._m(64, true), _vm._v(" "), _c("span", {
+    }, [_vm._m(54, true), _vm._v(" "), _c("span", {
       staticClass: "badge bg-success rounded-pill px-3 py-2",
       staticStyle: {
         "font-size": "0.9rem"
@@ -5541,16 +5783,19 @@ var render = function render() {
         right: "-15px",
         "font-size": "5rem"
       }
-    })]), _vm._v(" "), _vm._m(65, true)])]);
+    })]), _vm._v(" "), _vm._m(55, true)])]);
   }), _vm._v(" "), _vm.allTests.length === 0 ? _c("div", {
     staticClass: "col-12"
-  }, [_vm._m(66)]) : _vm._e()], 2)]), _vm._v(" "), _c("div", {
+  }, [_vm._m(56)]) : _vm._e()], 2)]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "documentos"
+    },
     attrs: {
       id: "documentos",
       role: "tabpanel"
     }
-  }, [_vm._m(67), _vm._v(" "), _c("div", {
+  }, [_vm._m(57), _vm._v(" "), _c("div", {
     staticClass: "d-flex flex-wrap gap-2 mb-4"
   }, [_c("button", {
     staticClass: "btn btn-sm rounded-pill px-3",
@@ -5652,7 +5897,7 @@ var render = function render() {
       staticClass: "card-body p-4"
     }, [_c("div", {
       staticClass: "d-flex align-items-start mb-3"
-    }, [_vm._m(68, true), _vm._v(" "), _c("div", {
+    }, [_vm._m(58, true), _vm._v(" "), _c("div", {
       staticStyle: {
         "min-width": "0"
       }
@@ -5696,39 +5941,140 @@ var render = function render() {
     staticClass: "text-muted"
   }, [_vm._v("No existen documentos adjuntos en esta categoría.")])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "finanzas"
+    },
     attrs: {
       id: "finanzas",
       role: "tabpanel"
     }
   }, [_c("div", {
-    staticClass: "card border"
+    staticClass: "row g-3 mb-4"
+  }, [_c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "card border rounded-3 shadow-sm",
+    staticStyle: {
+      "border-color": "#eef2f5 !important"
+    }
   }, [_c("div", {
     staticClass: "card-body p-4"
-  }, [_c("h5", {
-    staticClass: "card-title font-weight-bold mb-4"
-  }, [_vm._v("Deudas y Cuentas")]), _vm._v(" "), _c("table", {
-    staticClass: "table table-sm table-hover"
-  }, [_vm._m(69), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.deudas_financieras || [], function (deuda) {
-    return _c("tr", {
-      key: deuda.id
-    }, [_c("td", {
-      staticClass: "p-2 text-dark"
-    }, [_vm._v(_vm._s(_vm.formatDate(deuda.fecha)))]), _vm._v(" "), _c("td", {
-      staticClass: "p-2 text-muted"
-    }, [_vm._v(_vm._s(deuda.observacion || "Atención"))]), _vm._v(" "), _c("td", {
-      staticClass: "p-2 text-dark font-weight-bold"
-    }, [_vm._v("S/ " + _vm._s(deuda.monto))]), _vm._v(" "), _c("td", {
-      staticClass: "p-2"
-    }, [_c("span", {
-      staticClass: "badge",
-      "class": deuda.estado ? "bg-danger" : "bg-success"
-    }, [_vm._v(_vm._s(deuda.estado ? "Pendiente" : "Pagado"))])])]);
-  }), _vm._v(" "), !_vm.paciente.deudas_financieras || _vm.paciente.deudas_financieras.length == 0 ? _c("tr", [_c("td", {
-    staticClass: "text-center text-muted py-3",
-    attrs: {
-      colspan: "4"
+  }, [_vm._m(59), _vm._v(" "), _c("div", {
+    staticClass: "fw-bold",
+    staticStyle: {
+      "font-size": "1.5rem",
+      color: "#198754"
     }
-  }, [_vm._v("No presenta deudas")])]) : _vm._e()], 2)])])])]), _vm._v(" "), _vm._m(70)]), _vm._v(" "), _c("div", {
+  }, [_vm._v("\n                S/ " + _vm._s(_vm.paciente.deuda_total ? parseFloat(_vm.paciente.deuda_total).toFixed(2) : "0.00") + "\n              ")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "card border rounded-3 shadow-sm",
+    staticStyle: {
+      "border-color": "#eef2f5 !important"
+    }
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_vm._m(60), _vm._v(" "), _c("div", {
+    staticClass: "fw-bold",
+    staticStyle: {
+      "font-size": "1.5rem",
+      color: "#212529"
+    }
+  }, [_vm._v("\n                " + _vm._s(_vm.paciente.pagos_pendientes || 0) + "\n              ")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "card border rounded-3 shadow-sm",
+    staticStyle: {
+      "border-color": "#eef2f5 !important"
+    }
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_vm._m(61), _vm._v(" "), _c("div", {
+    staticClass: "fw-bold",
+    staticStyle: {
+      "font-size": "1.5rem",
+      color: "#198754"
+    }
+  }, [_vm._v("\n                S/ " + _vm._s(_vm.paciente.total_pagado ? parseFloat(_vm.paciente.total_pagado).toFixed(2) : "0.00") + "\n              ")])])])])]), _vm._v(" "), _vm._m(62), _vm._v(" "), _c("div", {
+    staticClass: "card border-0 rounded-3 shadow-sm mb-4"
+  }, [_c("div", {
+    staticClass: "card-body p-0"
+  }, [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-hover mb-0",
+    staticStyle: {
+      "font-size": "0.9rem"
+    }
+  }, [_vm._m(63), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.pagos_historial || [], function (pago) {
+    return _c("tr", {
+      key: pago.payment_id,
+      staticStyle: {
+        "border-bottom": "1px solid #f8f9fa"
+      }
+    }, [_c("td", {
+      staticClass: "align-middle py-3 ps-4"
+    }, [_c("span", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(_vm.formatOnlyDate(pago.date)))])]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle py-3 fw-bold text-dark"
+    }, [_vm._v("\n                    " + _vm._s(pago.concepto || "Consulta") + "\n                  ")]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle py-3 text-muted"
+    }, [_vm._v("\n                    " + _vm._s(_vm.getPaymentMethodName(pago.metodo_id)) + "\n                  ")]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle py-3 text-end text-dark"
+    }, [_vm._v("\n                    S/ " + _vm._s(pago.monto ? parseFloat(pago.monto).toFixed(2) : "0.00") + "\n                  ")]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle py-3 pe-4"
+    }, [pago.estado == 2 || pago.estado == null ? _c("span", {
+      staticClass: "badge rounded-pill px-3 py-2",
+      staticStyle: {
+        "background-color": "#d1fae5",
+        color: "#065f46",
+        "font-weight": "500",
+        "font-size": "0.78rem"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-check-circle me-1"
+    }), _vm._v(" Pagado\n                    ")]) : pago.estado == 1 ? _c("span", {
+      staticClass: "badge rounded-pill px-3 py-2",
+      staticStyle: {
+        "background-color": "#fef3c7",
+        color: "#92400e",
+        "font-weight": "500",
+        "font-size": "0.78rem"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-clock me-1"
+    }), _vm._v(" Sin pagar\n                    ")]) : pago.estado == 3 ? _c("span", {
+      staticClass: "badge rounded-pill px-3 py-2",
+      staticStyle: {
+        "background-color": "#fee2e2",
+        color: "#991b1b",
+        "font-weight": "500",
+        "font-size": "0.78rem"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-times-circle me-1"
+    }), _vm._v(" Anulado\n                    ")]) : _c("span", {
+      staticClass: "badge rounded-pill px-3 py-2",
+      staticStyle: {
+        "background-color": "#fef3c7",
+        color: "#92400e",
+        "font-weight": "500",
+        "font-size": "0.78rem"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-clock me-1"
+    }), _vm._v(" Pendiente\n                    ")])])]);
+  }), _vm._v(" "), !_vm.paciente.pagos_historial || _vm.paciente.pagos_historial.length === 0 ? _c("tr", [_vm._m(64)]) : _vm._e()], 2)])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "convenios"
+    },
+    attrs: {
+      id: "convenios",
+      role: "tabpanel"
+    }
+  }, [_vm._m(65)])]), _vm._v(" "), _c("div", {
     staticClass: "modal fade",
     attrs: {
       id: "modalDetalleFicha",
@@ -5740,7 +6086,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-lg modal-dialog-centered"
   }, [_c("div", {
     staticClass: "modal-content border-0 shadow-lg rounded-lg"
-  }, [_vm._m(71), _vm._v(" "), _vm.fichaSeleccionada ? _c("div", {
+  }, [_vm._m(66), _vm._v(" "), _vm.fichaSeleccionada ? _c("div", {
     staticClass: "modal-body p-4"
   }, [_c("div", {
     staticClass: "row mb-4 g-3"
@@ -5788,7 +6134,7 @@ var render = function render() {
     staticClass: "mb-0 text-dark"
   }, [_vm._v(_vm._s(_vm.fichaSeleccionada.motivo))])])])]), _vm._v(" "), _vm.fichaSeleccionada.interconsultas && _vm.fichaSeleccionada.interconsultas.length > 0 ? _c("div", {
     staticClass: "mb-4"
-  }, [_vm._m(72), _vm._v(" "), _vm._l(_vm.fichaSeleccionada.interconsultas, function (inter, idx) {
+  }, [_vm._m(67), _vm._v(" "), _vm._l(_vm.fichaSeleccionada.interconsultas, function (inter, idx) {
     return _c("div", {
       key: idx,
       staticClass: "card border-0 bg-light shadow-sm mb-2"
@@ -5805,7 +6151,7 @@ var render = function render() {
     }), _vm._v(" " + _vm._s(_vm.getProfessionalName(inter.professional_id)))])]), _vm._v(" "), inter.motivo ? _c("p", {
       staticClass: "mb-0 small text-dark mt-2"
     }, [_c("strong", [_vm._v("Motivo:")]), _vm._v(" " + _vm._s(inter.motivo))]) : _vm._e()])]);
-  })], 2) : _vm._e(), _vm._v(" "), _vm.getRecomendacionesParsed(_vm.fichaSeleccionada.recomendaciones).length > 0 ? _c("div", [_vm._m(73), _vm._v(" "), _c("div", {
+  })], 2) : _vm._e(), _vm._v(" "), _vm.getRecomendacionesParsed(_vm.fichaSeleccionada.recomendaciones).length > 0 ? _c("div", [_vm._m(68), _vm._v(" "), _c("div", {
     staticClass: "d-flex flex-wrap gap-2"
   }, _vm._l(_vm.getRecomendacionesParsed(_vm.fichaSeleccionada.recomendaciones), function (rec, idx) {
     return _c("span", {
@@ -5814,7 +6160,7 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fas fa-check me-1"
     }), _vm._v(" " + _vm._s(rec) + "\n              ")]);
-  }), 0)]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm._m(74)])])]), _vm._v(" "), _c("div", {
+  }), 0)]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm._m(69)])])]), _vm._v(" "), _c("div", {
     staticClass: "modal fade",
     attrs: {
       id: "modalPlanSeguridad",
@@ -5825,7 +6171,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-lg modal-dialog-centered"
   }, [_c("div", {
     staticClass: "modal-content border-0 shadow-lg rounded-lg"
-  }, [_vm._m(75), _vm._v(" "), _c("div", {
+  }, [_vm._m(70), _vm._v(" "), _c("div", {
     staticClass: "modal-body p-4 bg-light"
   }, [_c("form", {
     on: {
@@ -5838,7 +6184,7 @@ var render = function render() {
     staticClass: "row g-3"
   }, [_c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(76), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(71), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5862,7 +6208,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(77), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(72), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5886,7 +6232,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(78), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(73), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5910,7 +6256,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(79), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(74), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5934,7 +6280,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(80), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(75), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5958,7 +6304,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(81), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(76), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5982,7 +6328,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-12"
-  }, [_vm._m(82), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(77), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -6037,7 +6383,7 @@ var render = function render() {
     staticClass: "modal-content border-0 shadow-lg rounded-lg"
   }, [_c("div", {
     staticClass: "modal-header border-bottom-0 bg-light d-flex align-items-center"
-  }, [_vm._m(83), _vm._v(" "), _vm.planSeguridadSeleccionado ? _c("div", {
+  }, [_vm._m(78), _vm._v(" "), _vm.planSeguridadSeleccionado ? _c("div", {
     staticClass: "ms-auto me-3 small text-muted"
   }, [_vm._v("\n             Creado: " + _vm._s(_vm.formatDate(_vm.planSeguridadSeleccionado.fecha)) + "\n          ")]) : _vm._e(), _vm._v(" "), _c("button", {
     staticClass: "btn-close m-0",
@@ -6054,7 +6400,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(84), _vm._v(" "), _c("div", {
+  }, [_vm._m(79), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -6065,7 +6411,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(85), _vm._v(" "), _c("div", {
+  }, [_vm._m(80), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -6076,7 +6422,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(86), _vm._v(" "), _c("div", {
+  }, [_vm._m(81), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -6087,7 +6433,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(87), _vm._v(" "), _c("div", {
+  }, [_vm._m(82), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -6098,7 +6444,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(88), _vm._v(" "), _c("div", {
+  }, [_vm._m(83), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -6109,7 +6455,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(89), _vm._v(" "), _c("div", {
+  }, [_vm._m(84), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -6120,7 +6466,7 @@ var render = function render() {
     staticClass: "col-12"
   }, [_c("div", {
     staticClass: "card h-100 border-light shadow-sm"
-  }, [_vm._m(90), _vm._v(" "), _c("div", {
+  }, [_vm._m(85), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("p", {
     staticClass: "small text-muted mb-0",
@@ -6158,7 +6504,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-dialog-centered"
   }, [_c("div", {
     staticClass: "modal-content border-0 shadow-lg rounded-lg"
-  }, [_vm._m(91), _vm._v(" "), _c("div", {
+  }, [_vm._m(86), _vm._v(" "), _c("div", {
     staticClass: "modal-body p-4 bg-light"
   }, [_c("form", {
     on: {
@@ -6167,9 +6513,9 @@ var render = function render() {
         return _vm.subirNuevoDocumento.apply(null, arguments);
       }
     }
-  }, [_vm._m(92), _vm._v(" "), _c("div", {
+  }, [_vm._m(87), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(93), _vm._v(" "), _c("select", {
+  }, [_vm._m(88), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -6247,188 +6593,6 @@ var render = function render() {
   })], 1);
 };
 var staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
-    staticClass: "nav-item",
-    attrs: {
-      role: "presentation"
-    }
-  }, [_c("button", {
-    staticClass: "nav-link active font-weight-bold small text-dark",
-    attrs: {
-      id: "resumen-tab",
-      "data-bs-toggle": "tab",
-      "data-bs-target": "#resumen",
-      type: "button",
-      role: "tab"
-    }
-  }, [_vm._v("Resumen")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
-    staticClass: "nav-item",
-    attrs: {
-      role: "presentation"
-    }
-  }, [_c("button", {
-    staticClass: "nav-link font-weight-bold small text-muted",
-    attrs: {
-      id: "datos-tab",
-      "data-bs-toggle": "tab",
-      "data-bs-target": "#datos",
-      type: "button",
-      role: "tab"
-    }
-  }, [_vm._v("Datos Personales")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
-    staticClass: "nav-item",
-    attrs: {
-      role: "presentation"
-    }
-  }, [_c("button", {
-    staticClass: "nav-link font-weight-bold small text-muted",
-    attrs: {
-      id: "citas-tab",
-      "data-bs-toggle": "tab",
-      "data-bs-target": "#citas",
-      type: "button",
-      role: "tab"
-    }
-  }, [_vm._v("Citas & Paquetes")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
-    staticClass: "nav-item",
-    attrs: {
-      role: "presentation"
-    }
-  }, [_c("button", {
-    staticClass: "nav-link font-weight-bold small text-muted",
-    attrs: {
-      id: "triaje-tab",
-      "data-bs-toggle": "tab",
-      "data-bs-target": "#triaje",
-      type: "button",
-      role: "tab"
-    }
-  }, [_vm._v("Triaje & Seguridad")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
-    staticClass: "nav-item",
-    attrs: {
-      role: "presentation"
-    }
-  }, [_c("button", {
-    staticClass: "nav-link font-weight-bold small text-muted",
-    attrs: {
-      id: "seguimiento-tab",
-      "data-bs-toggle": "tab",
-      "data-bs-target": "#seguimiento",
-      type: "button",
-      role: "tab"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-clipboard-list me-1"
-  }), _vm._v(" Ficha de Seguimiento\n      ")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
-    staticClass: "nav-item",
-    attrs: {
-      role: "presentation"
-    }
-  }, [_c("button", {
-    staticClass: "nav-link font-weight-bold small text-muted",
-    attrs: {
-      id: "recetas-tab",
-      "data-bs-toggle": "tab",
-      "data-bs-target": "#recetas",
-      type: "button",
-      role: "tab"
-    }
-  }, [_vm._v("Recetas & Órdenes")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
-    staticClass: "nav-item",
-    attrs: {
-      role: "presentation"
-    }
-  }, [_c("button", {
-    staticClass: "nav-link font-weight-bold small text-muted",
-    attrs: {
-      id: "pruebas-tab",
-      "data-bs-toggle": "tab",
-      "data-bs-target": "#pruebas",
-      type: "button",
-      role: "tab"
-    }
-  }, [_vm._v("Pruebas Psicológicas")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
-    staticClass: "nav-item",
-    attrs: {
-      role: "presentation"
-    }
-  }, [_c("button", {
-    staticClass: "nav-link font-weight-bold small text-muted",
-    attrs: {
-      id: "documentos-tab",
-      "data-bs-toggle": "tab",
-      "data-bs-target": "#documentos",
-      type: "button",
-      role: "tab"
-    }
-  }, [_vm._v("Documentos")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
-    staticClass: "nav-item",
-    attrs: {
-      role: "presentation"
-    }
-  }, [_c("button", {
-    staticClass: "nav-link font-weight-bold small text-muted",
-    attrs: {
-      id: "convenios-tab",
-      "data-bs-toggle": "tab",
-      "data-bs-target": "#convenios",
-      type: "button",
-      role: "tab"
-    }
-  }, [_vm._v("Convenios")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("li", {
-    staticClass: "nav-item",
-    attrs: {
-      role: "presentation"
-    }
-  }, [_c("button", {
-    staticClass: "nav-link font-weight-bold small text-muted",
-    attrs: {
-      id: "finanzas-tab",
-      "data-bs-toggle": "tab",
-      "data-bs-target": "#finanzas",
-      type: "button",
-      role: "tab"
-    }
-  }, [_vm._v("Finanzas")])]);
-}, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
@@ -7046,27 +7210,89 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", {
-    staticClass: "bg-light"
-  }, [_c("tr", [_c("th", {
-    staticClass: "p-2 border-bottom-0 text-muted"
-  }, [_vm._v("Fecha")]), _vm._v(" "), _c("th", {
-    staticClass: "p-2 border-bottom-0 text-muted"
-  }, [_vm._v("Detalles")]), _vm._v(" "), _c("th", {
-    staticClass: "p-2 border-bottom-0 text-muted"
-  }, [_vm._v("Monto")]), _vm._v(" "), _c("th", {
-    staticClass: "p-2 border-bottom-0 text-muted"
-  }, [_vm._v("Estado")])])]);
+  return _c("div", {
+    staticClass: "text-muted small mb-2 d-flex align-items-center gap-2"
+  }, [_c("i", {
+    staticClass: "fas fa-dollar-sign text-muted"
+  }), _vm._v(" Deuda Total\n              ")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "tab-pane fade",
-    attrs: {
-      id: "convenios",
-      role: "tabpanel"
+    staticClass: "text-muted small mb-2 d-flex align-items-center gap-2"
+  }, [_c("i", {
+    staticClass: "far fa-calendar-alt text-muted"
+  }), _vm._v(" Pagos Pendientes\n              ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "text-muted small mb-2 d-flex align-items-center gap-2"
+  }, [_c("i", {
+    staticClass: "far fa-credit-card text-muted"
+  }), _vm._v(" Total Pagado\n              ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "d-flex align-items-center mb-3"
+  }, [_c("i", {
+    staticClass: "far fa-credit-card text-primary me-2"
+  }), _vm._v(" "), _c("h6", {
+    staticClass: "font-weight-bold mb-0 text-dark"
+  }, [_vm._v("Historial de Pagos")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", {
+    staticStyle: {
+      "border-bottom": "1px solid #f1f3f5"
     }
-  }, [_c("div", {
+  }, [_c("th", {
+    staticClass: "border-0 text-muted fw-normal py-3 ps-4",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Fecha")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 text-muted fw-normal py-3",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Concepto")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 text-muted fw-normal py-3",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Método")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 text-muted fw-normal py-3 text-end",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Monto")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 text-muted fw-normal py-3 pe-4",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Estado")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("td", {
+    staticClass: "text-center text-muted py-5",
+    attrs: {
+      colspan: "5"
+    }
+  }, [_c("i", {
+    staticClass: "far fa-folder-open mb-2 d-block",
+    staticStyle: {
+      "font-size": "2rem",
+      opacity: "0.3"
+    }
+  }), _vm._v("\n                    No hay historial de pagos registrado.\n                  ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
     staticClass: "card border-0 shadow-sm",
     staticStyle: {
       "border-radius": "12px",
@@ -7098,7 +7324,7 @@ var staticRenderFns = [function () {
     }
   }, [_c("i", {
     staticClass: "fas fa-tools me-2"
-  }), _vm._v(" Próximamente")])])])])]);
+  }), _vm._v(" Próximamente")])])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -7861,6 +8087,7 @@ var render = function render() {
       staticClass: "fa-solid fa-flask-vial me-2 text-primary"
     }), _vm._v(" Recetas\n                      ")])])])])])])]);
   }), 0)])])], 1) : _c("DetallePaciente", {
+    ref: "detallePaciente",
     attrs: {
       pacienteId: _vm.dataPaciente.id
     },
@@ -7878,6 +8105,9 @@ var render = function render() {
   }), _vm._v(" "), _c("ModalEdicionPaciente", {
     attrs: {
       dataPatient: _vm.dataPaciente
+    },
+    on: {
+      actualizar: _vm.getPatients
     }
   }), _vm._v(" "), _vm.data ? _c("modal-recetas", {
     attrs: {
@@ -7891,6 +8121,9 @@ var render = function render() {
     attrs: {
       dataPatient: _vm.data,
       profesionales: _vm.profesionales
+    },
+    on: {
+      actualizar: _vm.getPatients
     }
   }) : _vm._e(), _vm._v(" "), _vm.dataTriajes ? _c("modal-ver-triajes-viejos", {
     attrs: {

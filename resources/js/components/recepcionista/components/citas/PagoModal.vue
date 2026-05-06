@@ -183,6 +183,7 @@ import moment from 'moment'
 						this.dataCita.payment.price = parseFloat(this.dataCita.payment.price) - parseFloat(this.caso.monto_adelanto);
 						this.$emit('actualizarAdelanto', this.caso.monto_adelanto, this.dataCita.id)
 					}
+					this.$emit('actualizar')
 				})
 				.catch(err => {
 					console.error(err);

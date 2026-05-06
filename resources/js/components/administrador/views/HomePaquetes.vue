@@ -771,6 +771,14 @@ export default {
         
         this.paquetesFiltrados = response.data.paquetes.data;
         this.metricas = response.data.metricas;
+
+        // Si hay un paquete seleccionado, actualizar su referencia.
+        if (this.paqueteSeleccionado) {
+          const updatedPaquete = this.paquetesFiltrados.find(p => p.id === this.paqueteSeleccionado.id);
+          if (updatedPaquete) {
+            this.paqueteSeleccionado = updatedPaquete;
+          }
+        }
         
         this.pagination = {
           current_page: response.data.paquetes.current_page,
@@ -885,7 +893,7 @@ export default {
           modal.hide();
           
           // Recargar paquetes para actualizar contadores
-          this.cargarPaquetes(this.pagination.current_page);
+          await this.cargarPaquetes(this.pagination.current_page);
         }
       } catch (error) {
         console.error("Error al agendar cita:", error);
@@ -985,20 +993,20 @@ export default {
         const modal = bootstrap.Modal.getInstance(document.getElementById('modalProrratear'));
         if (modal) modal.hide();
         
-        Swal.fire({
+        this.$swal({
           icon: 'success',
           title: 'Paquete prorrateado',
           text: `Se generó una nota de crédito por S/ ${parseFloat(res.data.dinero_a_favor).toFixed(2)}`,
         });
-        this.cargarPaquetes(this.pagination.current_page);
+        await this.cargarPaquetes(this.pagination.current_page);
       } catch (error) {
-        Swal.fire('Error', error.response?.data?.error || 'No se pudo prorratear', 'error');
+        this.$swal('Error', error.response?.data?.error || 'No se pudo prorratear', 'error');
       } finally {
         this.procesandoEstado = false;
       }
     },
     async cambiarEstado(paquete, accion) {
-      const confirmacion = await Swal.fire({
+      const confirmacion = await this.$swal({
         title: `¿Seguro que deseas ${accion} el paquete?`,
         icon: 'warning',
         showCancelButton: true,
@@ -1010,10 +1018,15 @@ export default {
       this.procesandoEstado = true;
       try {
         await this.axios.post(`/api/${accion}Paquete/${paquete.id}`);
-        Swal.fire('Éxito', `Paquete actualizado a ${accion}`, 'success');
-        this.cargarPaquetes(this.pagination.current_page);
+        
+        // Actualización optimista local
+        if (accion === 'cancelar') paquete.estado = 6;
+        if (accion === 'congelar') paquete.estado = 4;
+        
+        this.$swal('Éxito', `Paquete actualizado a ${accion}`, 'success');
+        await this.cargarPaquetes(this.pagination.current_page);
       } catch (error) {
-        Swal.fire('Error', error.response?.data?.error || 'Error en la operación', 'error');
+        this.$swal('Error', error.response?.data?.error || 'Error en la operación', 'error');
       } finally {
         this.procesandoEstado = false;
       }

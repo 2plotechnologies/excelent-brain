@@ -162,7 +162,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       var _arguments = arguments,
         _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var page, response;
+        var page, response, updatedPaquete;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
@@ -188,27 +188,37 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               response = _context2.sent;
               _this3.paquetesFiltrados = response.data.paquetes.data;
               _this3.metricas = response.data.metricas;
+
+              // Si hay un paquete seleccionado, actualizar su referencia.
+              if (_this3.paqueteSeleccionado) {
+                updatedPaquete = _this3.paquetesFiltrados.find(function (p) {
+                  return p.id === _this3.paqueteSeleccionado.id;
+                });
+                if (updatedPaquete) {
+                  _this3.paqueteSeleccionado = updatedPaquete;
+                }
+              }
               _this3.pagination = {
                 current_page: response.data.paquetes.current_page,
                 last_page: response.data.paquetes.last_page,
                 from: response.data.paquetes.from,
                 to: response.data.paquetes.to
               };
-              _context2.next = 16;
+              _context2.next = 17;
               break;
-            case 13:
-              _context2.prev = 13;
+            case 14:
+              _context2.prev = 14;
               _context2.t0 = _context2["catch"](4);
               console.error("Error cargando paquetes:", _context2.t0);
-            case 16:
-              _context2.prev = 16;
+            case 17:
+              _context2.prev = 17;
               _this3.loading = false;
-              return _context2.finish(16);
-            case 19:
+              return _context2.finish(17);
+            case 20:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[4, 13, 16, 19]]);
+        }, _callee2, null, [[4, 14, 17, 20]]);
       }))();
     },
     cargarMonedas: function cargarMonedas() {
@@ -364,39 +374,43 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               return _this7.axios.post('/api/agendarCitaPaquete', payload);
             case 7:
               response = _context6.sent;
-              if (response.data.cita) {
-                _this7.$swal({
-                  title: 'Cita agendada',
-                  text: 'La sesión se ha programado correctamente.',
-                  icon: 'success',
-                  timer: 2000,
-                  showConfirmButton: false
-                });
-
-                // Cerrar modal
-                modalElement = document.getElementById('modalAgendarSesion');
-                modal = bootstrap.Modal.getInstance(modalElement);
-                modal.hide();
-
-                // Recargar paquetes para actualizar contadores
-                _this7.cargarPaquetes(_this7.pagination.current_page);
+              if (!response.data.cita) {
+                _context6.next = 15;
+                break;
               }
+              _this7.$swal({
+                title: 'Cita agendada',
+                text: 'La sesión se ha programado correctamente.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              });
+
+              // Cerrar modal
+              modalElement = document.getElementById('modalAgendarSesion');
+              modal = bootstrap.Modal.getInstance(modalElement);
+              modal.hide();
+
+              // Recargar paquetes para actualizar contadores
               _context6.next = 15;
+              return _this7.cargarPaquetes(_this7.pagination.current_page);
+            case 15:
+              _context6.next = 21;
               break;
-            case 11:
-              _context6.prev = 11;
+            case 17:
+              _context6.prev = 17;
               _context6.t0 = _context6["catch"](3);
               console.error("Error al agendar cita:", _context6.t0);
               alertify.error('Hubo un error al agendar la cita.');
-            case 15:
-              _context6.prev = 15;
+            case 21:
+              _context6.prev = 21;
               _this7.guardandoCita = false;
-              return _context6.finish(15);
-            case 18:
+              return _context6.finish(21);
+            case 24:
             case "end":
               return _context6.stop();
           }
-        }, _callee6, null, [[3, 11, 15, 18]]);
+        }, _callee6, null, [[3, 17, 21, 24]]);
       }))();
     },
     formatHora: function formatHora(hora) {
@@ -528,27 +542,29 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               res = _context7.sent;
               modal = bootstrap.Modal.getInstance(document.getElementById('modalProrratear'));
               if (modal) modal.hide();
-              Swal.fire({
+              _this9.$swal({
                 icon: 'success',
                 title: 'Paquete prorrateado',
                 text: "Se gener\xF3 una nota de cr\xE9dito por S/ ".concat(parseFloat(res.data.dinero_a_favor).toFixed(2))
               });
-              _this9.cargarPaquetes(_this9.pagination.current_page);
-              _context7.next = 14;
+              _context7.next = 10;
+              return _this9.cargarPaquetes(_this9.pagination.current_page);
+            case 10:
+              _context7.next = 15;
               break;
-            case 11:
-              _context7.prev = 11;
+            case 12:
+              _context7.prev = 12;
               _context7.t0 = _context7["catch"](1);
-              Swal.fire('Error', ((_error$response = _context7.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.error) || 'No se pudo prorratear', 'error');
-            case 14:
-              _context7.prev = 14;
+              _this9.$swal('Error', ((_error$response = _context7.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.error) || 'No se pudo prorratear', 'error');
+            case 15:
+              _context7.prev = 15;
               _this9.procesandoEstado = false;
-              return _context7.finish(14);
-            case 17:
+              return _context7.finish(15);
+            case 18:
             case "end":
               return _context7.stop();
           }
-        }, _callee7, null, [[1, 11, 14, 17]]);
+        }, _callee7, null, [[1, 12, 15, 18]]);
       }))();
     },
     cambiarEstado: function cambiarEstado(paquete, accion) {
@@ -559,7 +575,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           while (1) switch (_context8.prev = _context8.next) {
             case 0:
               _context8.next = 2;
-              return Swal.fire({
+              return _this10.$swal({
                 title: "\xBFSeguro que deseas ".concat(accion, " el paquete?"),
                 icon: 'warning',
                 showCancelButton: true,
@@ -579,23 +595,28 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context8.next = 9;
               return _this10.axios.post("/api/".concat(accion, "Paquete/").concat(paquete.id));
             case 9:
-              Swal.fire('Éxito', "Paquete actualizado a ".concat(accion), 'success');
-              _this10.cargarPaquetes(_this10.pagination.current_page);
-              _context8.next = 16;
+              // Actualización optimista local
+              if (accion === 'cancelar') paquete.estado = 6;
+              if (accion === 'congelar') paquete.estado = 4;
+              _this10.$swal('Éxito', "Paquete actualizado a ".concat(accion), 'success');
+              _context8.next = 14;
+              return _this10.cargarPaquetes(_this10.pagination.current_page);
+            case 14:
+              _context8.next = 19;
               break;
-            case 13:
-              _context8.prev = 13;
-              _context8.t0 = _context8["catch"](6);
-              Swal.fire('Error', ((_error$response2 = _context8.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.error) || 'Error en la operación', 'error');
             case 16:
               _context8.prev = 16;
-              _this10.procesandoEstado = false;
-              return _context8.finish(16);
+              _context8.t0 = _context8["catch"](6);
+              _this10.$swal('Error', ((_error$response2 = _context8.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.error) || 'Error en la operación', 'error');
             case 19:
+              _context8.prev = 19;
+              _this10.procesandoEstado = false;
+              return _context8.finish(19);
+            case 22:
             case "end":
               return _context8.stop();
           }
-        }, _callee8, null, [[6, 13, 16, 19]]);
+        }, _callee8, null, [[6, 16, 19, 22]]);
       }))();
     },
     verReporte: function verReporte(paquete) {

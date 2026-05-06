@@ -145,8 +145,8 @@
 			@tiemposEspera="abrirTiemposEspera"
 		/>
 
-    <modal-estado v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario"></modal-estado>
-    <pago-modal v-if="cita && cita.id" :cita="cita" :idUsuario="idUsuario" :idSede="idSede" @actualizarAdelanto="actualizarAdelanto"></pago-modal>
+    <modal-estado v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @actualizar="actualizarListadoCitas"></modal-estado>
+    <pago-modal v-if="cita && cita.id" :cita="cita" :idUsuario="idUsuario" :idSede="idSede" @actualizarAdelanto="actualizarAdelanto" @actualizar="actualizarListadoCitas"></pago-modal>
 		<modal-patient v-if="cita && cita.id" :dataCit="cita"></modal-patient>
     <reprog-modal v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="actualizarListadoCitas"></reprog-modal>
 		<info-modal v-if="cita && cita.id" :dataCit="cita" :precios="precios"></info-modal>
