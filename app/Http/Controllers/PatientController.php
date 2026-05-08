@@ -22,6 +22,7 @@ use App\Models\PlanSeguridad;
 use Faker\Provider\ar_EG\Person;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\TryCatch;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 class PatientController extends Controller
 {
@@ -957,6 +958,33 @@ class PatientController extends Controller
 			return response()->json($fichaSeguimiento);
 		}
 
+		public function exportFichaSeguimiento($id)
+		{
+			$ficha_seguimiento = FichaSeguimiento::with([
+				'interconsultas.professional',
+				'professional'
+			])->where('id', $id)->orderBy('fecha', 'desc')->first();
+			if (!$ficha_seguimiento) {
+				return response()->json([
+					'error' => 'Ficha de seguimiento no encontrada.',
+				], 404);
+			}
+
+			//Convertir campo recomendaciones que es un array.
+			$ficha_seguimiento->recomendaciones = json_decode($ficha_seguimiento->recomendaciones, true);
+
+			$paciente = Patient::with(['address'])->findOrFail($ficha_seguimiento->patient_id);
+
+			$pdf = PDF::loadView('recepcion.pdf_ficha_seguimiento', [
+				'ficha_seguimiento' => $ficha_seguimiento,
+				'paciente' => $paciente,
+			]);
+
+			$pdf->setPaper([0, 0, 612.00, 936.00], 'portrait');
+
+			return $pdf->download('ficha-seguimiento-' . $paciente->dni . '.pdf');
+		}
+
 		public function storePlanSeguridad(Request $request){
 			$validated = $request->validate([
 				'patient_id' => 'required|integer',
@@ -991,7 +1019,27 @@ class PatientController extends Controller
 			$planesSeguridad = PlanSeguridad::where('patient_id', $patient_id)->orderBy('fecha', 'desc')->get();
 			return response()->json($planesSeguridad);
 		}
-		
+
+		public function exportPlanSeguridad($id)
+		{
+			$plan_seguridad = PlanSeguridad::where('id', $id)->orderBy('fecha', 'desc')->first();
+			if (!$plan_seguridad) {
+				return response()->json([
+					'error' => 'Plan de seguridad no encontrado.',
+				], 404);
+			}
+
+			$paciente = Patient::with(['address'])->findOrFail($plan_seguridad->patient_id);
+
+			$pdf = PDF::loadView('recepcion.pdf_plan_seguridad', [
+				'plan_seguridad' => $plan_seguridad,
+				'paciente' => $paciente,
+			]);
+
+			$pdf->setPaper([0, 0, 612.00, 936.00], 'portrait');
+
+			return $pdf->download('plan-seguridad-' . $paciente->dni . '.pdf');
+		}
 
 		public function getFullPatientDetails($id)
 		{

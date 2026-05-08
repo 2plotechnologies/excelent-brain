@@ -1660,6 +1660,9 @@
 
           </div>
           <div class="modal-footer border-top-0 pt-0">
+            <a v-if="fichaSeleccionada" :href="`/api/export-ficha-seguimiento/${fichaSeleccionada.id}?token=${$token}`" class="btn btn-danger">
+              <i class="fas fa-file-pdf me-2"></i> Descargar PDF
+            </a>
             <button type="button" class="btn btn-light border px-4" data-bs-dismiss="modal">Cerrar</button>
           </div>
         </div>
@@ -2091,11 +2094,13 @@ export default {
       this.planSeguridadSeleccionado = plan;
     },
     descargarPlanPDF(plan) {
-      this.$swal.fire({
-        icon: 'info',
-        title: 'Próximamente',
-        text: 'La descarga de PDF para planes de seguridad estará disponible pronto.'
-      });
+      const url = `/api/export-plan-seguridad/${plan.id}?token=${this.$token}`;
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `plan-seguridad-${this.paciente.dni}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     },
     async fetchPatientDetails() {
       this.loading = true;
@@ -2348,8 +2353,9 @@ export default {
       }
     },
     getEvolutionColor(evo) {
-      if (!evo.typeEvolution) return '#6c757d';
-      const id = evo.typeEvolution.id;
+      const type = evo.type_evolution || evo.typeEvolution;
+      if (!type) return '#6c757d';
+      const id = type.id;
       // Map according to reference image:
       if (id == 1) return '#e74c3c'; // Psiquiatrica - Red
       if (id == 2) return '#fd7e14'; // Psicológica - Orange
@@ -2359,7 +2365,8 @@ export default {
       return '#6c757d'; // Default
     },
     getEvolutionTypeLabel(evo) {
-      if (evo.typeEvolution) return evo.typeEvolution.clasificacion;
+      const type = evo.type_evolution || evo.typeEvolution;
+      if (type) return type.clasificacion;
       return 'Evolución';
     },
     getPaymentMethodName(id) {

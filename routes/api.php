@@ -109,8 +109,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('chat', [ChatRecepcionController::class, 'addMessage']);
         Route::get('fichas-seguimiento/{patient_id}', [PatientController::class, 'getFichasSeguimiento']);
         Route::post('ficha-seguimiento', [PatientController::class, 'storeFichaSeguimiento']);
+        Route::get('export-ficha-seguimiento/{id}', [PatientController::class, 'exportFichaSeguimiento']);
         Route::get('planes-seguridad/{patient_id}', [PatientController::class, 'getPlanesSeguridad']);
         Route::post('plan-seguridad', [PatientController::class, 'storePlanSeguridad']);
+        Route::get('export-plan-seguridad/{id}', [PatientController::class, 'exportPlanSeguridad']);
         Route::post('/pacientes/{id}/generar-link', [QuestionnaireController::class, 'generarLinkApi']);
         Route::get('/pacientes/{id}/ultimo-autotriaje', [QuestionnaireController::class, 'ultimoAutoTriaje']);
         // Admin-only patient routes
