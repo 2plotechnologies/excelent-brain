@@ -383,6 +383,7 @@
                 <thead class="table-light">
                   <tr>
                     <th class="py-3">Fecha de Vencimiento</th>
+                    <th>Motivo</th>
                     <th>Estado</th>
                     <th class="text-end">Monto a Pagar</th>
                     <th class="text-center">Acción</th>
@@ -391,10 +392,27 @@
                 <tbody>
                   <tr v-for="cuota in (paqueteSeleccionado.deudas || [])" :key="cuota.id" :class="{'table-success': cuota.estado == 2}">
                     <td>
-                      <div class="fw-bold">{{ formatFecha(cuota.fecha) }}</div>
-                      <small class="text-danger" v-if="cuota.estado == 1 && esCuotaVencida(cuota.fecha)">
-                        <i class="fas fa-exclamation-circle"></i> Cuota Vencida
-                      </small>
+                      <div v-if="editandoDeudaId !== cuota.id">
+                        <div class="fw-bold d-flex align-items-center gap-2">
+                          {{ formatFecha(cuota.fecha) }}
+                          <button v-if="cuota.estado == 1" class="btn btn-sm btn-link text-muted p-0 ms-1" @click="iniciarEdicionDeuda(cuota)"><i class="fas fa-pencil-alt"></i></button>
+                        </div>
+                        <small class="text-danger" v-if="cuota.estado == 1 && esCuotaVencida(cuota.fecha)">
+                          <i class="fas fa-exclamation-circle"></i> Cuota Vencida
+                        </small>
+                      </div>
+                      <div v-else>
+                        <input type="date" class="form-control form-control-sm mb-1" v-model="formEditDeuda.fecha">
+                      </div>
+                    </td>
+                    <td>
+                      <div v-if="editandoDeudaId !== cuota.id">
+                        <span class="text-capitalize">{{ cuota.motivo }}</span>
+                        <div v-if="cuota.observaciones" class="small text-muted fst-italic mt-1" style="max-width: 200px; white-space: normal;"><i class="fas fa-info-circle"></i> {{ cuota.observaciones }}</div>
+                      </div>
+                      <div v-else>
+                        <input type="text" class="form-control form-control-sm mb-1" v-model="formEditDeuda.motivo">
+                      </div>
                     </td>
                     <td>
                       <span v-if="cuota.estado == 2" class="badge bg-success-subtle border border-success-subtle text-success">Pagado</span>
@@ -404,17 +422,26 @@
                       S/ {{ parseFloat(cuota.monto).toFixed(2) }}
                     </td>
                     <td class="text-center">
-                      <button v-if="cuota.estado == 1" class="btn btn-sm btn-primary shadow-sm" @click="procesarPago(cuota)" :disabled="procesandoPago">
-                        <i class="fas fa-hand-holding-usd me-1" v-if="!procesandoPago"></i> 
-                        <i class="fas fa-spinner fa-spin me-1" v-else></i> Pagar 
-                      </button>
-                      <button v-else class="btn btn-sm btn-light text-success" disabled>
-                        <i class="fas fa-check"></i>
-                      </button>
+                      <div v-if="editandoDeudaId === cuota.id" class="d-flex gap-1 justify-content-center">
+                        <button class="btn btn-sm btn-success shadow-sm" @click="guardarEdicionDeuda(cuota)"><i class="fas fa-check"></i></button>
+                        <button class="btn btn-sm btn-light shadow-sm" @click="cancelarEdicionDeuda()"><i class="fas fa-times"></i></button>
+                      </div>
+                      <div v-else class="d-flex gap-1 justify-content-center">
+                        <button v-if="cuota.estado == 1" class="btn btn-sm btn-primary shadow-sm text-nowrap" @click="procesarPago(cuota)" :disabled="procesandoPago">
+                          <i class="fas fa-hand-holding-usd me-1" v-if="!procesandoPago"></i> 
+                          <i class="fas fa-spinner fa-spin me-1" v-else></i> Pagar 
+                        </button>
+                        <button v-if="cuota.estado == 1" class="btn btn-sm btn-outline-secondary shadow-sm" @click="abrirModalFraccionar(cuota)" title="Fraccionar">
+                          <i class="fas fa-divide"></i> 
+                        </button>
+                        <button v-if="cuota.estado == 2" class="btn btn-sm btn-light text-success" disabled>
+                          <i class="fas fa-check"></i>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   <tr v-if="!paqueteSeleccionado.deudas || paqueteSeleccionado.deudas.length === 0">
-                    <td colspan="4" class="text-center py-4 text-muted fst-italic">No existen registros de cuotas para este paquete.</td>
+                    <td colspan="5" class="text-center py-4 text-muted fst-italic">No existen registros de cuotas para este paquete.</td>
                   </tr>
                 </tbody>
               </table>
@@ -698,6 +725,9 @@ export default {
       guardandoCita: false,
       procesandoEstado: false,
       formProrrateo: { observacion: '' },
+      editandoDeudaId: null,
+      formEditDeuda: { fecha: '', motivo: '' },
+      procesandoFraccion: false,
       nuevaSesion: {
         idProfesional: '',
         fecha: new Date().toISOString().split('T')[0],
@@ -1136,6 +1166,73 @@ export default {
       } finally {
         this.guardandoReporte = false;
       }
+    },
+    iniciarEdicionDeuda(cuota) {
+      this.editandoDeudaId = cuota.id;
+      this.formEditDeuda.fecha = cuota.fecha;
+      this.formEditDeuda.motivo = cuota.motivo;
+    },
+    cancelarEdicionDeuda() {
+      this.editandoDeudaId = null;
+    },
+    async guardarEdicionDeuda(cuota) {
+      try {
+        const datos = {
+          idDeuda: cuota.id,
+          fecha: this.formEditDeuda.fecha,
+          motivo: this.formEditDeuda.motivo,
+          user_id: this.idUsuario
+        };
+        const response = await this.axios.post('/api/actualizarDeuda', datos);
+        this.$swal('Éxito', response.data.message, 'success');
+        this.editandoDeudaId = null;
+        this.cargarPaquetes(this.pagination.current_page);
+      } catch (error) {
+        this.$swal('Error', 'No se pudo actualizar la cuota', 'error');
+      }
+    },
+    async abrirModalFraccionar(cuota) {
+      const { value: formValues } = await this.$swal({
+        title: 'Fraccionar Cuota',
+        html:
+          `<p class="text-muted">Cuota actual: <strong>S/ ${parseFloat(cuota.monto).toFixed(2)}</strong></p>` +
+          `<label class="form-label text-start d-block small fw-bold">Monto a separar:</label>` +
+          '<input id="swal-input1" class="form-control mb-3" type="number" step="0.01" min="0.01" max="'+(cuota.monto - 0.01)+'">' +
+          `<label class="form-label text-start d-block small fw-bold">Fecha de la nueva cuota (fracción):</label>` +
+          '<input id="swal-input2" class="form-control" type="date">',
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Fraccionar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+          const monto = document.getElementById('swal-input1').value;
+          const fecha = document.getElementById('swal-input2').value;
+          if (!monto || !fecha || parseFloat(monto) <= 0 || parseFloat(monto) >= cuota.monto) {
+            this.$swal.showValidationMessage('Ingresa un monto válido y una fecha');
+            return false;
+          }
+          return { monto: parseFloat(monto), fecha: fecha };
+        }
+      });
+
+      if (formValues) {
+        try {
+          this.procesandoFraccion = true;
+          const datos = {
+            idDeuda: cuota.id,
+            monto_fraccion: formValues.monto,
+            nueva_fecha: formValues.fecha,
+            user_id: this.idUsuario
+          };
+          const response = await this.axios.post('/api/fraccionarDeuda', datos);
+          this.$swal('Éxito', response.data.message, 'success');
+          this.cargarPaquetes(this.pagination.current_page);
+        } catch (error) {
+          this.$swal('Error', error.response?.data?.error || 'No se pudo fraccionar la cuota', 'error');
+        } finally {
+          this.procesandoFraccion = false;
+        }
+      }
     }
   }
 }
@@ -1440,7 +1537,7 @@ export default {
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 99999;
+  z-index: 1050;
   display: flex;
   align-items: center;
   justify-content: center;

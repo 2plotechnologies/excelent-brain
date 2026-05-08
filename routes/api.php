@@ -251,6 +251,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('prorratearPaquete/{id}', [PaqueteController::class, 'prorratearPaquete']);
         Route::post('cancelarPaquete/{id}', [PaqueteController::class, 'cancelarPaquete']);
         Route::post('congelarPaquete/{id}', [PaqueteController::class, 'congelarPaquete']);
+        Route::post('actualizarDeuda', [PaqueteController::class, 'actualizarDeuda']);
+        Route::post('fraccionarDeuda', [PaqueteController::class, 'fraccionarDeuda']);
 
         // Notas de Credito
         Route::get('notas-credito', [App\Http\Controllers\NotaCreditoController::class, 'index']);

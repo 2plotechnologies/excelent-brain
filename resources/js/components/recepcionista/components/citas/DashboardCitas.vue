@@ -202,8 +202,17 @@
                                           <i :class="getStatusBadge(cita.status).icon" class="mr-1"></i> {{ getStatusBadge(cita.status).text }}
                                       </span>
                                       
-                                      <a href="#" class="text-primary mr-3 text-decoration-none" v-if="cita.status != 3"><i class="fas fa-sync-alt mr-1"></i> Reprogramar</a>
-                                      <button class="btn btn-link text-muted"><i class="fas fa-ellipsis-h"></i></button>
+                                      <a href="#" class="text-primary mr-3 text-decoration-none" v-if="cita.status != 3" @click.prevent="abrirReprogramar(cita)" data-bs-toggle="modal" data-bs-target="#reprogModal"><i class="fas fa-sync-alt mr-1"></i> Reprogramar</a>
+                                      <div class="dropdown d-inline-block">
+                                          <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                              <i class="fas fa-ellipsis-h"></i>
+                                          </button>
+                                          <ul class="dropdown-menu dropdown-menu-right shadow border-0" style="border-radius: 10px; min-width: 200px;">
+                                              <li><a class="dropdown-item py-2" href="#" @click.prevent="abrirDetallesCita(cita)" data-bs-toggle="modal" data-bs-target="#modalAccionesCita"><i class="fas fa-eye text-primary mr-2" style="width: 16px;"></i> Ver Detalle</a></li>
+                                              <li><a class="dropdown-item py-2" href="#" @click.prevent="intercambiarHorario(cita)" data-bs-toggle="modal" data-bs-target="#modalIntercambio"><i class="fas fa-retweet text-warning mr-2" style="width: 16px;"></i> Cambiar Horario</a></li>
+                                              <li><a class="dropdown-item py-2" href="#" @click.prevent="prepararLimbo(cita)" data-bs-toggle="modal" data-bs-target="#reprogModal"><i class="fas fa-archive text-secondary mr-2" style="width: 16px;"></i> Enviar al Limbo</a></li>
+                                          </ul>
+                                      </div>
                                   </div>
                               </div>
                           </div>
@@ -216,6 +225,24 @@
           </div>
       </div>
 
+      <!-- Modales -->
+      <ModalAccionesCita v-if="cita && cita.id" :cita="cita" :indiceElegido="indexElegido" :precios="precios"
+          @changeMode="changeMode"
+          @openModal="distribuirAperturaModal"
+          @intercambiar="intercambiarHorario"
+          @eliminar="validarYEliminar"
+          @buscarRecetas="buscarRecetas"
+          @tiemposEspera="abrirTiemposEspera"
+      />
+      <reprog-modal ref="reprogModal" v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="actualizarListadoCitas"></reprog-modal>
+      <info-modal v-if="cita && cita.id" :dataCit="cita" :precios="precios"></info-modal>
+      <ModalIntercambio :posibles="posibles" :primero="primero" @actualizar="actualizarListadoCitas"></ModalIntercambio>
+      <modalVerRecetas :prescriptions="recetas"></modalVerRecetas>
+      <modalTiemposEspera :cita="citaTemp" @actualizar="actualizarListadoCitas"></modalTiemposEspera>
+      <modal-estado v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @actualizar="actualizarListadoCitas"></modal-estado>
+      <pago-modal v-if="cita && cita.id" :cita="cita" :idUsuario="idUsuario" :idSede="idSede" @actualizarAdelanto="actualizarAdelanto" @actualizar="actualizarListadoCitas"></pago-modal>
+      <modal-patient v-if="cita && cita.id" :dataCit="cita"></modal-patient>
+
   </div>
 </template>
 
@@ -223,15 +250,46 @@
 import { Doughnut, Bar } from 'vue-chartjs/legacy'
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, BarElement } from 'chart.js'
+import alertify from 'alertifyjs'
+
+import ModalAccionesCita from './ModalAccionesCita.vue'
+import ReprogModal from './ReprogModal.vue'
+import ModalIntercambio from './ModalIntercambio.vue'
+import PagoModal from './PagoModal.vue'
+import ModalEstadoCita from './ModalEstadoCita.vue'
+import InfoModal from './ModalInfo.vue'
+import modalTiemposEspera from './ModalTiemposEspera.vue'
+import modalVerRecetas from './ModalVerRecetas.vue'
+import ModalPatient from './ModalPatient.vue'
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, BarElement, ChartDataLabels)
 
 export default {
   name: 'DashboardCitas',
-  components: { Doughnut, Bar },
+  components: { 
+      Doughnut, Bar,
+      ModalAccionesCita,
+      ReprogModal,
+      ModalIntercambio,
+      PagoModal,
+      'modal-estado': ModalEstadoCita,
+      InfoModal,
+      modalTiemposEspera,
+      modalVerRecetas,
+      ModalPatient
+  },
   data() {
       return {
           showCharts: true,
+          cita: null,
+          indexElegido: -1,
+          precios: [],
+          idUsuario: null,
+          idSede: null,
+          posibles: [],
+          primero: {patient:[]},
+          citaTemp: [],
+          recetas: [],
           dashData: {
               totalCitasHoy: 0,
               totalCitasPendientes: 0,
@@ -271,10 +329,105 @@ export default {
       }
   },
   mounted() {
+      this.axios.get('/api/user').then((res) => {
+          this.idUsuario = parseInt(res.data.user.id)
+      })
+      this.listarPrecios();
       this.fetchDashboardData();
       setInterval(this.fetchDashboardData, 300000); // 5 minutes reload
   },
   methods: {
+      async listarPrecios() {
+          await this.axios.get('/api/listarPreciosTodos')
+          .then(response => this.precios = response.data)
+      },
+      abrirReprogramar(cita) {
+          this.cita = cita;
+          this.indexElegido = this.dashData.citasHoy.findIndex(x => x.id === cita.id);
+          this.$nextTick(() => {
+              if(this.$refs.reprogModal) {
+                  this.$refs.reprogModal.caso = 'reprogramar';
+              }
+          });
+      },
+      prepararLimbo(cita) {
+          this.cita = cita;
+          this.indexElegido = this.dashData.citasHoy.findIndex(x => x.id === cita.id);
+          this.$nextTick(() => {
+              if(this.$refs.reprogModal) {
+                  this.$refs.reprogModal.caso = 'limbo';
+              }
+          });
+      },
+      abrirDetallesCita(cita) {
+          this.cita = cita;
+          this.indexElegido = this.dashData.citasHoy.findIndex(x => x.id === cita.id);
+      },
+      changeMode(id, indiceP) {
+          this.$swal.fire({
+              title: 'Actualizar',
+              text: "¿Está seguro de cambiar el modo de la cita?",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Sí',
+              cancelButtonText: 'No'
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  this.axios.get(`/api/updateModeAppoinment/${id}`)
+                  .then(res => {
+                      this.fetchDashboardData();
+                  })
+              }
+          })
+      },
+      distribuirAperturaModal(data, tModalId, indexG) {
+          this.cita = data;
+          this.indexElegido = indexG;
+      },
+      intercambiarHorario(laCita) {
+          this.cita = laCita;
+          let idProf = laCita.professional_id;
+          this.primero = laCita;
+          this.posibles = this.dashData.citasHoy.filter(posible => posible.professional_id == idProf && posible.id != laCita.id);
+      },
+      validarYEliminar(id) {
+          this.$swal({
+              title: '¿Quieres eliminar esta cita?',
+              html: 'Ingrese un motivo para eliminar la cita. <br> <small>No se generará falta</small>',
+              input: 'text',
+              showCancelButton: true,
+              confirmButtonText: 'Si',
+              cancelButtonText: `No`,
+          }).then((result) => {
+              if( result.value =='')
+                  alertify.notify('No eliminado, falta rellenar un motivo' , 'danger', 5);
+              else
+                  if(result.isConfirmed){
+                      this.axios.post('/api/eliminarCita/'+id, {razon: result.value, usuario: this.idUsuario })
+                      .then((res) => {
+                          this.$swal('Cita eliminada con exito')
+                          this.fetchDashboardData();
+                      });
+                  }
+          })
+      },
+      buscarRecetas(id) {
+          this.axios(`/api/verRecetaPorId/${id}`)
+          .then(res => {
+              this.recetas = res.data;
+          })
+      },
+      abrirTiemposEspera(cita) {
+          this.citaTemp = cita;
+      },
+      actualizarAdelanto(adelanto, citaId) {
+          this.fetchDashboardData();
+      },
+      actualizarListadoCitas() {
+          this.fetchDashboardData();
+      },
       async fetchDashboardData() {
           try {
               let { data } = await this.axios.get('/api/dashboardModuloCitas');

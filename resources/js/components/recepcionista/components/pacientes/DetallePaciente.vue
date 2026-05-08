@@ -478,6 +478,82 @@
             </div>
           </div>
         </div>
+
+        <!-- Faltas y Reprogramaciones Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-4">
+          <h6 class="font-weight-bold mb-0 text-dark d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle text-warning me-2"></i> Faltas y Reprogramaciones
+          </h6>
+        </div>
+
+        <!-- Faltas y Reprogramaciones Grid -->
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card border rounded-3 shadow-sm h-100">
+              <div class="card-header bg-light border-0 py-3">
+                <h6 class="mb-0 text-dark font-weight-bold" style="font-size: 0.95rem;">
+                  <i class="fas fa-times-circle text-danger me-2"></i> Inasistencias (Faltas)
+                </h6>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0" style="font-size: 0.85rem;">
+                    <tbody>
+                      <tr v-for="cita in faltasCitas" :key="'f-'+cita.id">
+                        <td class="align-middle py-3 ps-4 border-bottom-0" style="border-bottom: 1px solid #f1f3f5 !important;">
+                          <div class="text-dark fw-bold">{{ formatOnlyDate(cita.date) }}</div>
+                          <div class="text-muted small">{{ formatOnlyTime(cita.hora) || formatOnlyTime(cita.date) }}</div>
+                        </td>
+                        <td class="align-middle py-3 text-dark border-bottom-0" style="border-bottom: 1px solid #f1f3f5 !important;">
+                          {{ cita.service ? cita.service.name : (cita.tipo_cita || 'Psicológica') }}
+                        </td>
+                        <td class="align-middle py-3 pe-4 text-muted border-bottom-0 text-end" style="border-bottom: 1px solid #f1f3f5 !important;">
+                          <span class="badge bg-danger bg-opacity-10 rounded-pill fw-normal px-2 py-1">Falta</span>
+                        </td>
+                      </tr>
+                      <tr v-if="faltasCitas.length === 0">
+                        <td colspan="3" class="text-center text-muted py-4">No registra inasistencias</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="card border rounded-3 shadow-sm h-100">
+              <div class="card-header bg-light border-0 py-3">
+                <h6 class="mb-0 text-dark font-weight-bold" style="font-size: 0.95rem;">
+                  <i class="fas fa-sync-alt text-info me-2"></i> Reprogramaciones
+                </h6>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0" style="font-size: 0.85rem;">
+                    <tbody>
+                      <tr v-for="cita in reprogramacionesCitas" :key="'r-'+cita.id">
+                        <td class="align-middle py-3 ps-4 border-bottom-0" style="border-bottom: 1px solid #f1f3f5 !important;">
+                          <div class="text-dark fw-bold">{{ formatOnlyDate(cita.date) }}</div>
+                          <div class="text-muted small">{{ formatOnlyTime(cita.hora) || formatOnlyTime(cita.date) }}</div>
+                        </td>
+                        <td class="align-middle py-3 text-dark border-bottom-0" style="border-bottom: 1px solid #f1f3f5 !important;">
+                          {{ cita.service ? cita.service.name : (cita.tipo_cita || 'Psicológica') }}
+                        </td>
+                        <td class="align-middle py-3 pe-4 text-muted border-bottom-0 text-end" style="border-bottom: 1px solid #f1f3f5 !important;">
+                          <span class="badge bg-info bg-opacity-10 rounded-pill fw-normal px-2 py-1">Reprogramada</span>
+                        </td>
+                      </tr>
+                      <tr v-if="reprogramacionesCitas.length === 0">
+                        <td colspan="3" class="text-center text-muted py-4">No registra reprogramaciones</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- HISTORIAL Medico -->
@@ -670,6 +746,9 @@
             <div class="d-flex gap-2">
               <button v-if="paciente.has_autotriaje" class="btn btn-info btn-sm rounded-pill shadow-sm px-3 text-white" data-bs-toggle="modal" data-bs-target="#modalVerAutoTriaje">
                 <i class="fas fa-eye me-1"></i> Ver autotriaje
+              </button>
+              <button v-else class="btn btn-primary btn-sm rounded-pill shadow-sm px-3" data-bs-toggle="modal" data-bs-target="#modalVerAutoTriaje" @click.prevent="generarLinkAutotriaje(paciente)">
+                <i class="fas fa-link me-1"></i> Generar Link Autotriaje
               </button>
               <button class="btn btn-primary btn-sm rounded-pill shadow-sm px-3" data-bs-toggle="modal" data-bs-target="#modalTriaje" @click="$emit('abrirTriaje', paciente)">
                 <i class="fa-solid fa-lungs me-1"></i> Nuevo Triaje
@@ -1791,6 +1870,32 @@
     
     <!-- Modal Ver AutoTriaje -->
     <modal-ver-auto-triaje v-if="paciente.has_autotriaje" :patient-id="paciente.id"></modal-ver-auto-triaje>
+
+     <!-- Modal Link Autotriaje -->
+    <div class="modal fade" id="modalLinkAutotriaje" tabindex="-1" aria-labelledby="modalLinkAutotriajeLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header border-bottom-0">
+            <h5 class="modal-title font-weight-bold" id="modalLinkAutotriajeLabel">Link de Autotriaje</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body pb-4">
+            <p class="text-secondary text-sm mb-3">El siguiente enlace es válido únicamente por 1 hora. Envíalo al paciente para que pueda completar su autotriaje.</p>
+            
+            <div class="input-group mb-3">
+              <input type="text" class="form-control bg-light" :value="linkGenerado" readonly id="inputLinkAutotriaje">
+              <button class="btn btn-outline-secondary" type="button" @click="copiarLink">
+                <i class="far fa-copy"></i> Copiar
+              </button>
+            </div>
+            
+            <a :href="'https://api.whatsapp.com/send?text=' + encodeURIComponent('Hola, por favor completa tu autotriaje en el siguiente enlace válido por 1 hora:\n\n' + linkGenerado)" target="_blank" class="btn btn-success w-100 mt-2" :class="{'disabled': !linkGenerado}">
+              <i class="fab fa-whatsapp me-2"></i> Enviar por WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -1820,6 +1925,7 @@ export default {
       savingFicha: false,
       professionalsList: [],
       fichaSeleccionada: null,
+      linkGenerado: '',
       nuevaFicha: {
         tipo: '',
         frecuencia: '',
@@ -1850,6 +1956,14 @@ export default {
     }
   },
   computed: {
+    faltasCitas() {
+      if (!this.paciente.appointments) return [];
+      return this.paciente.appointments.filter(cita => this.getStatusName(cita.status) === 'Cancelado' || cita.status == 3 || cita.status == 5);
+    },
+    reprogramacionesCitas() {
+      if (!this.paciente.appointments) return [];
+      return this.paciente.appointments.filter(cita => this.getStatusName(cita.status) === 'Reprogramado' || cita.status == 4);
+    },
     initials() {
       if (!this.paciente.name) return '??';
       const firstName = this.paciente.nombres ? this.paciente.nombres.trim().charAt(0) : '';
@@ -1994,6 +2108,24 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    async generarLinkAutotriaje(paciente) {
+      try {
+        const response = await this.axios.post(`/api/pacientes/${paciente.id}/generar-link`);
+        this.linkGenerado = response.data.link;
+        var myModal = new window.bootstrap.Modal(document.getElementById('modalLinkAutotriaje'));
+        myModal.show();
+      } catch (error) {
+        console.error(error);
+        alert('Ocurrió un error al generar el enlace');
+      }
+    },
+    copiarLink() {
+      const input = document.getElementById('inputLinkAutotriaje');
+      input.select();
+      input.setSelectionRange(0, 99999);
+      document.execCommand('copy');
+      alert('Link copiado al portapapeles');
     },
     buildTimeline() {
       const activities = [];

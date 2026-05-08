@@ -72,6 +72,12 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       formProrrateo: {
         observacion: ''
       },
+      editandoDeudaId: null,
+      formEditDeuda: {
+        fecha: '',
+        motivo: ''
+      },
+      procesandoFraccion: false,
       nuevaSesion: {
         idProfesional: '',
         fecha: new Date().toISOString().split('T')[0],
@@ -759,6 +765,114 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               return _context10.stop();
           }
         }, _callee10, null, [[4, 15, 19, 22]]);
+      }))();
+    },
+    iniciarEdicionDeuda: function iniciarEdicionDeuda(cuota) {
+      this.editandoDeudaId = cuota.id;
+      this.formEditDeuda.fecha = cuota.fecha;
+      this.formEditDeuda.motivo = cuota.motivo;
+    },
+    cancelarEdicionDeuda: function cancelarEdicionDeuda() {
+      this.editandoDeudaId = null;
+    },
+    guardarEdicionDeuda: function guardarEdicionDeuda(cuota) {
+      var _this13 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
+        var datos, response;
+        return _regeneratorRuntime().wrap(function _callee11$(_context11) {
+          while (1) switch (_context11.prev = _context11.next) {
+            case 0:
+              _context11.prev = 0;
+              datos = {
+                idDeuda: cuota.id,
+                fecha: _this13.formEditDeuda.fecha,
+                motivo: _this13.formEditDeuda.motivo,
+                user_id: _this13.idUsuario
+              };
+              _context11.next = 4;
+              return _this13.axios.post('/api/actualizarDeuda', datos);
+            case 4:
+              response = _context11.sent;
+              _this13.$swal('Éxito', response.data.message, 'success');
+              _this13.editandoDeudaId = null;
+              _this13.cargarPaquetes(_this13.pagination.current_page);
+              _context11.next = 13;
+              break;
+            case 10:
+              _context11.prev = 10;
+              _context11.t0 = _context11["catch"](0);
+              _this13.$swal('Error', 'No se pudo actualizar la cuota', 'error');
+            case 13:
+            case "end":
+              return _context11.stop();
+          }
+        }, _callee11, null, [[0, 10]]);
+      }))();
+    },
+    abrirModalFraccionar: function abrirModalFraccionar(cuota) {
+      var _this14 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
+        var _yield$_this14$$swal, formValues, datos, response, _error$response3;
+        return _regeneratorRuntime().wrap(function _callee12$(_context12) {
+          while (1) switch (_context12.prev = _context12.next) {
+            case 0:
+              _context12.next = 2;
+              return _this14.$swal({
+                title: 'Fraccionar Cuota',
+                html: "<p class=\"text-muted\">Cuota actual: <strong>S/ ".concat(parseFloat(cuota.monto).toFixed(2), "</strong></p>") + "<label class=\"form-label text-start d-block small fw-bold\">Monto a separar:</label>" + '<input id="swal-input1" class="form-control mb-3" type="number" step="0.01" min="0.01" max="' + (cuota.monto - 0.01) + '">' + "<label class=\"form-label text-start d-block small fw-bold\">Fecha de la nueva cuota (fracci\xF3n):</label>" + '<input id="swal-input2" class="form-control" type="date">',
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Fraccionar',
+                cancelButtonText: 'Cancelar',
+                preConfirm: function preConfirm() {
+                  var monto = document.getElementById('swal-input1').value;
+                  var fecha = document.getElementById('swal-input2').value;
+                  if (!monto || !fecha || parseFloat(monto) <= 0 || parseFloat(monto) >= cuota.monto) {
+                    _this14.$swal.showValidationMessage('Ingresa un monto válido y una fecha');
+                    return false;
+                  }
+                  return {
+                    monto: parseFloat(monto),
+                    fecha: fecha
+                  };
+                }
+              });
+            case 2:
+              _yield$_this14$$swal = _context12.sent;
+              formValues = _yield$_this14$$swal.value;
+              if (!formValues) {
+                _context12.next = 21;
+                break;
+              }
+              _context12.prev = 5;
+              _this14.procesandoFraccion = true;
+              datos = {
+                idDeuda: cuota.id,
+                monto_fraccion: formValues.monto,
+                nueva_fecha: formValues.fecha,
+                user_id: _this14.idUsuario
+              };
+              _context12.next = 10;
+              return _this14.axios.post('/api/fraccionarDeuda', datos);
+            case 10:
+              response = _context12.sent;
+              _this14.$swal('Éxito', response.data.message, 'success');
+              _this14.cargarPaquetes(_this14.pagination.current_page);
+              _context12.next = 18;
+              break;
+            case 15:
+              _context12.prev = 15;
+              _context12.t0 = _context12["catch"](5);
+              _this14.$swal('Error', ((_error$response3 = _context12.t0.response) === null || _error$response3 === void 0 || (_error$response3 = _error$response3.data) === null || _error$response3 === void 0 ? void 0 : _error$response3.error) || 'No se pudo fraccionar la cuota', 'error');
+            case 18:
+              _context12.prev = 18;
+              _this14.procesandoFraccion = false;
+              return _context12.finish(18);
+            case 21:
+            case "end":
+              return _context12.stop();
+          }
+        }, _callee12, null, [[5, 15, 18, 21]]);
       }))();
     }
   }
@@ -1818,7 +1932,7 @@ var render = function render() {
     staticClass: "table-light"
   }, [_c("tr", [_c("th", {
     staticClass: "py-3"
-  }, [_vm._v("Fecha de Vencimiento")]), _vm._v(" "), _c("th", [_vm._v("Estado")]), _vm._v(" "), _c("th", {
+  }, [_vm._v("Fecha de Vencimiento")]), _vm._v(" "), _c("th", [_vm._v("Motivo")]), _vm._v(" "), _c("th", [_vm._v("Estado")]), _vm._v(" "), _c("th", {
     staticClass: "text-end"
   }, [_vm._v("Monto a Pagar")]), _vm._v(" "), _c("th", {
     staticClass: "text-center"
@@ -1828,13 +1942,72 @@ var render = function render() {
       "class": {
         "table-success": cuota.estado == 2
       }
-    }, [_c("td", [_c("div", {
-      staticClass: "fw-bold"
-    }, [_vm._v(_vm._s(_vm.formatFecha(cuota.fecha)))]), _vm._v(" "), cuota.estado == 1 && _vm.esCuotaVencida(cuota.fecha) ? _c("small", {
+    }, [_c("td", [_vm.editandoDeudaId !== cuota.id ? _c("div", [_c("div", {
+      staticClass: "fw-bold d-flex align-items-center gap-2"
+    }, [_vm._v("\n                        " + _vm._s(_vm.formatFecha(cuota.fecha)) + "\n                        "), cuota.estado == 1 ? _c("button", {
+      staticClass: "btn btn-sm btn-link text-muted p-0 ms-1",
+      on: {
+        click: function click($event) {
+          return _vm.iniciarEdicionDeuda(cuota);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-pencil-alt"
+    })]) : _vm._e()]), _vm._v(" "), cuota.estado == 1 && _vm.esCuotaVencida(cuota.fecha) ? _c("small", {
       staticClass: "text-danger"
     }, [_c("i", {
       staticClass: "fas fa-exclamation-circle"
-    }), _vm._v(" Cuota Vencida\n                    ")]) : _vm._e()]), _vm._v(" "), _c("td", [cuota.estado == 2 ? _c("span", {
+    }), _vm._v(" Cuota Vencida\n                      ")]) : _vm._e()]) : _c("div", [_c("input", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: _vm.formEditDeuda.fecha,
+        expression: "formEditDeuda.fecha"
+      }],
+      staticClass: "form-control form-control-sm mb-1",
+      attrs: {
+        type: "date"
+      },
+      domProps: {
+        value: _vm.formEditDeuda.fecha
+      },
+      on: {
+        input: function input($event) {
+          if ($event.target.composing) return;
+          _vm.$set(_vm.formEditDeuda, "fecha", $event.target.value);
+        }
+      }
+    })])]), _vm._v(" "), _c("td", [_vm.editandoDeudaId !== cuota.id ? _c("div", [_c("span", {
+      staticClass: "text-capitalize"
+    }, [_vm._v(_vm._s(cuota.motivo))]), _vm._v(" "), cuota.observaciones ? _c("div", {
+      staticClass: "small text-muted fst-italic mt-1",
+      staticStyle: {
+        "max-width": "200px",
+        "white-space": "normal"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-info-circle"
+    }), _vm._v(" " + _vm._s(cuota.observaciones))]) : _vm._e()]) : _c("div", [_c("input", {
+      directives: [{
+        name: "model",
+        rawName: "v-model",
+        value: _vm.formEditDeuda.motivo,
+        expression: "formEditDeuda.motivo"
+      }],
+      staticClass: "form-control form-control-sm mb-1",
+      attrs: {
+        type: "text"
+      },
+      domProps: {
+        value: _vm.formEditDeuda.motivo
+      },
+      on: {
+        input: function input($event) {
+          if ($event.target.composing) return;
+          _vm.$set(_vm.formEditDeuda, "motivo", $event.target.value);
+        }
+      }
+    })])]), _vm._v(" "), _c("td", [cuota.estado == 2 ? _c("span", {
       staticClass: "badge bg-success-subtle border border-success-subtle text-success"
     }, [_vm._v("Pagado")]) : _c("span", {
       staticClass: "badge bg-warning-subtle border border-warning-subtle text-warning"
@@ -1842,8 +2015,30 @@ var render = function render() {
       staticClass: "text-end fw-bold"
     }, [_vm._v("\n                    S/ " + _vm._s(parseFloat(cuota.monto).toFixed(2)) + "\n                  ")]), _vm._v(" "), _c("td", {
       staticClass: "text-center"
+    }, [_vm.editandoDeudaId === cuota.id ? _c("div", {
+      staticClass: "d-flex gap-1 justify-content-center"
+    }, [_c("button", {
+      staticClass: "btn btn-sm btn-success shadow-sm",
+      on: {
+        click: function click($event) {
+          return _vm.guardarEdicionDeuda(cuota);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-check"
+    })]), _vm._v(" "), _c("button", {
+      staticClass: "btn btn-sm btn-light shadow-sm",
+      on: {
+        click: function click($event) {
+          return _vm.cancelarEdicionDeuda();
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-times"
+    })])]) : _c("div", {
+      staticClass: "d-flex gap-1 justify-content-center"
     }, [cuota.estado == 1 ? _c("button", {
-      staticClass: "btn btn-sm btn-primary shadow-sm",
+      staticClass: "btn btn-sm btn-primary shadow-sm text-nowrap",
       attrs: {
         disabled: _vm.procesandoPago
       },
@@ -1856,18 +2051,30 @@ var render = function render() {
       staticClass: "fas fa-hand-holding-usd me-1"
     }) : _c("i", {
       staticClass: "fas fa-spinner fa-spin me-1"
-    }), _vm._v(" Pagar \n                    ")]) : _c("button", {
+    }), _vm._v(" Pagar \n                      ")]) : _vm._e(), _vm._v(" "), cuota.estado == 1 ? _c("button", {
+      staticClass: "btn btn-sm btn-outline-secondary shadow-sm",
+      attrs: {
+        title: "Fraccionar"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.abrirModalFraccionar(cuota);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-divide"
+    })]) : _vm._e(), _vm._v(" "), cuota.estado == 2 ? _c("button", {
       staticClass: "btn btn-sm btn-light text-success",
       attrs: {
         disabled: ""
       }
     }, [_c("i", {
       staticClass: "fas fa-check"
-    })])])]);
+    })]) : _vm._e()])])]);
   }), _vm._v(" "), !_vm.paqueteSeleccionado.deudas || _vm.paqueteSeleccionado.deudas.length === 0 ? _c("tr", [_c("td", {
     staticClass: "text-center py-4 text-muted fst-italic",
     attrs: {
-      colspan: "4"
+      colspan: "5"
     }
   }, [_vm._v("No existen registros de cuotas para este paquete.")])]) : _vm._e()], 2)])])]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "modal-footer bg-light"
@@ -3131,7 +3338,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.push([module.id, "@import url(https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap);"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.paquetes-container[data-v-27b789ef] {\r\n  font-family: 'Inter', sans-serif;\r\n  color: #334155;\r\n  background-color: #f8fafc;\r\n  min-height: 100vh;\r\n  padding: 1.5rem;\r\n  border-radius: 12px;\n}\r\n\r\n/* Header tabs */\n.module-tabs[data-v-27b789ef] {\r\n  display: flex;\r\n  gap: 0.5rem;\r\n  background: #f1f5f9;\r\n  border-radius: 999px;\r\n  padding: 0.25rem;\n}\n.module-tab-btn[data-v-27b789ef] {\r\n  border: none;\r\n  color: #64748b;\r\n  border-radius: 999px;\r\n  font-weight: 600;\r\n  padding: 0.35rem 0.85rem;\n}\n.module-tab-btn.active[data-v-27b789ef] {\r\n  background: #1d4ed8;\r\n  color: #fff;\n}\n.module-tab-btn.active .badge[data-v-27b789ef] {\r\n  background: #fff !important;\r\n  color: #dc2626;\n}\r\n\r\n/* Search Box */\n.search-box[data-v-27b789ef] {\r\n  position: relative;\r\n  width: 100%;\r\n  max-width: 380px;\n}\n.search-box .search-icon[data-v-27b789ef] {\r\n  position: absolute;\r\n  left: 14px;\r\n  top: 50%;\r\n  transform: translateY(-50%);\r\n  color: #94a3b8;\n}\n.search-box input[data-v-27b789ef] {\r\n  padding-left: 40px;\r\n  border-radius: 8px;\r\n  border: 1px solid #cbd5e1;\r\n  background: #fff;\r\n  transition: all 0.2s;\r\n  box-shadow: 0 1px 2px rgba(0,0,0,0.02);\n}\n.search-box input[data-v-27b789ef]:focus {\r\n  border-color: #3b82f6;\r\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);\r\n  outline: none;\n}\r\n\r\n/* Metric Cards */\n.summary-card[data-v-27b789ef] {\r\n  border-radius: 12px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.summary-card[data-v-27b789ef]:hover {\r\n  transform: translateY(-3px);\r\n  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.03) !important;\n}\r\n\r\n/* Filters */\n.filter-label[data-v-27b789ef] {\r\n  width: 60px;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.btn-filter[data-v-27b789ef] {\r\n  background: transparent;\r\n  color: #64748b;\r\n  border: none;\r\n  font-weight: 500;\r\n  padding: 0.4rem 1rem;\r\n  border-radius: 20px;\r\n  transition: all 0.2s;\n}\n.btn-filter[data-v-27b789ef]:hover {\r\n  background: #f1f5f9;\r\n  color: #0f172a;\n}\n.btn-filter.active[data-v-27b789ef] {\r\n  background: #3b82f6;\r\n  color: white;\r\n  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);\n}\r\n\r\n/* Package List */\n.package-card[data-v-27b789ef] {\r\n  border-radius: 14px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.package-card[data-v-27b789ef]:hover {\r\n  box-shadow: 0 10px 20px -5px rgba(0,0,0,0.06), 0 8px 10px -6px rgba(0,0,0,0.04) !important;\n}\n.border-active[data-v-27b789ef] {\r\n  border-left: 5px solid #f59e0b !important;\n}\n.border-completed[data-v-27b789ef] {\r\n  border-left: 5px solid #3b82f6 !important;\n}\n.package-icon[data-v-27b789ef] {\r\n  width: 48px;\r\n  height: 48px;\r\n  border-radius: 12px;\r\n  background: #eff6ff;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 1.5rem;\n}\n.package-title[data-v-27b789ef] {\r\n  color: #0f172a;\r\n  font-size: 1.15rem;\n}\r\n\r\n/* Badges */\n.status-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  font-weight: 600;\r\n  text-transform: uppercase;\r\n  letter-spacing: 0.03em;\n}\n.status-act[data-v-27b789ef] { background: #dcfce7; color: #166534;\n}\n.status-com[data-v-27b789ef] { background: #dbeafe; color: #1e3a8a;\n}\n.status-pen[data-v-27b789ef] { background: #fef9c3; color: #854d0e;\n}\n.status-can[data-v-27b789ef] { background: #fee2e2; color: #991b1b;\n}\n.status-def[data-v-27b789ef] { background: #f1f5f9; color: #475569;\n}\n.type-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  background: #e0f2fe;\r\n  color: #0369a1;\r\n  font-weight: 600;\n}\n.custom-textarea[data-v-27b789ef] {\r\n  border: 1px solid #e2e8f0;\r\n  border-radius: 10px;\r\n  padding: 0.75rem 1rem;\r\n  font-size: 0.95rem;\r\n  transition: all 0.2s;\r\n  background-color: #f8fafc;\n}\n.custom-textarea[data-v-27b789ef]:focus {\r\n  background-color: #fff;\r\n  border-color: #3b82f6;\r\n  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);\n}\n.hover-link[data-v-27b789ef]:hover {\r\n  text-decoration: underline !important;\r\n  opacity: 0.8;\n}\r\n\r\n/* Progress bar smoothing */\n.progress-bar[data-v-27b789ef] {\r\n  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);\n}\r\n\r\n/* Buttons */\n.outline-btn[data-v-27b789ef] {\r\n  border: 1px solid #e2e8f0;\r\n  background: white;\r\n  color: #475569;\r\n  font-weight: 500;\r\n  border-radius: 6px;\r\n  transition: all 0.2s;\n}\n.outline-btn[data-v-27b789ef]:hover {\r\n  background: #f8fafc;\r\n  color: #0f172a;\r\n  border-color: #cbd5e1;\n}\n.hover-link[data-v-27b789ef] {\r\n  transition: color 0.2s;\n}\n.hover-link[data-v-27b789ef]:hover {\r\n  color: #0f172a !important;\n}\n.dropdown-toggle-link[data-v-27b789ef] {\r\n  color: #3b82f6;\r\n  font-weight: 500;\n}\n.dropdown-toggle-link[data-v-27b789ef]:hover {\r\n  color: #2563eb;\n}\n.info-meta span[data-v-27b789ef] {\r\n  font-size: 0.875rem;\n}\n.history-list-container[data-v-27b789ef] {\r\n  max-height: 250px;\r\n  overflow-y: auto;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar {\r\n  width: 6px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-track {\r\n  background: #f1f5f9;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb {\r\n  background: #cbd5e1; \r\n  border-radius: 10px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb:hover {\r\n  background: #94a3b8;\n}\n.history-item[data-v-27b789ef]:last-child {\r\n  border-bottom: none !important;\n}\r\n\r\n/* Deudas */\n.debt-summary-card[data-v-27b789ef] {\r\n  background: #f8fafc;\r\n  border: 1px solid #e2e8f0;\r\n  border-radius: 16px;\r\n  padding: 1.2rem 1.4rem;\n}\n.debt-summary-card p[data-v-27b789ef] {\r\n  color: #64748b;\r\n  font-size: 1.05rem;\n}\n.debt-card[data-v-27b789ef] {\r\n  border: 1px solid #fecaca;\r\n  border-radius: 18px;\r\n  background: #fff;\r\n  padding: 1.8rem;\n}\n.debt-icon[data-v-27b789ef] {\r\n  width: 68px;\r\n  height: 68px;\r\n  border-radius: 16px;\r\n  background: #fee2e2;\r\n  color: #ef4444;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 2rem;\n}\n.debt-meta[data-v-27b789ef] {\r\n  font-size: 1.05rem;\n}\n.debt-progress-label[data-v-27b789ef] {\r\n  font-size: 1.05rem;\n}\n.debt-progress[data-v-27b789ef] {\r\n  width: 100%;\r\n  height: 12px;\r\n  border-radius: 999px;\r\n  background: #f97316;\r\n  overflow: hidden;\n}\n.debt-progress-paid[data-v-27b789ef] {\r\n  height: 100%;\r\n  background: #2563eb;\r\n  border-radius: 999px 0 0 999px;\n}\n.debt-amount[data-v-27b789ef] {\r\n  color: #ef4444;\r\n  font-weight: 700;\r\n  font-size: 16px;\n}\n.debt-action-btn[data-v-27b789ef] {\r\n  padding: 0.55rem 1.2rem;\r\n  font-weight: 600;\r\n  font-size: 1.05rem;\n}\r\n\r\n/* Vue Modal Overlay - Bypasea el sistema de modales de Bootstrap */\n.vue-modal-overlay[data-v-27b789ef] {\r\n  position: fixed;\r\n  top: 0;\r\n  left: 0;\r\n  width: 100vw;\r\n  height: 100vh;\r\n  background: rgba(0, 0, 0, 0.5);\r\n  z-index: 99999;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  padding: 1rem;\n}\n.vue-modal-box[data-v-27b789ef] {\r\n  background: #fff;\r\n  border-radius: 12px;\r\n  box-shadow: 0 20px 60px rgba(0,0,0,0.3);\r\n  width: 100%;\r\n  max-width: 800px;\r\n  max-height: 90vh;\r\n  overflow-y: auto;\r\n  display: flex;\r\n  flex-direction: column;\n}\n.vue-modal-box .modal-header[data-v-27b789ef] {\r\n  border-radius: 12px 12px 0 0;\r\n  flex-shrink: 0;\n}\n.vue-modal-box .modal-footer[data-v-27b789ef] {\r\n  border-radius: 0 0 12px 12px;\r\n  flex-shrink: 0;\n}\r\n/* Transition */\n.vue-modal-fade-enter-active[data-v-27b789ef],\r\n.vue-modal-fade-leave-active[data-v-27b789ef] {\r\n  transition: opacity 0.2s ease;\n}\n.vue-modal-fade-enter-from[data-v-27b789ef],\r\n.vue-modal-fade-leave-to[data-v-27b789ef] {\r\n  opacity: 0;\n}\n.vue-modal-fade-enter[data-v-27b789ef],\r\n.vue-modal-fade-leave-to[data-v-27b789ef] {\r\n  opacity: 0;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.paquetes-container[data-v-27b789ef] {\r\n  font-family: 'Inter', sans-serif;\r\n  color: #334155;\r\n  background-color: #f8fafc;\r\n  min-height: 100vh;\r\n  padding: 1.5rem;\r\n  border-radius: 12px;\n}\r\n\r\n/* Header tabs */\n.module-tabs[data-v-27b789ef] {\r\n  display: flex;\r\n  gap: 0.5rem;\r\n  background: #f1f5f9;\r\n  border-radius: 999px;\r\n  padding: 0.25rem;\n}\n.module-tab-btn[data-v-27b789ef] {\r\n  border: none;\r\n  color: #64748b;\r\n  border-radius: 999px;\r\n  font-weight: 600;\r\n  padding: 0.35rem 0.85rem;\n}\n.module-tab-btn.active[data-v-27b789ef] {\r\n  background: #1d4ed8;\r\n  color: #fff;\n}\n.module-tab-btn.active .badge[data-v-27b789ef] {\r\n  background: #fff !important;\r\n  color: #dc2626;\n}\r\n\r\n/* Search Box */\n.search-box[data-v-27b789ef] {\r\n  position: relative;\r\n  width: 100%;\r\n  max-width: 380px;\n}\n.search-box .search-icon[data-v-27b789ef] {\r\n  position: absolute;\r\n  left: 14px;\r\n  top: 50%;\r\n  transform: translateY(-50%);\r\n  color: #94a3b8;\n}\n.search-box input[data-v-27b789ef] {\r\n  padding-left: 40px;\r\n  border-radius: 8px;\r\n  border: 1px solid #cbd5e1;\r\n  background: #fff;\r\n  transition: all 0.2s;\r\n  box-shadow: 0 1px 2px rgba(0,0,0,0.02);\n}\n.search-box input[data-v-27b789ef]:focus {\r\n  border-color: #3b82f6;\r\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);\r\n  outline: none;\n}\r\n\r\n/* Metric Cards */\n.summary-card[data-v-27b789ef] {\r\n  border-radius: 12px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.summary-card[data-v-27b789ef]:hover {\r\n  transform: translateY(-3px);\r\n  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.03) !important;\n}\r\n\r\n/* Filters */\n.filter-label[data-v-27b789ef] {\r\n  width: 60px;\r\n  font-size: 0.9rem;\r\n  font-weight: 500;\n}\n.btn-filter[data-v-27b789ef] {\r\n  background: transparent;\r\n  color: #64748b;\r\n  border: none;\r\n  font-weight: 500;\r\n  padding: 0.4rem 1rem;\r\n  border-radius: 20px;\r\n  transition: all 0.2s;\n}\n.btn-filter[data-v-27b789ef]:hover {\r\n  background: #f1f5f9;\r\n  color: #0f172a;\n}\n.btn-filter.active[data-v-27b789ef] {\r\n  background: #3b82f6;\r\n  color: white;\r\n  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);\n}\r\n\r\n/* Package List */\n.package-card[data-v-27b789ef] {\r\n  border-radius: 14px;\r\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.package-card[data-v-27b789ef]:hover {\r\n  box-shadow: 0 10px 20px -5px rgba(0,0,0,0.06), 0 8px 10px -6px rgba(0,0,0,0.04) !important;\n}\n.border-active[data-v-27b789ef] {\r\n  border-left: 5px solid #f59e0b !important;\n}\n.border-completed[data-v-27b789ef] {\r\n  border-left: 5px solid #3b82f6 !important;\n}\n.package-icon[data-v-27b789ef] {\r\n  width: 48px;\r\n  height: 48px;\r\n  border-radius: 12px;\r\n  background: #eff6ff;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 1.5rem;\n}\n.package-title[data-v-27b789ef] {\r\n  color: #0f172a;\r\n  font-size: 1.15rem;\n}\r\n\r\n/* Badges */\n.status-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  font-weight: 600;\r\n  text-transform: uppercase;\r\n  letter-spacing: 0.03em;\n}\n.status-act[data-v-27b789ef] { background: #dcfce7; color: #166534;\n}\n.status-com[data-v-27b789ef] { background: #dbeafe; color: #1e3a8a;\n}\n.status-pen[data-v-27b789ef] { background: #fef9c3; color: #854d0e;\n}\n.status-can[data-v-27b789ef] { background: #fee2e2; color: #991b1b;\n}\n.status-def[data-v-27b789ef] { background: #f1f5f9; color: #475569;\n}\n.type-badge[data-v-27b789ef] {\r\n  padding: 0.25rem 0.6rem;\r\n  border-radius: 4px;\r\n  font-size: 0.75rem;\r\n  background: #e0f2fe;\r\n  color: #0369a1;\r\n  font-weight: 600;\n}\n.custom-textarea[data-v-27b789ef] {\r\n  border: 1px solid #e2e8f0;\r\n  border-radius: 10px;\r\n  padding: 0.75rem 1rem;\r\n  font-size: 0.95rem;\r\n  transition: all 0.2s;\r\n  background-color: #f8fafc;\n}\n.custom-textarea[data-v-27b789ef]:focus {\r\n  background-color: #fff;\r\n  border-color: #3b82f6;\r\n  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);\n}\n.hover-link[data-v-27b789ef]:hover {\r\n  text-decoration: underline !important;\r\n  opacity: 0.8;\n}\r\n\r\n/* Progress bar smoothing */\n.progress-bar[data-v-27b789ef] {\r\n  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);\n}\r\n\r\n/* Buttons */\n.outline-btn[data-v-27b789ef] {\r\n  border: 1px solid #e2e8f0;\r\n  background: white;\r\n  color: #475569;\r\n  font-weight: 500;\r\n  border-radius: 6px;\r\n  transition: all 0.2s;\n}\n.outline-btn[data-v-27b789ef]:hover {\r\n  background: #f8fafc;\r\n  color: #0f172a;\r\n  border-color: #cbd5e1;\n}\n.hover-link[data-v-27b789ef] {\r\n  transition: color 0.2s;\n}\n.hover-link[data-v-27b789ef]:hover {\r\n  color: #0f172a !important;\n}\n.dropdown-toggle-link[data-v-27b789ef] {\r\n  color: #3b82f6;\r\n  font-weight: 500;\n}\n.dropdown-toggle-link[data-v-27b789ef]:hover {\r\n  color: #2563eb;\n}\n.info-meta span[data-v-27b789ef] {\r\n  font-size: 0.875rem;\n}\n.history-list-container[data-v-27b789ef] {\r\n  max-height: 250px;\r\n  overflow-y: auto;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar {\r\n  width: 6px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-track {\r\n  background: #f1f5f9;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb {\r\n  background: #cbd5e1; \r\n  border-radius: 10px;\n}\n.history-list-container[data-v-27b789ef]::-webkit-scrollbar-thumb:hover {\r\n  background: #94a3b8;\n}\n.history-item[data-v-27b789ef]:last-child {\r\n  border-bottom: none !important;\n}\r\n\r\n/* Deudas */\n.debt-summary-card[data-v-27b789ef] {\r\n  background: #f8fafc;\r\n  border: 1px solid #e2e8f0;\r\n  border-radius: 16px;\r\n  padding: 1.2rem 1.4rem;\n}\n.debt-summary-card p[data-v-27b789ef] {\r\n  color: #64748b;\r\n  font-size: 1.05rem;\n}\n.debt-card[data-v-27b789ef] {\r\n  border: 1px solid #fecaca;\r\n  border-radius: 18px;\r\n  background: #fff;\r\n  padding: 1.8rem;\n}\n.debt-icon[data-v-27b789ef] {\r\n  width: 68px;\r\n  height: 68px;\r\n  border-radius: 16px;\r\n  background: #fee2e2;\r\n  color: #ef4444;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  font-size: 2rem;\n}\n.debt-meta[data-v-27b789ef] {\r\n  font-size: 1.05rem;\n}\n.debt-progress-label[data-v-27b789ef] {\r\n  font-size: 1.05rem;\n}\n.debt-progress[data-v-27b789ef] {\r\n  width: 100%;\r\n  height: 12px;\r\n  border-radius: 999px;\r\n  background: #f97316;\r\n  overflow: hidden;\n}\n.debt-progress-paid[data-v-27b789ef] {\r\n  height: 100%;\r\n  background: #2563eb;\r\n  border-radius: 999px 0 0 999px;\n}\n.debt-amount[data-v-27b789ef] {\r\n  color: #ef4444;\r\n  font-weight: 700;\r\n  font-size: 16px;\n}\n.debt-action-btn[data-v-27b789ef] {\r\n  padding: 0.55rem 1.2rem;\r\n  font-weight: 600;\r\n  font-size: 1.05rem;\n}\r\n\r\n/* Vue Modal Overlay - Bypasea el sistema de modales de Bootstrap */\n.vue-modal-overlay[data-v-27b789ef] {\r\n  position: fixed;\r\n  top: 0;\r\n  left: 0;\r\n  width: 100vw;\r\n  height: 100vh;\r\n  background: rgba(0, 0, 0, 0.5);\r\n  z-index: 1050;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  padding: 1rem;\n}\n.vue-modal-box[data-v-27b789ef] {\r\n  background: #fff;\r\n  border-radius: 12px;\r\n  box-shadow: 0 20px 60px rgba(0,0,0,0.3);\r\n  width: 100%;\r\n  max-width: 800px;\r\n  max-height: 90vh;\r\n  overflow-y: auto;\r\n  display: flex;\r\n  flex-direction: column;\n}\n.vue-modal-box .modal-header[data-v-27b789ef] {\r\n  border-radius: 12px 12px 0 0;\r\n  flex-shrink: 0;\n}\n.vue-modal-box .modal-footer[data-v-27b789ef] {\r\n  border-radius: 0 0 12px 12px;\r\n  flex-shrink: 0;\n}\r\n/* Transition */\n.vue-modal-fade-enter-active[data-v-27b789ef],\r\n.vue-modal-fade-leave-active[data-v-27b789ef] {\r\n  transition: opacity 0.2s ease;\n}\n.vue-modal-fade-enter-from[data-v-27b789ef],\r\n.vue-modal-fade-leave-to[data-v-27b789ef] {\r\n  opacity: 0;\n}\n.vue-modal-fade-enter[data-v-27b789ef],\r\n.vue-modal-fade-leave-to[data-v-27b789ef] {\r\n  opacity: 0;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

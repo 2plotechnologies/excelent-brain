@@ -424,4 +424,107 @@ class PaqueteController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+    public function actualizarDeuda(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $idDeuda = $request->input('idDeuda');
+            $nuevoMotivo = $request->input('motivo');
+            $nuevaFecha = $request->input('fecha');
+            $usuarioId = $request->input('user_id') ?? auth()->id() ?? 1;
+
+            $deuda = DB::table('deudas')->where('id', $idDeuda)->first();
+            if (!$deuda) {
+                return response()->json(['error' => 'Deuda no encontrada'], 404);
+            }
+
+            $user = DB::table('users')->where('id', $usuarioId)->first();
+            $nombreUsuario = $user ? $user->nombre : 'Sistema';
+            
+            $cambios = [];
+            if ($deuda->motivo != $nuevoMotivo) {
+                $cambios[] = "Motivo cambiado de '{$deuda->motivo}' a '{$nuevoMotivo}'";
+            }
+            if ($deuda->fecha != $nuevaFecha) {
+                $cambios[] = "Fecha cambiada de '{$deuda->fecha}' a '{$nuevaFecha}'";
+            }
+
+            $nuevaObs = $deuda->observaciones;
+            if (count($cambios) > 0) {
+                $fechaHoraActual = \Carbon\Carbon::now()->format('Y-m-d H:i:s');
+                $textoCambios = implode(", ", $cambios);
+                $notaAdicional = "\n[$fechaHoraActual] Modificado por $nombreUsuario: $textoCambios";
+                $nuevaObs = $deuda->observaciones . $notaAdicional;
+                
+                DB::table('deudas')
+                    ->where('id', $idDeuda)
+                    ->update([
+                        'motivo' => $nuevoMotivo,
+                        'fecha' => $nuevaFecha,
+                        'observaciones' => trim($nuevaObs)
+                    ]);
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Cuota actualizada correctamente']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function fraccionarDeuda(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $idDeuda = $request->input('idDeuda');
+            $montoSeparar = floatval($request->input('monto_fraccion'));
+            $nuevaFecha = $request->input('nueva_fecha');
+            $usuarioId = $request->input('user_id') ?? auth()->id() ?? 1;
+
+            $deuda = DB::table('deudas')->where('id', $idDeuda)->first();
+            if (!$deuda) {
+                return response()->json(['error' => 'Deuda no encontrada'], 404);
+            }
+
+            if ($montoSeparar <= 0 || $montoSeparar >= $deuda->monto) {
+                return response()->json(['error' => 'Monto a separar inválido'], 400);
+            }
+
+            $user = DB::table('users')->where('id', $usuarioId)->first();
+            $nombreUsuario = $user ? $user->nombre : 'Sistema';
+
+            $nuevoMontoOriginal = $deuda->monto - $montoSeparar;
+
+            $fechaHoraActual = \Carbon\Carbon::now()->format('Y-m-d H:i:s');
+            
+            // Actualizar deuda original
+            $notaOriginal = "\n[$fechaHoraActual] Fraccionado por $nombreUsuario: Se separó S/ {$montoSeparar} para el {$nuevaFecha}.";
+            DB::table('deudas')
+                ->where('id', $idDeuda)
+                ->update([
+                    'monto' => $nuevoMontoOriginal,
+                    'observaciones' => trim($deuda->observaciones . $notaOriginal)
+                ]);
+
+            // Crear la nueva fracción
+            DB::table('deudas')->insert([
+                'patient_id' => $deuda->patient_id,
+                'motivo' => $deuda->motivo . " (Fracción)",
+                'user_id' => $deuda->user_id,
+                'fecha' => $nuevaFecha,
+                'monto' => $montoSeparar,
+                'estado' => $deuda->estado,
+                'activo' => 1,
+                'idMembresia' => $deuda->idMembresia,
+                'observaciones' => "[$fechaHoraActual] Cuota fraccionada de la deuda original por $nombreUsuario."
+            ]);
+
+            DB::commit();
+            return response()->json(['message' => 'Cuota fraccionada correctamente']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

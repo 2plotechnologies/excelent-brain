@@ -424,10 +424,10 @@
 							<button type="button" class="btn btn-light-danger btn-lg rounded-pill px-4 me-2" data-bs-dismiss="modal" v-if="pasoActual === 1">
 								Cancelar
 							</button>
-							<button type="button" v-if="pasoActual < 8" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm" @click="nextStep">
+							<button type="button" key="btn-siguiente" v-if="pasoActual < 8" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm" @click="nextStep">
 								Siguiente <i class="fas fa-arrow-right ms-2"></i>
 							</button>
-							<button type="submit" v-if="pasoActual === 8 && cita.vivo == 1" class="btn btn-success btn-lg rounded-pill px-5 shadow-sm">
+							<button type="submit" key="btn-registrar" v-if="pasoActual === 8 && cita.vivo == 1" class="btn btn-success btn-lg rounded-pill px-5 shadow-sm">
 								<i class="fas fa-save me-2"></i> Registrar Cita
 							</button>
 							<div v-if="pasoActual === 8 && cita.vivo != 1" class="alert alert-danger mb-0 rounded-pill">
