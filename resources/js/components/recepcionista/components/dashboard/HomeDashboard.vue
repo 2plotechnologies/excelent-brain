@@ -238,6 +238,23 @@
                                         </li>
                                     </ul>
                                 </div>
+
+                                <!-- RECETAS ALERTS -->
+                                <div v-if="dashboardData.alertasRecetas && dashboardData.alertasRecetas.length > 0" :class="{'mt-4': dashboardData.deudas && dashboardData.deudas.length > 0}">
+                                    <h6 class="text-info font-weight-bold border-bottom pb-2 mb-3">Recetas Próximas a Vencer</h6>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item px-0" v-for="(receta, i) in dashboardData.alertasRecetas" :key="'receta-'+i">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h6 class="mb-1 text-dark font-weight-bold" v-if="receta.patient">{{ receta.patient.nombres }} {{ receta.patient.name }}</h6>
+                                                <h6 class="mb-1 text-dark font-weight-bold" v-else>Paciente Sin Nombre</h6>
+                                                <span class="badge badge-info px-2 py-1 align-self-start">Vence: {{ receta.effective_date }}</span>
+                                            </div>
+                                            <p class="mb-1 text-muted small">
+                                                <i class="fas fa-prescription-bottle-alt mr-1"></i>Receta Médica
+                                            </p>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                         <div v-else class="text-center py-5 d-flex flex-column align-items-center justify-content-center h-100">
@@ -266,7 +283,8 @@ export default {
                 alertasDeudas: 0,
                 totalAlertas: 0,
                 sos: [],
-                deudas: []
+                deudas: [],
+                alertasRecetas: []
             },
             loading: true
         }
@@ -299,7 +317,8 @@ export default {
                         alertasDeudas: data.alertasDeudas || 0,
                         totalAlertas: data.totalAlertas || 0,
                         sos: data.sos || [],
-                        deudas: data.deudas || []
+                        deudas: data.deudas || [],
+                        alertasRecetas: data.alertasRecetas || []
                     };
                 })
                 .catch(err => {

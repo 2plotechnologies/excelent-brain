@@ -103,7 +103,7 @@
 
         <!-- SEARCH AND BUTTONS -->
         <div class="row align-items-center mb-3">
-            <div class="col-lg-6 mb-2 mb-lg-0">
+            <div class="col-xl-4 col-lg-12 mb-3 mb-xl-0">
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <button class="btn btn-white bg-white border-right-0 border" type="button" @click="searchPatients()">
@@ -114,11 +114,14 @@
                     placeholder="Buscar por DNI, nombre o celular..." autocomplete="off" @keyup.enter="searchPatients()" style="box-shadow:none;">
                 </div>
             </div>
-            <div class="col-lg-6 text-lg-right text-center">
-                <button class="btn btn-primary shadow-sm mr-1" data-bs-toggle="modal" data-bs-target="#modalNewPatient"><i class="fas fa-user-plus"></i> Nuevo Paciente</button>
-                <router-link to="/recepcionista/home" class="btn shadow-sm text-white mr-1" style="background-color: #f97316;"><i class="fas fa-plus"></i> Nueva Cita</router-link>
-                <button class="btn btn-white border shadow-sm mr-1"><i class="far fa-credit-card"></i> Cobrar Deuda</button>
-                <router-link to="/recepcionista/paquetes" class="btn btn-white border shadow-sm"><i class="fas fa-box"></i> Nuevo Paquete</router-link>
+            <div class="col-xl-8 col-lg-12 text-xl-right text-center">
+                <button class="btn btn-outline-info shadow-sm mr-2 mb-2" @click="toggleVista()">
+                    <i class="fas fa-birthday-cake"></i> Cumpleaños
+                </button>
+                <button class="btn btn-primary shadow-sm mr-2 mb-2" data-bs-toggle="modal" data-bs-target="#modalNewPatient"><i class="fas fa-user-plus"></i> Nuevo Paciente</button>
+                <router-link to="/recepcionista/home" class="btn shadow-sm text-white mr-2 mb-2" style="background-color: #f97316;"><i class="fas fa-plus"></i> Nueva Cita</router-link>
+                <button class="btn btn-white border shadow-sm mr-2 mb-2"><i class="far fa-credit-card"></i> Cobrar Deuda</button>
+                <router-link to="/recepcionista/paquetes" class="btn btn-white border shadow-sm mb-2"><i class="fas fa-box"></i> Nuevo Paquete</router-link>
             </div>
         </div>
 
@@ -337,9 +340,73 @@
       </table>
     </div>
     </div>
+
+    <!-- VISTA CUMPLEAÑOS -->
+    <div v-else-if="vistaActual === 'cumpleaños'" class="container-fluid px-0 mt-4">
+      <div class="d-flex align-items-center mb-3">
+        <button class="btn btn-link text-decoration-none px-0" @click="vistaActual = 'lista'">
+          <i class="fas fa-arrow-left"></i> Volver a Pacientes
+        </button>
+      </div>
+      <div class="card border-0 shadow-sm" style="border-radius:12px;">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0 font-weight-bold text-info"><i class="fas fa-birthday-cake me-2"></i> Cumpleaños del Mes</h5>
+            <div class="input-group w-auto">
+              <span class="input-group-text bg-light border-0"><i class="far fa-calendar-alt text-muted"></i></span>
+              <input type="date" class="form-control bg-light border-0" v-model="fechaCumple" id="fechaCumple" @change="cambiarFechaCumple()">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="border-bottom-0 text-muted small text-uppercase">N°</th>
+                  <th class="border-bottom-0 text-muted small text-uppercase">Nombres</th>
+                  <th class="border-bottom-0 text-muted small text-uppercase text-center">Fecha Cumpleaños</th>
+                  <th class="border-bottom-0 text-muted small text-uppercase text-center">Edad</th>
+                  <th class="border-bottom-0 text-muted small text-uppercase text-center">Citas Confirmadas</th>
+                  <th class="border-bottom-0 text-muted small text-uppercase text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(cliente, index) in clientesCumple" :key="'cumple_'+index">
+                  <td class="font-weight-bold text-dark">{{ index + 1 }}</td>
+                  <td class="text-capitalize text-dark fw-bold" @click="verDetalleCumple(cliente)" style="cursor:pointer">
+                    {{ (cliente.name || '').toLowerCase() }} {{ (cliente.nombres || '').toLowerCase() }}
+                  </td>
+                  <td class="text-center">{{ fechaLatam(cliente.birth_date) }}</td>
+                  <td class="text-center"><span class="badge bg-info text-white rounded-pill px-3 py-2" style="font-weight:600;">{{ edad(cliente.birth_date) }} años</span></td>
+                  <td class="text-center">
+                    <span class="badge" :class="cliente.confirmados > 0 ? 'bg-success' : 'bg-secondary'">{{ cliente.confirmados }}</span>
+                  </td>
+                  <td class="text-center">
+                    <a v-if="cliente.phone && cliente.phone != ''" 
+                       :href="`https://wa.me/51${cliente.phone.replace(/\\s+/g, '')}?text=Feliz cumpleaños 🎂 ${cliente.name} ${cliente.nombres}, recuerda que el que piensa positivo, ve lo invisible, siente lo intangible y logra lo imposible. Te desea la clínica Excelentemente 🤗`" 
+                       target="_blank" 
+                       class="btn btn-sm btn-success rounded-circle shadow-sm"
+                       title="Enviar WhatsApp">
+                      <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <span v-else class="text-muted small">Sin número</span>
+                  </td>
+                </tr>
+                <tr v-if="clientesCumple.length === 0">
+                  <td colspan="6" class="text-center text-muted py-5">
+                    <i class="fas fa-calendar-times fs-2 mb-3 opacity-50 d-block"></i>
+                    No se encontraron cumpleaños en este mes.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
     
     <DetallePaciente 
-      v-else 
+      v-else-if="vistaActual === 'detalle'" 
       :pacienteId="dataPaciente.id" 
       @volver="vistaActual = 'lista'" 
       @editarPaciente="dataPaciente = $event" 
@@ -413,6 +480,7 @@ import ModalVerHobbies from './reportes/ModalVerHobbies.vue'
 import OffVerMembresias from './OffVerMembresias.vue';
 import ModalAcuerdos from './ModalAcuerdos.vue';
 import ModalChat from './ModalChat.vue';
+import moment from 'moment';
 //Code.
 export default {
   name: 'HomePacientes',
@@ -421,6 +489,7 @@ export default {
     return {
       showCharts:false,
       dataPatients: [], queId:null, vistaActual: 'lista',
+      fechaCumple: moment().format('YYYY-MM-DD'), clientesCumple: [],
       data: null, dataTriajes:null, linkGenerado: '',
       dashData: { pacientesActivos:0, nuevosDelMes:0, conCitaHoy:0, conDeuda:0, casosSOS:0, tasaRetencion:0, pendientes:0, completadas:0, canceladas:0, reprogramadas:0, tiposAtencion:[] },
       tiposDataLoaded: false,
@@ -506,6 +575,35 @@ export default {
   },
 
   methods: {
+    toggleVista() {
+      this.vistaActual = this.vistaActual === 'lista' ? 'cumpleaños' : 'lista';
+      if (this.vistaActual === 'cumpleaños' && this.clientesCumple.length === 0) {
+        this.cargarCumpleanos();
+      }
+    },
+    async cargarCumpleanos() {
+      await this.axios.get(`/api/listarCumpleanos/${this.fechaCumple}`)
+        .then(response => {
+          this.clientesCumple = response.data;
+        })
+        .catch(err => console.error(err));
+    },
+    cambiarFechaCumple() {
+      this.cargarCumpleanos();
+    },
+    fechaLatam(fecha) {
+      if (!fecha) return '';
+      return moment(fecha).format('DD/MM/YYYY');
+    },
+    edad(fecha) {
+      if (!fecha) return 0;
+      let miEdad = moment(fecha);
+      return moment().diff(miEdad, 'years');
+    },
+    verDetalleCumple(cliente) {
+      this.dataPaciente = cliente;
+      this.vistaActual = 'detalle';
+    },
     async fetchDashboardPacientes() {
         try {
             let res = await this.axios.get('/api/dashboardModuloPacientes');

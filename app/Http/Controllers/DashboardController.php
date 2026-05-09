@@ -7,6 +7,7 @@ use App\Models\Patient;
 use App\Models\Appointment;
 use App\Models\Payment;
 use App\Models\Professional;
+use App\Models\Prescription;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -28,8 +29,11 @@ class DashboardController extends Controller
         //Solo deudas del mes actual.
         $alertasDeudas = DB::table('deudas')->where('estado', '1')->whereYear('fecha', today()->year)->whereMonth('fecha', today()->month)->count();
 
+        //Alertas recetas proximas a vencer (7 dias).
+        $alertasRecetasCount = Prescription::whereBetween('effective_date', [today(), today()->addDays(7)])->count();
+
         //Total Alertas.
-        $totalAlertas = $alertasSOS + $alertasDeudas;
+        $totalAlertas = $alertasSOS + $alertasDeudas + $alertasRecetasCount;
 
         //Listar citas de hoy.
         $citasHoy = Appointment::with('patient')->whereDate('date', today())->get();
@@ -39,6 +43,8 @@ class DashboardController extends Controller
         //Solo deudas del mes actual.
         $deudas = DB::table('deudas')->join('patients', 'deudas.patient_id', '=', 'patients.id')->where('deudas.estado', '1')->whereYear('deudas.fecha', today()->year)->whereMonth('deudas.fecha', today()->month)->get();
 
+        //Alertas recetas proximas a vencer (7 dias).
+        $alertasRecetas = Prescription::with('patient')->whereBetween('effective_date', [today(), today()->addDays(7)])->orderBy('effective_date', 'asc')->get();
 
 
         //Retornar los datos al dashboard en JSON.
@@ -52,6 +58,7 @@ class DashboardController extends Controller
             'citasHoy' => $citasHoy,
             'sos' => $sos,
             'deudas' => $deudas,
+            'alertasRecetas' => $alertasRecetas,
         ]);
         
     }

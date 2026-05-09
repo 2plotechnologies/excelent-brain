@@ -16,6 +16,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _recepcionista_components_pacientes_ModalNewPatient_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./../recepcionista/components/pacientes/ModalNewPatient.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue");
 /* harmony import */ var _recepcionista_components_pacientes_reportes_ModalVerHobbies_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./../recepcionista/components/pacientes/reportes/ModalVerHobbies.vue */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue");
 /* harmony import */ var _ModalArchivosTriaje_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ModalArchivosTriaje.vue */ "./resources/js/components/interno/ModalArchivosTriaje.vue");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_5__);
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -31,10 +33,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'HomePacientesInterno',
   data: function data() {
     return {
+      vistaActual: 'lista',
+      fechaCumple: moment__WEBPACK_IMPORTED_MODULE_5___default()().format('YYYY-MM-DD'),
+      clientesCumple: [],
       dataPatients: [],
       data: null,
       dataTriajes: null,
@@ -176,6 +182,43 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     verTriajesViejos: function verTriajesViejos(index) {
       this.dataTriajes = this.busqueda[index].triajes;
+    },
+    toggleVista: function toggleVista() {
+      this.vistaActual = this.vistaActual === 'lista' ? 'cumpleaños' : 'lista';
+      if (this.vistaActual === 'cumpleaños' && this.clientesCumple.length === 0) {
+        this.cargarCumpleanos();
+      }
+    },
+    cargarCumpleanos: function cargarCumpleanos() {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              _context4.next = 2;
+              return _this5.axios.get("/api/listarCumpleanos/".concat(_this5.fechaCumple)).then(function (response) {
+                _this5.clientesCumple = response.data;
+              })["catch"](function (err) {
+                return console.error(err);
+              });
+            case 2:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4);
+      }))();
+    },
+    cambiarFechaCumple: function cambiarFechaCumple() {
+      this.cargarCumpleanos();
+    },
+    fechaLatam: function fechaLatam(fecha) {
+      if (!fecha) return '';
+      return moment__WEBPACK_IMPORTED_MODULE_5___default()(fecha).format('DD/MM/YYYY');
+    },
+    edad: function edad(fecha) {
+      if (!fecha) return 0;
+      var miEdad = moment__WEBPACK_IMPORTED_MODULE_5___default()(fecha);
+      return moment__WEBPACK_IMPORTED_MODULE_5___default()().diff(miEdad, 'years');
     }
   },
   created: function created() {
@@ -747,7 +790,7 @@ var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c("main", [_c("div", {
-    staticClass: "d-sm-flex align-items-center justify-content-around mt-4"
+    staticClass: "d-sm-flex align-items-center justify-content-between mt-4 mb-3 gap-3"
   }, [_c("div", {
     staticClass: "d-none d-sm-inline-block form-inline w-100"
   }, [_c("div", {
@@ -781,9 +824,21 @@ var render = function render() {
         return _vm.searchPatients();
       }
     }
-  })])])]), _vm._v(" "), _vm._m(0), _vm._v(" "), _c("p", {
-    staticClass: "mt-3 mb-1"
-  }, [_vm._v("Últimos 20 pacientes registrados")]), _vm._v(" "), _c("table", {
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex gap-2"
+  }, [_c("button", {
+    staticClass: "btn btn-outline-info shadow-sm text-nowrap",
+    on: {
+      click: function click($event) {
+        return _vm.toggleVista();
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas",
+    "class": _vm.vistaActual === "cumpleaños" ? "fa-users" : "fa-birthday-cake"
+  }), _vm._v(" \n                " + _vm._s(_vm.vistaActual === "cumpleaños" ? "Lista de Pacientes" : "Cumpleaños") + "\n            ")]), _vm._v(" "), _vm._m(0)])]), _vm._v(" "), _vm.vistaActual === "lista" ? _c("div", [_c("p", {
+    staticClass: "mt-3 mb-1 font-weight-bold text-dark"
+  }, [_vm._v("Últimos pacientes registrados")]), _vm._v(" "), _c("table", {
     staticClass: "table table-striped mt-4"
   }, [_vm._m(1), _vm._v(" "), _c("tbody", _vm._l(_vm.busqueda, function (patients, index) {
     return _c("tr", {
@@ -846,7 +901,90 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fa-solid fa-shield-heart"
     })]) : _vm._e()])]);
-  }), 0)]), _vm._v(" "), _vm.data ? _c("modal-triaje", {
+  }), 0)])]) : _vm.vistaActual === "cumpleaños" ? _c("div", [_c("div", {
+    staticClass: "card border-0 shadow-sm mt-3"
+  }, [_c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mb-4"
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
+    staticClass: "input-group w-auto"
+  }, [_vm._m(3), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.fechaCumple,
+      expression: "fechaCumple"
+    }],
+    staticClass: "form-control bg-light border-0",
+    attrs: {
+      type: "date",
+      id: "fechaCumple"
+    },
+    domProps: {
+      value: _vm.fechaCumple
+    },
+    on: {
+      change: function change($event) {
+        return _vm.cambiarFechaCumple();
+      },
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.fechaCumple = $event.target.value;
+      }
+    }
+  })])]), _vm._v(" "), _c("table", {
+    staticClass: "table table-striped mt-2 align-middle"
+  }, [_vm._m(4), _vm._v(" "), _c("tbody", [_vm._l(_vm.clientesCumple, function (cliente, index) {
+    return _c("tr", {
+      key: "cumple_" + index
+    }, [_c("td", {
+      staticClass: "font-weight-bold"
+    }, [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", {
+      staticClass: "text-capitalize text-dark fw-bold",
+      staticStyle: {
+        cursor: "pointer"
+      },
+      attrs: {
+        "data-bs-toggle": "modal",
+        "data-bs-target": "#patientModal"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.dataProps(cliente);
+        }
+      }
+    }, [_vm._v("\n                  " + _vm._s((cliente.name || "").toLowerCase()) + " " + _vm._s((cliente.nombres || "").toLowerCase()) + "\n                ")]), _vm._v(" "), _c("td", {
+      staticClass: "text-center"
+    }, [_vm._v(_vm._s(_vm.fechaLatam(cliente.birth_date)))]), _vm._v(" "), _c("td", {
+      staticClass: "text-center"
+    }, [_c("span", {
+      staticClass: "badge bg-info bg-opacity-10 text-info border border-info border-opacity-25"
+    }, [_vm._v(_vm._s(_vm.edad(cliente.birth_date)) + " años")])]), _vm._v(" "), _c("td", {
+      staticClass: "text-center"
+    }, [_c("span", {
+      staticClass: "badge",
+      "class": cliente.confirmados > 0 ? "bg-success" : "bg-secondary"
+    }, [_vm._v(_vm._s(cliente.confirmados))])]), _vm._v(" "), _c("td", {
+      staticClass: "text-center"
+    }, [cliente.phone && cliente.phone != "" ? _c("a", {
+      staticClass: "btn btn-sm btn-success rounded-circle shadow-sm",
+      attrs: {
+        href: "https://wa.me/51".concat(cliente.phone.replace(/\\s+/g, ""), "?text=Feliz cumplea\xF1os \uD83C\uDF82 ").concat(cliente.name, " ").concat(cliente.nombres, ", recuerda que el que piensa positivo, ve lo invisible, siente lo intangible y logra lo imposible. Te desea la cl\xEDnica Excelentemente \uD83E\uDD17"),
+        target: "_blank",
+        title: "Enviar WhatsApp"
+      }
+    }, [_c("i", {
+      staticClass: "fab fa-whatsapp"
+    })]) : _c("span", {
+      staticClass: "text-muted small"
+    }, [_vm._v("Sin número")])])]);
+  }), _vm._v(" "), _vm.clientesCumple.length === 0 ? _c("tr", [_c("td", {
+    staticClass: "text-center text-muted py-4",
+    attrs: {
+      colspan: "6"
+    }
+  }, [_vm._v("No se encontraron cumpleaños en este mes.")])]) : _vm._e()], 2)])])])]) : _vm._e(), _vm._v(" "), _vm.data ? _c("modal-triaje", {
     attrs: {
       dataPatient: _vm.data,
       profesionales: _vm.profesionales
@@ -871,18 +1009,50 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("button", {
-    staticClass: "btn btn-outline-primary mt-2",
+    staticClass: "btn btn-primary shadow-sm text-nowrap",
     attrs: {
       "data-bs-toggle": "modal",
       "data-bs-target": "#modalNewPatient"
     }
   }, [_c("i", {
     staticClass: "fas fa-user-nurse"
-  }), _vm._v(" Crear paciente nuevo")]);
+  }), _vm._v(" Crear paciente\n            ")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("thead", [_c("tr", [_c("th", [_vm._v("N°")]), _vm._v(" "), _c("th", [_vm._v("Nombre y apellidos")]), _vm._v(" "), _c("th", [_vm._v("Hobbies")]), _vm._v(" "), _c("th", [_vm._v("Triaje")]), _vm._v(" "), _c("th", [_vm._v("Plan de Seguridad")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h5", {
+    staticClass: "mb-0 font-weight-bold text-info"
+  }, [_c("i", {
+    staticClass: "fas fa-birthday-cake me-2"
+  }), _vm._v(" Cumpleaños del Mes")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-light border-0"
+  }, [_c("i", {
+    staticClass: "far fa-calendar-alt text-muted"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", {
+    staticClass: "text-uppercase text-xs font-weight-bolder opacity-7 text-muted"
+  }, [_vm._v("N°")]), _vm._v(" "), _c("th", {
+    staticClass: "text-uppercase text-xs font-weight-bolder opacity-7 text-muted"
+  }, [_vm._v("Nombres")]), _vm._v(" "), _c("th", {
+    staticClass: "text-uppercase text-xs font-weight-bolder opacity-7 text-muted text-center"
+  }, [_vm._v("Fecha Cumpleaños")]), _vm._v(" "), _c("th", {
+    staticClass: "text-uppercase text-xs font-weight-bolder opacity-7 text-muted text-center"
+  }, [_vm._v("Edad")]), _vm._v(" "), _c("th", {
+    staticClass: "text-uppercase text-xs font-weight-bolder opacity-7 text-muted text-center"
+  }, [_vm._v("Citas Confirmadas")]), _vm._v(" "), _c("th", {
+    staticClass: "text-uppercase text-xs font-weight-bolder opacity-7 text-muted text-center"
+  }, [_vm._v("Acciones")])])]);
 }];
 render._withStripped = true;
 

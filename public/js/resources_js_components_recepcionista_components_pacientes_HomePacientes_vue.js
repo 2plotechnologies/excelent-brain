@@ -1115,7 +1115,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vue_chartjs_legacy__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! vue-chartjs/legacy */ "./node_modules/vue-chartjs/legacy/index.js");
+/* harmony import */ var vue_chartjs_legacy__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! vue-chartjs/legacy */ "./node_modules/vue-chartjs/legacy/index.js");
 /* harmony import */ var chartjs_plugin_datalabels__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! chartjs-plugin-datalabels */ "./node_modules/chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.esm.js");
 /* harmony import */ var chart_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! chart.js */ "./node_modules/chart.js/dist/chart.mjs");
 /* harmony import */ var _DetallePaciente_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DetallePaciente.vue */ "./resources/js/components/recepcionista/components/pacientes/DetallePaciente.vue");
@@ -1133,6 +1133,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _OffVerMembresias_vue__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./OffVerMembresias.vue */ "./resources/js/components/recepcionista/components/pacientes/OffVerMembresias.vue");
 /* harmony import */ var _ModalAcuerdos_vue__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./ModalAcuerdos.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalAcuerdos.vue");
 /* harmony import */ var _ModalChat_vue__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./ModalChat.vue */ "./resources/js/components/recepcionista/components/pacientes/ModalChat.vue");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_17___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_17__);
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -1162,6 +1164,7 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
 
 
 
+
 //Code.
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'HomePacientes',
@@ -1171,6 +1174,8 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
       dataPatients: [],
       queId: null,
       vistaActual: 'lista',
+      fechaCumple: moment__WEBPACK_IMPORTED_MODULE_17___default()().format('YYYY-MM-DD'),
+      clientesCumple: [],
       data: null,
       dataTriajes: null,
       linkGenerado: '',
@@ -1319,8 +1324,8 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
     };
   },
   components: {
-    Doughnut: vue_chartjs_legacy__WEBPACK_IMPORTED_MODULE_17__.Doughnut,
-    Bar: vue_chartjs_legacy__WEBPACK_IMPORTED_MODULE_17__.Bar,
+    Doughnut: vue_chartjs_legacy__WEBPACK_IMPORTED_MODULE_18__.Doughnut,
+    Bar: vue_chartjs_legacy__WEBPACK_IMPORTED_MODULE_18__.Bar,
     DetallePaciente: _DetallePaciente_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
     ModalEdicionPaciente: _ModalEditarPaciente_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
     ModalRecetas: _ModalRecetas_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
@@ -1341,90 +1346,131 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
     profesionales: null
   },
   methods: {
-    fetchDashboardPacientes: function fetchDashboardPacientes() {
+    toggleVista: function toggleVista() {
+      this.vistaActual = this.vistaActual === 'lista' ? 'cumpleaños' : 'lista';
+      if (this.vistaActual === 'cumpleaños' && this.clientesCumple.length === 0) {
+        this.cargarCumpleanos();
+      }
+    },
+    cargarCumpleanos: function cargarCumpleanos() {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var res, data;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              _context.prev = 0;
-              _context.next = 3;
-              return _this.axios.get('/api/dashboardModuloPacientes');
-            case 3:
-              res = _context.sent;
-              data = res.data;
-              _this.dashData = data;
-              if (data.tiposAtencion && data.tiposAtencion.length > 0) {
-                _this.donutObj.labels = data.tiposAtencion.map(function (t) {
-                  return t.descripcion;
-                });
-                _this.donutObj.datasets[0].data = data.tiposAtencion.map(function (t) {
-                  return t.total;
-                });
-                _this.tiposDataLoaded = true;
-              }
-              _this.barObj.datasets[0].data = [data.completadas || 0, data.pendientes || 0, data.canceladas || 0, data.reprogramadas || 0];
-              _context.next = 13;
-              break;
-            case 10:
-              _context.prev = 10;
-              _context.t0 = _context["catch"](0);
-              console.error(_context.t0);
-            case 13:
+              _context.next = 2;
+              return _this.axios.get("/api/listarCumpleanos/".concat(_this.fechaCumple)).then(function (response) {
+                _this.clientesCumple = response.data;
+              })["catch"](function (err) {
+                return console.error(err);
+              });
+            case 2:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[0, 10]]);
+        }, _callee);
+      }))();
+    },
+    cambiarFechaCumple: function cambiarFechaCumple() {
+      this.cargarCumpleanos();
+    },
+    fechaLatam: function fechaLatam(fecha) {
+      if (!fecha) return '';
+      return moment__WEBPACK_IMPORTED_MODULE_17___default()(fecha).format('DD/MM/YYYY');
+    },
+    edad: function edad(fecha) {
+      if (!fecha) return 0;
+      var miEdad = moment__WEBPACK_IMPORTED_MODULE_17___default()(fecha);
+      return moment__WEBPACK_IMPORTED_MODULE_17___default()().diff(miEdad, 'years');
+    },
+    verDetalleCumple: function verDetalleCumple(cliente) {
+      this.dataPaciente = cliente;
+      this.vistaActual = 'detalle';
+    },
+    fetchDashboardPacientes: function fetchDashboardPacientes() {
+      var _this2 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var res, data;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              _context2.prev = 0;
+              _context2.next = 3;
+              return _this2.axios.get('/api/dashboardModuloPacientes');
+            case 3:
+              res = _context2.sent;
+              data = res.data;
+              _this2.dashData = data;
+              if (data.tiposAtencion && data.tiposAtencion.length > 0) {
+                _this2.donutObj.labels = data.tiposAtencion.map(function (t) {
+                  return t.descripcion;
+                });
+                _this2.donutObj.datasets[0].data = data.tiposAtencion.map(function (t) {
+                  return t.total;
+                });
+                _this2.tiposDataLoaded = true;
+              }
+              _this2.barObj.datasets[0].data = [data.completadas || 0, data.pendientes || 0, data.canceladas || 0, data.reprogramadas || 0];
+              _context2.next = 13;
+              break;
+            case 10:
+              _context2.prev = 10;
+              _context2.t0 = _context2["catch"](0);
+              console.error(_context2.t0);
+            case 13:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, null, [[0, 10]]);
       }))();
     },
     updateFaults: function updateFaults(id, faults) {
-      var _this2 = this;
+      var _this3 = this;
       if (confirm('Estás seguro de agregar una falta a este usuario?')) {
         this.axios.get("/api/updateFaults/".concat(id, "/").concat(faults)).then(function (res) {
-          _this2.getPatients();
+          _this3.getPatients();
         });
       }
     },
     getPatients: function getPatients() {
-      var _this3 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
+      var _this4 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              _this3.busqueda = [];
-              _context2.next = 3;
-              return _this3.axios.get("/api/getLast10Patients").then(function (res) {
+              _this4.busqueda = [];
+              _context3.next = 3;
+              return _this4.axios.get("/api/getLast10Patients").then(function (res) {
                 //console.log(res.data);
-                _this3.dataPatients = res.data;
-                _this3.busqueda = _this3.dataPatients;
-                _this3.busqueda = [];
-                _this3.dataPatients.forEach(function (el, index) {
+                _this4.dataPatients = res.data;
+                _this4.busqueda = _this4.dataPatients;
+                _this4.busqueda = [];
+                _this4.dataPatients.forEach(function (el, index) {
                   //if (index < 5) {
-                  _this3.busqueda.push(el);
+                  _this4.busqueda.push(el);
                   //}
                 });
 
                 // Si hay un paciente seleccionado en detalle, actualizar su referencia.
-                if (_this3.dataPaciente && _this3.dataPaciente.id) {
-                  var updated = _this3.dataPatients.find(function (p) {
-                    return p.id === _this3.dataPaciente.id;
+                if (_this4.dataPaciente && _this4.dataPaciente.id) {
+                  var updated = _this4.dataPatients.find(function (p) {
+                    return p.id === _this4.dataPaciente.id;
                   });
                   if (updated) {
-                    _this3.prepararPaciente(updated);
+                    _this4.prepararPaciente(updated);
                   }
                 }
-                if (_this3.$refs.detallePaciente) {
-                  _this3.$refs.detallePaciente.fetchPatientDetails();
+                if (_this4.$refs.detallePaciente) {
+                  _this4.$refs.detallePaciente.fetchPatientDetails();
                 }
               })["catch"](function (err) {
                 console.error(err);
               });
             case 3:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
           }
-        }, _callee2);
+        }, _callee3);
       }))();
     },
     Like: function Like(valores) {
@@ -1434,58 +1480,58 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
       this.busqueda[index].club = valores.seleccionado;
     },
     searchPatients: function searchPatients() {
-      var _this4 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var valueInput, coincidenceDni;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) switch (_context3.prev = _context3.next) {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
             case 0:
               valueInput = document.getElementById("searchNamePatient").value;
               if (!(valueInput === '')) {
-                _context3.next = 5;
+                _context4.next = 5;
                 break;
               }
-              _this4.getPatients();
-              _context3.next = 8;
+              _this5.getPatients();
+              _context4.next = 8;
               break;
             case 5:
               coincidenceDni = [];
-              _context3.next = 8;
-              return _this4.axios.get("/api/searchPatientByNameDni/".concat(valueInput)).then(function (res) {
-                _this4.totalPatients = res.data;
-                coincidenceDni = _this4.totalPatients.filter(function (el) {
+              _context4.next = 8;
+              return _this5.axios.get("/api/searchPatientByNameDni/".concat(valueInput)).then(function (res) {
+                _this5.totalPatients = res.data;
+                coincidenceDni = _this5.totalPatients.filter(function (el) {
                   return el.dni == valueInput;
                 });
                 if (coincidenceDni.length > 0) {
-                  _this4.busqueda = coincidenceDni;
+                  _this5.busqueda = coincidenceDni;
                 } else {
                   var words = valueInput.split(' ');
                   words.forEach(function (word) {
-                    var _this4$busqueda2;
+                    var _this5$busqueda2;
                     if (/[0-9]/.test(word)) {
-                      var _this4$busqueda;
-                      _this4.totalPatients = _this4.totalPatients.filter(function (el) {
+                      var _this5$busqueda;
+                      _this5.totalPatients = _this5.totalPatients.filter(function (el) {
                         return el.dni != null && el.dni.matches(word) ? el : null;
                       });
-                      (_this4$busqueda = _this4.busqueda).push.apply(_this4$busqueda, _toConsumableArray(_this4.totalPatients));
+                      (_this5$busqueda = _this5.busqueda).push.apply(_this5$busqueda, _toConsumableArray(_this5.totalPatients));
                     }
-                    _this4.totalPatients = _this4.totalPatients.filter(function (el) {
+                    _this5.totalPatients = _this5.totalPatients.filter(function (el) {
                       return el.name.match(new RegExp("".concat(word), 'ig')) ? el : null;
                     });
-                    (_this4$busqueda2 = _this4.busqueda).push.apply(_this4$busqueda2, _toConsumableArray(_this4.totalPatients));
+                    (_this5$busqueda2 = _this5.busqueda).push.apply(_this5$busqueda2, _toConsumableArray(_this5.totalPatients));
                     //const coincidence = this.dataPatients.filter(el => el.name.match(new RegExp(`${word}`,'ig')).split(' ') ? el : null)
                     //
                   });
-                  _this4.busqueda = _this4.totalPatients;
+                  _this5.busqueda = _this5.totalPatients;
                 }
               })["catch"](function (err) {
                 console.error(err);
               });
             case 8:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
-        }, _callee3);
+        }, _callee4);
       }))();
     },
     dataProps: function dataProps(data) {
@@ -1501,20 +1547,20 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
       return text.toLowerCase();
     },
     listarprofesional: function listarprofesional() {
-      var _this5 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
+      var _this6 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
             case 0:
-              _context4.next = 2;
-              return _this5.axios.get('/api/profesional').then(function (response) {
-                _this5.profesionales = response.data;
+              _context5.next = 2;
+              return _this6.axios.get('/api/profesional').then(function (response) {
+                _this6.profesionales = response.data;
               });
             case 2:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
-        }, _callee4);
+        }, _callee5);
       }))();
     },
     abrirDetallePaciente: function abrirDetallePaciente(paciente) {
@@ -1540,20 +1586,20 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
       this.dataTriajes = this.busqueda[index].triajes;
     },
     verReprogramacionesViejos: function verReprogramacionesViejos(id) {
-      var _this6 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
+      var _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
             case 0:
-              _context5.next = 2;
-              return _this6.axios.get('/api/verReprogramaciones/' + id).then(function (response) {
-                _this6.reprogramaciones = response.data;
+              _context6.next = 2;
+              return _this7.axios.get('/api/verReprogramaciones/' + id).then(function (response) {
+                _this7.reprogramaciones = response.data;
               });
             case 2:
             case "end":
-              return _context5.stop();
+              return _context6.stop();
           }
-        }, _callee5);
+        }, _callee6);
       }))();
     },
     calculateAge: function calculateAge(birthday) {
@@ -1592,32 +1638,32 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
       return new Date(dateStr).toLocaleDateString('es-ES', options);
     },
     generarLinkAutotriaje: function generarLinkAutotriaje(paciente) {
-      var _this7 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+      var _this8 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         var response, myModal;
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-          while (1) switch (_context6.prev = _context6.next) {
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+          while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              _context6.prev = 0;
-              _context6.next = 3;
-              return _this7.axios.post("/api/pacientes/".concat(paciente.id, "/generar-link"));
+              _context7.prev = 0;
+              _context7.next = 3;
+              return _this8.axios.post("/api/pacientes/".concat(paciente.id, "/generar-link"));
             case 3:
-              response = _context6.sent;
-              _this7.linkGenerado = response.data.link;
+              response = _context7.sent;
+              _this8.linkGenerado = response.data.link;
               myModal = new window.bootstrap.Modal(document.getElementById('modalLinkAutotriaje'));
               myModal.show();
-              _context6.next = 13;
+              _context7.next = 13;
               break;
             case 9:
-              _context6.prev = 9;
-              _context6.t0 = _context6["catch"](0);
-              console.error(_context6.t0);
+              _context7.prev = 9;
+              _context7.t0 = _context7["catch"](0);
+              console.error(_context7.t0);
               alert('Ocurrió un error al generar el enlace');
             case 13:
             case "end":
-              return _context6.stop();
+              return _context7.stop();
           }
-        }, _callee6, null, [[0, 9]]);
+        }, _callee7, null, [[0, 9]]);
       }))();
     },
     copiarLink: function copiarLink() {
@@ -3809,7 +3855,7 @@ var render = function render() {
   }, [_vm._v("Pacientes recurrentes")])]), _vm._v(" "), _vm._m(5)])])])])]), _vm._v(" "), _c("div", {
     staticClass: "row align-items-center mb-3"
   }, [_c("div", {
-    staticClass: "col-lg-6 mb-2 mb-lg-0"
+    staticClass: "col-xl-4 col-lg-12 mb-3 mb-xl-0"
   }, [_c("div", {
     staticClass: "input-group"
   }, [_c("div", {
@@ -3844,9 +3890,18 @@ var render = function render() {
       }
     }
   })])]), _vm._v(" "), _c("div", {
-    staticClass: "col-lg-6 text-lg-right text-center"
-  }, [_vm._m(6), _vm._v(" "), _c("router-link", {
-    staticClass: "btn shadow-sm text-white mr-1",
+    staticClass: "col-xl-8 col-lg-12 text-xl-right text-center"
+  }, [_c("button", {
+    staticClass: "btn btn-outline-info shadow-sm mr-2 mb-2",
+    on: {
+      click: function click($event) {
+        return _vm.toggleVista();
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-birthday-cake"
+  }), _vm._v(" Cumpleaños\n                ")]), _vm._v(" "), _vm._m(6), _vm._v(" "), _c("router-link", {
+    staticClass: "btn shadow-sm text-white mr-2 mb-2",
     staticStyle: {
       "background-color": "#f97316"
     },
@@ -3856,7 +3911,7 @@ var render = function render() {
   }, [_c("i", {
     staticClass: "fas fa-plus"
   }), _vm._v(" Nueva Cita")]), _vm._v(" "), _vm._m(7), _vm._v(" "), _c("router-link", {
-    staticClass: "btn btn-white border shadow-sm",
+    staticClass: "btn btn-white border shadow-sm mb-2",
     attrs: {
       to: "/recepcionista/paquetes"
     }
@@ -4196,7 +4251,102 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fa-solid fa-flask-vial me-2 text-primary"
     }), _vm._v(" Recetas\n                      ")])])])])])])]);
-  }), 0)])])], 1) : _c("DetallePaciente", {
+  }), 0)])])], 1) : _vm.vistaActual === "cumpleaños" ? _c("div", {
+    staticClass: "container-fluid px-0 mt-4"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center mb-3"
+  }, [_c("button", {
+    staticClass: "btn btn-link text-decoration-none px-0",
+    on: {
+      click: function click($event) {
+        _vm.vistaActual = "lista";
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-arrow-left"
+  }), _vm._v(" Volver a Pacientes\n        ")])]), _vm._v(" "), _c("div", {
+    staticClass: "card border-0 shadow-sm",
+    staticStyle: {
+      "border-radius": "12px"
+    }
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mb-4"
+  }, [_vm._m(14), _vm._v(" "), _c("div", {
+    staticClass: "input-group w-auto"
+  }, [_vm._m(15), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.fechaCumple,
+      expression: "fechaCumple"
+    }],
+    staticClass: "form-control bg-light border-0",
+    attrs: {
+      type: "date",
+      id: "fechaCumple"
+    },
+    domProps: {
+      value: _vm.fechaCumple
+    },
+    on: {
+      change: function change($event) {
+        return _vm.cambiarFechaCumple();
+      },
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.fechaCumple = $event.target.value;
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-hover align-middle mb-0"
+  }, [_vm._m(16), _vm._v(" "), _c("tbody", [_vm._l(_vm.clientesCumple, function (cliente, index) {
+    return _c("tr", {
+      key: "cumple_" + index
+    }, [_c("td", {
+      staticClass: "font-weight-bold text-dark"
+    }, [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", {
+      staticClass: "text-capitalize text-dark fw-bold",
+      staticStyle: {
+        cursor: "pointer"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.verDetalleCumple(cliente);
+        }
+      }
+    }, [_vm._v("\n                    " + _vm._s((cliente.name || "").toLowerCase()) + " " + _vm._s((cliente.nombres || "").toLowerCase()) + "\n                  ")]), _vm._v(" "), _c("td", {
+      staticClass: "text-center"
+    }, [_vm._v(_vm._s(_vm.fechaLatam(cliente.birth_date)))]), _vm._v(" "), _c("td", {
+      staticClass: "text-center"
+    }, [_c("span", {
+      staticClass: "badge bg-info text-white rounded-pill px-3 py-2",
+      staticStyle: {
+        "font-weight": "600"
+      }
+    }, [_vm._v(_vm._s(_vm.edad(cliente.birth_date)) + " años")])]), _vm._v(" "), _c("td", {
+      staticClass: "text-center"
+    }, [_c("span", {
+      staticClass: "badge",
+      "class": cliente.confirmados > 0 ? "bg-success" : "bg-secondary"
+    }, [_vm._v(_vm._s(cliente.confirmados))])]), _vm._v(" "), _c("td", {
+      staticClass: "text-center"
+    }, [cliente.phone && cliente.phone != "" ? _c("a", {
+      staticClass: "btn btn-sm btn-success rounded-circle shadow-sm",
+      attrs: {
+        href: "https://wa.me/51".concat(cliente.phone.replace(/\\s+/g, ""), "?text=Feliz cumplea\xF1os \uD83C\uDF82 ").concat(cliente.name, " ").concat(cliente.nombres, ", recuerda que el que piensa positivo, ve lo invisible, siente lo intangible y logra lo imposible. Te desea la cl\xEDnica Excelentemente \uD83E\uDD17"),
+        target: "_blank",
+        title: "Enviar WhatsApp"
+      }
+    }, [_c("i", {
+      staticClass: "fab fa-whatsapp"
+    })]) : _c("span", {
+      staticClass: "text-muted small"
+    }, [_vm._v("Sin número")])])]);
+  }), _vm._v(" "), _vm.clientesCumple.length === 0 ? _c("tr", [_vm._m(17)]) : _vm._e()], 2)])])])])]) : _vm.vistaActual === "detalle" ? _c("DetallePaciente", {
     ref: "detallePaciente",
     attrs: {
       pacienteId: _vm.dataPaciente.id
@@ -4212,7 +4362,7 @@ var render = function render() {
         return _vm.dataProps($event);
       }
     }
-  }), _vm._v(" "), _c("ModalEdicionPaciente", {
+  }) : _vm._e(), _vm._v(" "), _c("ModalEdicionPaciente", {
     attrs: {
       dataPatient: _vm.dataPaciente
     },
@@ -4300,7 +4450,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-dialog-centered"
   }, [_c("div", {
     staticClass: "modal-content border-0 shadow"
-  }, [_vm._m(14), _vm._v(" "), _c("div", {
+  }, [_vm._m(18), _vm._v(" "), _c("div", {
     staticClass: "modal-body pb-4"
   }, [_c("p", {
     staticClass: "text-secondary text-sm mb-3"
@@ -4409,7 +4559,7 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("button", {
-    staticClass: "btn btn-primary shadow-sm mr-1",
+    staticClass: "btn btn-primary shadow-sm mr-2 mb-2",
     attrs: {
       "data-bs-toggle": "modal",
       "data-bs-target": "#modalNewPatient"
@@ -4421,7 +4571,7 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("button", {
-    staticClass: "btn btn-white border shadow-sm mr-1"
+    staticClass: "btn btn-white border shadow-sm mr-2 mb-2"
   }, [_c("i", {
     staticClass: "far fa-credit-card"
   }), _vm._v(" Cobrar Deuda")]);
@@ -4477,6 +4627,51 @@ var staticRenderFns = [function () {
   return _c("li", [_c("h6", {
     staticClass: "dropdown-header"
   }, [_vm._v("Clínica")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h5", {
+    staticClass: "mb-0 font-weight-bold text-info"
+  }, [_c("i", {
+    staticClass: "fas fa-birthday-cake me-2"
+  }), _vm._v(" Cumpleaños del Mes")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-light border-0"
+  }, [_c("i", {
+    staticClass: "far fa-calendar-alt text-muted"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", {
+    staticClass: "bg-light"
+  }, [_c("tr", [_c("th", {
+    staticClass: "border-bottom-0 text-muted small text-uppercase"
+  }, [_vm._v("N°")]), _vm._v(" "), _c("th", {
+    staticClass: "border-bottom-0 text-muted small text-uppercase"
+  }, [_vm._v("Nombres")]), _vm._v(" "), _c("th", {
+    staticClass: "border-bottom-0 text-muted small text-uppercase text-center"
+  }, [_vm._v("Fecha Cumpleaños")]), _vm._v(" "), _c("th", {
+    staticClass: "border-bottom-0 text-muted small text-uppercase text-center"
+  }, [_vm._v("Edad")]), _vm._v(" "), _c("th", {
+    staticClass: "border-bottom-0 text-muted small text-uppercase text-center"
+  }, [_vm._v("Citas Confirmadas")]), _vm._v(" "), _c("th", {
+    staticClass: "border-bottom-0 text-muted small text-uppercase text-center"
+  }, [_vm._v("Acciones")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("td", {
+    staticClass: "text-center text-muted py-5",
+    attrs: {
+      colspan: "6"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-calendar-times fs-2 mb-3 opacity-50 d-block"
+  }), _vm._v("\n                    No se encontraron cumpleaños en este mes.\n                  ")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;

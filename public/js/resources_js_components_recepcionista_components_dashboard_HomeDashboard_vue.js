@@ -27,7 +27,8 @@ moment__WEBPACK_IMPORTED_MODULE_0___default().locale('es');
         alertasDeudas: 0,
         totalAlertas: 0,
         sos: [],
-        deudas: []
+        deudas: [],
+        alertasRecetas: []
       },
       loading: true
     };
@@ -60,7 +61,8 @@ moment__WEBPACK_IMPORTED_MODULE_0___default().locale('es');
           alertasDeudas: data.alertasDeudas || 0,
           totalAlertas: data.totalAlertas || 0,
           sos: data.sos || [],
-          deudas: data.deudas || []
+          deudas: data.deudas || [],
+          alertasRecetas: data.alertasRecetas || []
         };
       })["catch"](function (err) {
         console.error("Error al obtener datos del dashboard:", err);
@@ -350,6 +352,27 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "far fa-calendar-alt mr-1"
     }), _vm._v("Vence: " + _vm._s(deuda.fecha))])]);
+  }), 0)]) : _vm._e(), _vm._v(" "), _vm.dashboardData.alertasRecetas && _vm.dashboardData.alertasRecetas.length > 0 ? _c("div", {
+    "class": {
+      "mt-4": _vm.dashboardData.deudas && _vm.dashboardData.deudas.length > 0
+    }
+  }, [_c("h6", {
+    staticClass: "text-info font-weight-bold border-bottom pb-2 mb-3"
+  }, [_vm._v("Recetas Próximas a Vencer")]), _vm._v(" "), _c("ul", {
+    staticClass: "list-group list-group-flush"
+  }, _vm._l(_vm.dashboardData.alertasRecetas, function (receta, i) {
+    return _c("li", {
+      key: "receta-" + i,
+      staticClass: "list-group-item px-0"
+    }, [_c("div", {
+      staticClass: "d-flex w-100 justify-content-between"
+    }, [receta.patient ? _c("h6", {
+      staticClass: "mb-1 text-dark font-weight-bold"
+    }, [_vm._v(_vm._s(receta.patient.nombres) + " " + _vm._s(receta.patient.name))]) : _c("h6", {
+      staticClass: "mb-1 text-dark font-weight-bold"
+    }, [_vm._v("Paciente Sin Nombre")]), _vm._v(" "), _c("span", {
+      staticClass: "badge badge-info px-2 py-1 align-self-start"
+    }, [_vm._v("Vence: " + _vm._s(receta.effective_date))])]), _vm._v(" "), _vm._m(11, true)]);
   }), 0)]) : _vm._e()])]) : _c("div", {
     staticClass: "text-center py-5 d-flex flex-column align-items-center justify-content-center h-100"
   }, [_c("p", {
@@ -494,6 +517,14 @@ var staticRenderFns = [function () {
   }), _vm._v(" "), _c("h6", {
     staticClass: "m-0 font-weight-bold text-dark"
   }, [_vm._v("Alertas Activas")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("p", {
+    staticClass: "mb-1 text-muted small"
+  }, [_c("i", {
+    staticClass: "fas fa-prescription-bottle-alt mr-1"
+  }), _vm._v("Receta Médica\n                                        ")]);
 }];
 render._withStripped = true;
 
