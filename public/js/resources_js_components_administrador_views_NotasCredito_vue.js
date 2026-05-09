@@ -158,7 +158,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 idSede: idSede
               });
             case 5:
-              Swal.fire('Éxito', 'Se registró el egreso y se devolvió el dinero.', 'success');
+              _this4.$swal.fire('Éxito', 'Se registró el egreso y se devolvió el dinero.', 'success');
               modal = bootstrap.Modal.getInstance(document.getElementById('modalDevolucion'));
               if (modal) modal.hide();
               _this4.fetchNotas();
@@ -167,7 +167,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 11:
               _context3.prev = 11;
               _context3.t0 = _context3["catch"](1);
-              Swal.fire('Error', ((_error$response = _context3.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.error) || 'Ocurrió un error', 'error');
+              _this4.$swal.fire('Error', ((_error$response = _context3.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.error) || 'Ocurrió un error', 'error');
             case 14:
               _context3.prev = 14;
               _this4.procesando = false;
@@ -201,7 +201,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 observacion: _this5.formUso.observacion
               });
             case 4:
-              Swal.fire('Éxito', 'Saldo descontado correctamente.', 'success');
+              _this5.$swal.fire('Éxito', 'Saldo descontado correctamente.', 'success');
               modal = bootstrap.Modal.getInstance(document.getElementById('modalUsoManual'));
               if (modal) modal.hide();
               _this5.fetchNotas();
@@ -210,7 +210,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 10:
               _context4.prev = 10;
               _context4.t0 = _context4["catch"](1);
-              Swal.fire('Error', ((_error$response2 = _context4.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.error) || 'Ocurrió un error', 'error');
+              _this5.$swal.fire('Error', ((_error$response2 = _context4.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.error) || 'Ocurrió un error', 'error');
             case 13:
               _context4.prev = 13;
               _this5.procesando = false;

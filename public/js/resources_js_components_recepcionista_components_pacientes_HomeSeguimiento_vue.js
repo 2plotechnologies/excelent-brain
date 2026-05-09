@@ -44,7 +44,8 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
       tabActiva: 'fidelizacion',
       buscador: '',
       filtroEtiqueta: 'todos',
-      filtroFecha: null,
+      filtroFechaDesde: null,
+      filtroFechaHasta: null,
       // CRM Seguimiento data
       cargandoCRM: false,
       pacientesCRM: [],
@@ -120,7 +121,15 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
           return (item.paciente || '').toLowerCase().includes(t) || (item.profesional || '').toLowerCase().includes(t) || (item.servicio || '').toLowerCase().includes(t);
         });
         var coincideEstado = _this.filtroEtiqueta === 'todos' || item.etiqueta === _this.filtroEtiqueta;
-        var coincideFecha = !_this.filtroFecha || item.ultima_cita === _this.filtroFecha;
+        var coincideFecha = true;
+        if (_this.filtroFechaDesde || _this.filtroFechaHasta) {
+          if (!item.ultima_cita) {
+            coincideFecha = false;
+          } else {
+            if (_this.filtroFechaDesde && item.ultima_cita < _this.filtroFechaDesde) coincideFecha = false;
+            if (_this.filtroFechaHasta && item.ultima_cita > _this.filtroFechaHasta) coincideFecha = false;
+          }
+        }
         return coincideTexto && coincideEstado && coincideFecha;
       });
       if (!texto) {
@@ -659,7 +668,7 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "row g-2 align-items-center"
   }, [_c("div", {
-    staticClass: "col-lg-9"
+    staticClass: "col-lg-4"
   }, [_c("input", {
     directives: [{
       name: "model",
@@ -686,7 +695,7 @@ var render = function render() {
       }
     }
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-lg-3"
+    staticClass: "col-lg-2"
   }, [_c("select", {
     directives: [{
       name: "model",
@@ -719,27 +728,63 @@ var render = function render() {
     }, [_vm._v(_vm._s(estado))]);
   })], 2)]), _vm._v(" "), _c("div", {
     staticClass: "col-lg-3"
-  }, [_c("input", {
+  }, [_c("div", {
+    staticClass: "input-group"
+  }, [_c("span", {
+    staticClass: "input-group-text small text-muted",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Desde")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.filtroFecha,
-      expression: "filtroFecha"
+      value: _vm.filtroFechaDesde,
+      expression: "filtroFechaDesde"
     }],
     staticClass: "form-control",
     attrs: {
       type: "date"
     },
     domProps: {
-      value: _vm.filtroFecha
+      value: _vm.filtroFechaDesde
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.filtroFecha = $event.target.value;
+        _vm.filtroFechaDesde = $event.target.value;
       }
     }
-  })])])])]), _vm._v(" "), _c("div", {
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-lg-3"
+  }, [_c("div", {
+    staticClass: "input-group"
+  }, [_c("span", {
+    staticClass: "input-group-text small text-muted",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Hasta")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.filtroFechaHasta,
+      expression: "filtroFechaHasta"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "date"
+    },
+    domProps: {
+      value: _vm.filtroFechaHasta
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.filtroFechaHasta = $event.target.value;
+      }
+    }
+  })])])])])]), _vm._v(" "), _c("div", {
     staticClass: "card"
   }, [_c("div", {
     staticClass: "table-responsive"

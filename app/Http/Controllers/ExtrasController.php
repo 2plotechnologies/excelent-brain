@@ -1540,143 +1540,159 @@ class ExtrasController extends Controller
 
 
 	public function seguimientoCrm(Request $request){
-		$hoy = Carbon::now()->startOfDay();
+		$hoyCarbon = Carbon::now()->startOfDay();
+		$hoyEndStr = Carbon::now()->endOfDay()->toDateTimeString();
 
-		$pacientes = [];
-		$citasQuery = Appointment::where('status', 2)
-			->whereDate('date', '<=', $hoy->toDateString());
+		$search = $request->query('search');
 
-        $search = $request->query('search');
+		$patientsQuery = DB::table('patients')
+			->where('vivo', 1)
+			->where('activo', 1);
 
-        if ($search) {
-            $words = explode(' ', trim($search));
-            $matchingQuery = Patient::query();
-            foreach ($words as $word) {
-                $matchingQuery->where(function($q) use ($word) {
-                    $q->where('name', 'LIKE', "%{$word}%")
-                      ->orWhere('nombres', 'LIKE', "%{$word}%")
-                      ->orWhere('dni', 'LIKE', "%{$word}%")
-                      ->orWhere('phone', 'LIKE', "%{$word}%");
-                });
-            }
-            $matchingPatients = $matchingQuery->pluck('id');
-            $patientIds = $citasQuery->whereIn('patient_id', $matchingPatients)->distinct()->pluck('patient_id');
-        } else {
-            // Default to processing all to correctly assign Fidelizacion/Recuperacion labels, 
-            // but we can limit the final result array to 10 if needed.
-            // For now, let's restore the original query that grabs all distinct patient_ids.
-            $patientIds = $citasQuery->distinct()->pluck('patient_id');
-        }
-
-		foreach ($patientIds->chunk(500) as $chunk) {
-			$citas = Appointment::with(['patient:id,name,nombres,vivo,activo', 'professional:id,nombre,name,profession'])
-				->whereIn('patient_id', $chunk)
-				->where('status', 2)
-				->whereDate('date', '<=', $hoy->toDateString())
-				->orderBy('date', 'asc')
-				->get();
-
-			$agrupadas = $citas->groupBy('patient_id');
-
-			foreach ($agrupadas as $patientId => $citasPaciente) {
-				$paciente = optional($citasPaciente->first())->patient;
-				if (!$paciente || (int) $paciente->vivo === 0 || (int) $paciente->activo === 0) {
-					continue;
-				}
-
-				$primeraAtencion = Carbon::parse($citasPaciente->first()->date)->startOfDay();
-				$ultimaCita = Carbon::parse($citasPaciente->last()->date)->startOfDay();
-				$totalCitas = $citasPaciente->count();
-				$diasDesdePrimera = $primeraAtencion->diffInDays($hoy);
-				$diasSinVenir = $ultimaCita->diffInDays($hoy);
-
-				$servicioFrecuente = $citasPaciente
-					->groupBy(function ($cita) {
-						$profesion = strtolower(trim(optional($cita->professional)->profession ?? ''));
-
-						if (strpos($profesion, 'psiqu') !== false) return 'Psiquiatría';
-						if (strpos($profesion, 'psico') !== false) return 'Psicología';
-
-						return 'Otros';
-					})
-					->sortByDesc(function ($grupo) {
-						return $grupo->count();
-					})
-					->keys()
-					->first() ?? 'Otros';
-
-				$profesionalFrecuente = $citasPaciente
-					->groupBy(function ($cita) {
-						$nombre = trim((optional($cita->professional)->name ?? '') . ' ' . (optional($cita->professional)->lastname ?? ''));
-						return $nombre !== '' ? $nombre : 'Sin profesional';
-					})
-					->sortByDesc(function ($grupo) {
-						return $grupo->count();
-					})
-					->keys()
-					->first() ?? 'Sin profesional';
-
-				$esFidelizado = false;
-				if ($servicioFrecuente === 'Psicología') {
-					$esFidelizado = $diasDesdePrimera >= 30 && $totalCitas >= 4;
-				} elseif ($servicioFrecuente === 'Psiquiatría') {
-					$esFidelizado = $diasDesdePrimera >= 60 && $totalCitas >= 2;
-				} else {
-					$esFidelizado = false;
-				}
-
-				$etiquetaFidelizacion = $esFidelizado ? 'Fidelizado' : 'No Fidelizado';
-
-				$esInactivo = false;
-				if ($servicioFrecuente === 'Psiquiatría') {
-					$esInactivo = $diasSinVenir >= 180;
-				} else {
-					$esInactivo = $diasSinVenir >= 90;
-				}
-
-				$etiquetaRecuperacion = $esInactivo ? 'Inactivo' : 'Activo';
-
-				$pacientes[] = [
-					'patient_id' => (int) $patientId,
-					'paciente' => trim(($paciente->name ?? '') . ' ' . ($paciente->nombres ?? '')),
-					'servicio' => $servicioFrecuente,
-					'profesional' => $profesionalFrecuente,
-					'citas' => $totalCitas,
-					'primera_atencion' => $primeraAtencion->toDateString(),
-					'ultima_cita' => $ultimaCita->toDateString(),
-					'dias_sin_venir' => $diasSinVenir,
-					'etiqueta_fidelizacion' => $etiquetaFidelizacion,
-					'etiqueta_recuperacion' => $etiquetaRecuperacion,
-				];
+		if ($search) {
+			$words = explode(' ', trim($search));
+			foreach ($words as $word) {
+				$patientsQuery->where(function($q) use ($word) {
+					$q->where('name', 'LIKE', "%{$word}%")
+					  ->orWhere('nombres', 'LIKE', "%{$word}%")
+					  ->orWhere('dni', 'LIKE', "%{$word}%")
+					  ->orWhere('phone', 'LIKE', "%{$word}%");
+				});
 			}
-			unset($citas);
-			unset($agrupadas);
 		}
 
-		$fidelizacion = collect($pacientes)->map(function ($item) {
-			$item['etiqueta'] = $item['etiqueta_fidelizacion'];
-			unset($item['etiqueta_fidelizacion'], $item['etiqueta_recuperacion']);
-			return $item;
-		});
+		$patients = $patientsQuery->select('id', 'name', 'nombres')->get()->keyBy('id');
+		$patientIds = $patients->keys()->toArray();
 
-		$recuperacion = collect($pacientes)->map(function ($item) {
-			$item['etiqueta'] = $item['etiqueta_recuperacion'];
-			unset($item['etiqueta_fidelizacion'], $item['etiqueta_recuperacion']);
-			return $item;
-		});
+		if (empty($patientIds)) {
+			return response()->json([
+				'pacientes' => [],
+				'resumen' => [
+					'fidelizados' => 0,
+					'noFidelizados' => 0,
+					'recuperacion' => 0,
+					'inactivos' => 0,
+				],
+			]);
+		}
 
-		$union = $fidelizacion->merge($recuperacion)->unique(function ($item) {
-			return $item['patient_id'] . '|' . $item['etiqueta'];
-		})->values();
+		$professionals = DB::table('professionals')
+			->select('id', 'name', 'profession')
+			->get()
+			->keyBy('id');
+
+		$citasRawQuery = DB::table('appointments')
+			->select('patient_id', 'professional_id', 'date')
+			->where('status', 2)
+			->where('date', '<=', $hoyEndStr);
+
+		if ($search) {
+			$citasRawQuery->whereIn('patient_id', $patientIds);
+		}
+
+		$citasRaw = $citasRawQuery->orderBy('date', 'asc')->get();
+
+		$agrupadas = [];
+		foreach ($citasRaw as $cita) {
+			$agrupadas[$cita->patient_id][] = $cita;
+		}
+
+		$pacientesResult = [];
+		$fidelizadosCount = 0;
+		$noFidelizadosCount = 0;
+		$recuperacionCount = 0;
+		$inactivosCount = 0;
+
+		foreach ($agrupadas as $patientId => $citasPaciente) {
+			if (!isset($patients[$patientId])) continue;
+			$paciente = $patients[$patientId];
+
+			$primeraAtencion = Carbon::parse($citasPaciente[0]->date)->startOfDay();
+			$ultimaCita = Carbon::parse($citasPaciente[count($citasPaciente) - 1]->date)->startOfDay();
+			$totalCitas = count($citasPaciente);
+			$diasDesdePrimera = $primeraAtencion->diffInDays($hoyCarbon);
+			$diasSinVenir = $ultimaCita->diffInDays($hoyCarbon);
+
+			$profCounts = [];
+			$servCounts = [];
+
+			foreach ($citasPaciente as $cita) {
+				$profId = $cita->professional_id;
+				$prof = isset($professionals[$profId]) ? $professionals[$profId] : null;
+
+				$profName = $prof ? trim(($prof->name ?? '') . ' ' . ($prof->name ?? '')) : 'Sin profesional';
+				if ($profName === '') $profName = 'Sin profesional';
+
+				$profesionRaw = $prof ? strtolower(trim($prof->profession ?? '')) : '';
+				if (strpos($profesionRaw, 'psiqu') !== false) {
+					$servName = 'Psiquiatría';
+				} elseif (strpos($profesionRaw, 'psico') !== false) {
+					$servName = 'Psicología';
+				} else {
+					$servName = 'Otros';
+				}
+
+				if (!isset($profCounts[$profName])) $profCounts[$profName] = 0;
+				$profCounts[$profName]++;
+
+				if (!isset($servCounts[$servName])) $servCounts[$servName] = 0;
+				$servCounts[$servName]++;
+			}
+
+			arsort($servCounts);
+			$servicioFrecuente = array_key_first($servCounts);
+
+			arsort($profCounts);
+			$profesionalFrecuente = array_key_first($profCounts);
+
+			$esFidelizado = false;
+			if ($servicioFrecuente === 'Psicología') {
+				$esFidelizado = $diasDesdePrimera >= 30 && $totalCitas >= 4;
+			} elseif ($servicioFrecuente === 'Psiquiatría') {
+				$esFidelizado = $diasDesdePrimera >= 60 && $totalCitas >= 2;
+			}
+
+			$etiquetaFidelizacion = $esFidelizado ? 'Fidelizado' : 'No Fidelizado';
+			if ($esFidelizado) $fidelizadosCount++; else $noFidelizadosCount++;
+
+			$esInactivo = false;
+			if ($servicioFrecuente === 'Psiquiatría') {
+				$esInactivo = $diasSinVenir >= 180;
+			} else {
+				$esInactivo = $diasSinVenir >= 90;
+			}
+
+			$etiquetaRecuperacion = $esInactivo ? 'Inactivo' : 'Activo';
+			if ($esInactivo) $inactivosCount++; else $recuperacionCount++;
+
+			$baseInfo = [
+				'patient_id' => (int) $patientId,
+				'paciente' => trim(($paciente->name ?? '') . ' ' . ($paciente->nombres ?? '')),
+				'servicio' => $servicioFrecuente,
+				'profesional' => $profesionalFrecuente,
+				'citas' => $totalCitas,
+				'primera_atencion' => $primeraAtencion->toDateString(),
+				'ultima_cita' => $ultimaCita->toDateString(),
+				'dias_sin_venir' => $diasSinVenir,
+			];
+
+			$pac1 = $baseInfo;
+			$pac1['etiqueta'] = $etiquetaFidelizacion;
+			$pacientesResult[] = $pac1;
+
+			$pac2 = $baseInfo;
+			$pac2['etiqueta'] = $etiquetaRecuperacion;
+			$pacientesResult[] = $pac2;
+		}
 
 		return response()->json([
-			'pacientes' => $union,
+			'pacientes' => $pacientesResult,
 			'resumen' => [
-				'fidelizados' => $fidelizacion->where('etiqueta', 'Fidelizado')->count(),
-				'noFidelizados' => $fidelizacion->where('etiqueta', 'No Fidelizado')->count(),
-				'recuperacion' => $recuperacion->where('etiqueta', 'Recuperación')->count(),
-				'inactivos' => $recuperacion->where('etiqueta', 'Inactivo')->count(),
-			],
+				'fidelizados' => $fidelizadosCount,
+				'noFidelizados' => $noFidelizadosCount,
+				'recuperacion' => $recuperacionCount,
+				'inactivos' => $inactivosCount,
+			]
 		]);
 	}
 

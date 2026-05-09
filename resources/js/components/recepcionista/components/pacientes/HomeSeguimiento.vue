@@ -153,7 +153,7 @@
       <div class="card mb-3">
         <div class="card-body">
           <div class="row g-2 align-items-center">
-            <div class="col-lg-9">
+            <div class="col-lg-4">
               <input
                 v-model="buscador"
                 class="form-control"
@@ -162,14 +162,23 @@
                 @keyup.enter="buscarCrmOriginal"
               >
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-2">
               <select v-model="filtroEtiqueta" class="form-select">
                 <option value="todos">Todos</option>
                 <option v-for="estado in estadosActuales" :key="estado" :value="estado">{{ estado }}</option>
               </select>
             </div>
             <div class="col-lg-3">
-              <input type="date" v-model="filtroFecha" class="form-control">
+              <div class="input-group">
+                <span class="input-group-text small text-muted" style="font-size: 0.85rem">Desde</span>
+                <input type="date" v-model="filtroFechaDesde" class="form-control">
+              </div>
+            </div>
+            <div class="col-lg-3">
+              <div class="input-group">
+                <span class="input-group-text small text-muted" style="font-size: 0.85rem">Hasta</span>
+                <input type="date" v-model="filtroFechaHasta" class="form-control">
+              </div>
             </div>
           </div>
         </div>
@@ -585,7 +594,8 @@ export default {
       tabActiva: 'fidelizacion',
       buscador: '',
       filtroEtiqueta: 'todos',
-      filtroFecha: null,
+      filtroFechaDesde: null,
+      filtroFechaHasta: null,
       
       // CRM Seguimiento data
       cargandoCRM: false,
@@ -654,7 +664,15 @@ export default {
 
         const coincideEstado = this.filtroEtiqueta === 'todos' || item.etiqueta === this.filtroEtiqueta;
 
-        const coincideFecha = !this.filtroFecha || item.ultima_cita === this.filtroFecha;
+        let coincideFecha = true;
+        if (this.filtroFechaDesde || this.filtroFechaHasta) {
+          if (!item.ultima_cita) {
+            coincideFecha = false;
+          } else {
+            if (this.filtroFechaDesde && item.ultima_cita < this.filtroFechaDesde) coincideFecha = false;
+            if (this.filtroFechaHasta && item.ultima_cita > this.filtroFechaHasta) coincideFecha = false;
+          }
+        }
 
         return coincideTexto && coincideEstado && coincideFecha;
       });

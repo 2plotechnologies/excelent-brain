@@ -267,14 +267,14 @@ export default {
           idSede: idSede
         });
         
-        Swal.fire('Éxito', 'Se registró el egreso y se devolvió el dinero.', 'success');
+        this.$swal.fire('Éxito', 'Se registró el egreso y se devolvió el dinero.', 'success');
         
         const modal = bootstrap.Modal.getInstance(document.getElementById('modalDevolucion'));
         if (modal) modal.hide();
         
         this.fetchNotas();
       } catch (error) {
-        Swal.fire('Error', error.response?.data?.error || 'Ocurrió un error', 'error');
+        this.$swal.fire('Error', error.response?.data?.error || 'Ocurrió un error', 'error');
       } finally {
         this.procesando = false;
       }
@@ -294,14 +294,14 @@ export default {
           observacion: this.formUso.observacion
         });
         
-        Swal.fire('Éxito', 'Saldo descontado correctamente.', 'success');
+        this.$swal.fire('Éxito', 'Saldo descontado correctamente.', 'success');
         
         const modal = bootstrap.Modal.getInstance(document.getElementById('modalUsoManual'));
         if (modal) modal.hide();
         
         this.fetchNotas();
       } catch (error) {
-        Swal.fire('Error', error.response?.data?.error || 'Ocurrió un error', 'error');
+        this.$swal.fire('Error', error.response?.data?.error || 'Ocurrió un error', 'error');
       } finally {
         this.procesando = false;
       }
