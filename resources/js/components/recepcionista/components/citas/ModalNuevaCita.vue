@@ -971,6 +971,15 @@ export default {
 				formData.append('idSede', this.idSede);
 				await this.axios.post('/api/appointment', formData, config)
 				.then(response => { //Trabaja en api -> modelo (appointment)>store()
+					if(response.data.error){
+						this.$swal({
+							icon: 'error',
+							title: 'Horario no disponible',
+							text: response.data.error
+						})
+						this.$emit('actualizarListadoCitas', true)
+						return;
+					}
 					console.log(response.data)
 					this.closeModal();
 					this.cita.membresia=''
@@ -984,7 +993,17 @@ export default {
 					this.clearModal()
 				})
 				.catch(error => {
+						//console.log(error)
+						if(error.response && error.response.status === 409){
+						this.$swal({
+							icon: 'error',
+							title: 'Horario no disponible',
+							text: error.response.data.error || 'El horario ya fue reservado por otro usuario'
+						})
+						this.$emit('actualizarListadoCitas', true)
+					}else{
 						console.log(error)
+					}
 				})
 			}
 		},

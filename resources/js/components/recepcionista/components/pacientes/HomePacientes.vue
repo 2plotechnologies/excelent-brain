@@ -348,7 +348,7 @@
     />
 
 		<ModalEdicionPaciente :dataPatient="dataPaciente" @actualizar="getPatients"></ModalEdicionPaciente>
-    <modal-recetas v-if="data" :dataPatient="data"></modal-recetas>
+    <modal-recetas :dataPatient="data || {}"></modal-recetas>
     <modal-faltas v-if="data" :dataPatient="data"></modal-faltas>
     <modal-triaje v-if="data" :dataPatient="data" :profesionales="profesionales" @actualizar="getPatients"></modal-triaje>
 		<modal-ver-triajes-viejos v-if="dataTriajes" :triajes="dataTriajes"></modal-ver-triajes-viejos>

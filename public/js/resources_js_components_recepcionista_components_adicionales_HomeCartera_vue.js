@@ -117,7 +117,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   }
                   bloque = _this2.citasResumidas.slice(i, i + tamanhoBloque);
                   bloque.forEach(function (cita) {
-                    var _cita$patient, _cita$patient2;
+                    var _cita$patient, _cita$patient2, _cita$patient3, _cita$patient4, _cita$patient5;
                     cita.visitas = _this2.citasCompletas.filter(function (item) {
                       return item.patient_id === cita.patient_id;
                     }).length;
@@ -134,7 +134,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                       return item.patient_id === cita.patient_id && item.status == 4;
                     }).length;
                     cita.fatas = (_cita$patient = cita.patient) === null || _cita$patient === void 0 ? void 0 : _cita$patient.faults;
-                    if (((_cita$patient2 = cita.patient) === null || _cita$patient2 === void 0 ? void 0 : _cita$patient2.discharge) == 1) cita.actual = 'De Alta';else {
+                    if (((_cita$patient2 = cita.patient) === null || _cita$patient2 === void 0 ? void 0 : _cita$patient2.alta_psicologica) == 1 && ((_cita$patient3 = cita.patient) === null || _cita$patient3 === void 0 ? void 0 : _cita$patient3.alta_psiquiatrica) == 1) cita.actual = 'Alta Psicológica y Psiquiátrica';else if (((_cita$patient4 = cita.patient) === null || _cita$patient4 === void 0 ? void 0 : _cita$patient4.alta_psicologica) == 1) cita.actual = 'Alta Psicológica';else if (((_cita$patient5 = cita.patient) === null || _cita$patient5 === void 0 ? void 0 : _cita$patient5.alta_psiquiatrica) == 1) cita.actual = 'Alta Psiquiátrica';else {
                       var condicion = _this2.citasCompletas.filter(function (item) {
                         return item.patient_id === cita.patient_id && item.patient_condition == 2;
                       }).length;
@@ -270,10 +270,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       } else return '';
     },
     queViejoEs: function queViejoEs(cita) {
-      var _cita$patient$created, _cita$patient3;
+      var _cita$patient$created, _cita$patient6;
       moment__WEBPACK_IMPORTED_MODULE_2___default().locale('es');
       var fechaMasAntigua = new Date();
-      fechaMasAntigua = (_cita$patient$created = (_cita$patient3 = cita.patient) === null || _cita$patient3 === void 0 ? void 0 : _cita$patient3.created_at) !== null && _cita$patient$created !== void 0 ? _cita$patient$created : '2022-01-01';
+      fechaMasAntigua = (_cita$patient$created = (_cita$patient6 = cita.patient) === null || _cita$patient6 === void 0 ? void 0 : _cita$patient6.created_at) !== null && _cita$patient$created !== void 0 ? _cita$patient$created : '2022-01-01';
       return moment__WEBPACK_IMPORTED_MODULE_2___default()(fechaMasAntigua).fromNow().replace('hace ', '');
     },
     capitalizar: function capitalizar(texto) {

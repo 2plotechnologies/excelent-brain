@@ -33,7 +33,7 @@
 					</select>
 				</div>
 				<div class="modal-footer border-0">
-					<button type="button" class="btn btn-outline-primary" @click="separarCita()" data-bs-dismiss="modal"><i class="fa-regular fa-floppy-disk"></i> Registrar</button>
+					<button type="button" class="btn btn-outline-primary" @click="separarCita()"><i class="fa-regular fa-floppy-disk"></i> Registrar</button>
 				</div>
 			</div>
 		</div>
@@ -76,12 +76,29 @@ export default{
 					byDoctor:1,
 					precio: 0
 				}).then(response=>{ console.log(response.data);
+					if( response.data.error ){
+						alertify.notify(response.data.error, 'danger', 10)
+						return;
+					}
+					if( response.data.mensaje ){
 					this.idProfesional = -1
 					this.cita.idHora = ''
 					if( response.data.mensaje )
 						alertify.notify('Reservado con éxito', 'success', 10)
-					else
+					alertify.notify('Reservado con éxito', 'success', 10)
+						this.limpiarFormulario()
+						this.$emit('citaCreada')
+						document.querySelector('#modalProximaCita .btn-close').click()
+					}else{
 						alertify.notify('Hubo un error guardando la reserva', 'danger', 10)
+					}
+				}).catch(error => {
+					if(error.response && error.response.status === 409){
+						alertify.notify(error.response.data.error || 'El horario ya fue reservado', 'danger', 10)
+					}else{
+						alertify.notify('Hubo un error guardando la reserva', 'danger', 10)
+						console.error(error)
+					}
 				})
 
 			}

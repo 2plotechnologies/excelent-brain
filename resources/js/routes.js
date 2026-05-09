@@ -80,6 +80,7 @@ const HomeAdicionales = () => import('./components/recepcionista/components/adic
 const HomeCartera = () => import('./components/recepcionista/components/adicionales/HomeCartera.vue')
 const HomeRecordatorios = () => import('./components/recepcionista/components/recordatorios/HomeRecordatorios.vue')
 const HomeLimbo = () => import('./components/recepcionista/components/citas/HomeLimbo.vue')
+const HomeAltas = () => import('./components/shared/HomeAltas.vue')
 const HomeSeguimiento = () => import('./components/recepcionista/components/pacientes/HomeSeguimiento.vue')
 
 
@@ -236,6 +237,11 @@ export const routes = [
         path: 'kurame',
         name: 'kurame',
         component: HomeKurame
+      },
+      {
+        path: 'altas',
+        name: 'altasProfesional',
+        component: HomeAltas
       }
     ]
   },
@@ -436,6 +442,11 @@ export const routes = [
         component: RecepcionistaReportesGerenciales
       },
       {
+        path: '/administrador/altas',
+        name: 'altasAdministrador',
+        component: HomeAltas
+      },
+      {
         path: '/administrador/reportes',
         name: 'HomeAdministradorRouterReportes',
         component: HomeAdministradorRouterReportes,
@@ -545,6 +556,11 @@ export const routes = [
         path: 'limbo',
         name: 'limbo',
         component: HomeLimbo
+      },
+      {
+        path: 'altas',
+        name: 'altasRecepcionista',
+        component: HomeAltas
       },
       {
         path: 'paquetes',

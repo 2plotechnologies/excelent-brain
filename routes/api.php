@@ -122,12 +122,15 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('returnTotalPatients', [PatientController::class, 'returnTotalPatients']);
             Route::get('xlsx_admin/{date}', [PatientController::class, 'monthXlsx']);
             //Route::get('discharge/{id}/{idProfesional}', [PatientController::class, 'discharge']);
+
             Route::get('agePerMonth/{month}', [PatientController::class, 'agePerMonth']);
         });
 
         // Admin-only patient routes
         Route::middleware('role:administrador,recepcionista,profesional')->group(function () {
-            Route::get('discharge/{id}/{idProfesional}', [PatientController::class, 'discharge']);
+            Route::post('discharge', [PatientController::class, 'discharge']);
+            Route::get('discharges', [PatientController::class, 'listDischarges']);
+            Route::put('discharges/{id}', [PatientController::class, 'updateDischargeStatus']);
         });
     });
 

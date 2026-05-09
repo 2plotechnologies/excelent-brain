@@ -106,13 +106,19 @@
 								@mousemove="moverTooltip($event)"
 								data-bs-toggle="modal" data-bs-target="#modalAccionesCita">
 							
-							<div class="booked-content h-100 position-relative overflow-hidden" :class="bgPorSemaforo(horaOcup)">
-								<div class="font-weight-bold text-truncate small lh-1 pt-1"><i :class="horaOcup.mode == 1 ? 'far fa-user' : 'fas fa-desktop'"></i> {{ horaOcup.patient.name.split(' ')[0] }} {{ horaOcup.patient.nombres.split(' ')[0] }}</div>
-								<div class="text-muted small mt-1" style="font-size: 0.7rem;">{{ formatHora(horaOcup.schedule ? horaOcup.schedule.check_time : '') }} - {{ formatHora(horaOcup.schedule ? horaOcup.schedule.departure_date : '') }}</div>
+							<div class="booked-content h-100 position-relative overflow-hidden d-flex flex-column" :class="bgPorSemaforo(horaOcup)">
+								<!-- Primera línea siempre visible: Nombre y Pago -->
+								<div class="d-flex justify-content-between align-items-center w-100">
+									<div class="font-weight-bold text-truncate lh-1" style="font-size: 0.75rem;">
+										<i :class="horaOcup.mode == 1 ? 'far fa-user' : 'fas fa-desktop'"></i> 
+										{{ horaOcup.patient.name.split(' ')[0] }} {{ horaOcup.patient.nombres.split(' ')[0] }}
+									</div>
+									<i class="fas fa-dollar-sign ml-1" style="font-size: 0.75rem;" :class="horaOcup.payment && horaOcup.payment.pay_status == 1 ? 'text-danger':'text-success'"></i>
+								</div>
 								
-								<!-- Iconos estado -->
-								<div class="position-absolute" style="bottom: 2px; right: 4px;">
-									<i class="fas fa-dollar-sign small" :class="horaOcup.payment && horaOcup.payment.pay_status == 1 ? 'text-danger':'text-success'"></i>
+								<!-- Segunda línea: Tiempo (se cortará si no hay alto suficiente) -->
+								<div class="text-muted mt-1 text-truncate" style="font-size: 0.65rem; line-height: 1;">
+									{{ formatHora(horaOcup.schedule ? horaOcup.schedule.check_time : '') }} - {{ formatHora(horaOcup.schedule ? horaOcup.schedule.departure_date : '') }}
 								</div>
 							</div>
 
@@ -153,8 +159,8 @@
 		<modal-search-patient></modal-search-patient>
 		<ModalIntercambio :posibles="posibles" :primero="primero" @actualizar="actualizarListadoCitas"></ModalIntercambio>
 		
-		<modalVerRecetas :prescriptions="recetas"></modalVerRecetas>
-		<modalTiemposEspera :cita="citaTemp" @actualizar="actualizarListadoCitas"></modalTiemposEspera>
+		<modalVerRecetas v-if="cita && cita.id" :prescriptions="recetas"></modalVerRecetas>
+		<modalTiemposEspera v-if="cita && cita.id" :cita="cita" @actualizar="actualizarListadoCitas"></modalTiemposEspera>
 
 	</div>
 </template>

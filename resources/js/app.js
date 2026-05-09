@@ -8,6 +8,48 @@ import App from './components/App.vue'
 import VueAxios from 'vue-axios'
 import axios from 'axios'
 
+// --- INICIO FIX 429 TOO MANY REQUESTS ---
+// Cache específico solo para /api/user para evitar error 429 (Too Many Requests)
+const originalGet = axios.get;
+let userPromise = null;
+let userCache = null;
+let userCacheTime = null;
+
+axios.get = function (url, config) {
+    if (url === '/api/user' || url.endsWith('/api/user')) {
+        // Si hay caché válido (menor a 60 segs), retornar clon para evitar mutaciones
+        if (userCache && (Date.now() - userCacheTime < 60000)) {
+            return Promise.resolve({
+                ...userCache,
+                data: JSON.parse(JSON.stringify(userCache.data))
+            });
+        }
+        // Si ya hay una petición en curso, reutilizar la promesa
+        if (userPromise) {
+            return userPromise.then(res => ({
+                ...res,
+                data: JSON.parse(JSON.stringify(res.data))
+            }));
+        }
+
+        userPromise = originalGet.call(this, url, config).then(response => {
+            userCache = { ...response, data: JSON.parse(JSON.stringify(response.data)) };
+            userCacheTime = Date.now();
+            userPromise = null;
+            return response;
+        }).catch(error => {
+            userPromise = null;
+            throw error;
+        });
+
+        return userPromise;
+    }
+
+    // Dejar pasar normalmente todas las demás peticiones GET
+    return originalGet.call(this, url, config);
+};
+// --- FIN FIX 429 TOO MANY REQUESTS ---
+
 // importamos y configuramos el router
 import VueRouter from 'vue-router'
 import { routes } from './routes'
@@ -40,7 +82,7 @@ if (_rawToken === 'undefined' || _rawToken === 'null') {
     localStorage.removeItem('token')
 }
 
-function loggedIn(){
+function loggedIn() {
     const t = localStorage.getItem('token')
     return t && t !== 'undefined' && t !== 'null' ? t : null
 }
@@ -51,15 +93,15 @@ Object.defineProperty(Vue.prototype, '$token', {
     get() { return localStorage.getItem('token') }
 })
 
-const router = new VueRouter ({
-  mode: 'history',
-  routes: routes,
+const router = new VueRouter({
+    mode: 'history',
+    routes: routes,
 })
 
 
 router.beforeEach((to, from, next) => {
     var element = document.getElementsByClassName('modal-backdrop')
-    if(element.length != 0){
+    if (element.length != 0) {
         element[0].classList.remove("show")
         element[0].classList.remove("fade")
         element[0].classList.remove("modal-backdrop")
@@ -69,30 +111,30 @@ router.beforeEach((to, from, next) => {
         // if not, redirect to login page.
         if (!loggedIn()) {
             next({
-            path: '/login',
-            query: { redirect: to.fullPath }
+                path: '/login',
+                query: { redirect: to.fullPath }
             })
         } else {
             next()
         }
-    } else if(to.matched.some(record => record.meta.guest)){
+    } else if (to.matched.some(record => record.meta.guest)) {
         if (loggedIn()) {
             next({
-            path: '/',
-            query: { redirect: to.fullPath }
+                path: '/',
+                query: { redirect: to.fullPath }
             })
         } else {
             next()
         }
-    }else{
+    } else {
         next() // make sure to always call next()!
     }
-  })
+})
 
 const app = new Vue({
-  el: '#app',
-  router: router,
-  render: h => h (App)
+    el: '#app',
+    router: router,
+    render: h => h(App)
 })
 
 

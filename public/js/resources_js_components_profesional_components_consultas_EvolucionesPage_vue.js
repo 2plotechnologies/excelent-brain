@@ -421,14 +421,30 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     toDischarge: function toDischarge() {
       var _this = this;
       this.$swal({
-        title: '¿Está seguro de dar de alta a este paciente?',
+        title: 'Dar de alta al paciente',
+        text: 'Ingrese un comentario sobre el alta:',
+        input: 'textarea',
+        inputPlaceholder: 'Comentarios...',
         showDenyButton: true,
-        confirmButtonText: 'Si',
-        denyButtonText: 'No'
+        confirmButtonText: 'Dar de Alta',
+        denyButtonText: 'Cancelar',
+        preConfirm: function preConfirm(comentario) {
+          if (!comentario) {
+            _this.$swal.showValidationMessage('El comentario es obligatorio para dar de alta');
+          }
+          return comentario;
+        }
       }).then(function (result) {
         if (result.isConfirmed) {
-          _this.axios.get("/api/discharge/".concat(_this.$route.params.idPaciente, "/").concat(_this.$attrs.idUser)).then(function (res) {
+          var typeDischarge = _this.dataUser.profession === 'Psiquiatra' ? 2 : 1;
+          _this.axios.post('/api/discharge', {
+            id: _this.$route.params.idPaciente,
+            idProfesional: _this.dataUser.id,
+            type: typeDischarge,
+            comments: result.value
+          }).then(function (res) {
             _this.$swal(res.data.msg);
+            _this.getHistories();
           });
         }
       });
@@ -1679,9 +1695,28 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           precio: 0
         }).then(function (response) {
           console.log(response.data);
-          _this.idProfesional = -1;
-          _this.cita.idHora = '';
-          if (response.data.mensaje) alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('Reservado con éxito', 'success', 10);else alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('Hubo un error guardando la reserva', 'danger', 10);
+          if (response.data.error) {
+            alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify(response.data.error, 'danger', 10);
+            return;
+          }
+          if (response.data.mensaje) {
+            _this.idProfesional = -1;
+            _this.cita.idHora = '';
+            if (response.data.mensaje) alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('Reservado con éxito', 'success', 10);
+            alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('Reservado con éxito', 'success', 10);
+            _this.limpiarFormulario();
+            _this.$emit('citaCreada');
+            document.querySelector('#modalProximaCita .btn-close').click();
+          } else {
+            alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('Hubo un error guardando la reserva', 'danger', 10);
+          }
+        })["catch"](function (error) {
+          if (error.response && error.response.status === 409) {
+            alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify(error.response.data.error || 'El horario ya fue reservado', 'danger', 10);
+          } else {
+            alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('Hubo un error guardando la reserva', 'danger', 10);
+            console.error(error);
+          }
         });
       }
     },
@@ -3432,7 +3467,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fa-solid fa-vial"
-  }), _vm._v(" Nueva receta\n\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm._m(3), _vm._v(" "), _vm.datosConsulta.discharge != 1 ? _c("button", {
+  }), _vm._v(" Nueva receta\n\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm._m(3), _vm._v(" "), _vm.dataUser.profession === "Psiquiatra" && _vm.datosConsulta.alta_psiquiatrica != 1 || _vm.dataUser.profession !== "Psiquiatra" && _vm.datosConsulta.alta_psicologica != 1 ? _c("button", {
     staticClass: "btn btn-outline-success my-1",
     on: {
       click: _vm.toDischarge
@@ -3480,11 +3515,18 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fa-solid fa-bomb"
-  }), _vm._v(" Eliminar SOS")])], 1)])])]), _vm._v(" "), _vm.datosConsulta.discharge == "1" ? _c("div", {
+  }), _vm._v(" Eliminar SOS")])], 1)])])]), _vm._v(" "), _vm.datosConsulta.alta_psicologica == 1 || _vm.datosConsulta.alta_psiquiatrica == 1 ? _c("div", {
     staticClass: "my-3"
-  }, [_vm._m(4)]) : _vm._e(), _vm._v(" "), _vm.datosConsulta.sos == "1" ? _c("div", {
+  }, [_c("div", {
+    staticClass: "alert alert-success",
+    attrs: {
+      role: "alert"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-thumbs-up"
+  }), _vm._v(" "), _c("strong", [_vm._v("Excelente!")]), _vm._v(" "), _vm.datosConsulta.alta_psicologica == 1 && _vm.datosConsulta.alta_psiquiatrica == 1 ? _c("span", [_vm._v("Paciente con Alta Psicológica y Psiquiátrica")]) : _vm.datosConsulta.alta_psicologica == 1 ? _c("span", [_vm._v("Paciente con Alta Psicológica")]) : _vm.datosConsulta.alta_psiquiatrica == 1 ? _c("span", [_vm._v("Paciente con Alta Psiquiátrica")]) : _vm._e()])]) : _vm._e(), _vm._v(" "), _vm.datosConsulta.sos == "1" ? _c("div", {
     staticClass: "my-3"
-  }, [_vm._m(5)]) : _vm._e(), _vm._v(" "), _c("div", {
+  }, [_vm._m(4)]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "row mt-3"
   }, [_c("div", {
     staticClass: "col-md-6"
@@ -3492,7 +3534,7 @@ var render = function render() {
     staticClass: "card shadow mb-4"
   }, [_c("div", {
     staticClass: "card-header bg-primary py-3 d-flex flex-row align-items-center justify-content-between"
-  }, [_vm._m(6), _vm._v(" "), _c("button", {
+  }, [_vm._m(5), _vm._v(" "), _c("button", {
     staticClass: "btn btn-sm btn-outline-light",
     attrs: {
       "data-bs-toggle": "modal",
@@ -3511,7 +3553,7 @@ var render = function render() {
     staticClass: "historia-info"
   }, [_c("p", {
     staticClass: "text-capitalize"
-  }, [_c("b", [_vm._v("Nombre:")]), _vm._v(" " + _vm._s(_vm.datosConsulta ? _vm.lowerCase(_vm.datosConsulta.name) + " " + _vm.lowerCase(_vm.datosConsulta.nombres) : "..."))]), _vm._v(" "), _c("p", [_c("b", [_vm._v("DNI:")]), _vm._v(" " + _vm._s(_vm.datosConsulta ? _vm.datosConsulta.dni : "..."))]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Número de celular:")]), _vm._v(" " + _vm._s(_vm.datosConsulta.phone ? _vm.datosConsulta.phone : "..."))]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Correo electrónico:")]), _vm._v(" " + _vm._s(_vm.datosConsulta.email ? _vm.datosConsulta.email : "..."))]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Ocupación:")]), _vm._v(" " + _vm._s(_vm.datosConsulta ? _vm.datosConsulta.occupation : "..."))]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Grado de instrucción:")]), _vm._v(" "), _vm.datosConsulta.instruction_degree == 1 ? _c("span", [_vm._v("Inicial")]) : _vm.datosConsulta.instruction_degree == 2 ? _c("span", [_vm._v("Primaria")]) : _vm.datosConsulta.instruction_degree == 3 ? _c("span", [_vm._v("Secundaria")]) : _vm.datosConsulta.instruction_degree == 4 ? _c("span", [_vm._v("Superior")]) : _vm.datosConsulta.instruction_degree == 5 ? _c("span", [_vm._v("Técnico")]) : _vm.datosConsulta.instruction_degree == 6 ? _c("span", [_vm._v("Sin Instrucción")]) : _vm._e()]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Fecha de cumpleaños:")]), _vm._v(" " + _vm._s(_vm.datosConsulta ? _vm.fechaLatam(_vm.datosConsulta.birth_date) : "...") + " (" + _vm._s(_vm.datosConsulta ? _vm.calculateAge(_vm.datosConsulta.birth_date) + " años" : "...") + ")")]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Estado civil:")]), _vm._v(" "), _vm.datosConsulta.marital_status == 1 ? _c("span", [_vm._v("Soltero")]) : _vm.datosConsulta.marital_status == 2 ? _c("span", [_vm._v("Casado")]) : _vm.datosConsulta.marital_status == 3 ? _c("span", [_vm._v("Viudo")]) : _vm.datosConsulta.marital_status == 4 ? _c("span", [_vm._v("Divorciado")]) : _vm.datosConsulta.marital_status == 5 ? _c("span", [_vm._v("Conviviente")]) : _vm._e()]), _vm._v(" "), _c("hr"), _vm._v(" "), _vm.datosConsulta.triajes.length > 0 ? _c("div", [_vm._m(7), _vm._v(" "), _c("div", {
+  }, [_c("b", [_vm._v("Nombre:")]), _vm._v(" " + _vm._s(_vm.datosConsulta ? _vm.lowerCase(_vm.datosConsulta.name) + " " + _vm.lowerCase(_vm.datosConsulta.nombres) : "..."))]), _vm._v(" "), _c("p", [_c("b", [_vm._v("DNI:")]), _vm._v(" " + _vm._s(_vm.datosConsulta ? _vm.datosConsulta.dni : "..."))]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Número de celular:")]), _vm._v(" " + _vm._s(_vm.datosConsulta.phone ? _vm.datosConsulta.phone : "..."))]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Correo electrónico:")]), _vm._v(" " + _vm._s(_vm.datosConsulta.email ? _vm.datosConsulta.email : "..."))]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Ocupación:")]), _vm._v(" " + _vm._s(_vm.datosConsulta ? _vm.datosConsulta.occupation : "..."))]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Grado de instrucción:")]), _vm._v(" "), _vm.datosConsulta.instruction_degree == 1 ? _c("span", [_vm._v("Inicial")]) : _vm.datosConsulta.instruction_degree == 2 ? _c("span", [_vm._v("Primaria")]) : _vm.datosConsulta.instruction_degree == 3 ? _c("span", [_vm._v("Secundaria")]) : _vm.datosConsulta.instruction_degree == 4 ? _c("span", [_vm._v("Superior")]) : _vm.datosConsulta.instruction_degree == 5 ? _c("span", [_vm._v("Técnico")]) : _vm.datosConsulta.instruction_degree == 6 ? _c("span", [_vm._v("Sin Instrucción")]) : _vm._e()]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Fecha de cumpleaños:")]), _vm._v(" " + _vm._s(_vm.datosConsulta ? _vm.fechaLatam(_vm.datosConsulta.birth_date) : "...") + " (" + _vm._s(_vm.datosConsulta ? _vm.calculateAge(_vm.datosConsulta.birth_date) + " años" : "...") + ")")]), _vm._v(" "), _c("p", [_c("b", [_vm._v("Estado civil:")]), _vm._v(" "), _vm.datosConsulta.marital_status == 1 ? _c("span", [_vm._v("Soltero")]) : _vm.datosConsulta.marital_status == 2 ? _c("span", [_vm._v("Casado")]) : _vm.datosConsulta.marital_status == 3 ? _c("span", [_vm._v("Viudo")]) : _vm.datosConsulta.marital_status == 4 ? _c("span", [_vm._v("Divorciado")]) : _vm.datosConsulta.marital_status == 5 ? _c("span", [_vm._v("Conviviente")]) : _vm._e()]), _vm._v(" "), _c("hr"), _vm._v(" "), _vm.datosConsulta.triajes.length > 0 ? _c("div", [_vm._m(6), _vm._v(" "), _c("div", {
     staticClass: "row row-cols-4"
   }, [_c("div", {
     staticClass: "col"
@@ -3523,17 +3565,17 @@ var render = function render() {
     staticClass: "col"
   }, [_c("p", [_c("strong", [_vm._v("T:")]), _vm._v(" " + _vm._s(_vm.datosConsulta.triajes[0].t))])])]), _vm._v(" "), _c("p", [_c("strong", [_vm._v("Fecha de Triaje:")]), _vm._v(" "), _c("span", [_vm._v(_vm._s(_vm.fechaLatam(_vm.datosConsulta.triajes[0].fecha)))])]), _vm._v(" "), _c("p", [_c("strong", [_vm._v("Motivo:")]), _vm._v(" "), _c("span", [_vm._v(_vm._s(_vm.datosConsulta.triajes[0].motivo))])]), _vm._v(" "), _c("p", [_c("strong", [_vm._v("Sintomatologia:")]), _vm._v(" "), _c("span", [_vm._v(_vm._s(_vm.datosConsulta.triajes[0].sintomatologia))])]), _vm._v(" "), _c("p", [_c("strong", [_vm._v("Antecedentes:")]), _vm._v(" "), _c("span", [_vm._v(_vm._s(_vm.datosConsulta.triajes[0].antecedentes))])]), _vm._v(" "), _c("p", [_c("strong", [_vm._v("Pruebas aplicadas")]), _vm._v(": "), _c("span", [_vm._v(_vm._s(_vm.datosConsulta.triajes[0].pruebas))])])]) : _c("div", [_c("p", [_vm._v("No existen datos de triaje")])])])])]), _vm._v(" "), _c("div", {
     staticClass: "card shadow mb-4"
-  }, [_vm._m(8), _vm._v(" "), _c("div", {
+  }, [_vm._m(7), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("ul", [_vm._l(_vm.comentarios, function (comentario) {
     return _c("li", [_c("i", {
       staticClass: "fa-regular fa-comment"
     }), _vm._v(" " + _vm._s(comentario.nombre) + ": " + _vm._s(comentario.comment))]);
-  }), _vm._v(" "), _vm.comentarios.length == 0 ? _c("li", [_vm._v("No hay recomendaciones previas")]) : _vm._e()], 2)])]), _vm._v(" "), _vm._m(9)]), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm.comentarios.length == 0 ? _c("li", [_vm._v("No hay recomendaciones previas")]) : _vm._e()], 2)])]), _vm._v(" "), _vm._m(8)]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "card shadow mb-4"
-  }, [_vm._m(10), _vm._v(" "), _c("div", {
+  }, [_vm._m(9), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("div", {
     staticClass: "historia-info"
@@ -3546,7 +3588,7 @@ var render = function render() {
     attrs: {
       id: "cardPerfil"
     }
-  }, [_vm._m(11), _vm._v(" "), _c("div", {
+  }, [_vm._m(10), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_vm.datosPaciente.semaforo.length > 0 ? _c("p", [_vm._v("Perfil del paciente: \n\t\t\t\t\t\t\t"), _c("a", {
     staticClass: "text-capitalize",
@@ -3620,7 +3662,7 @@ var render = function render() {
     staticClass: "row row-cols-md-2"
   }, [_c("div", {
     staticClass: "col"
-  }, [_c("div", {}, [_vm._m(12), _vm._v(" "), !_vm.inicialInputPsiquiatria.general_antecedent ? _c("p", {
+  }, [_c("div", {}, [_vm._m(11), _vm._v(" "), !_vm.inicialInputPsiquiatria.general_antecedent ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "general_antecedent",
@@ -3656,7 +3698,7 @@ var render = function render() {
         _vm.$set(_vm.inicialPsiquiatria, "general_antecedent", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(13), _vm._v(" "), !_vm.inicialInputPsiquiatria.main_signs_symptoms ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(12), _vm._v(" "), !_vm.inicialInputPsiquiatria.main_signs_symptoms ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "main_signs_symptoms",
@@ -3692,7 +3734,7 @@ var render = function render() {
         _vm.$set(_vm.inicialPsiquiatria, "main_signs_symptoms", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(14), _vm._v(" "), !_vm.inicialInputPsiquiatria.illness ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(13), _vm._v(" "), !_vm.inicialInputPsiquiatria.illness ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "psiquiatria_Illness",
@@ -3728,7 +3770,7 @@ var render = function render() {
         _vm.$set(_vm.inicialPsiquiatria, "illness", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(15), _vm._v(" "), !_vm.inicialInputPsiquiatria.apc ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(14), _vm._v(" "), !_vm.inicialInputPsiquiatria.apc ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "apc",
@@ -3764,7 +3806,7 @@ var render = function render() {
         _vm.$set(_vm.inicialPsiquiatria, "apc", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(16), _vm._v(" "), !_vm.inicialInputPsiquiatria.languaje ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(15), _vm._v(" "), !_vm.inicialInputPsiquiatria.languaje ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "languaje",
@@ -3800,7 +3842,7 @@ var render = function render() {
         _vm.$set(_vm.inicialPsiquiatria, "languaje", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(17), _vm._v(" "), !_vm.inicialInputPsiquiatria.thought ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(16), _vm._v(" "), !_vm.inicialInputPsiquiatria.thought ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "thought",
@@ -3836,7 +3878,7 @@ var render = function render() {
         _vm.$set(_vm.inicialPsiquiatria, "thought", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(18), _vm._v(" "), !_vm.inicialInputPsiquiatria.affect ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(17), _vm._v(" "), !_vm.inicialInputPsiquiatria.affect ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "affect",
@@ -3874,7 +3916,7 @@ var render = function render() {
     }
   })])])]), _vm._v(" "), _c("div", {
     staticClass: "col"
-  }, [_c("div", [_vm._m(19), _vm._v(" "), !_vm.inicialInputPsiquiatria.percetion ? _c("p", {
+  }, [_c("div", [_vm._m(18), _vm._v(" "), !_vm.inicialInputPsiquiatria.percetion ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "percetion",
@@ -3910,7 +3952,7 @@ var render = function render() {
         _vm.$set(_vm.inicialPsiquiatria, "percetion", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(20), _vm._v(" "), !_vm.inicialInputPsiquiatria.superior_function ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(19), _vm._v(" "), !_vm.inicialInputPsiquiatria.superior_function ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "superior_function",
@@ -3946,7 +3988,7 @@ var render = function render() {
         _vm.$set(_vm.inicialPsiquiatria, "superior_function", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(21), _vm._v(" "), !_vm.inicialInputPsiquiatria.abstraction ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(20), _vm._v(" "), !_vm.inicialInputPsiquiatria.abstraction ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "abstraction",
@@ -3982,7 +4024,7 @@ var render = function render() {
         _vm.$set(_vm.inicialPsiquiatria, "abstraction", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(22), _vm._v(" "), !_vm.inicialInputPsiquiatria.conscience ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(21), _vm._v(" "), !_vm.inicialInputPsiquiatria.conscience ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "conscience",
@@ -4018,7 +4060,7 @@ var render = function render() {
         _vm.$set(_vm.inicialPsiquiatria, "conscience", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(23), _vm._v(" "), !_vm.inicialInputPsiquiatria.insight ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(22), _vm._v(" "), !_vm.inicialInputPsiquiatria.insight ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "insight",
@@ -4054,7 +4096,7 @@ var render = function render() {
         _vm.$set(_vm.inicialPsiquiatria, "insight", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(24), _vm._v(" "), !_vm.inicialInputPsiquiatria.diagnostic_problems ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(23), _vm._v(" "), !_vm.inicialInputPsiquiatria.diagnostic_problems ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "diagnostic_problems",
@@ -4090,7 +4132,7 @@ var render = function render() {
         _vm.$set(_vm.inicialPsiquiatria, "diagnostic_problems", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(25), _vm._v(" "), _c("div", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(24), _vm._v(" "), _c("div", {
     staticClass: "form-group position-relative diagnostico-input",
     staticStyle: {
       "min-height": "100px"
@@ -4167,7 +4209,7 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fas fa-times"
     })])]) : _vm._e();
-  }), 0)])]), _vm._v(" "), _c("div", [_vm._m(26), _vm._v(" "), !_vm.inicialInputPsiquiatria.plan ? _c("p", {
+  }), 0)])]), _vm._v(" "), _c("div", [_vm._m(25), _vm._v(" "), !_vm.inicialInputPsiquiatria.plan ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "psiquiatria_plan",
@@ -4241,7 +4283,7 @@ var render = function render() {
     staticClass: "row row-cols-md-2"
   }, [_c("div", {
     staticClass: "col"
-  }, [_c("div", [_vm._m(27), _vm._v(" "), !_vm.inicialInputPsychological.illness ? _c("p", {
+  }, [_c("div", [_vm._m(26), _vm._v(" "), !_vm.inicialInputPsychological.illness ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "Psicologia_illness",
@@ -4277,7 +4319,7 @@ var render = function render() {
         _vm.$set(_vm.initialPsychological, "illness", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(28), _vm._v(" "), !_vm.inicialInputPsychological.antecedent ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(27), _vm._v(" "), !_vm.inicialInputPsychological.antecedent ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "antecedent",
@@ -4313,7 +4355,7 @@ var render = function render() {
         _vm.$set(_vm.initialPsychological, "antecedent", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(29), _vm._v(" "), !_vm.inicialInputPsychological.dynamic ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(28), _vm._v(" "), !_vm.inicialInputPsychological.dynamic ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "dynamic",
@@ -4351,7 +4393,7 @@ var render = function render() {
     }
   })])])]), _vm._v(" "), _c("div", {
     staticClass: "col"
-  }, [_c("div", [_vm._m(30), _vm._v(" "), !_vm.inicialInputPsychological.attitude ? _c("p", {
+  }, [_c("div", [_vm._m(29), _vm._v(" "), !_vm.inicialInputPsychological.attitude ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "attitude",
@@ -4387,7 +4429,7 @@ var render = function render() {
         _vm.$set(_vm.initialPsychological, "attitude", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(31), _vm._v(" "), !_vm.inicialInputPsychological.dx ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(30), _vm._v(" "), !_vm.inicialInputPsychological.dx ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "dx",
@@ -4423,7 +4465,7 @@ var render = function render() {
         _vm.$set(_vm.initialPsychological, "dx", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", [_vm._m(32), _vm._v(" "), !_vm.inicialInputPsychological.plan ? _c("p", {
+  })])]), _vm._v(" "), _c("div", [_vm._m(31), _vm._v(" "), !_vm.inicialInputPsychological.plan ? _c("p", {
     staticClass: "collapse__paragraph",
     attrs: {
       id: "Psicologia_plan",
@@ -4459,7 +4501,7 @@ var render = function render() {
         _vm.$set(_vm.initialPsychological, "plan", $event.target.value);
       }
     }
-  })])])])])])])])])]), _vm._v(" "), _vm._m(33), _vm._v(" "), _c("div", {
+  })])])])])])])])])]), _vm._v(" "), _vm._m(32), _vm._v(" "), _c("div", {
     staticClass: "tab-content mb-5",
     attrs: {
       id: "myTabContent"
@@ -4576,7 +4618,7 @@ var render = function render() {
       "aria-labelledby": "linea-tab",
       tabindex: "0"
     }
-  }, [_vm._m(34), _vm._v(" "), _c("lineaTiempo", {
+  }, [_vm._m(33), _vm._v(" "), _c("lineaTiempo", {
     attrs: {
       id: _vm.$route.params.idPaciente
     }
@@ -4605,7 +4647,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-lg"
   }, [_c("div", {
     staticClass: "modal-content"
-  }, [_vm._m(35), _vm._v(" "), _c("keep-alive", [this.datosExamPaciente.id ? _c(_vm.component, {
+  }, [_vm._m(34), _vm._v(" "), _c("keep-alive", [this.datosExamPaciente.id ? _c(_vm.component, {
     tag: "component",
     attrs: {
       dataPatient: _vm.datosExamPaciente,
@@ -4629,11 +4671,11 @@ var render = function render() {
     staticClass: "modal-dialog modal-lg"
   }, [_c("div", {
     staticClass: "modal-content"
-  }, [_vm._m(36), _vm._v(" "), _c("div", {
+  }, [_vm._m(35), _vm._v(" "), _c("div", {
     staticClass: "modal-body"
   }, [_c("table", {
     staticClass: "table table-striped"
-  }, [_vm._m(37), _vm._v(" "), _c("tbody", _vm._l(_vm.datosConsulta.prescriptions, function (prescription, index) {
+  }, [_vm._m(36), _vm._v(" "), _c("tbody", _vm._l(_vm.datosConsulta.prescriptions, function (prescription, index) {
     return _vm.datosConsulta ? _c("tr", {
       key: index
     }, [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(prescription ? prescription.attention_date : "..."))]), _vm._v(" "), _c("td", [prescription ? _c("a", {
@@ -4773,17 +4815,6 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fa-solid fa-vial"
   }), _vm._v(" Ver recetas\n\t\t\t\t\t\t")]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "alert alert-success",
-    attrs: {
-      role: "alert"
-    }
-  }, [_c("i", {
-    staticClass: "fa-solid fa-thumbs-up"
-  }), _vm._v(" "), _c("strong", [_vm._v("Excelente!")]), _vm._v(" Paciente dado de alta\n\t\t\t")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -6210,8 +6241,7 @@ var render = function render() {
   }, [_c("button", {
     staticClass: "btn btn-outline-primary",
     attrs: {
-      type: "button",
-      "data-bs-dismiss": "modal"
+      type: "button"
     },
     on: {
       click: function click($event) {

@@ -670,13 +670,15 @@ var render = function render() {
   }, _vm._l(_vm.appointments, function (appointment, index) {
     return _c("tr", {
       key: index
-    }, [_c("th", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("th", [_vm._v(_vm._s(appointment.id))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(appointment.patient.name) + "  " + _vm._s(appointment.patient.nombres))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.fechaLatam(appointment.date)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(appointment.precio.descripcion) + " ")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(appointment.payment ? "S/ ".concat(appointment.payment.price) : "Sin pago"))]), _vm._v(" "), _c("td", [appointment.payment.pay_status == 1 ? _c("span", {
+    }, [_c("th", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("th", [_vm._v(_vm._s(appointment.id))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(appointment.patient.name) + "  " + _vm._s(appointment.patient.nombres))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.fechaLatam(appointment.date)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(appointment.precio.descripcion) + " ")]), _vm._v(" "), _c("td", [_vm._v(_vm._s(appointment.payment ? "S/ ".concat(appointment.payment.price) : "Sin pago"))]), _vm._v(" "), _c("td", [appointment.payment ? [appointment.payment.pay_status == 1 ? _c("span", {
       staticClass: "text-muted"
     }, [_vm._v("Pendiente")]) : appointment.payment.pay_status == 2 ? _c("span", {
       staticClass: "text-success"
     }, [_vm._v("Pagado")]) : appointment.payment.pay_status == 3 ? _c("span", {
       staticClass: "text-danger"
-    }, [_vm._v("Anulado")]) : _vm._e()]), _vm._v(" "), _c("td", [appointment.status == 1 ? _c("span", {
+    }, [_vm._v("Anulado")]) : _vm._e()] : _c("span", {
+      staticClass: "text-muted"
+    }, [_vm._v("Sin registro")])], 2), _vm._v(" "), _c("td", [appointment.status == 1 ? _c("span", {
       staticClass: "text-danger"
     }, [_vm._v("Sin asistir")]) : _vm._e(), _vm._v(" "), appointment.status == 2 ? _c("span", {
       staticClass: "text-sucess"

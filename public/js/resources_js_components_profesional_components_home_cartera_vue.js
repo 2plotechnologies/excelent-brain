@@ -76,6 +76,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         _this2.citasResumidas = res.data.resumidas;
         _this2.citasCompletas = res.data.completas;
         _this2.citasResumidas.forEach(function (cita, index) {
+          var _cita$patient, _cita$patient2, _cita$patient3, _cita$patient4;
           cita.visitas = Object.values(_this2.citasCompletas).filter(function (item) {
             return item.patient_id === cita.patient_id;
           }).length;
@@ -92,7 +93,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             return item.patient_id === cita.patient_id && item.status == 4;
           }).length;
           cita.fatas = cita.patient.faults;
-          if (cita.patient.discharge == 1) cita.actual = 'De Alta';else {
+          if (((_cita$patient = cita.patient) === null || _cita$patient === void 0 ? void 0 : _cita$patient.alta_psicologica) == 1 && ((_cita$patient2 = cita.patient) === null || _cita$patient2 === void 0 ? void 0 : _cita$patient2.alta_psiquiatrica) == 1) cita.actual = 'Alta Psicológica y Psiquiátrica';else if (((_cita$patient3 = cita.patient) === null || _cita$patient3 === void 0 ? void 0 : _cita$patient3.alta_psicologica) == 1) cita.actual = 'Alta Psicológica';else if (((_cita$patient4 = cita.patient) === null || _cita$patient4 === void 0 ? void 0 : _cita$patient4.alta_psiquiatrica) == 1) cita.actual = 'Alta Psiquiátrica';else {
             condicion = Object.values(_this2.citasCompletas).filter(function (item) {
               return item.patient_id === cita.patient_id && item.patient_condition == 2;
             }).length;

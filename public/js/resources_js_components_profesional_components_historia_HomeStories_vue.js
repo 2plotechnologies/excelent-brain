@@ -1011,9 +1011,13 @@ var render = function render() {
       staticClass: "text-capitalize"
     }, [_vm._v("Paciente: "), _c("span", {
       staticClass: "fst-italic"
-    }, [_vm._v(_vm._s(historia.name ? _vm.lowerCase(historia.name) + ", " + _vm.lowerCase(historia.nombres) : "..."))])]), _vm._v(" "), historia.discharge == 1 ? _c("p", {
-      staticClass: "text-success"
-    }, [_vm._v("Paciente dado de alta")]) : _vm._e(), _vm._v(" "), !historia.initial_psychological_history && _vm.dataUser.profession === "Psicólogo" ? _c("p", {
+    }, [_vm._v(_vm._s(historia.name ? _vm.lowerCase(historia.name) + ", " + _vm.lowerCase(historia.nombres) : "..."))])]), _vm._v(" "), historia.alta_psicologica == 1 && historia.alta_psiquiatrica == 1 ? _c("p", {
+      staticClass: "text-success fw-bold"
+    }, [_vm._v("Paciente con Alta Psicológica y Psiquiátrica")]) : historia.alta_psicologica == 1 ? _c("p", {
+      staticClass: "text-info fw-bold"
+    }, [_vm._v("Paciente con Alta Psicológica")]) : historia.alta_psiquiatrica == 1 ? _c("p", {
+      staticClass: "text-success fw-bold"
+    }, [_vm._v("Paciente con Alta Psiquiátrica")]) : _vm._e(), _vm._v(" "), !historia.initial_psychological_history && _vm.dataUser.profession === "Psicólogo" ? _c("p", {
       staticClass: "text-danger"
     }, [_vm._v("\n\t\t\t\t\t\t\t\tSin historia inicial de psicología\n\t\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), !historia.initial_psychiatric_history && _vm.dataUser.profession === "Psiquiatra" ? _c("p", {
       staticClass: "text-danger"

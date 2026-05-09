@@ -1,6 +1,6 @@
 <template>
-	<div class="modal fade" id="modalTiemposEspera" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered">
+	<div class="modal fade" id="modalTiemposEspera" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
         <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between">
           <div class="d-flex align-items-center">
@@ -10,7 +10,7 @@
             <div>
               <h5 class="modal-title font-weight-bold text-dark mb-1">Tiempos de Espera</h5>
               <div class="d-flex gap-2 mt-1">
-                <span class="badge-status status-badge-info" v-if="cita">
+                <span class="badge-status status-badge-info" v-if="cita && cita.id">
                   <i class="fas fa-calendar-check mr-1"></i> Asignación de Horarios
                 </span>
               </div>
@@ -21,7 +21,8 @@
           </button>
         </div>
 
-				<div class="modal-body px-4 pt-4" v-if="cita">
+				<div class="modal-body px-4 pt-4">
+          <div v-if="cita && cita.id">
 					<p class="text-muted small mb-4">Seleccione una opción para registrar la hora actual en el sistema.</p>
           
           <div class="time-control-container p-3 mb-4">
@@ -63,7 +64,7 @@
               </div>
             </div>
           </div>
-
+          </div>
 				</div>
 			</div>
 		</div>

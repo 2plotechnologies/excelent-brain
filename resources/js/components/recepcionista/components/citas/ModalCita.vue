@@ -543,11 +543,13 @@ export default {
             timer: 10,
           })
 
-          if(res.data.patient.faults != 0){
-            this.$swal.fire({
-            title: 'Atención, este paciente tiene '+ res.data.patient.faults + ' faltas'
-            })
-          }
+         if (res.data.patient.alta_psicologica == 1 && res.data.patient.alta_psiquiatrica == 1) {
+						this.$swal.fire({ title: 'Atención', text: 'Este paciente cuenta con Alta Psicológica y Alta Psiquiátrica.', icon: 'warning' })
+					} else if (res.data.patient.alta_psicologica == 1) {
+						this.$swal.fire({ title: 'Atención', text: 'Este paciente cuenta con Alta Psicológica.', icon: 'warning' })
+					} else if (res.data.patient.alta_psiquiatrica == 1) {
+						this.$swal.fire({ title: 'Atención', text: 'Este paciente cuenta con Alta Psiquiátrica.', icon: 'warning' })
+					}
 
           this.cita.name = res.data.patient.name;
           this.cita.phone = res.data.patient.phone;

@@ -169,9 +169,28 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           precio: 0
         }).then(function (response) {
           console.log(response.data);
-          _this.idProfesional = -1;
-          _this.cita.idHora = '';
-          if (response.data.mensaje) alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('Reservado con éxito', 'success', 10);else alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('Hubo un error guardando la reserva', 'danger', 10);
+          if (response.data.error) {
+            alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify(response.data.error, 'danger', 10);
+            return;
+          }
+          if (response.data.mensaje) {
+            _this.idProfesional = -1;
+            _this.cita.idHora = '';
+            if (response.data.mensaje) alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('Reservado con éxito', 'success', 10);
+            alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('Reservado con éxito', 'success', 10);
+            _this.limpiarFormulario();
+            _this.$emit('citaCreada');
+            document.querySelector('#modalProximaCita .btn-close').click();
+          } else {
+            alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('Hubo un error guardando la reserva', 'danger', 10);
+          }
+        })["catch"](function (error) {
+          if (error.response && error.response.status === 409) {
+            alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify(error.response.data.error || 'El horario ya fue reservado', 'danger', 10);
+          } else {
+            alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('Hubo un error guardando la reserva', 'danger', 10);
+            console.error(error);
+          }
         });
       }
     },
@@ -3601,8 +3620,7 @@ var render = function render() {
   }, [_c("button", {
     staticClass: "btn btn-outline-primary",
     attrs: {
-      type: "button",
-      "data-bs-dismiss": "modal"
+      type: "button"
     },
     on: {
       click: function click($event) {
@@ -4201,11 +4219,11 @@ var render = function render() {
     on: {
       actualizar: _vm.getPatients
     }
-  }), _vm._v(" "), _vm.data ? _c("modal-recetas", {
+  }), _vm._v(" "), _c("modal-recetas", {
     attrs: {
-      dataPatient: _vm.data
+      dataPatient: _vm.data || {}
     }
-  }) : _vm._e(), _vm._v(" "), _vm.data ? _c("modal-faltas", {
+  }), _vm._v(" "), _vm.data ? _c("modal-faltas", {
     attrs: {
       dataPatient: _vm.data
     }
@@ -8709,6 +8727,11 @@ var render = function render() {
       idMembresia: _vm.idMembresia,
       idServicio: _vm.idServicio,
       membresia: _vm.membresiaActiva
+    },
+    on: {
+      citaCreada: function citaCreada($event) {
+        return _vm.pedirCitasMembresia(_vm.membresiaActiva);
+      }
     }
   }), _vm._v(" "), _c("ModalPaqueteria", {
     attrs: {

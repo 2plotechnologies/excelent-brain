@@ -237,8 +237,8 @@
       <reprog-modal ref="reprogModal" v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="actualizarListadoCitas"></reprog-modal>
       <info-modal v-if="cita && cita.id" :dataCit="cita" :precios="precios"></info-modal>
       <ModalIntercambio :posibles="posibles" :primero="primero" @actualizar="actualizarListadoCitas"></ModalIntercambio>
-      <modalVerRecetas :prescriptions="recetas"></modalVerRecetas>
-      <modalTiemposEspera :cita="citaTemp" @actualizar="actualizarListadoCitas"></modalTiemposEspera>
+      <modalVerRecetas v-if="cita && cita.id" :prescriptions="recetas"></modalVerRecetas>
+      <modalTiemposEspera v-if="cita && cita.id" :cita="cita" @actualizar="actualizarListadoCitas"></modalTiemposEspera>
       <modal-estado v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @actualizar="actualizarListadoCitas"></modal-estado>
       <pago-modal v-if="cita && cita.id" :cita="cita" :idUsuario="idUsuario" :idSede="idSede" @actualizarAdelanto="actualizarAdelanto" @actualizar="actualizarListadoCitas"></pago-modal>
       <modal-patient v-if="cita && cita.id" :dataCit="cita"></modal-patient>
