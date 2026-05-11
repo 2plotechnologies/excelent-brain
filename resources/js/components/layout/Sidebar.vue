@@ -61,6 +61,12 @@
 									<span>Notas de Crédito</span>
 							</router-link>
 						</li>
+						<li class="nav-item nav__list" @click="activeSidebar()">
+							<router-link  to="/administrador/horas-trabajadas" class="nav-link">
+								<i class="fas fa-clock"></i>
+									<span>Horas Trabajadas</span>
+							</router-link>
+						</li>
 						<!-- Nav Item - Dashboard -->
 						<li class="nav-item nav__list" @click="activeSidebar()">
 								<router-link to="/administrador/reportes/total" class="nav-link">

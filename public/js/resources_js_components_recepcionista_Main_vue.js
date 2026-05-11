@@ -464,6 +464,20 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "nav-link",
     attrs: {
+      to: "/administrador/horas-trabajadas"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-clock"
+  }), _vm._v(" "), _c("span", [_vm._v("Horas Trabajadas")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "nav-item nav__list",
+    on: {
+      click: function click($event) {
+        return _vm.activeSidebar();
+      }
+    }
+  }, [_c("router-link", {
+    staticClass: "nav-link",
+    attrs: {
       to: "/administrador/reportes/total"
     }
   }, [_c("i", {

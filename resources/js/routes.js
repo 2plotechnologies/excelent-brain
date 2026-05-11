@@ -20,6 +20,7 @@ const HomePaquetes = () => import('./components/administrador/views/HomePaquetes
 const NotasCredito = () => import('./components/administrador/views/NotasCredito.vue')
 const editarPacientesAdmin = () => import('./components/administrador/views/EditarPacientesAdmin.vue')
 const RecepcionistaReportesGerenciales = () => import('./components/administrador/views/reportes/ReportesGerenciales');
+const HomeHorasTrabajadas = () => import('./components/administrador/views/HomeHorasTrabajadas.vue');
 
 const HomeAdministradorRouterReportes = () => import('./components/administrador/views/reportes/HomeRouterReportes.vue');
 const HomeAdministradorReportes = () => import('./components/administrador/views/reportes/HomeReportes.vue');
@@ -429,6 +430,11 @@ export const routes = [
         path: '/administrador/editar/pacientes',
         name: 'editarPacientesAdmin',
         component: editarPacientesAdmin
+      },
+      {
+        path: '/administrador/horas-trabajadas',
+        name: 'horasTrabajadas',
+        component: HomeHorasTrabajadas
       },
 
       {

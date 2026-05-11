@@ -33,6 +33,7 @@ use App\Http\Controllers\ChatRecepcionController;
 use App\Http\Controllers\SeguimientoCRMController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\QuestionnaireController;
+use App\Http\Controllers\HorasTrabajadasController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -220,6 +221,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('listarPreciosTodos', [ExtrasController::class, 'listarPreciosTodos']);
         Route::post('reportsJimmy', [SimpleController::class, 'reportsJimmy']);
         Route::get('seguimiento-crm', [ExtrasController::class, 'seguimientoCrm']);
+        
+        // Horas Trabajadas y Bloqueos
+        Route::get('reporte-horas-trabajadas', [HorasTrabajadasController::class, 'getReporte']);
+        Route::post('bloquear-horarios', [HorasTrabajadasController::class, 'bloquearHorario']);
+        Route::delete('desbloquear-horario/{id}', [HorasTrabajadasController::class, 'desbloquearHorario']);
     });
 
     // ── REPORTS (incluyendo profesional) ──────────────────────────────────────────────────
