@@ -530,10 +530,12 @@ var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c("main", [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "mb-3 d-flex gap-2 flex-wrap"
+    staticClass: "mb-4 nav-pills-custom"
   }, [_c("button", {
-    staticClass: "btn",
-    "class": _vm.tabActiva === "fidelizacion" ? "btn-primary" : "btn-outline-secondary",
+    staticClass: "nav-link-custom",
+    "class": {
+      active: _vm.tabActiva === "fidelizacion"
+    },
     attrs: {
       type: "button"
     },
@@ -543,10 +545,12 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "fa-regular fa-heart me-1"
+    staticClass: "fa-regular fa-heart"
   }), _vm._v(" Fidelización\n    ")]), _vm._v(" "), _c("button", {
-    staticClass: "btn",
-    "class": _vm.tabActiva === "recuperacion" ? "btn-primary" : "btn-outline-secondary",
+    staticClass: "nav-link-custom",
+    "class": {
+      active: _vm.tabActiva === "recuperacion"
+    },
     attrs: {
       type: "button"
     },
@@ -556,10 +560,12 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "fa-solid fa-triangle-exclamation me-1"
+    staticClass: "fa-solid fa-triangle-exclamation"
   }), _vm._v(" Recuperación\n    ")]), _vm._v(" "), _c("button", {
-    staticClass: "btn",
-    "class": _vm.tabActiva === "crmSeguimiento" ? "btn-primary" : "btn-outline-secondary",
+    staticClass: "nav-link-custom",
+    "class": {
+      active: _vm.tabActiva === "crmSeguimiento"
+    },
     attrs: {
       type: "button"
     },
@@ -569,7 +575,7 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "fa-solid fa-bell me-1"
+    staticClass: "fa-solid fa-user-group"
   }), _vm._v(" CRM Seguimiento\n    ")])]), _vm._v(" "), _vm.tabActiva === "fidelizacion" ? _c("div", [_c("div", {
     staticClass: "row g-3 mb-3"
   }, [_c("div", {
@@ -1731,7 +1737,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.crm-table th[data-v-b4a9e972] {\r\n  font-weight: 600;\r\n  letter-spacing: 0.5px;\n}\n.crm-table td[data-v-b4a9e972] {\r\n  vertical-align: middle;\n}\n.puntero[data-v-b4a9e972] { cursor: pointer;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.nav-pills-custom[data-v-b4a9e972] {\r\n  background-color: #f1f3f5;\r\n  padding: 5px;\r\n  border-radius: 12px;\r\n  display: inline-flex;\r\n  gap: 4px;\n}\n.nav-link-custom[data-v-b4a9e972] {\r\n  border: none;\r\n  background: transparent;\r\n  padding: 10px 20px;\r\n  border-radius: 10px;\r\n  font-weight: 500;\r\n  color: #64748b;\r\n  transition: all 0.25s ease;\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 10px;\r\n  font-size: 0.95rem;\n}\n.nav-link-custom[data-v-b4a9e972]:hover {\r\n  color: #334155;\r\n  background-color: rgba(255, 255, 255, 0.5);\n}\n.nav-link-custom.active[data-v-b4a9e972] {\r\n  background-color: #ffffff !important;\r\n  color: #0f172a !important;\r\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);\n}\n.nav-link-custom i[data-v-b4a9e972] {\r\n  font-size: 1.1rem;\n}\n.crm-table th[data-v-b4a9e972] {\r\n  font-weight: 600;\r\n  letter-spacing: 0.5px;\n}\n.crm-table td[data-v-b4a9e972] {\r\n  vertical-align: middle;\n}\n.puntero[data-v-b4a9e972] { cursor: pointer;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

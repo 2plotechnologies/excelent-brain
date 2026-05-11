@@ -5,31 +5,31 @@
       <p class="text-muted mb-0">Gestión de seguimiento, fidelización y recuperación de pacientes</p>
     </div>
 
-    <div class="mb-3 d-flex gap-2 flex-wrap">
+    <div class="mb-4 nav-pills-custom">
       <button
         type="button"
-        class="btn"
-        :class="tabActiva === 'fidelizacion' ? 'btn-primary' : 'btn-outline-secondary'"
+        class="nav-link-custom"
+        :class="{ active: tabActiva === 'fidelizacion' }"
         @click="tabActiva = 'fidelizacion'"
       >
-        <i class="fa-regular fa-heart me-1"></i> Fidelización
+        <i class="fa-regular fa-heart"></i> Fidelización
       </button>
       <button
         type="button"
-        class="btn"
-        :class="tabActiva === 'recuperacion' ? 'btn-primary' : 'btn-outline-secondary'"
+        class="nav-link-custom"
+        :class="{ active: tabActiva === 'recuperacion' }"
         @click="tabActiva = 'recuperacion'"
       >
-        <i class="fa-solid fa-triangle-exclamation me-1"></i> Recuperación
+        <i class="fa-solid fa-triangle-exclamation"></i> Recuperación
       </button>
 
       <button
         type="button"
-        class="btn"
-        :class="tabActiva === 'crmSeguimiento' ? 'btn-primary' : 'btn-outline-secondary'"
+        class="nav-link-custom"
+        :class="{ active: tabActiva === 'crmSeguimiento' }"
         @click="tabActiva = 'crmSeguimiento'"
       >
-        <i class="fa-solid fa-bell me-1"></i> CRM Seguimiento
+        <i class="fa-solid fa-user-group"></i> CRM Seguimiento
       </button>
     </div>
 
@@ -933,6 +933,43 @@ export default {
 </script>
 
 <style scoped>
+.nav-pills-custom {
+  background-color: #f1f3f5;
+  padding: 5px;
+  border-radius: 12px;
+  display: inline-flex;
+  gap: 4px;
+}
+
+.nav-link-custom {
+  border: none;
+  background: transparent;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 500;
+  color: #64748b;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+}
+
+.nav-link-custom:hover {
+  color: #334155;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.nav-link-custom.active {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.nav-link-custom i {
+  font-size: 1.1rem;
+}
+
 .crm-table th {
   font-weight: 600;
   letter-spacing: 0.5px;

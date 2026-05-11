@@ -337,9 +337,12 @@
                   <div class="row">
                     <!-- ETIQUETAS DE COMPORTAMIENTO -->
                     <div class="col-md-6 mb-3 mb-md-0">
-                      <h6 class="fw-bold mb-3 text-dark">
+                      <h6 class="fw-bold mb-3 text-dark d-flex align-items-center">
                         <i class="fas fa-tags text-primary me-2"></i>
                         Etiquetas de Comportamiento
+                        <button class="btn btn-link btn-sm text-primary p-0 ms-2" data-bs-toggle="modal" data-bs-target="#modalVerEstados" @click="prepararSemaforo()">
+                          <i class="fas fa-pen"></i>
+                        </button>
                       </h6>
                       <div class="d-flex flex-wrap gap-2" v-if="paciente.semaforo_estados && paciente.semaforo_estados.length > 0">
                         <span class="badge border bg-white text-dark shadow-sm px-3 py-2" v-for="sem in paciente.semaforo_estados.slice(0, 5)" :key="sem.id">
@@ -353,13 +356,16 @@
 
                     <!-- HOBBIES -->
                     <div class="col-md-6">
-                      <h6 class="fw-bold mb-3 text-dark">
+                      <h6 class="fw-bold mb-3 text-dark d-flex align-items-center">
                         <i class="fas fa-heart text-danger me-2"></i>
                         Hobbies e Intereses
+                        <button class="btn btn-link btn-sm text-primary p-0 ms-2" data-bs-toggle="modal" data-bs-target="#modalVerHobbies" @click="prepararHobbies()">
+                          <i class="fas fa-pen"></i>
+                        </button>
                       </h6>
                       <div class="d-flex flex-wrap gap-2" v-if="getHobbies(paciente.hobbies).length > 0">
                         <span class="badge bg-info bg-opacity-10 border text-white border-info border-opacity-25 px-3 py-2" v-for="(hobbie, index) in getHobbies(paciente.hobbies)" :key="index">
-                          {{ hobbie }}
+                          {{ hobbies[hobbie] || hobbie }}
                         </span>
                       </div>
                       <div v-else>
@@ -1899,16 +1905,26 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal Ver Estados / Etiquetas -->
+    <modal-ver-estados v-if="paciente && paciente.id" :dataPatient="paciente" :estados="estados"></modal-ver-estados>
+
+    <!-- Modal Hobbies -->
+    <modal-ver-hobbies :hobbies="hobbies" :id="queId" :misHobbies="misHobbies"></modal-ver-hobbies>
   </div>
 </template>
 
 <script>
 import ModalVerAutoTriaje from '../../../acceso_publico/ModalVerAutoTriaje.vue'
+import ModalVerEstados from './ModalVerEstados.vue'
+import ModalVerHobbies from './reportes/ModalVerHobbies.vue'
 
 export default {
   name: 'DetallePaciente',
   components: {
-    ModalVerAutoTriaje
+    ModalVerAutoTriaje,
+    ModalVerEstados,
+    ModalVerHobbies
   },
   props: {
     pacienteId: {
@@ -1955,7 +1971,22 @@ export default {
       savingPlanSeguridad: false,
       filtroDocumento: 'Todos',
       nuevoDocumentoTipo: '',
-      subiendoDocumento: false
+      subiendoDocumento: false,
+      queId: null,
+      misHobbies: [],
+      hobbies: ['pintura','dibujo', 'fotografía', 'tejido', 'costura', 'joyería', 'senderismo', 'acampar', 'jardinería', 'pesca', 'ciclismo', 'deportes', 'fútbol', 'basket', 'tenis', 'ajedrez', 'juegos de mesa', 'billar', 'música', 'tocar un instrumento', 'canto', 'composición musical', 'producción musical', 'gastronomía', 'cocina', 'recetas', 'horneado', 'postres', 'manualidades', 'origami', 'modelodo en arcilla', 'creación', 'natación', 'surf', 'kayac', 'buceo', 'esquí', 'tecnología', 'programación', 'robótica', 'computación', 'edición de videos', 'diseño gráfico', 'coleccionismo', 'monedas', 'vinilos', 'baile', 'danzas', 'escritura', 'periodismo', 'poesía', 'libros', 'lectura', 'cuentos', 'idiomas', 'viajes', 'exploración de lugares', 'fitnes', 'gym', 'yoga', 'pilates', 'entrenamiento', 'meditación', 'voluntariado', 'mascotas', 'animalista', 'astronomía', 'jardinería', 'plantas', 'huertos', 'paisajes', 'cine', 'series', 'novelas'],
+      estados: [
+				{id: 1, valor: 'Neutro', detalle: 'No tiene ningún registro de actitud'},
+				{id: 2, valor: 'cumplidor', detalle: 'es un paciente exclente'},
+				{id: 3, valor: 'promotor', detalle: 'promueve actividades entre sus compañeros o la empresa'},
+				{id: 4, valor: 'wow', detalle: 'es involucrado en actividades, participativo'},
+				{id: 5, valor: 'reprogramador', detalle: 'suele aplazarcitas y actividades'},
+				{id: 6, valor: 'exigente', detalle: 'un paciente/cliente que siempre pide un trato especial'},
+				{id: 7, valor: 'deudor', detalle: 'paciente con deudas'},
+				{id: 8, valor: 'insatisfecho', detalle: 'suele quejarse de los servicios'},
+				{id: 9, valor: 'paciente de riesgo', detalle: 'paciente con amenazas o actos de violencia.'},
+				{id: 10, valor: 'problemático', detalle: 'paciente con problemas.'},
+			]
     }
   },
   computed: {
@@ -2505,6 +2536,17 @@ export default {
       } finally {
         this.subiendoDocumento = false;
       }
+    },
+    prepararSemaforo() {
+      this.queId = this.paciente.id;
+      if (!this.paciente.semaforo) {
+        // Alias semaforo_estados to semaforo if it exists, otherwise initialize empty
+        this.paciente.semaforo = this.paciente.semaforo_estados || [];
+      }
+    },
+    prepararHobbies() {
+      this.queId = this.paciente.id;
+      this.misHobbies = this.getHobbies(this.paciente.hobbies);
     }
   },
   mounted() {
