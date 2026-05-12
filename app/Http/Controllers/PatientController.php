@@ -34,6 +34,7 @@ class PatientController extends Controller
 	public function index()
 	{
 		$patient = Patient::where('activo', '=', 1)
+		->where('dni', '<>', 'BLOQUEO')
 		->with('initial_psychiatric_history', 'initial_psychological_history', 'semaforo')
 		->whereNotNull('dni')
 		->limit(50)->get();
@@ -65,6 +66,7 @@ class PatientController extends Controller
 
 		->where('a.professional_id', $id)
 		->where('activo', 1)
+		->where('dni', '<>', 'BLOQUEO')
 		->where('a.status', '<>', 3)
 		->latest('a.created_at')->take(10)
 		
@@ -88,6 +90,7 @@ class PatientController extends Controller
 		->where('patients.name', 'like', '%'. $texto.'%' )
 		->orWhere('patients.dni', $texto)
 		->where('activo', 1)
+		->where('dni', '<>', 'BLOQUEO')
 		->groupBy('patients.id')
 		->get();
 
@@ -151,13 +154,15 @@ class PatientController extends Controller
 
 	public function getPatient ()
 	{
-		$patient = Patient::with('relative', 'address', 'prescriptions')
+		$patient = Patient::where('dni', '<>', 'BLOQUEO')
+		->with('relative', 'address', 'prescriptions')
 		->get();
 
 		return response()->json($patient);
 	}
 	public function getLast10Patients (){
 		$patients = Patient::where('activo', '=', 1)
+		->where('dni', '<>', 'BLOQUEO')
 		->with('relative', 'address', 'prescriptions', 'semaforo', 'acuerdos', 'acuerdos.usuario')
 		->latest('created_at')->take(20)
 		->get();
@@ -191,8 +196,8 @@ class PatientController extends Controller
 		return response()->json($patients);
 	}
 	public function getLast10PatientsAdmin (){
-		$patients = Patient::
-		with('relative', 'address', 'prescriptions')
+		$patients = Patient::where('dni', '<>', 'BLOQUEO')
+		->with('relative', 'address', 'prescriptions')
 		->latest('created_at')->take(20)
 		->get();
 		foreach($patients as $patient){
@@ -212,8 +217,11 @@ class PatientController extends Controller
 	}
 	public function searchPatientByNameDni ($nombre){
 		$patients = Patient::where('activo', 1)
-		->where('name', 'LIKE', "%".$nombre ."%")
-		->orWhere('dni', $nombre )
+		->where('dni', '<>', 'BLOQUEO')
+		->where(function($query) use ($nombre){
+			$query->where('name', 'LIKE', "%".$nombre ."%")
+				->orWhere('dni', $nombre );
+		})
 		->with('relative', 'address', 'prescriptions', 'acuerdos', 'acuerdos.usuario')
 		->orderBy('name', 'asc')
 		->get();
@@ -247,9 +255,11 @@ class PatientController extends Controller
 		return response()->json($patients);
 	}
 	public function searchPatientByNameDniAdmin ($nombre){
-		$patients = Patient::
-		where('name', 'LIKE', "%".$nombre ."%")
-		->orWhere('dni', $nombre )
+		$patients = Patient::where('dni', '<>', 'BLOQUEO')
+		->where(function($query) use ($nombre){
+			$query->where('name', 'LIKE', "%".$nombre ."%")
+				->orWhere('dni', $nombre );
+		})
 		->with('relative', 'address', 'prescriptions')
 		->orderBy('name', 'asc')
 		->get();
@@ -529,7 +539,7 @@ class PatientController extends Controller
 	}
 
 	public function getNames(){
-		$patients = Patient::all();
+		$patients = Patient::where('dni', '<>', 'BLOQUEO')->get();
 		return $patients;
 	}
 
@@ -714,7 +724,8 @@ class PatientController extends Controller
 			$fecha = Carbon::create($buscar);
 			$mes = $fecha->month;
 			$año = $fecha->day;
-			$pacientes = Patient::whereMonth('birth_date', '=', $mes )
+			$pacientes = Patient::where('dni', '<>', 'BLOQUEO')
+			->whereMonth('birth_date', '=', $mes )
 			->whereDay('birth_date', '=', $año)
 			//->orderBy('birth_date', 'asc')
 			->orderByRaw("DAY(birth_date) ASC")

@@ -14,7 +14,7 @@ class DashboardController extends Controller
 {
     public function dashboardRecepcion(){
         //Pacientes activos count.
-        $pacientesActivos = Patient::where('activo', true)->count();
+        $pacientesActivos = Patient::where('activo', true)->where('dni', '<>', 'BLOQUEO')->count();
 
         //Citas de hoy count.
         $citasHoy = Appointment::whereDate('date', today())->count();
@@ -23,14 +23,18 @@ class DashboardController extends Controller
         $ingresosHoy = Payment::whereDate('created_at', today())->sum('price');
 
         //Alertas SOS.
-        $alertasSOS = Patient::where('sos', true)->count();
+        $alertasSOS = Patient::where('sos', true)->where('dni', '<>', 'BLOQUEO')->count();
 
         //Alertas deudas (No existe el modelo, usar sql crudo).
         //Solo deudas del mes actual.
         $alertasDeudas = DB::table('deudas')->where('estado', '1')->whereYear('fecha', today()->year)->whereMonth('fecha', today()->month)->count();
 
         //Alertas recetas proximas a vencer (7 dias).
-        $alertasRecetasCount = Prescription::whereBetween('effective_date', [today(), today()->addDays(7)])->count();
+        $alertasRecetasCount = Prescription::whereBetween('effective_date', [today(), today()->addDays(7)])
+            ->whereHas('patient', function($query){
+                $query->where('dni', '<>', 'BLOQUEO');
+            })
+            ->count();
 
         //Total Alertas.
         $totalAlertas = $alertasSOS + $alertasDeudas + $alertasRecetasCount;
@@ -39,12 +43,16 @@ class DashboardController extends Controller
         $citasHoy = Appointment::with('patient')->whereDate('date', today())->get();
 
         //Alertas activas (No existe el modelo, usar sql crudo).
-        $sos = DB::table('sos')->join('patients', 'sos.IdPaciente', '=', 'patients.id')->where('sos.activo', true)->get();
+        $sos = DB::table('sos')->join('patients', 'sos.IdPaciente', '=', 'patients.id')->where('sos.activo', true)->where('patients.dni', '<>', 'BLOQUEO')->get();
         //Solo deudas del mes actual.
-        $deudas = DB::table('deudas')->join('patients', 'deudas.patient_id', '=', 'patients.id')->where('deudas.estado', '1')->whereYear('deudas.fecha', today()->year)->whereMonth('deudas.fecha', today()->month)->get();
+        $deudas = DB::table('deudas')->join('patients', 'deudas.patient_id', '=', 'patients.id')->where('deudas.estado', '1')->where('patients.dni', '<>', 'BLOQUEO')->whereYear('deudas.fecha', today()->year)->whereMonth('deudas.fecha', today()->month)->get();
 
         //Alertas recetas proximas a vencer (7 dias).
-        $alertasRecetas = Prescription::with('patient')->whereBetween('effective_date', [today(), today()->addDays(7)])->orderBy('effective_date', 'asc')->get();
+        $alertasRecetas = Prescription::with('patient')->whereBetween('effective_date', [today(), today()->addDays(7)])
+            ->whereHas('patient', function($query){
+                $query->where('dni', '<>', 'BLOQUEO');
+            })
+            ->orderBy('effective_date', 'asc')->get();
 
 
         //Retornar los datos al dashboard en JSON.
@@ -86,10 +94,10 @@ class DashboardController extends Controller
 
     public function dashboardModuloPacientes(){
         //Pacientes activos count.
-        $pacientesActivos = Patient::where('activo', true)->count();
+        $pacientesActivos = Patient::where('activo', true)->where('dni', '<>', 'BLOQUEO')->count();
 
         //Nuevos del mes.
-        $nuevosDelMes = Patient::whereDate('created_at', '>=', now()->startOfMonth())->count();
+        $nuevosDelMes = Patient::whereDate('created_at', '>=', now()->startOfMonth())->where('dni', '<>', 'BLOQUEO')->count();
 
         //Ingresos del dia count.
         $ingresosHoy = Payment::whereDate('created_at', today())->sum('price');
@@ -101,12 +109,12 @@ class DashboardController extends Controller
         $conDeuda = DB::table('deudas')->where('estado', '1')->whereYear('fecha', today()->year)->whereMonth('fecha', today()->month)->count();
 
         //Casos SOS.
-        $casosSOS = DB::table('sos')->join('patients', 'sos.IdPaciente', '=', 'patients.id')->where('sos.activo', true)->count();
+        $casosSOS = DB::table('sos')->join('patients', 'sos.IdPaciente', '=', 'patients.id')->where('sos.activo', true)->where('patients.dni', '<>', 'BLOQUEO')->count();
 
         //Tasa de retencion.
-        $activos = Patient::where('activo', true)->count();
+        $activos = Patient::where('activo', true)->where('dni', '<>', 'BLOQUEO')->count();
         //Total de pacientes.
-        $totalPacientes = Patient::count();
+        $totalPacientes = Patient::where('dni', '<>', 'BLOQUEO')->count();
         //Tasa de retencion.
         $tasaRetencion = $activos / $totalPacientes * 100;
 

@@ -154,15 +154,17 @@ class ExtrasController extends Controller
 		if( $fecha== Carbon::now()->format('Y-m-d') ){
 			$resultados = DB::table('deudas as d')->where('d.activo', 1)
 			->join('patients as p', 'p.id', '=', 'd.patient_id' )
+			->where('p.dni', '<>', 'BLOQUEO')
 			->whereDate('d.fecha', '<=', $fecha)
 			//->where('estado', 1)
-			->whereNotIn('estado', [2,3]) //Ver la forma de disminuir la lista de hoy, porque se hará larga
+			->whereNotIn('estado', [2,3]) //Ver la forma de disminuir la lista de hoy, porque se hará larga.
 			->orderBy('estado', 'asc')
 			->orderBy('d.fecha', 'asc')
 			->select( 'd.*', 'p.*', 'd.id as idDeuda')
 			->get();
 			$cobrados = DB::table('deudas as d')->where('d.activo', 1)
 			->join('patients as p', 'p.id', '=', 'd.patient_id' )
+			->where('p.dni', '<>', 'BLOQUEO')
 			->whereDate('d.fechaActualiza', '=', $fecha)
 			->whereIn('estado', [2,3])
 			->orderBy('estado', 'asc')
@@ -172,6 +174,7 @@ class ExtrasController extends Controller
 		}else{
 			$resultados = DB::table('deudas as d')->where('d.activo', 1)
 			->join('patients as p', 'p.id', '=', 'd.patient_id' )
+			->where('p.dni', '<>', 'BLOQUEO')
 			->whereDate('d.fecha', '<=', $fecha)
 			//->where('estado', 1)
 			->whereNotIn('estado', [2,3]) //Ver la forma de disminuir la lista de hoy, porque se hará larga
@@ -181,6 +184,7 @@ class ExtrasController extends Controller
 			->get();
 			$cobrados = DB::table('deudas as d')->where('d.activo', 1)
 			->join('patients as p', 'p.id', '=', 'd.patient_id' )
+			->where('p.dni', '<>', 'BLOQUEO')
 			->whereDate('d.fechaActualiza', '=', $fecha)
 			->whereIn('estado', [2,3])
 			->orderBy('estado', 'asc')
@@ -225,30 +229,34 @@ class ExtrasController extends Controller
 				inner join patients p on p.id = ap.patient_id
 				inner join precios pre on pre.id = ap.type
 				where status not like 3 and datediff(now(), date) between 7 and 90
-				and p.discharge = 0 and 
+				and p.discharge = 0 and p.dni <> 'BLOQUEO' and 
 				date = (SELECT MAX(date) from appointments apo where apo.patient_id = ap.patient_id GROUP BY apo.patient_id )
 				group by ap.patient_id
 				order by date desc;") );
 				return response()->json($results);
 				break;
 			case '2':
-				$pacientes = Patient::where('hobbies', '<>', '[]')
+				$pacientes = Patient::where('dni', '<>', 'BLOQUEO')
+				->where('hobbies', '<>', '[]')
 				->whereNotNull('hobbies')
 				->orderBy('name', 'asc')
 				->get();
 				return response()->json($pacientes);
 				break;
 			case '3':
-				$pacientes = Patient::where('club', 1)
+				$pacientes = Patient::where('dni', '<>', 'BLOQUEO')
+				->where('club', 1)
 				->orderBy('name', 'asc')->get();
 				return response()->json($pacientes); break;
 			case '4':
-				$pacientes = Patient::where('club', 2)
+				$pacientes = Patient::where('dni', '<>', 'BLOQUEO')
+				->where('club', 2)
 				->orderBy('name', 'asc')->get();
 				return response()->json($pacientes); break;
 			case '5':
 				$resultados = DB::table('semaforo as s')
 				->join('patients as p', 'p.id', '=', 's.patient_id')
+				->where('p.dni', '<>', 'BLOQUEO')
 				->select('p.name', 's.*')
 				->orderBy('p.name', 'asc')
 				->get();
@@ -422,9 +430,11 @@ class ExtrasController extends Controller
 				return $citas;
 				break;
 			case '17':
-				$pacientes = Patient::
-				where('phone', '=', '')->orWhere('phone', '=', null)
-				->orWhere('gender', '=', null)
+				$pacientes = Patient::where('dni', '<>', 'BLOQUEO')
+				->where(function($query){
+					$query->where('phone', '=', '')->orWhere('phone', '=', null)
+					->orWhere('gender', '=', null);
+				})
 				->where('activo', 1)
 				->with('address')
 				->whereHas('address', function($query){
@@ -752,7 +762,9 @@ class ExtrasController extends Controller
 
 		}
 		if($request->get('texto')<>''){
-			$pacientes = Patient::where('name', 'like', '%'. $request->get('texto').'%')->get();
+			$pacientes = Patient::where('name', 'like', '%'. $request->get('texto').'%')
+				->where('dni', '<>', 'BLOQUEO')
+				->get();
 			$citasResumidas=[]; $citasCompletas=[];
 			foreach ($pacientes as $paciente) {
 				$cResumen = Appointment::where('patient_id', $paciente->id)

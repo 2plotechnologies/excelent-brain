@@ -92,12 +92,15 @@ class ReporteController extends Controller
     public function conteoProfesional(Request $request)
     {
         $total = DB::table('appointments')
-            ->whereBetween('date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
-            ->whereIn('status', [1,2])
+            ->join('patients', 'appointments.patient_id', '=', 'patients.id')
+            ->where('patients.dni', '<>', 'BLOQUEO')
+            ->whereBetween('appointments.date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
+            ->whereIn('appointments.status', [1,2])
             ->count();
 
         return DB::table('appointments as app')
             ->join('professionals as p', 'app.professional_id', '=', 'p.id')
+            ->join('patients as pat', 'app.patient_id', '=', 'pat.id')
             ->selectRaw("
                 p.name as profesional,
                 COUNT(CASE WHEN app.status IN (1,2) THEN 1 END) as atenciones,
@@ -106,6 +109,7 @@ class ReporteController extends Controller
                 COUNT(CASE WHEN app.status = 4 THEN 1 END) as reprogramados,
                 CONCAT(ROUND(COUNT(CASE WHEN app.status IN (1,2) THEN 1 END) * 100.0 / ?,1),'%') as porcentaje
             ", [$total])
+            ->where('pat.dni', '<>', 'BLOQUEO')
             ->whereBetween('app.date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
             ->groupBy('p.id','p.name')
             ->havingRaw("atenciones > 0 OR anulados > 0 OR reprogramados > 0")
@@ -119,16 +123,20 @@ class ReporteController extends Controller
     public function continuidad(Request $request)
     {
         $total = DB::table('appointments')
-            ->whereBetween('date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
-            ->whereIn('status', [1,2])
-            ->distinct('patient_id')
-            ->count('patient_id');
+            ->join('patients', 'appointments.patient_id', '=', 'patients.id')
+            ->where('patients.dni', '<>', 'BLOQUEO')
+            ->whereBetween('appointments.date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
+            ->whereIn('appointments.status', [1,2])
+            ->distinct('appointments.patient_id')
+            ->count('appointments.patient_id');
 
         $base = DB::table('appointments')
-            ->select('patient_id', DB::raw('MIN(patient_condition) as condicion_final'))
-            ->whereBetween('date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
-            ->whereIn('status', [1,2])
-            ->groupBy('patient_id');
+            ->join('patients', 'appointments.patient_id', '=', 'patients.id')
+            ->select('appointments.patient_id', DB::raw('MIN(appointments.patient_condition) as condicion_final'))
+            ->where('patients.dni', '<>', 'BLOQUEO')
+            ->whereBetween('appointments.date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
+            ->whereIn('appointments.status', [1,2])
+            ->groupBy('appointments.patient_id');
 
         $data = DB::query()->fromSub($base, 'resumen')
             ->selectRaw("
@@ -150,9 +158,11 @@ class ReporteController extends Controller
             ->get();
 
         $totalRow = DB::table('appointments')
-            ->selectRaw("'Atendidos únicos' as condicion, COUNT(DISTINCT patient_id) as cantidad, '100%' as porcentaje")
-            ->whereBetween('date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
-            ->whereIn('status', [1,2])
+            ->join('patients', 'appointments.patient_id', '=', 'patients.id')
+            ->where('patients.dni', '<>', 'BLOQUEO')
+            ->selectRaw("'Atendidos únicos' as condicion, COUNT(DISTINCT appointments.patient_id) as cantidad, '100%' as porcentaje")
+            ->whereBetween('appointments.date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
+            ->whereIn('appointments.status', [1,2])
             ->first();
 
         return $data->push($totalRow);
@@ -164,8 +174,10 @@ class ReporteController extends Controller
     public function especialidad(Request $request)
     {
         $total = DB::table('appointments')
-            ->whereBetween('date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
-            ->where('status', 2)
+            ->join('patients', 'appointments.patient_id', '=', 'patients.id')
+            ->where('patients.dni', '<>', 'BLOQUEO')
+            ->whereBetween('appointments.date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
+            ->where('appointments.status', 2)
             ->count();
 
         return DB::table('appointments as app')
@@ -177,6 +189,8 @@ class ReporteController extends Controller
                 COUNT(DISTINCT app.patient_id) as atendidos,
                 CONCAT(ROUND(COUNT(app.id) * 100.0 / ?,1),'%') as porcentaje
             ", [$total])
+            ->join('patients as pat', 'app.patient_id', '=', 'pat.id')
+            ->where('pat.dni', '<>', 'BLOQUEO')
             ->whereBetween('app.date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
             ->where('app.status', 2)
             ->groupBy('c.id','c.clasificacion')
@@ -218,6 +232,8 @@ class ReporteController extends Controller
                 SUM(CASE WHEN app.patient_condition = 3 THEN 1 ELSE 0 END) as reevaluaciones,
                 COUNT(app.id) as total
             ")
+            ->join('patients as pat', 'app.patient_id', '=', 'pat.id')
+            ->where('pat.dni', '<>', 'BLOQUEO')
             ->whereBetween('app.date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
             ->whereIn('app.status',[1,2])
             ->groupBy('prf.profession','prf.name')
@@ -250,6 +266,7 @@ class ReporteController extends Controller
     {
         $total = DB::table('patients as p')
             ->join('appointments as app','app.patient_id','=','p.id')
+            ->where('p.dni', '<>', 'BLOQUEO')
             ->whereBetween('app.date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
             ->whereIn('app.status',[1,2])
             ->distinct('p.id')
@@ -266,6 +283,7 @@ class ReporteController extends Controller
                 COUNT(DISTINCT p.id) as cantidad,
                 CONCAT(ROUND(COUNT(DISTINCT p.id)*100/? ,2),'%') as porcentaje
             ",[$total])
+            ->where('p.dni', '<>', 'BLOQUEO')
             ->whereBetween('app.date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
             ->whereIn('app.status',[1,2])
             ->groupBy('genero')
@@ -305,6 +323,7 @@ class ReporteController extends Controller
                 COUNT(DISTINCT p.id) as altas
             ")
             ->where('p.discharge',1)
+            ->where('p.dni', '<>', 'BLOQUEO')
             ->whereBetween('app.date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
             ->whereIn('app.status',[1,2])
             ->groupBy('prf.id','prf.name','prf.profession')
