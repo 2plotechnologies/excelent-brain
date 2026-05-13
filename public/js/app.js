@@ -7031,6 +7031,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       horaManualId: '',
       horariosDisponibles: [],
       cargandoHorarios: false,
+      isProcessing: false,
       pasos: [{
         id: 1,
         label: 'Paciente',
@@ -7203,8 +7204,16 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     this.fetchPacientes();
     var modal = document.getElementById('modalNuevaCita');
     if (modal) {
-      modal.addEventListener('hidden.bs.modal', function () {
-        _this.clearModal();
+      // Sincronizar datos cada vez que el modal se muestra
+      modal.addEventListener('show.bs.modal', function () {
+        _this.initFromProps();
+      });
+      modal.addEventListener('hidden.bs.modal', function (event) {
+        // Solo limpiar si el modal que se cerró es realmente modalNuevaCita
+        // y no un sub-modal o un evento burbujeado
+        if (event.target.id === 'modalNuevaCita') {
+          _this.clearModal();
+        }
       });
     }
   },
@@ -7238,31 +7247,123 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.pasoActual = 2;
     },
     guardarNuevoPaciente: function guardarNuevoPaciente() {
-      if (this.cita.type_dni == 1 && (this.cita.dni == '' || this.cita.dni.length < 8)) {
-        alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Todo paciente debe tener un DNI válido', 10);
-        return;
-      }
-      if (this.cita.name == '' && this.cita.nombres == '') {
-        alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar apellidos y nombres', 10);
-        return;
-      }
-      if (this.cita.phone == '') {
-        alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar un celular', 10);
-        return;
-      }
-      if (this.cita.contacto == '' || this.cita.contacto_celular == '' || this.cita.parentezco == '') {
-        alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar el contacto de emergencia', 10);
-        return;
-      }
-      this.patientNew = true;
-      this.pasoActual = 2;
-      var myModalEl = document.getElementById('modalNuevoPaciente');
-      var modal = bootstrap.Modal.getInstance(myModalEl);
-      if (modal) {
-        modal.hide();
-      } else {
-        document.querySelector('#modalNuevoPaciente .btn-close').click();
-      }
+      var _this4 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var payload;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              if (!(_this4.cita.type_dni == 1 && (_this4.cita.dni == '' || _this4.cita.dni.length < 8))) {
+                _context.next = 3;
+                break;
+              }
+              alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Todo paciente debe tener un DNI válido', 10);
+              return _context.abrupt("return");
+            case 3:
+              if (!(_this4.cita.name == '' && _this4.cita.nombres == '')) {
+                _context.next = 6;
+                break;
+              }
+              alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar apellidos y nombres', 10);
+              return _context.abrupt("return");
+            case 6:
+              if (!(_this4.cita.phone == '')) {
+                _context.next = 9;
+                break;
+              }
+              alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar un celular', 10);
+              return _context.abrupt("return");
+            case 9:
+              if (!(_this4.cita.contacto == '' || _this4.cita.contacto_celular == '' || _this4.cita.parentezco == '')) {
+                _context.next = 12;
+                break;
+              }
+              alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar el contacto de emergencia', 10);
+              return _context.abrupt("return");
+            case 12:
+              _this4.isProcessing = true;
+              _this4.$swal.fire({
+                title: 'Guardando datos del paciente...',
+                allowOutsideClick: false,
+                didOpen: function didOpen() {
+                  _this4.$swal.showLoading();
+                }
+              });
+              payload = {
+                paciente: {
+                  dni: _this4.cita.dni,
+                  name: _this4.cita.name,
+                  nombres: _this4.cita.nombres,
+                  phone: _this4.cita.phone,
+                  email: _this4.cita.email,
+                  instruction_degree: _this4.cita.instruction_degree,
+                  gender: _this4.cita.gender,
+                  birth_date: _this4.cita.birth_date,
+                  occupation: _this4.cita.occupation,
+                  marital_status: _this4.cita.marital_status,
+                  recomendation: _this4.cita.recomendation,
+                  recomendacion_comentario: _this4.cita.recomendacion_comentario,
+                  type_dni: _this4.cita.type_dni,
+                  address: {
+                    address: _this4.cita.address,
+                    district: _this4.cita.district,
+                    province: _this4.cita.province,
+                    department: _this4.cita.department
+                  },
+                  contacto: _this4.cita.contacto,
+                  contacto_celular: _this4.cita.contacto_celular,
+                  parentezco: _this4.cita.parentezco,
+                  contacto2: _this4.cita.contacto2,
+                  contacto_celular2: _this4.cita.contacto_celular2,
+                  parentezco2: _this4.cita.parentezco2
+                }
+              };
+              _context.next = 17;
+              return _this4.axios.post('/api/patient/new', payload).then(function (res) {
+                if (res.data.status === 'repetido') {
+                  alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().warning('El paciente ya existe en el sistema');
+                } else {
+                  _this4.$swal.fire({
+                    icon: 'success',
+                    title: 'Paciente registrado',
+                    text: 'Los datos se guardaron correctamente',
+                    timer: 1500,
+                    showConfirmButton: false
+                  });
+                }
+                _this4.patientNew = true;
+                _this4.pasoActual = 2;
+                _this4.fetchPacientes(); // Refresh list
+
+                // Cerrar modal Nuevo Paciente
+                var myModalEl = document.getElementById('modalNuevoPaciente');
+                var modal = bootstrap.Modal.getInstance(myModalEl);
+                if (modal) {
+                  modal.hide();
+                } else {
+                  document.querySelector('#modalNuevoPaciente .btn-close').click();
+                }
+
+                // Asegurar que modalNuevaCita permanezca abierto y funcional
+                _this4.$nextTick(function () {
+                  var parentModalEl = document.getElementById('modalNuevaCita');
+                  if (parentModalEl) {
+                    var parentModal = bootstrap.Modal.getOrCreateInstance(parentModalEl);
+                    parentModal.show();
+                  }
+                });
+              })["catch"](function (err) {
+                console.error(err);
+                _this4.$swal.fire('Error', 'No se pudo guardar los datos del paciente', 'error');
+              })["finally"](function () {
+                _this4.isProcessing = false;
+              });
+            case 17:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee);
+      }))();
     },
     nextStep: function nextStep() {
       if (this.pasoActual === 1) {
@@ -7348,54 +7449,54 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       return '';
     },
     buscarHorariosManual: function buscarHorariosManual() {
-      var _this4 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var diaManual, diaSemana;
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              if (!(!_this4.fechaManual || !_this4.cita.professional_id)) {
-                _context.next = 2;
+              if (!(!_this5.fechaManual || !_this5.cita.professional_id)) {
+                _context2.next = 2;
                 break;
               }
-              return _context.abrupt("return");
+              return _context2.abrupt("return");
             case 2:
-              diaManual = moment__WEBPACK_IMPORTED_MODULE_2___default()(_this4.fechaManual).format('d');
-              diaSemana = _this4.dayWeek(diaManual - 1);
-              _this4.cargandoHorarios = true;
-              _context.next = 7;
-              return _this4.axios.get("/api/horarioCuadernoOcupado/".concat(_this4.fechaManual, "/").concat(diaSemana)).then(function (res) {
+              diaManual = moment__WEBPACK_IMPORTED_MODULE_2___default()(_this5.fechaManual).format('d');
+              diaSemana = _this5.dayWeek(diaManual - 1);
+              _this5.cargandoHorarios = true;
+              _context2.next = 7;
+              return _this5.axios.get("/api/horarioCuadernoOcupado/".concat(_this5.fechaManual, "/").concat(diaSemana)).then(function (res) {
                 var solos = res.data.solos.filter(function (h) {
-                  return h.professional_id == _this4.cita.professional_id;
+                  return h.professional_id == _this5.cita.professional_id;
                 });
                 var invalidos = res.data.invalidos;
-                _this4.horariosDisponibles = solos.filter(function (h) {
+                _this5.horariosDisponibles = solos.filter(function (h) {
                   return !invalidos.find(function (i) {
                     return i.schedule_id == h.id;
                   });
                 });
 
                 // Preselect if horaManualId is still valid, else clear
-                if (!_this4.horariosDisponibles.find(function (h) {
-                  return h.id == _this4.horaManualId;
+                if (!_this5.horariosDisponibles.find(function (h) {
+                  return h.id == _this5.horaManualId;
                 })) {
-                  _this4.horaManualId = '';
-                  _this4.cita.schedule_id = '';
+                  _this5.horaManualId = '';
+                  _this5.cita.schedule_id = '';
                 }
               })["finally"](function () {
-                return _this4.cargandoHorarios = false;
+                return _this5.cargandoHorarios = false;
               });
             case 7:
             case "end":
-              return _context.stop();
+              return _context2.stop();
           }
-        }, _callee);
+        }, _callee2);
       }))();
     },
     seleccionarHoraManual: function seleccionarHoraManual() {
-      var _this5 = this;
+      var _this6 = this;
       var horaSeleccionada = this.horariosDisponibles.find(function (h) {
-        return h.id == _this5.horaManualId;
+        return h.id == _this6.horaManualId;
       });
       if (horaSeleccionada) {
         this.cita.schedule_id = horaSeleccionada.id;
@@ -7412,11 +7513,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       return moment__WEBPACK_IMPORTED_MODULE_2___default()(horita, 'HH:mm:ss').format('hh:mm a');
     },
     precioDinamico: function precioDinamico() {
-      var _this6 = this;
+      var _this7 = this;
       this.cita.price = 0;
       if (this.cita.type == '') this.cita.price = 0;else {
         var precioPadre = this.precios.find(function (p) {
-          return p.id == _this6.cita.type;
+          return p.id == _this7.cita.type;
         });
         var precio = 0;
         var descuentoPorcentual;
@@ -7437,195 +7538,203 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     pedirMonedas: function pedirMonedas() {
-      var _this7 = this;
+      var _this8 = this;
       this.axios('/api/listarMonedas').then(function (resp) {
-        return _this7.monedas = resp.data;
+        return _this8.monedas = resp.data;
       });
     },
     insertar: function insertar(e) {
-      var _this8 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+      var _this9 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var config, formData, horaSel;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
             case 0:
               e.preventDefault();
+              if (!_this9.isProcessing) {
+                _context3.next = 3;
+                break;
+              }
+              return _context3.abrupt("return");
+            case 3:
               config = {
                 headers: {
                   'content-type': 'multipart/form-data'
                 }
               };
-              if (!(_this8.cita.type_dni == 1 && (_this8.cita.dni == '' || _this8.cita.dni.length < 8))) {
-                _context2.next = 6;
+              if (!(_this9.cita.type_dni == 1 && (_this9.cita.dni == '' || _this9.cita.dni.length < 8))) {
+                _context3.next = 8;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Todo paciente debe tener un DNI válido', 10);
-              _context2.next = 91;
+              _context3.next = 93;
               break;
-            case 6:
-              if (!(_this8.cita.type_dni != 1 && (_this8.cita.dni == '' || _this8.cita.dni.length < 8))) {
-                _context2.next = 10;
+            case 8:
+              if (!(_this9.cita.type_dni != 1 && (_this9.cita.dni == '' || _this9.cita.dni.length < 8))) {
+                _context3.next = 12;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Todo extranjero debe tener un documento de identidad válido', 10);
-              _context2.next = 91;
+              _context3.next = 93;
               break;
-            case 10:
-              if (!(_this8.cita.name == '' && _this8.cita.nombres == '')) {
-                _context2.next = 14;
+            case 12:
+              if (!(_this9.cita.name == '' && _this9.cita.nombres == '')) {
+                _context3.next = 16;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar apellidos y  nombres', 10);
-              _context2.next = 91;
+              _context3.next = 93;
               break;
-            case 14:
-              if (!(_this8.cita.phone == '')) {
-                _context2.next = 18;
+            case 16:
+              if (!(_this9.cita.phone == '')) {
+                _context3.next = 20;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar un celular', 10);
-              _context2.next = 91;
+              _context3.next = 93;
               break;
-            case 18:
-              if (_this8.cita.type) {
-                _context2.next = 22;
+            case 20:
+              if (_this9.cita.type) {
+                _context3.next = 24;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe seleccionar un tipo de servicio', 10);
-              _context2.next = 91;
+              _context3.next = 93;
               break;
-            case 22:
-              if (!(_this8.tieneDescuento && _this8.razonPorcentaje == '')) {
-                _context2.next = 26;
+            case 24:
+              if (!(_this9.tieneDescuento && _this9.razonPorcentaje == '')) {
+                _context3.next = 28;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Tiene que rellenarse un motivo de descuento', 10);
-              _context2.next = 91;
+              _context3.next = 93;
               break;
-            case 26:
-              if (!(_this8.tieneRebaja && _this8.razonRebaja == '')) {
-                _context2.next = 30;
+            case 28:
+              if (!(_this9.tieneRebaja && _this9.razonRebaja == '')) {
+                _context3.next = 32;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Tiene que rellenarse un motivo de rebaja', 10);
-              _context2.next = 91;
+              _context3.next = 93;
               break;
-            case 30:
-              if (!(_this8.descuentoAdelanto && _this8.razonAdelanto == '')) {
-                _context2.next = 34;
+            case 32:
+              if (!(_this9.descuentoAdelanto && _this9.razonAdelanto == '')) {
+                _context3.next = 36;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Tiene que rellenarse una fecha o razón del adelanto', 10);
-              _context2.next = 91;
+              _context3.next = 93;
               break;
-            case 34:
-              if (!(_this8.cita.contacto == '' || _this8.cita.contacto_celular == '' || _this8.cita.parentezco == '')) {
-                _context2.next = 38;
+            case 36:
+              if (!(_this9.cita.contacto == '' || _this9.cita.contacto_celular == '' || _this9.cita.parentezco == '')) {
+                _context3.next = 40;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar el contacto de emergencia', 10);
-              _context2.next = 91;
+              _context3.next = 93;
               break;
-            case 38:
-              if (!(_this8.cita.recomendation == '')) {
-                _context2.next = 42;
+            case 40:
+              if (!(_this9.cita.recomendation == '')) {
+                _context3.next = 44;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Debe rellenar  la referencia', 10);
-              _context2.next = 91;
+              _context3.next = 93;
               break;
-            case 42:
+            case 44:
               formData = new FormData();
-              formData.append('dni', _this8.cita.dni);
-              formData.append('phone', _this8.cita.phone);
-              formData.append('name', _this8.cita.name.toUpperCase() || 'Sin apellidos');
-              formData.append('nombres', _this8.cita.nombres.toUpperCase() || '');
-              formData.append('email', _this8.cita.email);
-              formData.append('address', _this8.cita.address);
-              formData.append('department', _this8.cita.department);
-              formData.append('province', _this8.cita.province);
-              formData.append('district', _this8.cita.district);
-              formData.append('birth_date', _this8.cita.birth_date);
-              formData.append('gender', parseInt(_this8.cita.gender));
-              formData.append('occupation', _this8.cita.occupation);
-              formData.append('marital_status', _this8.cita.marital_status);
-              formData.append('instruction_degree', _this8.cita.instruction_degree);
-              formData.append('professional_id', _this8.cita.professional_id);
-              horaSel = _this8.horariosDisponibles.find(function (h) {
-                return h.id == _this8.horaManualId;
+              formData.append('dni', _this9.cita.dni);
+              formData.append('phone', _this9.cita.phone);
+              formData.append('name', _this9.cita.name.toUpperCase() || 'Sin apellidos');
+              formData.append('nombres', _this9.cita.nombres.toUpperCase() || '');
+              formData.append('email', _this9.cita.email);
+              formData.append('address', _this9.cita.address);
+              formData.append('department', _this9.cita.department);
+              formData.append('province', _this9.cita.province);
+              formData.append('district', _this9.cita.district);
+              formData.append('birth_date', _this9.cita.birth_date);
+              formData.append('gender', parseInt(_this9.cita.gender));
+              formData.append('occupation', _this9.cita.occupation);
+              formData.append('marital_status', _this9.cita.marital_status);
+              formData.append('instruction_degree', _this9.cita.instruction_degree);
+              formData.append('professional_id', _this9.cita.professional_id);
+              horaSel = _this9.horariosDisponibles.find(function (h) {
+                return h.id == _this9.horaManualId;
               });
-              formData.append('schedule_id', _this8.horaManualId);
+              formData.append('schedule_id', _this9.horaManualId);
               formData.append('check_time', horaSel ? horaSel.check_time : '');
-              formData.append('date', _this8.fechaManual);
-              formData.append('clasification', _this8.cita.clasification);
-              formData.append('price', _this8.cita.price);
-              formData.append('type', _this8.cita.type); //nueva lista de servicios
+              formData.append('date', _this9.fechaManual);
+              formData.append('clasification', _this9.cita.clasification);
+              formData.append('price', _this9.cita.price);
+              formData.append('type', _this9.cita.type); //nueva lista de servicios
               //formData.append('patient_condition', this.cita.patient_condition); //El sistema evalúa la condición: nuevo o continuo, no es necesario pasar
-              formData.append('recomendation', _this8.cita.recomendation);
-              formData.append('recomendacion_comentario', _this8.cita.recomendacion_comentario);
-              formData.append('mode', _this8.cita.mode);
-              formData.append('link', _this8.cita.link);
-              formData.append('type_dni', _this8.cita.type_dni);
-              formData.append('contacto', _this8.cita.contacto);
-              formData.append('contacto_celular', _this8.cita.contacto_celular);
-              formData.append('parentezco', _this8.cita.parentezco);
-              formData.append('contacto2', _this8.cita.contacto2);
-              formData.append('contacto_celular2', _this8.cita.contacto_celular2);
-              formData.append('parentezco2', _this8.cita.parentezco2);
-              formData.append('continuo', _this8.precioNuevo ? '1' : 2); //this.cita.type_amount
-              formData.append('user_id', _this8.idUsuario);
+              formData.append('recomendation', _this9.cita.recomendation);
+              formData.append('recomendacion_comentario', _this9.cita.recomendacion_comentario);
+              formData.append('mode', _this9.cita.mode);
+              formData.append('link', _this9.cita.link);
+              formData.append('type_dni', _this9.cita.type_dni);
+              formData.append('contacto', _this9.cita.contacto);
+              formData.append('contacto_celular', _this9.cita.contacto_celular);
+              formData.append('parentezco', _this9.cita.parentezco);
+              formData.append('contacto2', _this9.cita.contacto2);
+              formData.append('contacto_celular2', _this9.cita.contacto_celular2);
+              formData.append('parentezco2', _this9.cita.parentezco2);
+              formData.append('continuo', _this9.precioNuevo ? '1' : 2); //this.cita.type_amount
+              formData.append('user_id', _this9.idUsuario);
               formData.append('formato_nuevo', 1);
               formData.append('etiqueta', $('#sltServicio option:selected').text());
-              formData.append('rebaja', _this8.descuentoRebaja);
-              formData.append('motivoRebaja', _this8.razonRebaja);
-              formData.append('descuento', _this8.descuentoPorcentaje);
-              formData.append('motivoDescuento', _this8.razonPorcentaje);
-              formData.append('new_status', _this8.cita.new_status);
-              formData.append('adelanto', _this8.descuentoAdelanto);
-              formData.append('razonAdelanto', _this8.razonAdelanto);
-              formData.append('monedaAdelanto', _this8.monedaAdelanto);
-              formData.append('idSede', _this8.idSede);
-              _context2.next = 91;
-              return _this8.axios.post('/api/appointment', formData, config).then(function (response) {
+              formData.append('rebaja', _this9.descuentoRebaja);
+              formData.append('motivoRebaja', _this9.razonRebaja);
+              formData.append('descuento', _this9.descuentoPorcentaje);
+              formData.append('motivoDescuento', _this9.razonPorcentaje);
+              formData.append('new_status', _this9.cita.new_status);
+              formData.append('adelanto', _this9.descuentoAdelanto);
+              formData.append('razonAdelanto', _this9.razonAdelanto);
+              formData.append('monedaAdelanto', _this9.monedaAdelanto);
+              formData.append('idSede', _this9.idSede);
+              _context3.next = 93;
+              return _this9.axios.post('/api/appointment', formData, config).then(function (response) {
                 //Trabaja en api -> modelo (appointment)>store()
                 if (response.data.error) {
-                  _this8.$swal({
+                  _this9.$swal({
                     icon: 'error',
                     title: 'Horario no disponible',
                     text: response.data.error
                   });
-                  _this8.$emit('actualizarListadoCitas', true);
+                  _this9.$emit('actualizarListadoCitas', true);
                   return;
                 }
                 console.log(response.data);
-                _this8.closeModal();
-                _this8.cita.membresia = '';
-                _this8.$emit('actualizarListadoCitas', true);
+                _this9.closeModal();
+                _this9.cita.membresia = '';
+                _this9.$emit('actualizarListadoCitas', true);
                 //console.log(response.data.cita.id)
-                _this8.$swal({
+                _this9.$swal({
                   icon: 'success',
                   title: 'Cita registrada con éxito'
                 });
                 //this.$parent.listar()
-                _this8.clearModal();
+                _this9.clearModal();
               })["catch"](function (error) {
                 //console.log(error)
                 if (error.response && error.response.status === 409) {
-                  _this8.$swal({
+                  _this9.$swal({
                     icon: 'error',
                     title: 'Horario no disponible',
                     text: error.response.data.error || 'El horario ya fue reservado por otro usuario'
                   });
-                  _this8.$emit('actualizarListadoCitas', true);
+                  _this9.$emit('actualizarListadoCitas', true);
                 } else {
                   console.log(error);
                 }
+              })["finally"](function () {
+                _this9.isProcessing = false;
               });
-            case 91:
+            case 93:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
           }
-        }, _callee2);
+        }, _callee3);
       }))();
     },
     closeModal: function closeModal() {
@@ -7696,7 +7805,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.monedaAdelanto = 1;
     },
     reniec: function reniec() {
-      var _this9 = this;
+      var _this10 = this;
       if (this.switchReciec === 0) return;
       this.switchReciec = 0;
       this.limpiarInputs(false);
@@ -7707,28 +7816,28 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         timer: 2500,
         timerProgressBar: true,
         didOpen: function didOpen() {
-          timerProgressBar: true, _this9.$swal.showLoading();
+          timerProgressBar: true, _this10.$swal.showLoading();
         }
       });
       this.axios.get("/api/buscarPacienteDB/" + this.cita.dni).then(function (res) {
         if (res.data.patient == null) {
           //Buscar en reniec, nuevo
-          if (_this9.cita.type_dni == 1) {
+          if (_this10.cita.type_dni == 1) {
             //window.axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
-            _this9.axios.get("/api/buscarDni/" + _this9.cita.dni).then(function (response) {
+            _this10.axios.get("/api/buscarDni/" + _this10.cita.dni).then(function (response) {
               console.log(response.data);
-              _this9.cita.name = "".concat(response.data.apellido_paterno, " ").concat(response.data.apellido_materno, " ").trim();
-              _this9.cita.nombres = "".concat(response.data.nombres.trim());
-              _this9.cita.vivo = 1;
+              _this10.cita.name = "".concat(response.data.apellido_paterno, " ").concat(response.data.apellido_materno, " ").trim();
+              _this10.cita.nombres = "".concat(response.data.nombres.trim());
+              _this10.cita.vivo = 1;
               if (response.data.apellido_paterno) {
-                _this9.patientNew = false;
-                _this9.$swal.fire({
+                _this10.patientNew = false;
+                _this10.$swal.fire({
                   icon: 'success',
                   title: 'Okey',
                   text: 'Paciente nuevo'
                 });
               } else {
-                _this9.$swal.fire({
+                _this10.$swal.fire({
                   icon: 'error',
                   title: 'Oops...',
                   text: 'DNI no encontrado!',
@@ -7742,7 +7851,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         } else {
           var _res$data$relacion$0$, _res$data$relacion$0$2, _res$data$relacion$0$3, _res$data$relacion$1$, _res$data$relacion$, _res$data$relacion$1$2, _res$data$relacion$2, _res$data$relacion$1$3, _res$data$relacion$3;
           //encontró en la DB
-          _this9.$swal.fire({
+          _this10.$swal.fire({
             title: 'Buscando paciente',
             timer: 10
           });
@@ -7753,49 +7862,49 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             for (var i = 0; i < cantDeudas; i++) {
               sumaDeudas += res.data.deudas[i].monto;
             }
-            _this9.alertaDeudas = true;
-            _this9.mensajeDeudas = "El paciente tiene <strong>".concat(cantDeudas == 1 ? '1 deuda' : cantDeudas + ' deudas', "</strong> de <strong>").concat(moment__WEBPACK_IMPORTED_MODULE_2___default()(res.data.deudas[0].fecha).fromNow(), "</strong> por un total de <strong>S/ ").concat(parseFloat(sumaDeudas).toFixed(2), "</strong>");
-          } else _this9.alertaDeudas = false;
+            _this10.alertaDeudas = true;
+            _this10.mensajeDeudas = "El paciente tiene <strong>".concat(cantDeudas == 1 ? '1 deuda' : cantDeudas + ' deudas', "</strong> de <strong>").concat(moment__WEBPACK_IMPORTED_MODULE_2___default()(res.data.deudas[0].fecha).fromNow(), "</strong> por un total de <strong>S/ ").concat(parseFloat(sumaDeudas).toFixed(2), "</strong>");
+          } else _this10.alertaDeudas = false;
           if (res.data.patient.faults != 0) {
-            _this9.$swal.fire({
+            _this10.$swal.fire({
               title: 'Atención, este paciente tiene ' + res.data.patient.faults + ' faltas'
             });
           }
-          _this9.cita.name = res.data.patient.name;
-          _this9.cita.nombres = res.data.patient.nombres;
-          _this9.cita.phone = res.data.patient.phone;
-          _this9.cita.email = res.data.patient.email;
-          _this9.cita.birth_date = res.data.patient.birth_date;
-          _this9.cita.marital_status = res.data.patient.marital_status;
-          _this9.cita.instruction_degree = res.data.patient.instruction_degree;
-          _this9.cita.gender = typeof parseInt(res.data.patient.gender) === 'number' && res.data.patient.gender !== null ? res.data.patient.gender : 2;
-          _this9.cita.occupation = res.data.patient.occupation;
-          _this9.cita.address = res.data.patient.address.address;
-          _this9.cita.department = res.data.patient.address.department;
-          _this9.cita.province = res.data.patient.address.province;
-          _this9.cita.district = res.data.patient.address.district;
-          _this9.cita.vivo = res.data.patient.vivo;
-          _this9.cita.contacto = (_res$data$relacion$0$ = res.data.relacion[0].name) !== null && _res$data$relacion$0$ !== void 0 ? _res$data$relacion$0$ : '';
-          _this9.cita.contacto_celular = (_res$data$relacion$0$2 = res.data.relacion[0].phone) !== null && _res$data$relacion$0$2 !== void 0 ? _res$data$relacion$0$2 : '';
-          _this9.cita.parentezco = (_res$data$relacion$0$3 = res.data.relacion[0].kinship) !== null && _res$data$relacion$0$3 !== void 0 ? _res$data$relacion$0$3 : '';
-          _this9.cita.contacto2 = (_res$data$relacion$1$ = (_res$data$relacion$ = res.data.relacion[1]) === null || _res$data$relacion$ === void 0 ? void 0 : _res$data$relacion$.name) !== null && _res$data$relacion$1$ !== void 0 ? _res$data$relacion$1$ : '';
-          _this9.cita.contacto_celular2 = (_res$data$relacion$1$2 = (_res$data$relacion$2 = res.data.relacion[1]) === null || _res$data$relacion$2 === void 0 ? void 0 : _res$data$relacion$2.phone) !== null && _res$data$relacion$1$2 !== void 0 ? _res$data$relacion$1$2 : '';
-          _this9.cita.parentezco2 = (_res$data$relacion$1$3 = (_res$data$relacion$3 = res.data.relacion[1]) === null || _res$data$relacion$3 === void 0 ? void 0 : _res$data$relacion$3.kinship) !== null && _res$data$relacion$1$3 !== void 0 ? _res$data$relacion$1$3 : '';
-          _this9.cita.etiqueta = res.data.patient.etiqueta;
-          _this9.cita.deudas = res.data.patient.deudas;
-          _this9.cita.prev_status = res.data.patient.new_status;
-          _this9.cita.club = res.data.patient.club;
-          _this9.cita.membresia = res.data.membresia;
-          _this9.cita.recomendation = res.data.patient.recomendation;
-          _this9.cita.recomendacion_comentario = res.data.patient.recomendacion_comentario;
-          _this9.patientNew = true;
-          _this9.moverProvincias(false);
-          _this9.moverDistritos();
+          _this10.cita.name = res.data.patient.name;
+          _this10.cita.nombres = res.data.patient.nombres;
+          _this10.cita.phone = res.data.patient.phone;
+          _this10.cita.email = res.data.patient.email;
+          _this10.cita.birth_date = res.data.patient.birth_date;
+          _this10.cita.marital_status = res.data.patient.marital_status;
+          _this10.cita.instruction_degree = res.data.patient.instruction_degree;
+          _this10.cita.gender = typeof parseInt(res.data.patient.gender) === 'number' && res.data.patient.gender !== null ? res.data.patient.gender : 2;
+          _this10.cita.occupation = res.data.patient.occupation;
+          _this10.cita.address = res.data.patient.address.address;
+          _this10.cita.department = res.data.patient.address.department;
+          _this10.cita.province = res.data.patient.address.province;
+          _this10.cita.district = res.data.patient.address.district;
+          _this10.cita.vivo = res.data.patient.vivo;
+          _this10.cita.contacto = (_res$data$relacion$0$ = res.data.relacion[0].name) !== null && _res$data$relacion$0$ !== void 0 ? _res$data$relacion$0$ : '';
+          _this10.cita.contacto_celular = (_res$data$relacion$0$2 = res.data.relacion[0].phone) !== null && _res$data$relacion$0$2 !== void 0 ? _res$data$relacion$0$2 : '';
+          _this10.cita.parentezco = (_res$data$relacion$0$3 = res.data.relacion[0].kinship) !== null && _res$data$relacion$0$3 !== void 0 ? _res$data$relacion$0$3 : '';
+          _this10.cita.contacto2 = (_res$data$relacion$1$ = (_res$data$relacion$ = res.data.relacion[1]) === null || _res$data$relacion$ === void 0 ? void 0 : _res$data$relacion$.name) !== null && _res$data$relacion$1$ !== void 0 ? _res$data$relacion$1$ : '';
+          _this10.cita.contacto_celular2 = (_res$data$relacion$1$2 = (_res$data$relacion$2 = res.data.relacion[1]) === null || _res$data$relacion$2 === void 0 ? void 0 : _res$data$relacion$2.phone) !== null && _res$data$relacion$1$2 !== void 0 ? _res$data$relacion$1$2 : '';
+          _this10.cita.parentezco2 = (_res$data$relacion$1$3 = (_res$data$relacion$3 = res.data.relacion[1]) === null || _res$data$relacion$3 === void 0 ? void 0 : _res$data$relacion$3.kinship) !== null && _res$data$relacion$1$3 !== void 0 ? _res$data$relacion$1$3 : '';
+          _this10.cita.etiqueta = res.data.patient.etiqueta;
+          _this10.cita.deudas = res.data.patient.deudas;
+          _this10.cita.prev_status = res.data.patient.new_status;
+          _this10.cita.club = res.data.patient.club;
+          _this10.cita.membresia = res.data.membresia;
+          _this10.cita.recomendation = res.data.patient.recomendation;
+          _this10.cita.recomendacion_comentario = res.data.patient.recomendacion_comentario;
+          _this10.patientNew = true;
+          _this10.moverProvincias(false);
+          _this10.moverDistritos();
         }
       })["catch"](function (err) {
         console.error(err);
       })["finally"](function (result) {
-        _this9.switchReciec = 1;
+        _this10.switchReciec = 1;
         document.querySelector(".btnReniec").classList.replace('btn-danger', 'btn-info');
       });
     },
@@ -7925,50 +8034,50 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     listarPrecios: function listarPrecios() {
-      var _this10 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) switch (_context3.prev = _context3.next) {
-            case 0:
-              _context3.next = 2;
-              return _this10.axios.get('/api/listarPreciosTodos').then(function (response) {
-                return _this10.precios = response.data;
-              });
-            case 2:
-            case "end":
-              return _context3.stop();
-          }
-        }, _callee3);
-      }))();
-    },
-    listarDepartamentos: function listarDepartamentos() {
       var _this11 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
               _context4.next = 2;
-              return _this11.axios.get('/api/departamentos').then(function (response) {
-                _this11.ubigeo.departamentos = response.data['departamentos'];
-                _this11.ubigeo.provincias = response.data['provincias'];
-                _this11.ubigeo.distritos = response.data['distritos'];
-                _this11.provincias = _this11.ubigeo.provincias.filter(function (provincia) {
-                  return provincia.idDepa == 12;
-                });
-                _this11.distritos = _this11.ubigeo.distritos.filter(function (distrito) {
-                  return distrito.idProv == 103;
-                });
-                _this11.cita.department = 12;
-                _this11.cita.province = 103;
-                _this11.cita.district = 1006;
-                _this11.moverProvincias(false);
-                _this11.moverDistritos();
+              return _this11.axios.get('/api/listarPreciosTodos').then(function (response) {
+                return _this11.precios = response.data;
               });
             case 2:
             case "end":
               return _context4.stop();
           }
         }, _callee4);
+      }))();
+    },
+    listarDepartamentos: function listarDepartamentos() {
+      var _this12 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              _context5.next = 2;
+              return _this12.axios.get('/api/departamentos').then(function (response) {
+                _this12.ubigeo.departamentos = response.data['departamentos'];
+                _this12.ubigeo.provincias = response.data['provincias'];
+                _this12.ubigeo.distritos = response.data['distritos'];
+                _this12.provincias = _this12.ubigeo.provincias.filter(function (provincia) {
+                  return provincia.idDepa == 12;
+                });
+                _this12.distritos = _this12.ubigeo.distritos.filter(function (distrito) {
+                  return distrito.idProv == 103;
+                });
+                _this12.cita.department = 12;
+                _this12.cita.province = 103;
+                _this12.cita.district = 1006;
+                _this12.moverProvincias(false);
+                _this12.moverDistritos();
+              });
+            case 2:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5);
       }))();
     },
     moverProvincias: function moverProvincias(borrar) {
@@ -7995,6 +8104,16 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       });
       //console.log(enc);
       return enc.stat;
+    },
+    initFromProps: function initFromProps() {
+      if (this.horaElegida && this.profesionalElegido) {
+        this.cita.professional_id = this.profesionalElegido.id;
+        this.cita.clasification = this.profesionalElegido.idProfesion;
+        this.fechaManual = this.fechaElegida;
+        this.horaManualId = this.horaElegida.id;
+        this.cita.schedule_id = this.horaElegida.id;
+        this.horariosDisponibles = [this.horaElegida];
+      }
     }
   },
   created: function created() {
@@ -8006,43 +8125,33 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     //this.cita.department = 12;
   },
   watch: {
-    horaElegida: function horaElegida() {
-      if (this.horaElegida && this.profesionalElegido) {
-        this.cita.professional_id = this.profesionalElegido.id;
-        this.cita.clasification = this.profesionalElegido.idProfesion;
-        this.fechaManual = this.fechaElegida;
-        this.horaManualId = this.horaElegida.id;
-        this.cita.schedule_id = this.horaElegida.id;
-        this.horariosDisponibles = [this.horaElegida];
-      } else {
-        this.cita.professional_id = '';
-        this.cita.schedule_id = '';
-        this.fechaManual = moment__WEBPACK_IMPORTED_MODULE_2___default()().format('YYYY-MM-DD');
-        this.horaManualId = '';
-        this.horariosDisponibles = [];
+    horaElegida: {
+      immediate: true,
+      handler: function handler() {
+        this.initFromProps();
       }
     }
   },
   computed: {
     doctoresFiltradosPorCat: function doctoresFiltradosPorCat() {
-      var _this12 = this;
+      var _this13 = this;
       if (!this.doctores) return [];
       if (!this.cita.clasification) return this.doctores;
       return this.doctores.filter(function (d) {
-        return d.idProfesion == _this12.cita.clasification || d.profession_id == _this12.cita.clasification;
+        return d.idProfesion == _this13.cita.clasification || d.profession_id == _this13.cita.clasification;
       });
     },
     horaSeleccionada: function horaSeleccionada() {
-      var _this13 = this;
+      var _this14 = this;
       return this.horariosDisponibles.find(function (h) {
-        return h.id == _this13.horaManualId;
+        return h.id == _this14.horaManualId;
       }) || {};
     },
     profesionalSeleccionado: function profesionalSeleccionado() {
-      var _this14 = this;
+      var _this15 = this;
       if (!this.doctores) return {};
       return this.doctores.find(function (d) {
-        return d.id == _this14.cita.professional_id;
+        return d.id == _this15.cita.professional_id;
       }) || {};
     },
     filtro: function filtro() {
@@ -12750,10 +12859,11 @@ var render = function render() {
       id: "modalNuevaCita",
       tabindex: "-1",
       "aria-labelledby": "exampleModalLabel",
-      "aria-hidden": "true"
+      "aria-hidden": "true",
+      "data-bs-backdrop": "static"
     }
   }, [_c("div", {
-    staticClass: "modal-dialog modal-xl"
+    staticClass: "modal-dialog modal-xl modal-dialog-scrollable"
   }, [_c("div", {
     staticClass: "modal-content"
   }, [_vm._m(0), _vm._v(" "), _c("div", {
@@ -12784,7 +12894,27 @@ var render = function render() {
     }, [_vm._v(_vm._s(step.label))]), _vm._v(" "), step.id < 8 ? _c("div", {
       staticClass: "step-connector mx-3 d-none d-lg-block"
     }) : _vm._e()]);
-  }), 0), _vm._v(" "), _c("div", {
+  }), 0), _vm._v(" "), _vm.pasoActual > 1 && _vm.cita.dni ? _c("div", {
+    staticClass: "alert alert-info d-flex align-items-center mb-4 rounded-4 border-0 shadow-sm transition-all"
+  }, [_vm._m(1), _vm._v(" "), _c("div", {
+    staticClass: "flex-grow-1"
+  }, [_c("div", {
+    staticClass: "fw-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.cita.name) + " " + _vm._s(_vm.cita.nombres))]), _vm._v(" "), _c("div", {
+    staticClass: "small text-muted"
+  }, [_vm._v("DNI: " + _vm._s(_vm.cita.dni) + " | Cel: " + _vm._s(_vm.cita.phone))])]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm btn-outline-primary rounded-pill px-3",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        _vm.pasoActual = 1;
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-edit me-1"
+  }), _vm._v(" Cambiar\r\n\t\t\t\t\t\t")])]) : _vm._e(), _vm._v(" "), _c("div", {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -12803,7 +12933,7 @@ var render = function render() {
     staticClass: "card-body p-4"
   }, [_c("div", {
     staticClass: "input-group mb-4 bg-light rounded-pill p-1"
-  }, [_vm._m(1), _vm._v(" "), _c("input", {
+  }, [_vm._m(2), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12848,7 +12978,7 @@ var render = function render() {
       }
     }, [_c("div", {
       staticClass: "d-flex align-items-center"
-    }, [_vm._m(2, true), _vm._v(" "), _c("div", [_c("h6", {
+    }, [_vm._m(3, true), _vm._v(" "), _c("div", [_c("h6", {
       staticClass: "mb-0 font-weight-bold"
     }, [_vm._v(_vm._s(paciente.name) + " " + _vm._s(paciente.nombres))]), _vm._v(" "), _c("small", {
       staticClass: "text-muted"
@@ -12859,7 +12989,7 @@ var render = function render() {
     staticClass: "text-center text-muted py-5"
   }, [_c("i", {
     staticClass: "fas fa-user-slash fa-3x mb-3 text-light"
-  }), _vm._v(" "), _c("p", [_vm._v("No se encontraron pacientes.")])]) : _vm._e()], 2), _vm._v(" "), _vm._m(3)])])])])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _c("p", [_vm._v("No se encontraron pacientes.")])]) : _vm._e()], 2), _vm._v(" "), _vm._m(4)])])])])]), _vm._v(" "), _c("div", {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -12975,7 +13105,7 @@ var render = function render() {
       }
     }, [_c("div", {
       staticClass: "card-body text-center p-4"
-    }, [_vm._m(4, true), _vm._v(" "), _c("h6", {
+    }, [_vm._m(5, true), _vm._v(" "), _c("h6", {
       staticClass: "mb-1 font-weight-bold text-dark"
     }, [_vm._v(_vm._s(prof.name))]), _vm._v(" "), _c("small", {
       staticClass: "text-muted"
@@ -13099,7 +13229,7 @@ var render = function render() {
         return _vm.seleccionarModalidad(1);
       }
     }
-  }, [_vm._m(5), _vm._v(" "), _c("h5", {
+  }, [_vm._m(6), _vm._v(" "), _c("h5", {
     staticClass: "font-weight-bold"
   }, [_vm._v("Presencial")]), _vm._v(" "), _c("p", {
     staticClass: "small text-muted mb-0"
@@ -13115,7 +13245,7 @@ var render = function render() {
         return _vm.seleccionarModalidad(2);
       }
     }
-  }, [_vm._m(6), _vm._v(" "), _c("h5", {
+  }, [_vm._m(7), _vm._v(" "), _c("h5", {
     staticClass: "font-weight-bold"
   }, [_vm._v("Virtual")]), _vm._v(" "), _c("p", {
     staticClass: "small text-muted mb-0"
@@ -13131,7 +13261,7 @@ var render = function render() {
         return _vm.seleccionarModalidad(3);
       }
     }
-  }, [_vm._m(7), _vm._v(" "), _c("h5", {
+  }, [_vm._m(8), _vm._v(" "), _c("h5", {
     staticClass: "font-weight-bold"
   }, [_vm._v("Domicilio")]), _vm._v(" "), _c("p", {
     staticClass: "small text-muted mb-0"
@@ -13141,7 +13271,7 @@ var render = function render() {
     staticClass: "card-body"
   }, [_c("div", {
     staticClass: "form-group mb-0"
-  }, [_vm._m(8), _vm._v(" "), _c("input", {
+  }, [_vm._m(9), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13181,7 +13311,7 @@ var render = function render() {
     staticClass: "col-md-6 mb-4"
   }, [_c("div", {
     staticClass: "card border-0 shadow-sm rounded-4 bg-white p-4 h-100"
-  }, [_vm._m(9), _vm._v(" "), _c("div", {
+  }, [_vm._m(10), _vm._v(" "), _c("div", {
     staticClass: "form-check form-switch mb-3 custom-switch"
   }, [_c("input", {
     directives: [{
@@ -13552,7 +13682,7 @@ var render = function render() {
     staticClass: "col-md-6 mb-4"
   }, [_c("div", {
     staticClass: "card border-0 shadow-sm rounded-4 bg-white p-4 h-100"
-  }, [_vm._m(10), _vm._v(" "), _c("div", {
+  }, [_vm._m(11), _vm._v(" "), _c("div", {
     staticClass: "form-group h-100 d-flex flex-column"
   }, [_c("textarea", {
     directives: [{
@@ -13646,7 +13776,7 @@ var render = function render() {
     staticClass: "mb-4 lead text-center font-weight-bold"
   }, [_vm._v("Resumen de la Cita")]), _vm._v(" "), _c("div", {
     staticClass: "ticket-container bg-white shadow-lg rounded-5 overflow-hidden border"
-  }, [_vm._m(11), _vm._v(" "), _c("div", {
+  }, [_vm._m(12), _vm._v(" "), _c("div", {
     staticClass: "ticket-body p-4 p-md-5"
   }, [_c("div", {
     staticClass: "row mb-5"
@@ -13672,13 +13802,13 @@ var render = function render() {
     staticClass: "row mb-5 bg-light rounded-4 p-4 mx-0"
   }, [_c("div", {
     staticClass: "col-md-6 mb-3 mb-md-0 d-flex align-items-center"
-  }, [_vm._m(12), _vm._v(" "), _c("div", [_c("h6", {
+  }, [_vm._m(13), _vm._v(" "), _c("div", [_c("h6", {
     staticClass: "mb-0 font-weight-bold"
   }, [_vm._v(_vm._s(_vm.fechaManual))]), _vm._v(" "), _c("small", {
     staticClass: "text-muted"
   }, [_vm._v("Fecha asignada")])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6 d-flex align-items-center justify-content-md-end"
-  }, [_vm._m(13), _vm._v(" "), _c("div", {
+  }, [_vm._m(14), _vm._v(" "), _c("div", {
     staticClass: "text-md-end"
   }, [_c("h6", {
     staticClass: "mb-0 font-weight-bold"
@@ -13708,9 +13838,9 @@ var render = function render() {
     staticClass: "mb-0 font-weight-bold text-success"
   }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.cita.price).toFixed(2)))])])]), _vm._v(" "), _vm.cita.recomendacion_comentario ? _c("div", {
     staticClass: "notes-section mt-4 bg-soft-warning p-4 rounded-4 border-dashed border-warning"
-  }, [_vm._m(14), _vm._v(" "), _c("p", {
+  }, [_vm._m(15), _vm._v(" "), _c("p", {
     staticClass: "mb-0 small text-dark fst-italic"
-  }, [_vm._v(_vm._s(_vm.cita.recomendacion_comentario))])]) : _vm._e()]), _vm._v(" "), _vm._m(15)])])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v(_vm._s(_vm.cita.recomendacion_comentario))])]) : _vm._e()]), _vm._v(" "), _vm._m(16)])])])]), _vm._v(" "), _c("div", {
     staticClass: "modal-footer border-0 justify-content-between px-4 pb-4"
   }, [_c("div", [_vm.pasoActual > 1 ? _c("button", {
     staticClass: "btn btn-outline-secondary btn-lg rounded-pill px-4",
@@ -13745,9 +13875,12 @@ var render = function render() {
     key: "btn-registrar",
     staticClass: "btn btn-success btn-lg rounded-pill px-5 shadow-sm",
     attrs: {
-      type: "submit"
+      type: "submit",
+      disabled: _vm.isProcessing
     }
-  }, [_c("i", {
+  }, [_vm.isProcessing ? _c("span", {
+    staticClass: "spinner-border spinner-border-sm me-2"
+  }) : _c("i", {
     staticClass: "fas fa-save me-2"
   }), _vm._v(" Registrar Cita\r\n\t\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm.pasoActual === 8 && _vm.cita.vivo != 1 ? _c("div", {
     staticClass: "alert alert-danger mb-0 rounded-pill"
@@ -13768,9 +13901,9 @@ var render = function render() {
     staticClass: "modal-dialog modal-dialog-scrollable modal-xl"
   }, [_c("div", {
     staticClass: "modal-content"
-  }, [_vm._m(16), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
   }, [_vm._m(17), _vm._v(" "), _c("div", {
+    staticClass: "modal-body"
+  }, [_vm._m(18), _vm._v(" "), _c("div", {
     staticClass: "card mb-3"
   }, [_c("div", {
     staticClass: "card-body"
@@ -13778,7 +13911,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col"
-  }, [_vm._m(18), _vm._v(" "), _c("select", {
+  }, [_vm._m(19), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13814,7 +13947,7 @@ var render = function render() {
     }
   }, [_vm._v("Pasaporte")])])]), _vm._v(" "), _c("div", {
     staticClass: "col"
-  }, [_vm._m(19), _vm._v(" "), _c("input", {
+  }, [_vm._m(20), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13915,7 +14048,7 @@ var render = function render() {
     staticClass: "fas fa-search"
   })])])]), _vm._v(" "), _c("div", {
     staticClass: "col-4"
-  }, [_vm._m(20), _vm._v(" "), _c("input", {
+  }, [_vm._m(21), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13940,7 +14073,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-4"
-  }, [_vm._m(21), _vm._v(" "), _c("input", {
+  }, [_vm._m(22), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13967,7 +14100,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(22), _vm._v(" "), _c("input", {
+  }, [_vm._m(23), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13991,7 +14124,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(23), _vm._v(" "), _c("select", {
+  }, [_vm._m(24), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -14038,7 +14171,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(24), _vm._v(" "), _c("select", {
+  }, [_vm._m(25), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -14087,7 +14220,7 @@ var render = function render() {
     }
   }, [_vm._v("Sin instrucción")])])]), _vm._v(" "), _c("div", {
     staticClass: "col"
-  }, [_vm._m(25), _vm._v(" "), _c("input", {
+  }, [_vm._m(26), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -14115,7 +14248,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(26), _vm._v(" "), _c("select", {
+  }, [_vm._m(27), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -14147,7 +14280,7 @@ var render = function render() {
     }, [_vm._v(_vm._s(departamento.departamento))]);
   }), 0)]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(27), _vm._v(" "), _c("select", {
+  }, [_vm._m(28), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -14179,7 +14312,7 @@ var render = function render() {
     }, [_vm._v(_vm._s(provincia.provincia))]);
   }), 0)]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(28), _vm._v(" "), _c("select", {
+  }, [_vm._m(29), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -14211,7 +14344,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(29), _vm._v(" "), _c("input", {
+  }, [_vm._m(30), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -14237,7 +14370,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(30), _vm._v(" "), _c("select", {
+  }, [_vm._m(31), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -14305,7 +14438,7 @@ var render = function render() {
         _vm.$set(_vm.cita, "email", $event.target.value);
       }
     }
-  })])])])]), _vm._v(" "), _vm._m(31), _vm._v(" "), _c("div", {
+  })])])])]), _vm._v(" "), _vm._m(32), _vm._v(" "), _c("div", {
     staticClass: "card"
   }, [_c("div", {
     staticClass: "card-body"
@@ -14313,7 +14446,7 @@ var render = function render() {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(32), _vm._v(" "), _c("input", {
+  }, [_vm._m(33), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -14339,7 +14472,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(33), _vm._v(" "), _c("input", {
+  }, [_vm._m(34), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -14365,7 +14498,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-4"
-  }, [_vm._m(34), _vm._v(" "), _c("input", {
+  }, [_vm._m(35), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -14487,19 +14620,23 @@ var render = function render() {
     staticClass: "btn btn-secondary",
     attrs: {
       type: "button",
-      "data-bs-dismiss": "modal"
+      "data-bs-dismiss": "modal",
+      disabled: _vm.isProcessing
     }
   }, [_vm._v("Cancelar")]), _vm._v(" "), _c("button", {
     staticClass: "btn btn-primary",
     attrs: {
-      type: "button"
+      type: "button",
+      disabled: _vm.isProcessing
     },
     on: {
       click: _vm.guardarNuevoPaciente
     }
-  }, [_c("i", {
+  }, [_vm.isProcessing ? _c("span", {
+    staticClass: "spinner-border spinner-border-sm me-2"
+  }) : _c("i", {
     staticClass: "fas fa-check"
-  }), _vm._v(" Confirmar Datos")])])])])])]);
+  }), _vm._v(" Confirmar Datos\r\n\t\t\t\t")])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -14522,6 +14659,18 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fas fa-times"
   })])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "avatar-circle bg-primary text-white d-flex align-items-center justify-content-center me-3",
+    staticStyle: {
+      width: "40px",
+      height: "40px"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-user"
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;

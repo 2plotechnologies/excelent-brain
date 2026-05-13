@@ -98,58 +98,65 @@ class PatientController extends Controller
 	}
 
 	/**
-	 * Return all patient with recipes and addrres
+	 * Return all patient with recipes and addrres.
 	 */
 	public function insertPatient(Request $request){
-		
-		$repetido = Patient::where('dni', $request->input('paciente.dni'));
-		if( $repetido->count() >0){
-			echo 'repetidos '. $repetido->count(); 
-		}else{
-			//echo $request->input('paciente.name');die();
-			$paciente = Patient::create([
-					'dni'=>$request->input('paciente.dni'),
-					'name'=> trim(str_replace('  ', ' ' , $request->input('paciente.name'))),
-					'nombres'=> trim(str_replace('  ', ' ' , $request->input('paciente.nombres'))),
-					'phone'=>$request->input('paciente.phone'),
-					'instruction_degree'=> $request->input('paciente.instruction_degree') ?? 6,
-					'gender'=> $request->input('paciente.gender') ?? 2,
-					'birth_date'=> $request->input('birth_date') =='null' ? null: $request->input('paciente.birth_date'),
-					'occupation'=> $request->input('occupation') =='null' ? null: $request->input('paciente.occupation'),
-					'marital_status'=> $request->input('paciente.marital_status'),
-					'recomendation' => $request->input('paciente.recomendation'),
-					'recomendacion_comentario' => $request->input('paciente.recomendacion_comentario'),
-				]);
-			Address::create([
-				'address'=> $request->input('paciente.address.address'),
-				'district'=>$request->input('paciente.address.district'),
-				'province'=>$request->input('paciente.address.province'),
-				'department'=>$request->input('paciente.address.department'),
-				'patient_id' => $paciente->id
-			]);
-
-			Relative::where('patient_id',$paciente->id)->delete();
-
-			if($request->input('paciente.contacto')){
-				Relative::create([
-					'name'=> str_replace('null', '', $request->input('paciente.contacto')),
-					'phone'=> str_replace('null', '', $request->input('paciente.contacto_celular')),
-					'kinship'=> str_replace('null', '', $request->input('paciente.parentezco')),
-					'patient_id' => $paciente->id
-				]);
-			}
-
-			if($request->input('paciente.contacto2') ){
-				Relative::create([
-					'name'=> str_replace('null', '', $request->input('paciente.contacto2')),
-					'phone'=> str_replace('null', '', $request->input('paciente.contacto_celular2')),
-					'kinship'=> str_replace('null', '', $request->input('paciente.parentezco2')),
-					'patient_id' => $paciente->id
-				]);
-			}
-			echo $paciente->id;
+		$repetido = Patient::where('dni', $request->input('paciente.dni'))->first();
+		if($repetido){
+			return response()->json([
+				'status' => 'repetido',
+				'id' => $repetido->id,
+				'message' => 'El paciente ya existe en el sistema'
+			], 200); // We return 200 but indicate it's repeated.
 		}
 
+		$paciente = Patient::create([
+			'dni'=>$request->input('paciente.dni'),
+			'name'=> trim(str_replace('  ', ' ' , $request->input('paciente.name'))),
+			'nombres'=> trim(str_replace('  ', ' ' , $request->input('paciente.nombres'))),
+			'phone'=>$request->input('paciente.phone'),
+			'email'=>$request->input('paciente.email'),
+			'instruction_degree'=> $request->input('paciente.instruction_degree') ?? 6,
+			'gender'=> $request->input('paciente.gender') ?? 2,
+			'birth_date'=> $request->input('paciente.birth_date') == 'null' ? null : $request->input('paciente.birth_date'),
+			'occupation'=> $request->input('paciente.occupation') == 'null' ? null : $request->input('paciente.occupation'),
+			'marital_status'=> $request->input('paciente.marital_status') ?? 1,
+			'recomendation' => $request->input('paciente.recomendation'),
+			'recomendacion_comentario' => $request->input('paciente.recomendacion_comentario'),
+			'type_dni' => $request->input('paciente.type_dni') ?? 1,
+		]);
+
+		Address::create([
+			'address'=> $request->input('paciente.address.address'),
+			'district'=>$request->input('paciente.address.district'),
+			'province'=>$request->input('paciente.address.province'),
+			'department'=>$request->input('paciente.address.department'),
+			'patient_id' => $paciente->id
+		]);
+
+		if($request->input('paciente.contacto')){
+			Relative::create([
+				'name'=> str_replace('null', '', $request->input('paciente.contacto')),
+				'phone'=> str_replace('null', '', $request->input('paciente.contacto_celular')),
+				'kinship'=> str_replace('null', '', $request->input('paciente.parentezco')),
+				'patient_id' => $paciente->id
+			]);
+		}
+
+		if($request->input('paciente.contacto2') ){
+			Relative::create([
+				'name'=> str_replace('null', '', $request->input('paciente.contacto2')),
+				'phone'=> str_replace('null', '', $request->input('paciente.contacto_celular2')),
+				'kinship'=> str_replace('null', '', $request->input('paciente.parentezco2')),
+				'patient_id' => $paciente->id
+			]);
+		}
+
+		return response()->json([
+			'status' => 'success',
+			'id' => $paciente->id,
+			'message' => 'Paciente registrado con éxito'
+		]);
 	}
 
 	public function getPatient ()

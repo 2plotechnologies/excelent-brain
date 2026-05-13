@@ -1,7 +1,9 @@
 <template>
 <div>
-<div class="modal fade " id="modalNuevaCita" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-xl">
+<div class="modal fade" id="modalNuevaCita" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+
+	<div class="modal-dialog modal-xl modal-dialog-scrollable">
+
 		<div class="modal-content">
 			<div class="modal-header border-0 pb-0">
 			<h5 class="modal-title" id="addCitaModalLabel">Registrar Nueva Cita</h5>
@@ -20,6 +22,22 @@
 							<div v-if="step.id < 8" class="step-connector mx-3 d-none d-lg-block"></div>
 						</div>
 					</div>
+
+					<!-- Resumen del Paciente Seleccionado -->
+					<div v-if="pasoActual > 1 && cita.dni" class="alert alert-info d-flex align-items-center mb-4 rounded-4 border-0 shadow-sm transition-all">
+						<div class="avatar-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+							<i class="fas fa-user"></i>
+						</div>
+						<div class="flex-grow-1">
+							<div class="fw-bold text-dark">{{ cita.name }} {{ cita.nombres }}</div>
+							<div class="small text-muted">DNI: {{ cita.dni }} | Cel: {{ cita.phone }}</div>
+						</div>
+						<button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" @click="pasoActual = 1">
+							<i class="fas fa-edit me-1"></i> Cambiar
+						</button>
+					</div>
+
+
 
 					<!-- Step 1: Paciente -->
 					<div v-show="pasoActual === 1">
@@ -427,9 +445,12 @@
 							<button type="button" key="btn-siguiente" v-if="pasoActual < 8" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm" @click="nextStep">
 								Siguiente <i class="fas fa-arrow-right ms-2"></i>
 							</button>
-							<button type="submit" key="btn-registrar" v-if="pasoActual === 8 && cita.vivo == 1" class="btn btn-success btn-lg rounded-pill px-5 shadow-sm">
-								<i class="fas fa-save me-2"></i> Registrar Cita
+							<button type="submit" key="btn-registrar" v-if="pasoActual === 8 && cita.vivo == 1" class="btn btn-success btn-lg rounded-pill px-5 shadow-sm" :disabled="isProcessing">
+								<span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+								<i v-else class="fas fa-save me-2"></i> Registrar Cita
 							</button>
+
+
 							<div v-if="pasoActual === 8 && cita.vivo != 1" class="alert alert-danger mb-0 rounded-pill">
 								<i class="fas fa-cross me-2"></i> El paciente figura como fallecido.
 							</div>
@@ -606,9 +627,14 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-				<button type="button" class="btn btn-primary" @click="guardarNuevoPaciente"><i class="fas fa-check"></i> Confirmar Datos</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" :disabled="isProcessing">Cancelar</button>
+				<button type="button" class="btn btn-primary" @click="guardarNuevoPaciente" :disabled="isProcessing">
+					<span v-if="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+					<i v-else class="fas fa-check"></i> Confirmar Datos
+				</button>
 			</div>
+
+
 		</div>
 </div>
 </div>
@@ -626,7 +652,7 @@ export default {
 	data(){
 		return{
 			pasoActual: 1, listaPacientes: [], busquedaTexto: '', timerBusqueda: null,
-			fechaManual: '', horaManualId: '', horariosDisponibles: [], cargandoHorarios: false,
+			fechaManual: '', horaManualId: '', horariosDisponibles: [], cargandoHorarios: false, isProcessing: false,
 			pasos: [
 				{ id: 1, label: 'Paciente', icon: 'fa-user' },
 				{ id: 2, label: 'Especialidad', icon: 'fa-stethoscope' },
@@ -700,10 +726,22 @@ export default {
 		
 		const modal = document.getElementById('modalNuevaCita')
 		if (modal) {
-			modal.addEventListener('hidden.bs.modal', () => {
-				this.clearModal();
+			// Sincronizar datos cada vez que el modal se muestra
+			modal.addEventListener('show.bs.modal', () => {
+				this.initFromProps();
+			})
+
+			modal.addEventListener('hidden.bs.modal', (event) => {
+				// Solo limpiar si el modal que se cerró es realmente modalNuevaCita
+				// y no un sub-modal o un evento burbujeado
+				if (event.target.id === 'modalNuevaCita') {
+					this.clearModal();
+				}
 			})
 		}
+
+
+
 	},
 	 
 	methods: {
@@ -729,7 +767,9 @@ export default {
 			this.reniec();
 			this.pasoActual = 2;
 		},
-		guardarNuevoPaciente() {
+
+
+		async guardarNuevoPaciente() {
 			if( this.cita.type_dni==1 && (this.cita.dni =='' || this.cita.dni.length<8) ) {
 				alertify.error('Todo paciente debe tener un DNI válido', 10);
 				return;
@@ -746,15 +786,93 @@ export default {
 				alertify.error('Debe rellenar el contacto de emergencia', 10);
 				return;
 			}
-			this.patientNew = true;
-			this.pasoActual = 2;
-			var myModalEl = document.getElementById('modalNuevoPaciente');
-			var modal = bootstrap.Modal.getInstance(myModalEl);
-			if(modal) {
-				modal.hide();
-			} else {
-				document.querySelector('#modalNuevoPaciente .btn-close').click();
-			}
+
+			this.isProcessing = true;
+			this.$swal.fire({
+				title: 'Guardando datos del paciente...',
+				allowOutsideClick: false,
+				didOpen: () => {
+					this.$swal.showLoading()
+				}
+			});
+
+			let payload = {
+				paciente: {
+					dni: this.cita.dni,
+					name: this.cita.name,
+					nombres: this.cita.nombres,
+					phone: this.cita.phone,
+					email: this.cita.email,
+					instruction_degree: this.cita.instruction_degree,
+					gender: this.cita.gender,
+					birth_date: this.cita.birth_date,
+					occupation: this.cita.occupation,
+					marital_status: this.cita.marital_status,
+					recomendation: this.cita.recomendation,
+					recomendacion_comentario: this.cita.recomendacion_comentario,
+					type_dni: this.cita.type_dni,
+					address: {
+						address: this.cita.address,
+						district: this.cita.district,
+						province: this.cita.province,
+						department: this.cita.department
+					},
+					contacto: this.cita.contacto,
+					contacto_celular: this.cita.contacto_celular,
+					parentezco: this.cita.parentezco,
+					contacto2: this.cita.contacto2,
+					contacto_celular2: this.cita.contacto_celular2,
+					parentezco2: this.cita.parentezco2
+				}
+			};
+
+			await this.axios.post('/api/patient/new', payload)
+				.then(res => {
+					if (res.data.status === 'repetido') {
+						alertify.warning('El paciente ya existe en el sistema');
+					} else {
+						this.$swal.fire({
+							icon: 'success',
+							title: 'Paciente registrado',
+							text: 'Los datos se guardaron correctamente',
+							timer: 1500,
+							showConfirmButton: false
+						});
+					}
+
+					this.patientNew = true;
+					this.pasoActual = 2;
+					this.fetchPacientes(); // Refresh list
+
+
+
+					// Cerrar modal Nuevo Paciente
+					const myModalEl = document.getElementById('modalNuevoPaciente');
+					const modal = bootstrap.Modal.getInstance(myModalEl);
+					if(modal) {
+						modal.hide();
+					} else {
+						document.querySelector('#modalNuevoPaciente .btn-close').click();
+					}
+
+					// Asegurar que modalNuevaCita permanezca abierto y funcional
+					this.$nextTick(() => {
+						const parentModalEl = document.getElementById('modalNuevaCita');
+						if (parentModalEl) {
+							const parentModal = bootstrap.Modal.getOrCreateInstance(parentModalEl);
+							parentModal.show();
+						}
+					});
+
+
+				})
+				.catch(err => {
+					console.error(err);
+					this.$swal.fire('Error', 'No se pudo guardar los datos del paciente', 'error');
+				})
+				.finally(() => {
+					this.isProcessing = false;
+				});
 		},
 		nextStep() {
 			if (this.pasoActual === 1) {
@@ -903,6 +1021,8 @@ export default {
 		},
 		async insertar(e){ 
 			e.preventDefault()
+			if (this.isProcessing) return;
+
 			const config = {
 				headers: { 'content-type': 'multipart/form-data' }
 			}
@@ -1005,6 +1125,10 @@ export default {
 						console.log(error)
 					}
 				})
+				.finally(() => {
+					this.isProcessing = false;
+				});
+
 			}
 		},
 		closeModal(){
@@ -1302,6 +1426,16 @@ export default {
 			let enc = this.status.find(x=> x.id == tipo)
 			//console.log(enc);
 			return enc.stat
+		},
+		initFromProps() {
+			if (this.horaElegida && this.profesionalElegido) {
+				this.cita.professional_id = this.profesionalElegido.id;
+				this.cita.clasification = this.profesionalElegido.idProfesion;
+				this.fechaManual = this.fechaElegida;
+				this.horaManualId = this.horaElegida.id;
+				this.cita.schedule_id = this.horaElegida.id;
+				this.horariosDisponibles = [this.horaElegida];
+			}
 		}
 	},
 	created (){
@@ -1314,23 +1448,14 @@ export default {
 		
 	},
 	watch:{
-		horaElegida(){
-			if (this.horaElegida && this.profesionalElegido) {
-				this.cita.professional_id = this.profesionalElegido.id;
-				this.cita.clasification = this.profesionalElegido.idProfesion;
-				this.fechaManual = this.fechaElegida;
-				this.horaManualId = this.horaElegida.id;
-				this.cita.schedule_id = this.horaElegida.id;
-				this.horariosDisponibles = [this.horaElegida];
-			} else {
-				this.cita.professional_id = '';
-				this.cita.schedule_id = '';
-				this.fechaManual = moment().format('YYYY-MM-DD');
-				this.horaManualId = '';
-				this.horariosDisponibles = [];
+		horaElegida: {
+			immediate: true,
+			handler() {
+				this.initFromProps();
 			}
 		}
 	},
+
 
 	computed:{
 		doctoresFiltradosPorCat() {
