@@ -120,7 +120,6 @@
                 </button>
                 <button class="btn btn-primary shadow-sm mr-2 mb-2" data-bs-toggle="modal" data-bs-target="#modalNewPatient"><i class="fas fa-user-plus"></i> Nuevo Paciente</button>
                 <router-link to="/recepcionista/home" class="btn shadow-sm text-white mr-2 mb-2" style="background-color: #f97316;"><i class="fas fa-plus"></i> Nueva Cita</router-link>
-                <button class="btn btn-white border shadow-sm mr-2 mb-2"><i class="far fa-credit-card"></i> Cobrar Deuda</button>
                 <router-link to="/recepcionista/paquetes" class="btn btn-white border shadow-sm mb-2"><i class="fas fa-box"></i> Nuevo Paquete</router-link>
             </div>
         </div>

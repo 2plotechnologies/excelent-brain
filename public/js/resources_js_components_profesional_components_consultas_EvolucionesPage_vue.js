@@ -2343,7 +2343,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               return _this.axios.put("/api/patient/".concat(_this.dataPatient.id), _this.dataPatient).then(function (res) {
                 console.log(res);
                 _this.closeModal();
-                _this.$swal('Datos de paciente actualizado con éxito');
+                _this.$swal.fire('Éxito', 'Datos de paciente actualizados con éxito', 'success');
                 _this.$emit('actualizar');
               })["catch"](function (err) {
                 console.error(err);
@@ -2415,8 +2415,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     capturaSeñal: function capturaSeñal() {
-      console.log('apli');
-      if (this.dataPatient.relative.length == 0) {
+      if (this.dataPatient.relative && this.dataPatient.relative.length == 0) {
         this.dataPatient.relative.push({
           id: -1,
           name: '',
@@ -2426,9 +2425,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
       this.listarDepartamentos(false);
     }
-  },
-  mounted: function mounted() {
-    //this.$parent.$on('cambioDato', this.capturaSeñal);
   },
   watch: {
     dataPatient: {
@@ -2454,13 +2450,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       deep: true,
       immediate: true
     }
-  },
-  updated: function updated() {
-    //this.updateValues;
-    //console.log('ver paciente rel ',this.dataPatient.relative);
-  },
-  created: function created() {
-    //this.updateValues;
   }
 });
 
@@ -2515,28 +2504,49 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     queCodigo: function queCodigo(tipo) {
-      return this.estados.filter(function (z) {
+      var est = this.estados.find(function (z) {
         return z.id == tipo;
-      })[0].valor;
+      });
+      return est ? est.valor : 'Indefinido';
+    },
+    badgeColor: function badgeColor(tipo) {
+      // Suponiendo que 1=Verde, 2=Amarillo, 3=Rojo (o similar)
+      if (tipo == 1) return 'badge-success-soft';
+      if (tipo == 2) return 'badge-warning-soft';
+      if (tipo == 3) return 'badge-danger-soft';
+      return 'badge-secondary-soft';
     },
     eliminarEstado: function eliminarEstado(id, index) {
       var _this2 = this;
-      if (confirm('¿Deseas eliminar el estado?')) {
-        this.axios.post('/api/eliminarSemaforo/' + id).then(function (response) {
-          if (response.data.msg == 'eliminado') {
-            _this2.dataPatient.semaforo.splice(index, 1);
-          }
-        });
-      }
+      this.$swal.fire({
+        title: '¿Deseas eliminar el estado?',
+        text: "Esta acción no se puede deshacer",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then(function (result) {
+        if (result.isConfirmed) {
+          _this2.axios.post('/api/eliminarSemaforo/' + id).then(function (response) {
+            if (response.data.msg == 'eliminado') {
+              _this2.dataPatient.semaforo.splice(index, 1);
+              _this2.$swal.fire('Eliminado', 'El registro ha sido eliminado.', 'success');
+            }
+          });
+        }
+      });
     }
   },
   computed: {
     verDetalle: function verDetalle() {
       var _this3 = this;
       return function (id) {
-        return _this3.estados.find(function (x) {
+        var est = _this3.estados.find(function (x) {
           return x.id == id;
-        }).detalle;
+        });
+        return est ? est.detalle : 'Sin detalle';
       };
     }
   }
@@ -2647,7 +2657,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     capitalizarPrimeraLetra: function capitalizarPrimeraLetra(palabra) {
       if (palabra.length === 0) return "";
-      // Convierte la primera letra a mayúscula y el resto a minúscula
       palabra = palabra.toLowerCase();
       palabra = palabra.charAt(0).toUpperCase() + palabra.slice(1);
       return palabra;
@@ -2662,11 +2671,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           text: _this3.capitalizarPrimeraLetra(hob)
         });
       });
-      //this.actividades.sort((a,b)=>a.descripcion.localeCompare(b.descripcion))
     }
-  },
-  watch: {
-    //hobbies(){ this.recargarLista() }
   }
 });
 
@@ -7436,10 +7441,10 @@ render._withStripped = true;
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496":
-/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496 ***!
-  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -7459,24 +7464,33 @@ var render = function render() {
       "aria-hidden": "true"
     }
   }, [_c("div", {
-    staticClass: "modal-dialog modal-lg modal-dialog-centered"
+    staticClass: "modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
   }, [_c("div", {
-    staticClass: "modal-content"
+    staticClass: "modal-content border-0 shadow-lg",
+    staticStyle: {
+      "border-radius": "20px",
+      overflow: "hidden"
+    }
   }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
+    staticClass: "modal-body px-4 pt-4"
   }, [_c("form", {
-    attrs: {
-      action: ""
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.updatePatient.apply(null, arguments);
+      }
     }
   }, [_c("div", {
-    staticClass: "form-group row"
+    staticClass: "section-container mb-4"
+  }, [_vm._m(1), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
   }, [_c("div", {
-    staticClass: "col-sm-6"
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Dni")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("DNI / DOCUMENTO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -7486,9 +7500,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "dni",
-      id: "dni",
-      placeholder: "Dni del paciente"
+      placeholder: "DNI del paciente"
     },
     domProps: {
       value: _vm.dataPatient.dni
@@ -7499,13 +7511,13 @@ var render = function render() {
         _vm.$set(_vm.dataPatient, "dni", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Teléfono")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("TELÉFONO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -7515,9 +7527,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "phone",
-      id: "phone",
-      placeholder: "Telefono del paciente"
+      placeholder: "Celular"
     },
     domProps: {
       value: _vm.dataPatient.phone
@@ -7528,25 +7538,23 @@ var render = function render() {
         _vm.$set(_vm.dataPatient, "phone", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Paciente")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("APELLIDOS")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.dataPatient.name,
       expression: "dataPatient.name"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control text-uppercase",
     attrs: {
       type: "text",
-      name: "name",
-      id: "name",
-      placeholder: "Apellidos del paciente"
+      placeholder: "Apellidos"
     },
     domProps: {
       value: _vm.dataPatient.name
@@ -7557,25 +7565,23 @@ var render = function render() {
         _vm.$set(_vm.dataPatient, "name", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Paciente")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("NOMBRES")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.dataPatient.nombres,
       expression: "dataPatient.nombres"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control text-uppercase",
     attrs: {
       type: "text",
-      name: "nombres",
-      id: "nombres",
-      placeholder: "Nombres del paciente"
+      placeholder: "Nombres"
     },
     domProps: {
       value: _vm.dataPatient.nombres
@@ -7587,182 +7593,12 @@ var render = function render() {
       }
     }
   })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
+    staticClass: "col-md-6"
   }, [_c("div", {
-    staticClass: "col-sm-6"
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Dirección")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.dataPatient.address.address,
-      expression: "dataPatient.address.address"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "address",
-      id: "address",
-      placeholder: "Direccion del paciente"
-    },
-    domProps: {
-      value: _vm.dataPatient.address.address
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.dataPatient.address, "address", $event.target.value);
-      }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Correo electrónico")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.dataPatient.email,
-      expression: "dataPatient.email"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "email",
-      name: "email",
-      id: "email",
-      placeholder: "Correo electrónico"
-    },
-    domProps: {
-      value: _vm.dataPatient.email
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.dataPatient, "email", $event.target.value);
-      }
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
-  }, [_c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Departamento")]), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.dataPatient.address.department,
-      expression: "dataPatient.address.department"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "department"
-    },
-    on: {
-      change: [function ($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.dataPatient.address, "department", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }, function ($event) {
-        return _vm.moverProvincias(true);
-      }]
-    }
-  }, _vm._l(_vm.ubigeo.departamentos, function (departamento) {
-    return _c("option", {
-      domProps: {
-        value: departamento.idDepa
-      }
-    }, [_vm._v(_vm._s(departamento.departamento))]);
-  }), 0)]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Provincia")]), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.dataPatient.address.province,
-      expression: "dataPatient.address.province"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "provincia"
-    },
-    on: {
-      change: [function ($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.dataPatient.address, "province", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }, function ($event) {
-        return _vm.moverDistritos();
-      }]
-    }
-  }, _vm._l(_vm.provincias, function (provincia) {
-    return _c("option", {
-      domProps: {
-        value: provincia.idProv
-      }
-    }, [_vm._v(_vm._s(provincia.provincia))]);
-  }), 0)]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Distrito")]), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.dataPatient.address.district,
-      expression: "dataPatient.address.district"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "distrito"
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.dataPatient.address, "district", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }
-    }
-  }, _vm._l(_vm.distritos, function (distrito) {
-    return _c("option", {
-      domProps: {
-        value: distrito.idDist
-      }
-    }, [_vm._v(_vm._s(distrito.distrito))]);
-  }), 0)])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
-  }, [_c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Fecha de nacimiento")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("FECHA DE NACIMIENTO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -7771,9 +7607,7 @@ var render = function render() {
     }],
     staticClass: "form-control",
     attrs: {
-      type: "date",
-      name: "birth_date",
-      id: "birth_date"
+      type: "date"
     },
     domProps: {
       value: _vm.dataPatient.birth_date
@@ -7784,13 +7618,13 @@ var render = function render() {
         _vm.$set(_vm.dataPatient, "birth_date", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Género")]), _vm._v(" "), _c("select", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("GÉNERO")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -7798,9 +7632,6 @@ var render = function render() {
       expression: "dataPatient.gender"
     }],
     staticClass: "form-select",
-    attrs: {
-      id: "sexo"
-    },
     on: {
       change: function change($event) {
         var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
@@ -7828,13 +7659,175 @@ var render = function render() {
     domProps: {
       value: 3
     }
-  }, [_vm._v("LGTB+")])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  }, [_vm._v("LGTB+")])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "section-container mb-4"
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
+  }, [_c("div", {
+    staticClass: "col-md-12"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("DIRECCIÓN")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.dataPatient.address.address,
+      expression: "dataPatient.address.address"
+    }],
+    staticClass: "form-control",
     attrs: {
-      "for": "name"
+      type: "text",
+      placeholder: "Dirección completa"
+    },
+    domProps: {
+      value: _vm.dataPatient.address.address
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.dataPatient.address, "address", $event.target.value);
+      }
     }
-  }, [_vm._v("Ocupación")]), _vm._v(" "), _c("input", {
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-12"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("CORREO ELECTRÓNICO")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.dataPatient.email,
+      expression: "dataPatient.email"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "email",
+      placeholder: "email@ejemplo.com"
+    },
+    domProps: {
+      value: _vm.dataPatient.email
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.dataPatient, "email", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("DEPARTAMENTO")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.dataPatient.address.department,
+      expression: "dataPatient.address.department"
+    }],
+    staticClass: "form-select",
+    on: {
+      change: [function ($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.dataPatient.address, "department", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }, function ($event) {
+        return _vm.moverProvincias(true);
+      }]
+    }
+  }, _vm._l(_vm.ubigeo.departamentos, function (departamento) {
+    return _c("option", {
+      key: departamento.idDepa,
+      domProps: {
+        value: departamento.idDepa
+      }
+    }, [_vm._v(_vm._s(departamento.departamento))]);
+  }), 0)])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("PROVINCIA")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.dataPatient.address.province,
+      expression: "dataPatient.address.province"
+    }],
+    staticClass: "form-select",
+    on: {
+      change: [function ($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.dataPatient.address, "province", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }, function ($event) {
+        return _vm.moverDistritos();
+      }]
+    }
+  }, _vm._l(_vm.provincias, function (provincia) {
+    return _c("option", {
+      key: provincia.idProv,
+      domProps: {
+        value: provincia.idProv
+      }
+    }, [_vm._v(_vm._s(provincia.provincia))]);
+  }), 0)])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("DISTRITO")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.dataPatient.address.district,
+      expression: "dataPatient.address.district"
+    }],
+    staticClass: "form-select",
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.dataPatient.address, "district", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, _vm._l(_vm.distritos, function (distrito) {
+    return _c("option", {
+      key: distrito.idDist,
+      domProps: {
+        value: distrito.idDist
+      }
+    }, [_vm._v(_vm._s(distrito.distrito))]);
+  }), 0)])])])]), _vm._v(" "), _c("div", {
+    staticClass: "section-container mb-4"
+  }, [_vm._m(3), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
+  }, [_c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("OCUPACIÓN")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -7844,9 +7837,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "occupation",
-      id: "occupation",
-      placeholder: "Ocuación del paciente"
+      placeholder: "Ocupación"
     },
     domProps: {
       value: _vm.dataPatient.occupation
@@ -7858,16 +7849,12 @@ var render = function render() {
       }
     }
   })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
+    staticClass: "col-md-4"
   }, [_c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("div", {
-    staticClass: "form-group"
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Estado Civil")]), _vm._v(" "), _c("select", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("ESTADO CIVIL")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -7875,10 +7862,6 @@ var render = function render() {
       expression: "dataPatient.marital_status"
     }],
     staticClass: "form-select",
-    attrs: {
-      name: "marital_status",
-      id: "marital_status"
-    },
     on: {
       change: function change($event) {
         var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
@@ -7911,14 +7894,12 @@ var render = function render() {
       value: "5"
     }
   }, [_vm._v("Conviviente")])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+    staticClass: "col-md-4"
   }, [_c("div", {
-    staticClass: "form-group"
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Grado de instrucción")]), _vm._v(" "), _c("select", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("GRADO INSTRUCCIÓN")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -7926,10 +7907,6 @@ var render = function render() {
       expression: "dataPatient.instruction_degree"
     }],
     staticClass: "form-select",
-    attrs: {
-      name: "instruction_degree",
-      id: "instruction_degree"
-    },
     on: {
       change: function change($event) {
         var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
@@ -7961,24 +7938,21 @@ var render = function render() {
     attrs: {
       value: "5"
     }
-  }, [_vm._v("Tecnico")]), _vm._v(" "), _c("option", {
+  }, [_vm._v("Técnico")]), _vm._v(" "), _c("option", {
     attrs: {
       value: "6"
     }
-  }, [_vm._v("Sin instrucción")])])])])]), _vm._v(" "), _c("hr"), _vm._v(" "), _c("h5", {
-    staticClass: "modal-title",
-    attrs: {
-      id: "exampleModalLabel"
-    }
-  }, [_vm._v(" Datos del familiar")]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
+  }, [_vm._v("Sin instrucción")])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "section-container mb-4"
+  }, [_vm._m(4), _vm._v(" "), _vm.dataPatient.relative && _vm.dataPatient.relative.length > 0 ? _c("div", {
+    staticClass: "row g-3 mb-3 p-3 rounded-4 bg-light border-0 mx-0"
+  }, [_vm._m(5), _vm._v(" "), _c("div", {
+    staticClass: "col-md-12"
   }, [_c("div", {
-    staticClass: "col-sm-12"
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Nombre del primer contacto")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("NOMBRE COMPLETO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -7988,9 +7962,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "relative_name",
-      id: "relativename",
-      placeholder: "Nombre de pariente"
+      placeholder: "Nombre"
     },
     domProps: {
       value: _vm.dataPatient.relative[0].name
@@ -8001,13 +7973,13 @@ var render = function render() {
         _vm.$set(_vm.dataPatient.relative[0], "name", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Telefono")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("TELÉFONO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -8017,9 +7989,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "relative_phone",
-      id: "relativephone",
-      placeholder: "Telefono de pariente"
+      placeholder: "Celular"
     },
     domProps: {
       value: _vm.dataPatient.relative[0].phone
@@ -8030,13 +8000,13 @@ var render = function render() {
         _vm.$set(_vm.dataPatient.relative[0], "phone", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Parentesco")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("PARENTESCO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -8046,9 +8016,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "kinship",
-      id: "kinship",
-      placeholder: "Parentesco"
+      placeholder: "Ej: Madre, Padre..."
     },
     domProps: {
       value: _vm.dataPatient.relative[0].kinship
@@ -8059,15 +8027,15 @@ var render = function render() {
         _vm.$set(_vm.dataPatient.relative[0], "kinship", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
+  })])])]) : _vm._e(), _vm._v(" "), _vm.dataPatient.relative && _vm.dataPatient.relative.length > 1 ? _c("div", {
+    staticClass: "row g-3 p-3 rounded-4 bg-light border-0 mx-0"
+  }, [_vm._m(6), _vm._v(" "), _c("div", {
+    staticClass: "col-md-12"
   }, [_c("div", {
-    staticClass: "col-sm-12"
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Nombre del segundo contacto")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("NOMBRE COMPLETO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -8077,9 +8045,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "relative_name",
-      id: "relativename",
-      placeholder: "Nombre de pariente"
+      placeholder: "Nombre"
     },
     domProps: {
       value: _vm.dataPatient.relative[1].name
@@ -8090,13 +8056,13 @@ var render = function render() {
         _vm.$set(_vm.dataPatient.relative[1], "name", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Telefono")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("TELÉFONO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -8106,9 +8072,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "relative_phone",
-      id: "relativephone",
-      placeholder: "Telefono de pariente"
+      placeholder: "Celular"
     },
     domProps: {
       value: _vm.dataPatient.relative[1].phone
@@ -8119,13 +8083,13 @@ var render = function render() {
         _vm.$set(_vm.dataPatient.relative[1], "phone", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Parentesco")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("PARENTESCO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -8135,9 +8099,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "kinship",
-      id: "kinship",
-      placeholder: "Parentesco"
+      placeholder: "Ej: Amigo, Tío..."
     },
     domProps: {
       value: _vm.dataPatient.relative[1].kinship
@@ -8148,19 +8110,18 @@ var render = function render() {
         _vm.$set(_vm.dataPatient.relative[1], "kinship", $event.target.value);
       }
     }
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "modal-footer border-0"
+  })])])]) : _vm._e()])])]), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer border-0 pb-4 px-4 pt-0"
   }, [_c("button", {
-    staticClass: "btn btn-outline-danger",
+    staticClass: "btn btn-light rounded-pill px-4 font-weight-bold",
     attrs: {
       type: "button",
       "data-bs-dismiss": "modal"
     }
   }, [_vm._v("Cancelar")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-outline-primary",
+    staticClass: "btn btn-primary rounded-pill px-5 font-weight-bold shadow-sm",
     attrs: {
-      type: "button",
-      "data-bs-dismiss": "modal"
+      type: "button"
     },
     on: {
       click: function click($event) {
@@ -8168,42 +8129,93 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-sync-alt"
-  }), _vm._v(" Actualizar")])])])])]);
+    staticClass: "fas fa-save mr-2"
+  }), _vm._v(" Actualizar Datos\n\t\t\t\t")])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header"
-  }, [_c("h5", {
-    staticClass: "modal-title",
-    attrs: {
-      id: "exampleModalLabel"
-    }
-  }, [_vm._v(" Datos del Paciente")]), _vm._v(" "), _c("button", {
-    staticClass: "close",
+    staticClass: "modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center"
+  }, [_c("div", {
+    staticClass: "icon-header-container mr-3"
+  }, [_c("i", {
+    staticClass: "fas fa-user-edit text-primary h4 mb-0"
+  })]), _vm._v(" "), _c("div", [_c("h5", {
+    staticClass: "modal-title font-weight-bold text-dark mb-1"
+  }, [_vm._v("Editar Datos del Paciente")]), _vm._v(" "), _c("p", {
+    staticClass: "small text-muted mb-0"
+  }, [_vm._v("Actualiza la información personal y de contacto")])])]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close-custom",
     attrs: {
       type: "button",
-      id: "btnCerrarEdPac",
       "data-bs-dismiss": "modal",
-      "aria-label": "Close"
+      "aria-label": "Close",
+      id: "btnCerrarEdPac"
     }
-  }, [_c("span", {
-    attrs: {
-      "aria-hidden": "true"
-    }
-  }, [_vm._v("×")])])]);
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "section-label mb-3"
+  }, [_c("i", {
+    staticClass: "fas fa-user-circle mr-2 text-primary"
+  }), _vm._v(" DATOS PERSONALES\n\t\t\t\t\t\t")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "section-label mb-3"
+  }, [_c("i", {
+    staticClass: "fas fa-map-marker-alt mr-2 text-primary"
+  }), _vm._v(" UBICACIÓN Y CONTACTO\n\t\t\t\t\t\t")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "section-label mb-3"
+  }, [_c("i", {
+    staticClass: "fas fa-info-circle mr-2 text-primary"
+  }), _vm._v(" INFORMACIÓN ADICIONAL\n\t\t\t\t\t\t")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "section-label mb-3"
+  }, [_c("i", {
+    staticClass: "fas fa-phone-alt mr-2 text-primary"
+  }), _vm._v(" CONTACTOS DE EMERGENCIA\n\t\t\t\t\t\t")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "col-md-12"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-primary mb-1"
+  }, [_vm._v("PRIMER CONTACTO")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "col-md-12"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-primary mb-1"
+  }, [_vm._v("SEGUNDO CONTACTO")])]);
 }];
 render._withStripped = true;
 
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4":
-/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4 ***!
-  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -8223,31 +8235,49 @@ var render = function render() {
       "aria-hidden": "true"
     }
   }, [_c("div", {
-    staticClass: "modal-dialog modal-lg"
+    staticClass: "modal-dialog modal-lg modal-dialog-centered"
   }, [_c("div", {
-    staticClass: "modal-content"
-  }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
-  }, [_c("p", {
-    staticClass: "mb-0 lead"
-  }, [_vm._v("Paciente: " + _vm._s(_vm.dataPatient.name))]), _vm._v(" "), _c("div", {
-    staticClass: "card mb-2"
+    staticClass: "modal-content border-0 shadow-lg",
+    staticStyle: {
+      "border-radius": "20px",
+      overflow: "hidden"
+    }
   }, [_c("div", {
-    staticClass: "card-body"
+    staticClass: "modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between"
   }, [_c("div", {
-    staticClass: "row"
+    staticClass: "d-flex align-items-center"
+  }, [_vm._m(0), _vm._v(" "), _c("div", [_c("h5", {
+    staticClass: "modal-title font-weight-bold text-dark mb-1"
+  }, [_vm._v("Estado del paciente")]), _vm._v(" "), _c("p", {
+    staticClass: "small text-muted mb-0"
+  }, [_vm._v("Paciente: "), _c("span", {
+    staticClass: "font-weight-bold text-primary"
+  }, [_vm._v(_vm._s(_vm.dataPatient.name))])])])]), _vm._v(" "), _vm._m(1)]), _vm._v(" "), _c("div", {
+    staticClass: "modal-body px-4 pt-4"
   }, [_c("div", {
-    staticClass: "col-sm-3"
-  }, [_c("select", {
+    staticClass: "card border-0 shadow-sm rounded-4 mb-4",
+    staticStyle: {
+      background: "#f8f9fc",
+      border: "1px solid #f1f3f9!important"
+    }
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("div", {
+    staticClass: "row align-items-center"
+  }, [_c("div", {
+    staticClass: "col-md-4 mb-3 mb-md-0"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted mb-2"
+  }, [_vm._v("CALIFICACIÓN")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.semaforo.codigo,
       expression: "semaforo.codigo"
     }],
-    staticClass: "form-select text-capitalize",
-    attrs: {
-      id: ""
+    staticClass: "form-select rounded-pill border-0 shadow-sm px-3 text-capitalize",
+    staticStyle: {
+      height: "45px"
     },
     on: {
       change: function change($event) {
@@ -8262,24 +8292,29 @@ var render = function render() {
     }
   }, _vm._l(_vm.estados, function (estado) {
     return _c("option", {
-      staticClass: "text-capitalize",
+      key: estado.id,
       domProps: {
         value: estado.id
       }
     }, [_vm._v(_vm._s(estado.valor))]);
   }), 0)]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("input", {
+    staticClass: "col-md-5 mb-3 mb-md-0"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted mb-2"
+  }, [_vm._v("DETALLES / OBSERVACIONES")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.semaforo.observaciones,
       expression: "semaforo.observaciones"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control rounded-pill border-0 shadow-sm px-3",
+    staticStyle: {
+      height: "45px"
+    },
     attrs: {
       type: "text",
-      placeholder: "Detalles"
+      placeholder: "Ingresa detalles..."
     },
     domProps: {
       value: _vm.semaforo.observaciones
@@ -8291,49 +8326,76 @@ var render = function render() {
       }
     }
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-3"
+    staticClass: "col-md-3 mt-md-4"
   }, [_c("button", {
-    staticClass: "btn btn-outline-secondary",
+    staticClass: "btn btn-primary w-100 rounded-pill font-weight-bold shadow-sm",
+    staticStyle: {
+      height: "45px"
+    },
     on: {
       click: function click($event) {
         return _vm.enviarSemaforo();
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-share"
-  }), _vm._v(" Enviar")])])]), _vm._v(" "), _c("p", {
-    staticClass: "mt-2 mb-0"
-  }, [_vm._v("Detalle: " + _vm._s(_vm.verDetalle(_vm.semaforo.codigo)))])])]), _vm._v(" "), _c("table", {
-    staticClass: "table table-striped"
-  }, [_vm._m(1), _vm._v(" "), _c("tbody", _vm._l(_vm.dataPatient.semaforo, function (semaf, index) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.fechaLatam(semaf.registro)))]), _vm._v(" "), _c("td", {
-      staticClass: "text-capitalize"
-    }, [_vm._v(_vm._s(_vm.queCodigo(semaf.codigo)))]), _vm._v(" "), _c("td", {
-      staticClass: "text-capitalize"
-    }, [_vm._v(_vm._s(semaf.observaciones))]), _vm._v(" "), _c("td", [_c("button", {
-      staticClass: "btn btn-danger btn-sm",
+    staticClass: "fas fa-paper-plane mr-1"
+  }), _vm._v(" Actualizar\n\t\t\t\t\t\t\t\t")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mt-3 bg-white p-2 px-3 rounded-3 border-dashed small",
+    staticStyle: {
+      border: "1px dashed #dee2e6!important"
+    }
+  }, [_c("span", {
+    staticClass: "text-muted"
+  }, [_vm._v("Detalle del estado seleccionado:")]), _vm._v(" "), _c("span", {
+    staticClass: "font-weight-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.verDetalle(_vm.semaforo.codigo)))])])])]), _vm._v(" "), _c("div", {
+    staticClass: "table-responsive rounded-4 border overflow-hidden"
+  }, [_c("table", {
+    staticClass: "table table-hover mb-0"
+  }, [_vm._m(2), _vm._v(" "), _c("tbody", [_vm._l(_vm.dataPatient.semaforo, function (semaf, index) {
+    return _c("tr", {
+      key: index
+    }, [_c("td", {
+      staticClass: "px-4 py-3 align-middle text-muted small"
+    }, [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", {
+      staticClass: "px-4 py-3 align-middle small"
+    }, [_vm._v(_vm._s(_vm.fechaLatam(semaf.registro)))]), _vm._v(" "), _c("td", {
+      staticClass: "px-4 py-3 align-middle"
+    }, [_c("span", {
+      staticClass: "badge-custom",
+      "class": _vm.badgeColor(semaf.codigo)
+    }, [_vm._v("\n\t\t\t\t\t\t\t\t\t\t" + _vm._s(_vm.queCodigo(semaf.codigo)) + "\n\t\t\t\t\t\t\t\t\t")])]), _vm._v(" "), _c("td", {
+      staticClass: "px-4 py-3 align-middle small text-capitalize text-muted"
+    }, [_vm._v(_vm._s(semaf.observaciones))]), _vm._v(" "), _c("td", {
+      staticClass: "px-4 py-3 align-middle text-center"
+    }, [_c("button", {
+      staticClass: "btn btn-soft-danger btn-sm rounded-circle shadow-none",
+      attrs: {
+        title: "Eliminar"
+      },
       on: {
         click: function click($event) {
           return _vm.eliminarEstado(semaf.id, index);
         }
       }
     }, [_c("i", {
-      staticClass: "fas fa-trash"
+      staticClass: "fas fa-trash-alt"
     })])])]);
-  }), 0)])])])])]);
+  }), _vm._v(" "), !_vm.dataPatient.semaforo || _vm.dataPatient.semaforo.length === 0 ? _c("tr", [_vm._m(3)]) : _vm._e()], 2)])])]), _vm._v(" "), _vm._m(4)])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header bg-primary text-white"
-  }, [_c("h5", {
-    staticClass: "modal-title",
-    attrs: {
-      id: "infoModalLabel"
-    }
-  }, [_vm._v("Perfil del paciente")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-danger",
+    staticClass: "icon-header-container mr-3"
+  }, [_c("i", {
+    staticClass: "fas fa-traffic-light text-primary h4 mb-0"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn-close-custom",
     attrs: {
       type: "button",
       "data-bs-dismiss": "modal",
@@ -8341,11 +8403,58 @@ var staticRenderFns = [function () {
     }
   }, [_c("i", {
     staticClass: "fas fa-times"
-  })])]);
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("N°")]), _vm._v(" "), _c("th", [_vm._v("Fecha")]), _vm._v(" "), _c("th", [_vm._v("Calificación")]), _vm._v(" "), _c("th", [_vm._v("Detalle")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
+  return _c("thead", {
+    staticStyle: {
+      background: "#f8f9fc"
+    }
+  }, [_c("tr", [_c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3",
+    staticStyle: {
+      width: "60px"
+    }
+  }, [_vm._v("N°")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3"
+  }, [_vm._v("FECHA")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3"
+  }, [_vm._v("ESTADO")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3"
+  }, [_vm._v("OBSERVACIONES")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3 text-center",
+    staticStyle: {
+      width: "80px"
+    }
+  }, [_vm._v("@")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("td", {
+    staticClass: "text-center py-5",
+    attrs: {
+      colspan: "5"
+    }
+  }, [_c("div", {
+    staticClass: "py-2"
+  }, [_c("i", {
+    staticClass: "fas fa-history fa-3x text-light mb-3"
+  }), _vm._v(" "), _c("p", {
+    staticClass: "text-muted mb-0"
+  }, [_vm._v("No hay historial de estados registrado")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modal-footer border-0 pb-4 px-4"
+  }, [_c("button", {
+    staticClass: "btn btn-light rounded-pill px-4 font-weight-bold",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Cerrar")])]);
 }];
 render._withStripped = true;
 
@@ -8426,10 +8535,10 @@ render._withStripped = true;
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600":
-/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600 ***!
-  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -8448,25 +8557,33 @@ var render = function render() {
       "aria-hidden": "true"
     }
   }, [_c("div", {
-    staticClass: "modal-dialog"
+    staticClass: "modal-dialog modal-dialog-centered"
   }, [_c("div", {
-    staticClass: "modal-content"
+    staticClass: "modal-content border-0 shadow-lg",
+    staticStyle: {
+      "border-radius": "20px",
+      overflow: "hidden"
+    }
   }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
+    staticClass: "modal-body px-4 pt-4"
   }, [_c("div", {
-    staticClass: "card mb-2"
+    staticClass: "card border-0 shadow-sm rounded-4 mb-4",
+    staticStyle: {
+      background: "#f8f9fc",
+      border: "1px solid #f1f3f9!important"
+    }
   }, [_c("div", {
-    staticClass: "card-body"
+    staticClass: "card-body p-3"
   }, [_c("div", {
-    staticClass: "row"
+    staticClass: "row align-items-center"
   }, [_c("div", {
-    staticClass: "col-sm-6"
-  }, [[_c("VSelect", {
+    staticClass: "col-sm-8 mb-2 mb-sm-0"
+  }, [_c("VSelect", {
     attrs: {
-      addClass: "text-capitalize",
+      addClass: "text-capitalize modern-vselect",
       searchable: true,
       searchPlaceholder: "Buscar hobbies",
-      defaultTitle: "Hobbies",
+      defaultTitle: "Selecciona un hobbie",
       searchNotFound: "No hay resultados",
       options: _vm.actividades
     },
@@ -8477,60 +8594,117 @@ var render = function render() {
       },
       expression: "selected"
     }
-  })]], 2), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })], 1), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
   }, [_c("button", {
-    staticClass: "btn btn-outline-secondary",
+    staticClass: "btn btn-primary w-100 rounded-pill font-weight-bold shadow-sm",
     on: {
       click: function click($event) {
         return _vm.addHobbie();
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-paperclip"
-  }), _vm._v(" Agregar")])])])])]), _vm._v(" "), _c("table", {
-    staticClass: "table"
+    staticClass: "fas fa-plus mr-1"
+  }), _vm._v(" Agregar\n\t\t\t\t\t\t\t\t")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "table-responsive rounded-4 border overflow-hidden"
+  }, [_c("table", {
+    staticClass: "table table-hover mb-0"
   }, [_vm._m(1), _vm._v(" "), _c("tbody", [_vm._l(_vm.misHobbies, function (hobbie, index) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", {
-      staticClass: "text-capitalize"
-    }, [_vm._v(_vm._s(_vm.hobbies[hobbie]))]), _vm._v(" "), _c("td", [_c("button", {
-      staticClass: "btn btn-outlihe-danger",
+    return _c("tr", {
+      key: index
+    }, [_c("td", {
+      staticClass: "px-4 py-3 align-middle text-muted small"
+    }, [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", {
+      staticClass: "px-4 py-3 align-middle font-weight-bold text-dark text-capitalize"
+    }, [_vm._v(_vm._s(_vm.hobbies[hobbie]))]), _vm._v(" "), _c("td", {
+      staticClass: "px-4 py-3 align-middle text-center"
+    }, [_c("button", {
+      staticClass: "btn btn-soft-danger btn-sm rounded-circle shadow-none",
+      attrs: {
+        title: "Eliminar"
+      },
       on: {
         click: function click($event) {
           return _vm.borrarHobbie(index);
         }
       }
     }, [_c("i", {
-      staticClass: "fa-solid fa-eraser"
+      staticClass: "fas fa-trash-alt"
     })])])]);
-  }), _vm._v(" "), _vm.misHobbies.length === 0 ? _c("tr", [_c("td", {
-    attrs: {
-      colspan: "4"
-    }
-  }, [_vm._v("No existen hobbies")])]) : _vm._e()], 2)])])])])]);
+  }), _vm._v(" "), _vm.misHobbies.length === 0 ? _c("tr", [_vm._m(2)]) : _vm._e()], 2)])])]), _vm._v(" "), _vm._m(3)])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header border-0"
-  }, [_c("h1", {
-    staticClass: "modal-title fs-5",
-    attrs: {
-      id: "exampleModalLabel"
-    }
-  }, [_vm._v("Hobbies del paciente")]), _vm._v(" "), _c("button", {
-    staticClass: "btn-close",
+    staticClass: "modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center"
+  }, [_c("div", {
+    staticClass: "icon-header-container mr-3"
+  }, [_c("i", {
+    staticClass: "fas fa-heart text-primary h4 mb-0"
+  })]), _vm._v(" "), _c("div", [_c("h5", {
+    staticClass: "modal-title font-weight-bold text-dark mb-1"
+  }, [_vm._v("Hobbies del paciente")]), _vm._v(" "), _c("p", {
+    staticClass: "small text-muted mb-0"
+  }, [_vm._v("Gestiona las actividades favoritas del paciente")])])]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close-custom",
     attrs: {
       type: "button",
       "data-bs-dismiss": "modal",
       "aria-label": "Close"
     }
-  })]);
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("N°")]), _vm._v(" "), _c("th", [_vm._v("Hobbie")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
+  return _c("thead", {
+    staticStyle: {
+      background: "#f8f9fc"
+    }
+  }, [_c("tr", [_c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3",
+    staticStyle: {
+      width: "60px"
+    }
+  }, [_vm._v("N°")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3"
+  }, [_vm._v("HOBBIE")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3 text-center",
+    staticStyle: {
+      width: "80px"
+    }
+  }, [_vm._v("@")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("td", {
+    staticClass: "text-center py-5",
+    attrs: {
+      colspan: "3"
+    }
+  }, [_c("div", {
+    staticClass: "py-2"
+  }, [_c("i", {
+    staticClass: "fas fa-layer-group fa-3x text-light mb-3"
+  }), _vm._v(" "), _c("p", {
+    staticClass: "text-muted mb-0"
+  }, [_vm._v("No existen hobbies registrados")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modal-footer border-0 pb-4 px-4"
+  }, [_c("button", {
+    staticClass: "btn btn-light rounded-pill px-4 font-weight-bold",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Cerrar")])]);
 }];
 render._withStripped = true;
 
@@ -8698,10 +8872,56 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.pointer {\r\n\tcursor: pointer;\n}\
 
 /***/ }),
 
-/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css":
-/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css ***!
-  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.icon-header-container[data-v-46429496] {\n  background: #f0f7ff;\n  width: 44px;\n  height: 44px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 12px;\n}\n.btn-close-custom[data-v-46429496] {\n  background: #f8f9fa;\n  border: none;\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  color: #adb5bd;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  transition: all 0.2s;\n  cursor: pointer;\n}\n.btn-close-custom[data-v-46429496]:hover { background: #e9ecef; color: #495057;\n}\n.section-label[data-v-46429496] {\n  font-size: 0.75rem;\n  font-weight: 800;\n  color: #adb5bd;\n  letter-spacing: 1px;\n  text-transform: uppercase;\n  display: flex;\n  align-items: center;\n}\n.input-group-modern[data-v-46429496] {\n\tdisplay: flex;\n\tflex-direction: column;\n\tgap: 4px;\n}\n.input-group-modern label[data-v-46429496] {\n\tmargin-bottom: 0;\n\tmargin-left: 4px;\n}\n.input-group-modern .form-control[data-v-46429496], \n.input-group-modern .form-select[data-v-46429496] {\n\tborder-radius: 12px!important;\n\tborder: 1px solid #e9ecef!important;\n\tpadding: 10px 15px!important;\n\tbackground: #fcfdfe!important;\n\tfont-size: 0.9rem!important;\n\ttransition: all 0.2s;\n}\n.input-group-modern .form-control[data-v-46429496]:focus, \n.input-group-modern .form-select[data-v-46429496]:focus {\n\tborder-color: #0d6efd!important;\n\tbackground: #fff!important;\n\tbox-shadow: 0 0 0 4px rgba(13, 110, 253, 0.05)!important;\n}\n.bg-light[data-v-46429496] {\n\tbackground-color: #f8f9fc!important;\n}\n.mr-3[data-v-46429496] { margin-right: 1rem;\n}\n.mr-2[data-v-46429496] { margin-right: 0.5rem;\n}\n.font-weight-bold[data-v-46429496] { font-weight: 700!important;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.icon-header-container[data-v-53bfa8f4] {\r\n  background: #f0f7ff;\r\n  width: 44px;\r\n  height: 44px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  border-radius: 12px;\n}\n.btn-close-custom[data-v-53bfa8f4] {\r\n  background: #f8f9fa;\r\n  border: none;\r\n  width: 32px;\r\n  height: 32px;\r\n  border-radius: 50%;\r\n  color: #adb5bd;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  transition: all 0.2s;\r\n  cursor: pointer;\n}\n.btn-close-custom[data-v-53bfa8f4]:hover { background: #e9ecef; color: #495057;\n}\n.badge-custom[data-v-53bfa8f4] {\r\n\tpadding: 4px 12px;\r\n\tborder-radius: 50px;\r\n\tfont-size: 0.75rem;\r\n\tfont-weight: 700;\r\n\ttext-transform: uppercase;\n}\n.badge-success-soft[data-v-53bfa8f4] { background: #e7fcf3; color: #0ca678; border: 1px solid #c3fae8;\n}\n.badge-warning-soft[data-v-53bfa8f4] { background: #fff9db; color: #f08c00; border: 1px solid #fff3bf;\n}\n.badge-danger-soft[data-v-53bfa8f4] { background: #fff5f5; color: #e03131; border: 1px solid #ffe3e3;\n}\n.badge-secondary-soft[data-v-53bfa8f4] { background: #f1f3f5; color: #495057; border: 1px solid #e9ecef;\n}\n.btn-soft-danger[data-v-53bfa8f4] {\r\n\tbackground: #fff5f5;\r\n\tcolor: #e03131;\r\n\tborder: none;\r\n\twidth: 32px;\r\n\theight: 32px;\r\n\ttransition: all 0.2s;\n}\n.btn-soft-danger[data-v-53bfa8f4]:hover {\r\n\tbackground: #ffc9c9;\r\n\tcolor: #c92a2a;\n}\n.table th[data-v-53bfa8f4] {\r\n\tletter-spacing: 0.5px;\r\n\tborder-bottom: 1px solid #f1f3f9!important;\n}\n.table tr[data-v-53bfa8f4] {\r\n\ttransition: background 0.2s;\n}\n.table tr[data-v-53bfa8f4]:hover {\r\n\tbackground: #fcfdfe!important;\n}\n.mr-3[data-v-53bfa8f4] { margin-right: 1rem;\n}\n.mr-1[data-v-53bfa8f4] { margin-right: 0.25rem;\n}\n.font-weight-bold[data-v-53bfa8f4] { font-weight: 700!important;\n}\n.border-dashed[data-v-53bfa8f4] { border-style: dashed!important;\n}\r\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -8714,7 +8934,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.v-select-toggle, .v-dropdown-item{font-size: 15px!important;}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.icon-header-container[data-v-5e47f600] {\r\n  background: #f0f7ff;\r\n  width: 44px;\r\n  height: 44px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  border-radius: 12px;\n}\n.btn-close-custom[data-v-5e47f600] {\r\n  background: #f8f9fa;\r\n  border: none;\r\n  width: 32px;\r\n  height: 32px;\r\n  border-radius: 50%;\r\n  color: #adb5bd;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  transition: all 0.2s;\r\n  cursor: pointer;\n}\n.btn-close-custom[data-v-5e47f600]:hover { background: #e9ecef; color: #495057;\n}\n.btn-soft-danger[data-v-5e47f600] {\r\n\tbackground: #fff5f5;\r\n\tcolor: #e03131;\r\n\tborder: none;\r\n\twidth: 32px;\r\n\theight: 32px;\r\n\ttransition: all 0.2s;\n}\n.btn-soft-danger[data-v-5e47f600]:hover {\r\n\tbackground: #ffc9c9;\r\n\tcolor: #c92a2a;\n}\n.modern-vselect[data-v-5e47f600] .v-select-toggle {\r\n\tborder-radius: 50px!important;\r\n\tborder: 1px solid #dee2e6!important;\r\n\tpadding: 8px 20px!important;\r\n\tbackground: #fff!important;\r\n\tfont-size: 14px!important;\n}\n.table th[data-v-5e47f600] {\r\n\tletter-spacing: 0.5px;\r\n\tborder-bottom: 1px solid #f1f3f9!important;\n}\n.table tr[data-v-5e47f600] {\r\n\ttransition: background 0.2s;\n}\n.table tr[data-v-5e47f600]:hover {\r\n\tbackground: #fcfdfe!important;\n}\n.mr-3[data-v-5e47f600] { margin-right: 1rem;\n}\n.mr-1[data-v-5e47f600] { margin-right: 0.25rem;\n}\n.font-weight-bold[data-v-5e47f600] { font-weight: 700!important;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -8924,19 +9144,19 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
-/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css":
-/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css":
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_style_index_0_id_46429496_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css");
 
             
 
@@ -8945,11 +9165,69 @@ var options = {};
 options.insert = "head";
 options.singleton = false;
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_style_index_0_id_46429496_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_style_index_0_id_46429496_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_style_index_0_id_53bfa8f4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_style_index_0_id_53bfa8f4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_style_index_0_id_53bfa8f4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -9715,23 +9993,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ModalEditarPaciente_vue_vue_type_template_id_46429496__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalEditarPaciente.vue?vue&type=template&id=46429496 */ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496");
+/* harmony import */ var _ModalEditarPaciente_vue_vue_type_template_id_46429496_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true */ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true");
 /* harmony import */ var _ModalEditarPaciente_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModalEditarPaciente.vue?vue&type=script&lang=js */ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _ModalEditarPaciente_vue_vue_type_style_index_0_id_46429496_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css */ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _ModalEditarPaciente_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _ModalEditarPaciente_vue_vue_type_template_id_46429496__WEBPACK_IMPORTED_MODULE_0__.render,
-  _ModalEditarPaciente_vue_vue_type_template_id_46429496__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _ModalEditarPaciente_vue_vue_type_template_id_46429496_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _ModalEditarPaciente_vue_vue_type_template_id_46429496_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "46429496",
   null
   
 )
@@ -9753,23 +10033,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ModalVerEstados_vue_vue_type_template_id_53bfa8f4__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalVerEstados.vue?vue&type=template&id=53bfa8f4 */ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4");
+/* harmony import */ var _ModalVerEstados_vue_vue_type_template_id_53bfa8f4_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true */ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true");
 /* harmony import */ var _ModalVerEstados_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModalVerEstados.vue?vue&type=script&lang=js */ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _ModalVerEstados_vue_vue_type_style_index_0_id_53bfa8f4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css */ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _ModalVerEstados_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _ModalVerEstados_vue_vue_type_template_id_53bfa8f4__WEBPACK_IMPORTED_MODULE_0__.render,
-  _ModalVerEstados_vue_vue_type_template_id_53bfa8f4__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _ModalVerEstados_vue_vue_type_template_id_53bfa8f4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _ModalVerEstados_vue_vue_type_template_id_53bfa8f4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "53bfa8f4",
   null
   
 )
@@ -9829,9 +10111,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=template&id=5e47f600 */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600");
+/* harmony import */ var _ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true");
 /* harmony import */ var _ModalVerHobbies_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=script&lang=js */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=script&lang=js");
-/* harmony import */ var _ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css");
+/* harmony import */ var _ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css");
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -9843,11 +10125,11 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _ModalVerHobbies_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__.render,
-  _ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "5e47f600",
   null
   
 )
@@ -10446,34 +10728,34 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496":
-/*!**************************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496 ***!
-  \**************************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true":
+/*!**************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true ***!
+  \**************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_template_id_46429496__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_template_id_46429496__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_template_id_46429496_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_template_id_46429496_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_template_id_46429496__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalEditarPaciente.vue?vue&type=template&id=46429496 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_template_id_46429496_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true");
 
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4":
-/*!**********************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4 ***!
-  \**********************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true":
+/*!**********************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true ***!
+  \**********************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_template_id_53bfa8f4__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_template_id_53bfa8f4__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_template_id_53bfa8f4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_template_id_53bfa8f4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_template_id_53bfa8f4__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerEstados.vue?vue&type=template&id=53bfa8f4 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_template_id_53bfa8f4_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true");
 
 
 /***/ }),
@@ -10494,18 +10776,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600":
-/*!*******************************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600 ***!
-  \*******************************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true":
+/*!*******************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true ***!
+  \*******************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=template&id=5e47f600 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true");
 
 
 /***/ }),
@@ -10594,14 +10876,38 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css":
-/*!*********************************************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css ***!
-  \*********************************************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css":
+/*!****************************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css ***!
+  \****************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css");
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_style_index_0_id_46429496_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css":
+/*!************************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css ***!
+  \************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_style_index_0_id_53bfa8f4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css":
+/*!*********************************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css ***!
+  \*********************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css");
 
 
 /***/ }),

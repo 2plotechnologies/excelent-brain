@@ -48,7 +48,13 @@ class QuestionnaireController extends Controller
             ], 403);
         }
 
-        return response()->json($link);
+        // Obtener datos del paciente
+        $patient = \App\Models\Patient::with('relative')->find($link->patient_id);
+
+        return response()->json([
+            'link' => $link,
+            'patient' => $patient
+        ]);
     }
 
     public function store(Request $request, $token)

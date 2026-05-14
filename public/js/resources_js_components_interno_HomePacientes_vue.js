@@ -749,7 +749,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     capitalizarPrimeraLetra: function capitalizarPrimeraLetra(palabra) {
       if (palabra.length === 0) return "";
-      // Convierte la primera letra a mayúscula y el resto a minúscula
       palabra = palabra.toLowerCase();
       palabra = palabra.charAt(0).toUpperCase() + palabra.slice(1);
       return palabra;
@@ -764,11 +763,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           text: _this3.capitalizarPrimeraLetra(hob)
         });
       });
-      //this.actividades.sort((a,b)=>a.descripcion.localeCompare(b.descripcion))
     }
-  },
-  watch: {
-    //hobbies(){ this.recargarLista() }
   }
 });
 
@@ -2925,10 +2920,10 @@ render._withStripped = true;
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600":
-/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600 ***!
-  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -2947,25 +2942,33 @@ var render = function render() {
       "aria-hidden": "true"
     }
   }, [_c("div", {
-    staticClass: "modal-dialog"
+    staticClass: "modal-dialog modal-dialog-centered"
   }, [_c("div", {
-    staticClass: "modal-content"
+    staticClass: "modal-content border-0 shadow-lg",
+    staticStyle: {
+      "border-radius": "20px",
+      overflow: "hidden"
+    }
   }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
+    staticClass: "modal-body px-4 pt-4"
   }, [_c("div", {
-    staticClass: "card mb-2"
+    staticClass: "card border-0 shadow-sm rounded-4 mb-4",
+    staticStyle: {
+      background: "#f8f9fc",
+      border: "1px solid #f1f3f9!important"
+    }
   }, [_c("div", {
-    staticClass: "card-body"
+    staticClass: "card-body p-3"
   }, [_c("div", {
-    staticClass: "row"
+    staticClass: "row align-items-center"
   }, [_c("div", {
-    staticClass: "col-sm-6"
-  }, [[_c("VSelect", {
+    staticClass: "col-sm-8 mb-2 mb-sm-0"
+  }, [_c("VSelect", {
     attrs: {
-      addClass: "text-capitalize",
+      addClass: "text-capitalize modern-vselect",
       searchable: true,
       searchPlaceholder: "Buscar hobbies",
-      defaultTitle: "Hobbies",
+      defaultTitle: "Selecciona un hobbie",
       searchNotFound: "No hay resultados",
       options: _vm.actividades
     },
@@ -2976,60 +2979,117 @@ var render = function render() {
       },
       expression: "selected"
     }
-  })]], 2), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })], 1), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
   }, [_c("button", {
-    staticClass: "btn btn-outline-secondary",
+    staticClass: "btn btn-primary w-100 rounded-pill font-weight-bold shadow-sm",
     on: {
       click: function click($event) {
         return _vm.addHobbie();
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-paperclip"
-  }), _vm._v(" Agregar")])])])])]), _vm._v(" "), _c("table", {
-    staticClass: "table"
+    staticClass: "fas fa-plus mr-1"
+  }), _vm._v(" Agregar\n\t\t\t\t\t\t\t\t")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "table-responsive rounded-4 border overflow-hidden"
+  }, [_c("table", {
+    staticClass: "table table-hover mb-0"
   }, [_vm._m(1), _vm._v(" "), _c("tbody", [_vm._l(_vm.misHobbies, function (hobbie, index) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", {
-      staticClass: "text-capitalize"
-    }, [_vm._v(_vm._s(_vm.hobbies[hobbie]))]), _vm._v(" "), _c("td", [_c("button", {
-      staticClass: "btn btn-outlihe-danger",
+    return _c("tr", {
+      key: index
+    }, [_c("td", {
+      staticClass: "px-4 py-3 align-middle text-muted small"
+    }, [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", {
+      staticClass: "px-4 py-3 align-middle font-weight-bold text-dark text-capitalize"
+    }, [_vm._v(_vm._s(_vm.hobbies[hobbie]))]), _vm._v(" "), _c("td", {
+      staticClass: "px-4 py-3 align-middle text-center"
+    }, [_c("button", {
+      staticClass: "btn btn-soft-danger btn-sm rounded-circle shadow-none",
+      attrs: {
+        title: "Eliminar"
+      },
       on: {
         click: function click($event) {
           return _vm.borrarHobbie(index);
         }
       }
     }, [_c("i", {
-      staticClass: "fa-solid fa-eraser"
+      staticClass: "fas fa-trash-alt"
     })])])]);
-  }), _vm._v(" "), _vm.misHobbies.length === 0 ? _c("tr", [_c("td", {
-    attrs: {
-      colspan: "4"
-    }
-  }, [_vm._v("No existen hobbies")])]) : _vm._e()], 2)])])])])]);
+  }), _vm._v(" "), _vm.misHobbies.length === 0 ? _c("tr", [_vm._m(2)]) : _vm._e()], 2)])])]), _vm._v(" "), _vm._m(3)])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header border-0"
-  }, [_c("h1", {
-    staticClass: "modal-title fs-5",
-    attrs: {
-      id: "exampleModalLabel"
-    }
-  }, [_vm._v("Hobbies del paciente")]), _vm._v(" "), _c("button", {
-    staticClass: "btn-close",
+    staticClass: "modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center"
+  }, [_c("div", {
+    staticClass: "icon-header-container mr-3"
+  }, [_c("i", {
+    staticClass: "fas fa-heart text-primary h4 mb-0"
+  })]), _vm._v(" "), _c("div", [_c("h5", {
+    staticClass: "modal-title font-weight-bold text-dark mb-1"
+  }, [_vm._v("Hobbies del paciente")]), _vm._v(" "), _c("p", {
+    staticClass: "small text-muted mb-0"
+  }, [_vm._v("Gestiona las actividades favoritas del paciente")])])]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close-custom",
     attrs: {
       type: "button",
       "data-bs-dismiss": "modal",
       "aria-label": "Close"
     }
-  })]);
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("N°")]), _vm._v(" "), _c("th", [_vm._v("Hobbie")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
+  return _c("thead", {
+    staticStyle: {
+      background: "#f8f9fc"
+    }
+  }, [_c("tr", [_c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3",
+    staticStyle: {
+      width: "60px"
+    }
+  }, [_vm._v("N°")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3"
+  }, [_vm._v("HOBBIE")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3 text-center",
+    staticStyle: {
+      width: "80px"
+    }
+  }, [_vm._v("@")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("td", {
+    staticClass: "text-center py-5",
+    attrs: {
+      colspan: "3"
+    }
+  }, [_c("div", {
+    staticClass: "py-2"
+  }, [_c("i", {
+    staticClass: "fas fa-layer-group fa-3x text-light mb-3"
+  }), _vm._v(" "), _c("p", {
+    staticClass: "text-muted mb-0"
+  }, [_vm._v("No existen hobbies registrados")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modal-footer border-0 pb-4 px-4"
+  }, [_c("button", {
+    staticClass: "btn btn-light rounded-pill px-4 font-weight-bold",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Cerrar")])]);
 }];
 render._withStripped = true;
 
@@ -3082,10 +3142,10 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.modal-content[data-v-085f439b] {\r\
 
 /***/ }),
 
-/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css":
-/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css ***!
-  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -3098,7 +3158,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.v-select-toggle, .v-dropdown-item{font-size: 15px!important;}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.icon-header-container[data-v-5e47f600] {\r\n  background: #f0f7ff;\r\n  width: 44px;\r\n  height: 44px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  border-radius: 12px;\n}\n.btn-close-custom[data-v-5e47f600] {\r\n  background: #f8f9fa;\r\n  border: none;\r\n  width: 32px;\r\n  height: 32px;\r\n  border-radius: 50%;\r\n  color: #adb5bd;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  transition: all 0.2s;\r\n  cursor: pointer;\n}\n.btn-close-custom[data-v-5e47f600]:hover { background: #e9ecef; color: #495057;\n}\n.btn-soft-danger[data-v-5e47f600] {\r\n\tbackground: #fff5f5;\r\n\tcolor: #e03131;\r\n\tborder: none;\r\n\twidth: 32px;\r\n\theight: 32px;\r\n\ttransition: all 0.2s;\n}\n.btn-soft-danger[data-v-5e47f600]:hover {\r\n\tbackground: #ffc9c9;\r\n\tcolor: #c92a2a;\n}\n.modern-vselect[data-v-5e47f600] .v-select-toggle {\r\n\tborder-radius: 50px!important;\r\n\tborder: 1px solid #dee2e6!important;\r\n\tpadding: 8px 20px!important;\r\n\tbackground: #fff!important;\r\n\tfont-size: 14px!important;\n}\n.table th[data-v-5e47f600] {\r\n\tletter-spacing: 0.5px;\r\n\tborder-bottom: 1px solid #f1f3f9!important;\n}\n.table tr[data-v-5e47f600] {\r\n\ttransition: background 0.2s;\n}\n.table tr[data-v-5e47f600]:hover {\r\n\tbackground: #fcfdfe!important;\n}\n.mr-3[data-v-5e47f600] { margin-right: 1rem;\n}\n.mr-1[data-v-5e47f600] { margin-right: 0.25rem;\n}\n.font-weight-bold[data-v-5e47f600] { font-weight: 700!important;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -3163,10 +3223,10 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
-/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css":
-/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -3175,7 +3235,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css");
 
             
 
@@ -3184,11 +3244,11 @@ var options = {};
 options.insert = "head";
 options.singleton = false;
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -3488,9 +3548,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=template&id=5e47f600 */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600");
+/* harmony import */ var _ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true");
 /* harmony import */ var _ModalVerHobbies_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=script&lang=js */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=script&lang=js");
-/* harmony import */ var _ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css");
+/* harmony import */ var _ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css");
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -3502,11 +3562,11 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _ModalVerHobbies_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__.render,
-  _ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "5e47f600",
   null
   
 )
@@ -3688,18 +3748,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600":
-/*!*******************************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600 ***!
-  \*******************************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true":
+/*!*******************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true ***!
+  \*******************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=template&id=5e47f600 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true");
 
 
 /***/ }),
@@ -3728,14 +3788,14 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css":
-/*!*********************************************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css ***!
-  \*********************************************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css":
+/*!*********************************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css ***!
+  \*********************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css");
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css");
 
 
 /***/ }),

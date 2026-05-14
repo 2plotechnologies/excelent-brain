@@ -2064,7 +2064,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               return _this.axios.put("/api/patient/".concat(_this.dataPatient.id), _this.dataPatient).then(function (res) {
                 console.log(res);
                 _this.closeModal();
-                _this.$swal('Datos de paciente actualizado con éxito');
+                _this.$swal.fire('Éxito', 'Datos de paciente actualizados con éxito', 'success');
                 _this.$emit('actualizar');
               })["catch"](function (err) {
                 console.error(err);
@@ -2136,8 +2136,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     capturaSeñal: function capturaSeñal() {
-      console.log('apli');
-      if (this.dataPatient.relative.length == 0) {
+      if (this.dataPatient.relative && this.dataPatient.relative.length == 0) {
         this.dataPatient.relative.push({
           id: -1,
           name: '',
@@ -2147,9 +2146,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
       this.listarDepartamentos(false);
     }
-  },
-  mounted: function mounted() {
-    //this.$parent.$on('cambioDato', this.capturaSeñal);
   },
   watch: {
     dataPatient: {
@@ -2175,13 +2171,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       deep: true,
       immediate: true
     }
-  },
-  updated: function updated() {
-    //this.updateValues;
-    //console.log('ver paciente rel ',this.dataPatient.relative);
-  },
-  created: function created() {
-    //this.updateValues;
   }
 });
 
@@ -2732,28 +2721,49 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     queCodigo: function queCodigo(tipo) {
-      return this.estados.filter(function (z) {
+      var est = this.estados.find(function (z) {
         return z.id == tipo;
-      })[0].valor;
+      });
+      return est ? est.valor : 'Indefinido';
+    },
+    badgeColor: function badgeColor(tipo) {
+      // Suponiendo que 1=Verde, 2=Amarillo, 3=Rojo (o similar)
+      if (tipo == 1) return 'badge-success-soft';
+      if (tipo == 2) return 'badge-warning-soft';
+      if (tipo == 3) return 'badge-danger-soft';
+      return 'badge-secondary-soft';
     },
     eliminarEstado: function eliminarEstado(id, index) {
       var _this2 = this;
-      if (confirm('¿Deseas eliminar el estado?')) {
-        this.axios.post('/api/eliminarSemaforo/' + id).then(function (response) {
-          if (response.data.msg == 'eliminado') {
-            _this2.dataPatient.semaforo.splice(index, 1);
-          }
-        });
-      }
+      this.$swal.fire({
+        title: '¿Deseas eliminar el estado?',
+        text: "Esta acción no se puede deshacer",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then(function (result) {
+        if (result.isConfirmed) {
+          _this2.axios.post('/api/eliminarSemaforo/' + id).then(function (response) {
+            if (response.data.msg == 'eliminado') {
+              _this2.dataPatient.semaforo.splice(index, 1);
+              _this2.$swal.fire('Eliminado', 'El registro ha sido eliminado.', 'success');
+            }
+          });
+        }
+      });
     }
   },
   computed: {
     verDetalle: function verDetalle() {
       var _this3 = this;
       return function (id) {
-        return _this3.estados.find(function (x) {
+        var est = _this3.estados.find(function (x) {
           return x.id == id;
-        }).detalle;
+        });
+        return est ? est.detalle : 'Sin detalle';
       };
     }
   }
@@ -3126,7 +3136,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     capitalizarPrimeraLetra: function capitalizarPrimeraLetra(palabra) {
       if (palabra.length === 0) return "";
-      // Convierte la primera letra a mayúscula y el resto a minúscula
       palabra = palabra.toLowerCase();
       palabra = palabra.charAt(0).toUpperCase() + palabra.slice(1);
       return palabra;
@@ -3141,11 +3150,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           text: _this3.capitalizarPrimeraLetra(hob)
         });
       });
-      //this.actividades.sort((a,b)=>a.descripcion.localeCompare(b.descripcion))
     }
-  },
-  watch: {
-    //hobbies(){ this.recargarLista() }
   }
 });
 
@@ -3785,7 +3790,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   render: () => (/* binding */ render),
 /* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
 /* harmony export */ });
-var render=function render(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"patient-detail-container"},[_c("div",{staticClass:"d-flex align-items-center mb-4 mt-2"},[_c("button",{staticClass:"btn btn-link text-decoration-none px-0",on:{click:function click($event){return _vm.$emit("volver");}}},[_c("i",{staticClass:"fas fa-arrow-left"}),_vm._v(" Volver a Pacientes\n    ")])]),_vm._v(" "),_c("div",{staticClass:"card shadow-sm mb-4 border-0 rounded-lg",staticStyle:{"background-color":"#fcfcfc"}},[!_vm.loading?_c("div",{staticClass:"card-body d-flex justify-content-between align-items-center flex-wrap"},[_c("div",{staticClass:"d-flex align-items-center mb-3 mb-md-0"},[_c("div",{staticClass:"rounded-circle text-primary bg-light border d-flex justify-content-center align-items-center me-3 shadow-sm font-weight-bold",staticStyle:{width:"60px",height:"60px","font-size":"20px"}},[_vm._v("\n          "+_vm._s(_vm.initials)+"\n        ")]),_vm._v(" "),_c("div",[_c("h4",{staticClass:"mb-1 font-weight-bold d-flex align-items-center gap-2"},[_vm._v("\n            "+_vm._s(_vm.paciente.name)+" "+_vm._s(_vm.paciente.nombres)+"\n            "),_vm.paciente.activo||_vm.paciente.activo_sn?_c("span",{staticClass:"badge bg-success",staticStyle:{"font-size":"0.6rem","vertical-align":"middle"}},[_c("i",{staticClass:"fas fa-heart"}),_vm._v(" Activo")]):_vm._e(),_vm._v(" "),_vm._l(_vm.paciente.semaforo_estados.slice(0,5),function(sem){return _c("span",{key:sem.id,staticClass:"badge border bg-warning text-white",staticStyle:{"font-size":"0.6rem","vertical-align":"middle"}},[_c("i",{staticClass:"fas fa-tag text-white me-1"}),_vm._v(" "+_vm._s(_vm.getEstadoNombre(sem.codigo))+"\n            ")]);})],2),_vm._v(" "),_c("div",{staticClass:"text-muted small"},[_vm.paciente.birth_date?_c("span",{staticClass:"me-3"},[_vm._v(_vm._s(_vm.getAge(_vm.paciente.birth_date))+" años - "+_vm._s(_vm.getGender(_vm.paciente.gender)))]):_vm._e(),_vm._v(" "),_c("span",{staticClass:"me-3"},[_vm._v("DNI: "+_vm._s(_vm.paciente.dni))]),_vm._v(" "),_vm.paciente.medical_evolutions?_c("span",[_c("i",{staticClass:"fas fa-history text-muted"}),_vm._v(" "+_vm._s(_vm.paciente.medical_evolutions.length)+" evoluciones en historial")]):_vm._e()])])]),_vm._v(" "),_c("div",{staticClass:"d-flex gap-2 flex-wrap"},[_c("a",{staticClass:"btn btn-light shadow-sm rounded border",attrs:{href:"tel:"+_vm.paciente.phone}},[_c("i",{staticClass:"fas fa-phone"}),_vm._v(" Llamar")]),_vm._v(" "),_c("a",{staticClass:"btn btn-light shadow-sm rounded border",attrs:{href:"https://wa.me/51"+_vm.paciente.phone,target:"_blank"}},[_c("i",{staticClass:"fab fa-whatsapp"}),_vm._v(" WhatsApp")])])]):_vm._e()]),_vm._v(" "),_c("ul",{staticClass:"nav nav-tabs mb-4 px-2",staticStyle:{"border-bottom":"0"},attrs:{id:"patientTabs",role:"tablist"}},[_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-dark","class":{active:_vm.activeTab==="resumen"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="resumen";}}},[_vm._v("Resumen")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="datos"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="datos";}}},[_vm._v("Datos Personales")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="citas"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="citas";}}},[_vm._v("Citas & Paquetes")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="historial"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="historial";}}},[_vm._v("Historial Clínico "),_vm.paciente.medical_evolutions?_c("span",[_vm._v("("+_vm._s(_vm.paciente.medical_evolutions.length)+")")]):_vm._e()])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="triaje"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="triaje";}}},[_vm._v("Triaje & Seguridad")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="seguimiento"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="seguimiento";}}},[_c("i",{staticClass:"fas fa-clipboard-list me-1"}),_vm._v(" Ficha de Seguimiento\n      ")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="recetas"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="recetas";}}},[_vm._v("Recetas & Órdenes")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="pruebas"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="pruebas";}}},[_vm._v("Pruebas Psicológicas")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="documentos"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="documentos";}}},[_vm._v("Documentos")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="convenios"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="convenios";}}},[_vm._v("Convenios")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="finanzas"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="finanzas";}}},[_vm._v("Finanzas")])])]),_vm._v(" "),_vm.loading?_c("div",{staticClass:"text-center my-5"},[_vm._m(0),_vm._v(" "),_c("p",{staticClass:"mt-2 text-muted"},[_vm._v("Cargando información completa del paciente...")])]):_c("div",{staticClass:"tab-content px-2",attrs:{id:"patientTabsContent"}},[_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="resumen"},attrs:{id:"resumen",role:"tabpanel"}},[_c("div",{staticClass:"row"},[_c("div",{staticClass:"col-md-4"},[_c("div",{staticClass:"card shadow-sm border rounded-lg mb-3"},[_c("div",{staticClass:"card-body"},[_vm._m(1),_vm._v(" "),_vm.proximaCita?_c("div",[_c("h5",{staticClass:"mb-1 text-dark"},[_vm._v(_vm._s(_vm.formatDateTime(_vm.proximaCita.date,_vm.proximaCita.hora)))]),_vm._v(" "),_vm.proximaCita.professional?_c("p",{staticClass:"small text-muted mb-0"},[_vm._v(_vm._s(_vm.proximaCita.professional.name))]):_vm._e()]):_c("div",[_c("p",{staticClass:"text-muted mb-0 small"},[_vm._v("No hay citas próximas programadas.")])])])]),_vm._v(" "),_c("div",{staticClass:"card shadow-sm border rounded-lg mb-3"},[_c("div",{staticClass:"card-body"},[_vm._m(2),_vm._v(" "),_vm.ultimaEvolucion?_c("div",[_c("p",{staticClass:"small text-muted mb-1"},[_vm._v(_vm._s(_vm.formatDate(_vm.ultimaEvolucion.date))+" - Dr. "+_vm._s(_vm.ultimaEvolucion.professional?_vm.ultimaEvolucion.professional.name:""))]),_vm._v(" "),_c("p",{staticClass:"small mb-0"},[_vm._v(_vm._s(_vm.ultimaEvolucion.descripcion||"Sin descripción"))])]):_c("div",[_c("p",{staticClass:"text-muted mb-0 small"},[_vm._v("No hay evoluciones registradas.")])])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-8"},[_c("div",{staticClass:"card shadow-sm border rounded-lg h-100"},[_c("div",{staticClass:"card-body p-4"},[_vm._m(3),_vm._v(" "),_c("div",{staticClass:"timeline ms-3 mt-3 content-timeline"},[_vm._l(_vm.timelineActivity.slice(0,5),function(item,index){return _c("div",{key:index,staticClass:"timeline-item pb-3 mb-3 border-bottom"},[_c("div",{staticClass:"d-flex justify-content-between"},[_c("div",[_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(item.type=="Cita"?"Cita Programada":"Evolución Clínica"))]),_vm._v(" "),_c("p",{staticClass:"small text-muted mb-0 mt-1"},[_vm._v(_vm._s(item.desc))]),_vm._v(" "),_c("p",{staticClass:"small text-primary mb-0 mt-1"},[_vm._v(_vm._s(item.profesional))])]),_vm._v(" "),_c("div",{staticClass:"text-end"},[_c("span",{staticClass:"small text-muted"},[_vm._v(_vm._s(_vm.formatDate(item.date)))])])])]);}),_vm._v(" "),_vm.timelineActivity.length===0?_c("div",{staticClass:"text-muted small"},[_vm._v("\n                  No hay actividad reciente.\n                ")]):_vm._e()],2)])])])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="datos"},attrs:{id:"datos",role:"tabpanel"}},[_c("div",{staticClass:"position-relative"},[_c("button",{staticClass:"btn btn-outline-primary btn-sm position-absolute",staticStyle:{top:"0",right:"0"},attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalEdicionPaciente"},on:{click:function click($event){return _vm.$emit("editarPaciente",_vm.paciente);}}},[_c("i",{staticClass:"fas fa-pen"}),_vm._v(" Editar Datos\n        ")]),_vm._v(" "),_c("h4",{staticClass:"mb-4 fw-bold"},[_vm._v("Datos Personales")]),_vm._v(" "),_c("div",{staticClass:"row g-4"},[_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card border-0 shadow-sm h-100"},[_c("div",{staticClass:"card-body"},[_vm._m(4),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Nombre Completo")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.name)+" "+_vm._s(_vm.paciente.nombres))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("DNI")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.dni))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Fecha de Nacimiento")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.birth_date))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Género")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.gender==1?"Masculino":_vm.paciente.gender==2?"Femenino":"Otro"))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Estado Civil")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.marital_status==1?"Soltero":_vm.paciente.marital_status==2?"Casado":_vm.paciente.marital_status==3?"Divorciado":_vm.paciente.marital_status==4?"Viudo":_vm.paciente.marital_status==5?"Conviviente":"—"))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Ocupación")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.occupation||"—"))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Grado de Instrucción")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.instruction_degree==1?"Inicial":_vm.paciente.instruction_degree==2?"Primaria":_vm.paciente.instruction_degree==3?"Secundaria":_vm.paciente.instruction_degree==4?"Superior":_vm.paciente.instruction_degree==5?"Técnico":_vm.paciente.instruction_degree==6?"Ninguno":"—"))])])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card border-0 shadow-sm h-100"},[_c("div",{staticClass:"card-body"},[_vm._m(5),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Teléfono")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.phone))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Email")]),_vm._v(" "),_c("strong",{staticStyle:{"word-break":"break-all"}},[_vm._v("\n                    "+_vm._s(_vm.paciente.email||"—")+"\n                  ")])]),_vm._v(" "),_vm.paciente.address?_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Dirección")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.address.address))])]):_vm._e(),_vm._v(" "),_vm.paciente.address?_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Departamento")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.departamento))])]):_vm._e(),_vm._v(" "),_vm.paciente.address?_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Provincia")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.provincia))])]):_vm._e(),_vm._v(" "),_vm.paciente.address?_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Distrito")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.distrito))])]):_vm._e(),_vm._v(" "),_c("div",[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Referencia")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.reference||"—"))])])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card border-0 shadow-sm h-100"},[_c("div",{staticClass:"card-body"},[_vm._m(6),_vm._v(" "),_vm.paciente.relative&&_vm.paciente.relative.length?_c("div",_vm._l(_vm.paciente.relative,function(rel){return _c("div",{directives:[{name:"show",rawName:"v-show",value:rel.name,expression:"rel.name"}],key:rel.id},[_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Nombre")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(rel.name))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Teléfono")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(rel.phone))])]),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Relación")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(rel.kinship))])]),_vm._v(" "),_vm.paciente.relative.length>1?_c("hr"):_vm._e()]);}),0):_c("div",[_c("small",{staticClass:"text-muted"},[_vm._v("No hay contactos registrados.")])])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card border-0 shadow-sm h-100"},[_c("div",{staticClass:"card-body"},[_vm._m(7),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Fecha de Registro")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.created_at))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Última Visita")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.last_visit||"—"))])]),_vm._v(" "),_c("div",[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Total de Evoluciones")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.evolutions_count||0)+" registros")])])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-12"},[_c("div",{staticClass:"card border-0 shadow-sm h-100 bg-light"},[_c("div",{staticClass:"card-body"},[_c("div",{staticClass:"row"},[_c("div",{staticClass:"col-md-6 mb-3 mb-md-0"},[_c("h6",{staticClass:"fw-bold mb-3 text-dark d-flex align-items-center"},[_c("i",{staticClass:"fas fa-tags text-primary me-2"}),_vm._v("\n                      Etiquetas de Comportamiento\n                      "),_c("button",{staticClass:"btn btn-link btn-sm text-primary p-0 ms-2",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalVerEstados"},on:{click:function click($event){return _vm.prepararSemaforo();}}},[_c("i",{staticClass:"fas fa-pen"})])]),_vm._v(" "),_vm.paciente.semaforo_estados&&_vm.paciente.semaforo_estados.length>0?_c("div",{staticClass:"d-flex flex-wrap gap-2"},_vm._l(_vm.paciente.semaforo_estados.slice(0,5),function(sem){return _c("span",{key:sem.id,staticClass:"badge border bg-white text-dark shadow-sm px-3 py-2"},[_c("i",{staticClass:"fas fa-tag text-warning me-1"}),_vm._v(" "+_vm._s(_vm.getEstadoNombre(sem.codigo))+"\n                      ")]);}),0):_c("div",[_c("small",{staticClass:"text-muted"},[_vm._v("No hay etiquetas de comportamiento registradas.")])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("h6",{staticClass:"fw-bold mb-3 text-dark d-flex align-items-center"},[_c("i",{staticClass:"fas fa-heart text-danger me-2"}),_vm._v("\n                      Hobbies e Intereses\n                      "),_c("button",{staticClass:"btn btn-link btn-sm text-primary p-0 ms-2",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalVerHobbies"},on:{click:function click($event){return _vm.prepararHobbies();}}},[_c("i",{staticClass:"fas fa-pen"})])]),_vm._v(" "),_vm.getHobbies(_vm.paciente.hobbies).length>0?_c("div",{staticClass:"d-flex flex-wrap gap-2"},_vm._l(_vm.getHobbies(_vm.paciente.hobbies),function(hobbie,index){return _c("span",{key:index,staticClass:"badge bg-info bg-opacity-10 border text-white border-info border-opacity-25 px-3 py-2"},[_vm._v("\n                        "+_vm._s(_vm.hobbies[hobbie]||hobbie)+"\n                      ")]);}),0):_c("div",[_c("small",{staticClass:"text-muted"},[_vm._v("No hay hobbies registrados.")])])])])])])])])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="citas"},attrs:{id:"citas",role:"tabpanel"}},[_vm._m(8),_vm._v(" "),_c("div",{staticClass:"row mb-4"},[_vm._l(_vm.paciente.membresias,function(mem){return _c("div",{key:mem.id,staticClass:"col-md-6"},[_c("div",{staticClass:"card border rounded-3 mb-3 shadow-sm",staticStyle:{"border-color":"#eef2f5 !important"}},[_c("div",{staticClass:"card-body p-4"},[_c("div",{staticClass:"d-flex justify-content-between align-items-start mb-1"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0",staticStyle:{"font-size":"1.05rem"}},[_vm._v(_vm._s(mem.precio?mem.precio.descripcion:"Paquete/Membresía"))]),_vm._v(" "),_c("span",{staticClass:"badge rounded-pill px-3 py-1","class":mem.activo?"bg-success bg-opacity-10":"bg-secondary bg-opacity-10 text-secondary",staticStyle:{"font-weight":"500"}},[_vm._v("\n                  "+_vm._s(mem.activo?"Activo":"Inactivo")+"\n                ")])]),_vm._v(" "),_c("p",{staticClass:"text-muted small mb-4"},[_vm._v("Vence: "+_vm._s(_vm.formatOnlyDate(mem.fin)))]),_vm._v(" "),_c("div",{staticClass:"d-flex justify-content-between align-items-end mb-2"},[_c("span",{staticClass:"text-dark small",staticStyle:{"font-weight":"500"}},[_vm._v("Sesiones usadas")]),_vm._v(" "),_c("span",{staticClass:"text-dark small font-weight-bold"},[_vm._v(_vm._s(mem.sesiones_usadas||0)+" / "+_vm._s(mem.sesiones_totales||6))])]),_vm._v(" "),_c("div",{staticClass:"progress mb-2 rounded-pill",staticStyle:{height:"6px"}},[_c("div",{staticClass:"progress-bar bg-primary",style:{width:(mem.sesiones_usadas||0)/(mem.sesiones_totales||6)*100+"%"},attrs:{role:"progressbar"}}),_vm._v(" "),_c("div",{staticClass:"progress-bar",staticStyle:{"background-color":"#fd7e14"},style:{width:100-(mem.sesiones_usadas||0)/(mem.sesiones_totales||6)*100+"%"},attrs:{role:"progressbar"}})]),_vm._v(" "),_c("small",{staticClass:"text-muted",staticStyle:{"font-size":"0.75rem"}},[_vm._v(_vm._s((mem.sesiones_totales||6)-(mem.sesiones_usadas||0))+" sesiones restantes")])])])]);}),_vm._v(" "),!_vm.paciente.membresias||_vm.paciente.membresias.length==0?_c("div",{staticClass:"col-12"},[_c("div",{staticClass:"alert alert-light border text-center text-muted"},[_vm._v("\n            No tiene paquetes o membresías.\n          ")])]):_vm._e()],2),_vm._v(" "),_vm._m(9),_vm._v(" "),_c("div",{staticClass:"card border rounded-3 shadow-sm mb-4"},[_c("div",{staticClass:"card-body p-0"},[_c("div",{staticClass:"table-responsive"},[_c("table",{staticClass:"table table-hover mb-0",staticStyle:{"font-size":"0.9rem"}},[_vm._m(10),_vm._v(" "),_c("tbody",[_vm._l(_vm.paciente.appointments||[],function(cita){return _c("tr",{key:cita.id},[_c("td",{staticClass:"align-middle py-3 ps-4 border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_c("div",{staticClass:"text-dark fw-bold",staticStyle:{"font-size":"0.9rem"}},[_vm._v(_vm._s(_vm.formatOnlyDate(cita.date)))]),_vm._v(" "),_c("div",{staticClass:"text-muted small"},[_vm._v(_vm._s(_vm.formatOnlyTime(cita.hora)||_vm.formatOnlyTime(cita.date)))])]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 text-dark border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_vm._v("\n                    "+_vm._s(cita.service?cita.service.name:cita.tipo_cita||"Psicológica")+"\n                  ")]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_c("a",{staticClass:"text-primary text-decoration-none",attrs:{href:"#"}},[_vm._v(_vm._s(cita.professional?cita.professional.name:"N/A"))])]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[cita.status==1||cita.status=="Confirmada"?_c("span",{staticClass:"badge bg-primary bg-opacity-10 rounded-pill fw-normal px-3 py-2",staticStyle:{"font-size":"0.8rem"}},[_c("i",{staticClass:"far fa-calendar-check me-1"}),_vm._v(" Confirmada\n                    ")]):cita.status==2||cita.status=="Completada"?_c("span",{staticClass:"badge bg-success bg-opacity-10 rounded-pill fw-normal px-3 py-2",staticStyle:{"font-size":"0.8rem"}},[_c("i",{staticClass:"fas fa-check-circle me-1"}),_vm._v(" Completada\n                    ")]):_c("span",{staticClass:"badge bg-secondary bg-opacity-10 rounded-pill fw-normal px-3 py-2",staticStyle:{"font-size":"0.8rem"}},[_vm._v("\n                      "+_vm._s(_vm.getStatusName(cita.status))+"\n                    ")])]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 pe-4 text-muted border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_vm._v("\n                    "+_vm._s(cita.notas||cita.descripcion||cita.motivo||"—")+"\n                  ")])]);}),_vm._v(" "),!_vm.paciente.appointments||_vm.paciente.appointments.length==0?_c("tr",[_c("td",{staticClass:"text-center text-muted py-4",attrs:{colspan:"5"}},[_vm._v("No tiene citas en el historial")])]):_vm._e()],2)])])])]),_vm._v(" "),_vm._m(11),_vm._v(" "),_c("div",{staticClass:"row"},[_c("div",{staticClass:"col-md-6 mb-4"},[_c("div",{staticClass:"card border rounded-3 shadow-sm h-100"},[_vm._m(12),_vm._v(" "),_c("div",{staticClass:"card-body p-0"},[_c("div",{staticClass:"table-responsive"},[_c("table",{staticClass:"table table-hover mb-0",staticStyle:{"font-size":"0.85rem"}},[_c("tbody",[_vm._l(_vm.faltasCitas,function(cita){return _c("tr",{key:"f-"+cita.id},[_c("td",{staticClass:"align-middle py-3 ps-4 border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_c("div",{staticClass:"text-dark fw-bold"},[_vm._v(_vm._s(_vm.formatOnlyDate(cita.date)))]),_vm._v(" "),_c("div",{staticClass:"text-muted small"},[_vm._v(_vm._s(_vm.formatOnlyTime(cita.hora)||_vm.formatOnlyTime(cita.date)))])]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 text-dark border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_vm._v("\n                        "+_vm._s(cita.service?cita.service.name:cita.tipo_cita||"Psicológica")+"\n                      ")]),_vm._v(" "),_vm._m(13,true)]);}),_vm._v(" "),_vm.faltasCitas.length===0?_c("tr",[_c("td",{staticClass:"text-center text-muted py-4",attrs:{colspan:"3"}},[_vm._v("No registra inasistencias")])]):_vm._e()],2)])])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6 mb-4"},[_c("div",{staticClass:"card border rounded-3 shadow-sm h-100"},[_vm._m(14),_vm._v(" "),_c("div",{staticClass:"card-body p-0"},[_c("div",{staticClass:"table-responsive"},[_c("table",{staticClass:"table table-hover mb-0",staticStyle:{"font-size":"0.85rem"}},[_c("tbody",[_vm._l(_vm.reprogramacionesCitas,function(cita){return _c("tr",{key:"r-"+cita.id},[_c("td",{staticClass:"align-middle py-3 ps-4 border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_c("div",{staticClass:"text-dark fw-bold"},[_vm._v(_vm._s(_vm.formatOnlyDate(cita.date)))]),_vm._v(" "),_c("div",{staticClass:"text-muted small"},[_vm._v(_vm._s(_vm.formatOnlyTime(cita.hora)||_vm.formatOnlyTime(cita.date)))])]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 text-dark border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_vm._v("\n                        "+_vm._s(cita.service?cita.service.name:cita.tipo_cita||"Psicológica")+"\n                      ")]),_vm._v(" "),_vm._m(15,true)]);}),_vm._v(" "),_vm.reprogramacionesCitas.length===0?_c("tr",[_c("td",{staticClass:"text-center text-muted py-4",attrs:{colspan:"3"}},[_vm._v("No registra reprogramaciones")])]):_vm._e()],2)])])])])])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="historial"},attrs:{id:"historial",role:"tabpanel"}},[_vm.paciente.initial_psychological_history||_vm.paciente.initial_psychiatric_history?_c("div",{staticClass:"accordion mb-4 bg-white shadow-sm rounded-lg",attrs:{id:"accordionInitialHistories"}},[_vm.paciente.initial_psychological_history?_c("div",{staticClass:"accordion-item border-0 border-bottom rounded-top"},[_c("h2",{staticClass:"accordion-header",attrs:{id:"headingPsycho"}},[_c("button",{staticClass:"accordion-button bg-light text-primary font-weight-bold",attrs:{type:"button","data-bs-toggle":"collapse","data-bs-target":"#collapsePsycho","aria-expanded":"true","aria-controls":"collapsePsycho"}},[_vm._v("\n              Evaluación Psicológica Inicial\n              "),_vm.paciente.initial_psychological_history.created_at?_c("span",{staticClass:"ms-3 text-muted small",staticStyle:{"font-weight":"normal"}},[_vm._v("\n                 - "+_vm._s(_vm.formatDate(_vm.paciente.initial_psychological_history.created_at))+"\n              ")]):_vm._e()])]),_vm._v(" "),_c("div",{staticClass:"accordion-collapse collapse show",attrs:{id:"collapsePsycho","aria-labelledby":"headingPsycho","data-bs-parent":"#accordionInitialHistories"}},[_c("div",{staticClass:"accordion-body px-4 py-4",staticStyle:{"background-color":"#fbfcff"}},[_c("div",{staticClass:"mb-3"},[_vm._m(16),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychological_history.illness))])]),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_vm._m(17),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychological_history.antecedent))])]),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_vm._m(18),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychological_history.dynamic))])]),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_vm._m(19),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychological_history.attitude))])]),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_vm._m(20),_vm._v(" "),_c("div",{staticClass:"p-2 rounded bg-white border border-light small text-dark mt-1 shadow-sm"},[_vm._v("\n                  "+_vm._s(_vm.paciente.initial_psychological_history.dx)+"\n                ")])]),_vm._v(" "),_c("div",{staticClass:"mb-0 bg-light p-3 border rounded"},[_vm._m(21),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.paciente.initial_psychological_history.plan))])])])])]):_vm._e(),_vm._v(" "),_vm.paciente.initial_psychiatric_history?_c("div",{staticClass:"accordion-item border-0"},[_c("h2",{staticClass:"accordion-header",attrs:{id:"headingPsychiatric"}},[_c("button",{staticClass:"accordion-button collapsed bg-light text-success font-weight-bold",attrs:{type:"button","data-bs-toggle":"collapse","data-bs-target":"#collapsePsychiatric","aria-expanded":"false","aria-controls":"collapsePsychiatric"}},[_vm._v("\n              Eval. Psiquiátrica Inicial\n              "),_vm.paciente.initial_psychiatric_history.created_at?_c("span",{staticClass:"ms-3 text-muted small",staticStyle:{"font-weight":"normal"}},[_vm._v("\n                - "+_vm._s(_vm.formatDate(_vm.paciente.initial_psychiatric_history.created_at))+"\n              ")]):_vm._e()])]),_vm._v(" "),_c("div",{staticClass:"accordion-collapse collapse",attrs:{id:"collapsePsychiatric","aria-labelledby":"headingPsychiatric","data-bs-parent":"#accordionInitialHistories"}},[_c("div",{staticClass:"accordion-body px-4 py-4",staticStyle:{"background-color":"#f8fdfa"}},[_c("div",{staticClass:"row"},[_c("div",{staticClass:"col-md-6 mb-3"},[_vm._m(22),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.general_antecedent))])]),_vm._v(" "),_c("div",{staticClass:"col-md-6 mb-3"},[_vm._m(23),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.main_signs_symptoms))])]),_vm._v(" "),_c("div",{staticClass:"col-md-6 mb-3"},[_vm._m(24),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.illness))])]),_vm._v(" "),_c("div",{staticClass:"col-md-6 mb-3"},[_vm._m(25),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.apc))])]),_vm._v(" "),_c("div",{staticClass:"col-12 mt-2"},[_c("div",{staticClass:"row bg-white p-3 rounded border mx-0 mb-3 shadow-sm"},[_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Lenguaje")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.languaje))])]),_vm._v(" "),_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Pensamiento")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.thought))])]),_vm._v(" "),_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Afecto")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.affect))])]),_vm._v(" "),_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Percepción")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.percetion))])]),_vm._v(" "),_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Func. Superior")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.superior_function))])]),_vm._v(" "),_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Abstracción")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.abstraction))])]),_vm._v(" "),_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Conciencia")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.conscience))])]),_vm._v(" "),_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Insight")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.insight))])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6 mb-3"},[_vm._m(26),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.diagnostic_problems))])]),_vm._v(" "),_c("div",{staticClass:"col-md-6 mb-3"},[_vm._m(27),_vm._v(" "),_c("div",{staticClass:"p-2 rounded bg-white border border-light small text-dark shadow-sm"},[_vm._v("\n                     "+_vm._s(_vm.paciente.initial_psychiatric_history.diagnostic)+"\n                  ")])]),_vm._v(" "),_c("div",{staticClass:"col-12 mt-2"},[_c("div",{staticClass:"bg-light p-3 border rounded text-dark"},[_vm._m(28),_vm._v(" "),_c("p",{staticClass:"small mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.plan))])])])])])])]):_vm._e()]):_vm._e(),_vm._v(" "),_vm._m(29),_vm._v(" "),_vm.paciente.medical_evolutions&&_vm.paciente.medical_evolutions.length>0?_c("div",{staticClass:"alert alert-success bg-opacity-10 border-0 py-2 px-3 mb-3 small d-flex align-items-center rounded-lg"},[_c("i",{staticClass:"fas fa-bell me-2 text-success"}),_vm._v(" "),_vm._m(30)]):_vm._e(),_vm._v(" "),_vm.paciente.medical_evolutions&&_vm.paciente.medical_evolutions.length>0?_c("div",{staticClass:"row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4"},_vm._l(_vm.paciente.medical_evolutions,function(evo){return _c("div",{key:evo.id,staticClass:"col"},[_c("div",{staticClass:"card h-100 border-0 shadow-sm rounded-lg evolution-card overflow-hidden"},[_c("div",{staticClass:"p-2 px-3 text-white d-flex justify-content-between align-items-center",style:{backgroundColor:_vm.getEvolutionColor(evo)}},[_c("span",{staticClass:"font-weight-bold small",staticStyle:{"letter-spacing":"0.3px"}},[_vm._v("\n                "+_vm._s(_vm.formatLongDate(evo.date))+" \n                "),_c("span",{staticClass:"opacity-75 ms-1",staticStyle:{"font-weight":"normal"}},[_vm._v("(#"+_vm._s(evo.id)+")")])])]),_vm._v(" "),_c("div",{staticClass:"card-body p-3 d-flex flex-column"},[_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block text-uppercase font-weight-bold",staticStyle:{"font-size":"0.65rem","letter-spacing":"0.5px"}},[_vm._v("Clase")]),_vm._v(" "),_c("div",{staticClass:"d-flex align-items-center"},[_c("span",{staticClass:"small text-dark font-weight-bold"},[_vm._v(_vm._s(_vm.getEvolutionTypeLabel(evo)))])])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block text-uppercase font-weight-bold",staticStyle:{"font-size":"0.65rem","letter-spacing":"0.5px"}},[_vm._v("Profesional")]),_vm._v(" "),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(evo.professional?evo.professional.name:"N/A"))])]),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_c("small",{staticClass:"text-muted d-block text-uppercase font-weight-bold",staticStyle:{"font-size":"0.65rem","letter-spacing":"0.5px"}},[_vm._v("Diagnóstico")]),_vm._v(" "),_c("p",{staticClass:"small text-dark mb-0 text-truncate-3",staticStyle:{"line-height":"1.5","white-space":"pre-wrap"}},[_vm._v(_vm._s(evo.content||evo.descripcion))])]),_vm._v(" "),evo.plan?_c("div",{staticClass:"mt-auto pt-2"},[_c("div",{staticClass:"p-2 bg-light rounded border-start border-3 border-warning"},[_vm._m(31,true),_vm._v(" "),_c("p",{staticClass:"small text-muted mb-0 text-truncate-2",staticStyle:{"font-style":"italic","white-space":"pre-wrap"}},[_vm._v(_vm._s(evo.plan))])])]):_vm._e(),_vm._v(" "),_vm._m(32,true)])])]);}),0):_c("div",{staticClass:"card border border-dashed p-5 text-center text-muted rounded-lg mb-4"},[_c("i",{staticClass:"fas fa-folder-open fs-1 mb-3 opacity-25"}),_vm._v(" "),_c("p",{staticClass:"mb-0"},[_vm._v("Aún no cuenta con evoluciones de seguimiento cronológico.")])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="triaje"},attrs:{id:"triaje",role:"tabpanel"}},[_c("div",{staticClass:"row"},[_c("div",{staticClass:"col-12 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2"},[_vm._m(33),_vm._v(" "),_c("div",{staticClass:"d-flex gap-2"},[_vm.paciente.has_autotriaje?_c("button",{staticClass:"btn btn-info btn-sm rounded-pill shadow-sm px-3 text-white",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalVerAutoTriaje"}},[_c("i",{staticClass:"fas fa-eye me-1"}),_vm._v(" Ver autotriaje\n            ")]):_c("button",{staticClass:"btn btn-primary btn-sm rounded-pill shadow-sm px-3",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalVerAutoTriaje"},on:{click:function click($event){$event.preventDefault();return _vm.generarLinkAutotriaje(_vm.paciente);}}},[_c("i",{staticClass:"fas fa-link me-1"}),_vm._v(" Generar Link Autotriaje\n            ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary btn-sm rounded-pill shadow-sm px-3",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalTriaje"},on:{click:function click($event){return _vm.$emit("abrirTriaje",_vm.paciente);}}},[_c("i",{staticClass:"fa-solid fa-lungs me-1"}),_vm._v(" Nuevo Triaje\n            ")])])]),_vm._v(" "),_c("div",{staticClass:"col-12 mb-4"},[_vm.paciente.triajes&&_vm.paciente.triajes.length>0?_c("div",_vm._l(_vm.paciente.triajes,function(tr){return _c("div",{key:tr.id,staticClass:"card border-0 shadow-sm mb-3 rounded-lg",staticStyle:{"background-color":"#fcfcfc"}},[_c("div",{staticClass:"card-body p-4"},[_c("div",{staticClass:"d-flex mb-4"},[_vm._m(34,true),_vm._v(" "),_c("div",[_c("h6",{staticClass:"font-weight-bold mb-1 text-dark"},[_vm._v("Triaje "+_vm._s(_vm.getTriajeReferencia(tr.referencia)))]),_vm._v(" "),_c("div",{staticClass:"small text-muted"},[_c("span",[_vm._v(_vm._s(_vm.formatDateWithTime(tr.fecha||tr.created_at)))]),_vm._v(" "),tr.responsable?_c("span",{staticClass:"mx-1"},[_vm._v("·")]):_vm._e(),_vm._v(" "),tr.responsable?_c("span",[_vm._v("Int. "+_vm._s(tr.responsable))]):_vm._e()])])]),_vm._v(" "),_c("div",{staticClass:"row mb-3"},[_c("div",{staticClass:"col-md-4 mb-3 mb-md-0"},[_c("h6",{staticClass:"small text-muted font-weight-bold text-uppercase mb-3",staticStyle:{"letter-spacing":"0.5px"}},[_vm._v("Signos Vitales")]),_vm._v(" "),_c("div",{staticClass:"d-flex flex-column gap-2 small"},[tr.pa?_c("div",{staticClass:"d-flex align-items-center"},[_c("i",{staticClass:"far fa-heart text-danger me-2",staticStyle:{width:"16px"}}),_vm._v(" "),_c("span",{staticClass:"text-muted me-1"},[_vm._v("PA:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.pa))])]):_vm._e(),_vm._v(" "),tr.fc?_c("div",{staticClass:"d-flex align-items-center"},[_c("span",{staticClass:"text-muted fw-bold me-2",staticStyle:{width:"16px"}},[_vm._v("FC")]),_vm._v(" "),_c("span",{staticClass:"text-muted me-1"},[_vm._v("FC:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.fc)+" "),_c("span",{staticClass:"fw-normal text-muted"},[_vm._v("bpm")])])]):_vm._e(),_vm._v(" "),tr.fr?_c("div",{staticClass:"d-flex align-items-center"},[_c("span",{staticClass:"text-muted fw-bold me-2",staticStyle:{width:"16px"}},[_vm._v("FR")]),_vm._v(" "),_c("span",{staticClass:"text-muted me-1"},[_vm._v("FR:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.fr)+" "),_c("span",{staticClass:"fw-normal text-muted"},[_vm._v("rpm")])])]):_vm._e(),_vm._v(" "),tr.t?_c("div",{staticClass:"d-flex align-items-center"},[_c("i",{staticClass:"fas fa-temperature-low text-info me-2",staticStyle:{width:"16px"}}),_vm._v(" "),_c("span",{staticClass:"text-muted me-1"},[_vm._v("Temp:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.t)+" "),_c("span",{staticClass:"fw-normal text-muted"},[_vm._v("°C")])])]):_vm._e(),_vm._v(" "),tr.saturacion?_c("div",{staticClass:"d-flex align-items-center"},[_c("i",{staticClass:"fas fa-wind text-primary me-2",staticStyle:{width:"16px"}}),_vm._v(" "),_c("span",{staticClass:"text-muted me-1"},[_vm._v("SpO2:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.saturacion)+" "),_c("span",{staticClass:"fw-normal text-muted"},[_vm._v("%")])])]):_vm._e(),_vm._v(" "),tr.peso?_c("div",{staticClass:"d-flex align-items-center"},[_c("span",{staticClass:"text-muted fw-bold me-2",staticStyle:{width:"16px"}},[_vm._v("P.")]),_vm._v(" "),_c("span",{staticClass:"text-muted me-1"},[_vm._v("Peso:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.peso))])]):_vm._e(),_vm._v(" "),tr.talla?_c("div",{staticClass:"d-flex align-items-center"},[_c("span",{staticClass:"text-muted fw-bold me-2",staticStyle:{width:"16px"}},[_vm._v("T.")]),_vm._v(" "),_c("span",{staticClass:"text-muted me-1"},[_vm._v("Talla:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.talla))])]):_vm._e()])]),_vm._v(" "),_c("div",{staticClass:"col-md-4 mb-3 mb-md-0"},[_c("h6",{staticClass:"small text-muted font-weight-bold text-uppercase mb-3",staticStyle:{"letter-spacing":"0.5px"}},[_vm._v("Evaluación y Pruebas")]),_vm._v(" "),_c("div",{staticClass:"d-flex flex-column gap-2 small"},[tr.prioridad?_c("div",[_c("span",{staticClass:"text-muted d-block mb-1"},[_vm._v("Prioridad:")]),_vm._v(" "),_c("span",{staticClass:"badge","class":_vm.getPrioridadClass(tr.prioridad)},[_vm._v(_vm._s(_vm.getPrioridadText(tr.prioridad)))])]):_vm._e(),_vm._v(" "),tr.pruebas?_c("div",{staticClass:"mt-2"},[_c("span",{staticClass:"text-muted d-block mb-1"},[_vm._v("Pruebas Aplicadas:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.pruebas))])]):_vm._e()])]),_vm._v(" "),_c("div",{staticClass:"col-md-4"},[_c("h6",{staticClass:"small text-muted font-weight-bold text-uppercase mb-3",staticStyle:{"letter-spacing":"0.5px"}},[_vm._v("Clínica")]),_vm._v(" "),_c("div",{staticClass:"d-flex flex-column gap-2 small"},[tr.sintomatologia?_c("div",[_c("span",{staticClass:"text-muted me-1"},[_vm._v("Sintomatología:")]),_vm._v(" "),_c("span",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.sintomatologia))])]):_vm._e(),_vm._v(" "),tr.antecedentes?_c("div",[_c("span",{staticClass:"text-muted me-1"},[_vm._v("Antecedentes:")]),_vm._v(" "),_c("span",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.antecedentes))])]):_vm._e()])])]),_vm._v(" "),_c("div",{staticClass:"mt-4"},[tr.motivo?_c("p",{staticClass:"small text-dark mb-3"},[_c("span",{staticClass:"text-muted me-1"},[_vm._v("Motivo:")]),_vm._v(" "+_vm._s(tr.motivo)+"\n                  ")]):_vm._e()])])]);}),0):_c("div",{staticClass:"alert alert-light text-center border py-5 mb-4"},[_c("i",{staticClass:"fas fa-clipboard text-muted mb-3 fs-1 d-block"}),_vm._v(" "),_c("h6",{staticClass:"text-muted"},[_vm._v("No existen registros de triaje para este paciente.")])])]),_vm._v(" "),_c("div",{staticClass:"col-12"},[_vm._m(35),_vm._v(" "),_c("div",{staticClass:"card border"},[_c("div",{staticClass:"card-body p-4"},[_vm.paciente.semaforo_estados&&_vm.paciente.semaforo_estados.length>0?_c("ul",{staticClass:"list-group list-group-flush"},_vm._l(_vm.paciente.semaforo_estados.slice(0,5),function(sem){return _c("li",{key:sem.id,staticClass:"list-group-item px-0"},[_c("strong",[_vm._v(_vm._s(_vm.formatDate(sem.registro)))]),_vm._v(" "),_c("p",{staticClass:"mb-0 small mt-1"},[_vm._v("Código: "+_vm._s(sem.codigo)+" - "),_c("span",{staticClass:"text-muted"},[_vm._v(_vm._s(sem.observaciones))])])]);}),0):_c("p",{staticClass:"text-muted small mb-0"},[_vm._v("Sin registros en el semáforo.")])])])]),_vm._v(" "),_c("div",{staticClass:"col-12 mt-4"},[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-3"},[_vm._m(36),_vm._v(" "),_c("div",{staticClass:"d-flex gap-2"},[_c("button",{staticClass:"btn btn-primary btn-sm rounded-pill shadow-sm px-3 fw-bold",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalPlanSeguridad"},on:{click:_vm.abrirNuevoPlan}},[_c("i",{staticClass:"fas fa-plus me-1"}),_vm._v(" Nuevo Plan\n              ")])])]),_vm._v(" "),_vm.paciente.planes_seguridad&&_vm.paciente.planes_seguridad.length>0?_c("div",_vm._l(_vm.paciente.planes_seguridad,function(plan){return _c("div",{key:plan.id,staticClass:"card border-0 shadow-sm mb-4 rounded-lg",staticStyle:{"background-color":"#fcfcfc"}},[_c("div",{staticClass:"card-body p-4"},[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2"},[_c("div",{staticClass:"d-flex align-items-center"},[_vm._m(37,true),_vm._v(" "),_c("div",[_c("h6",{staticClass:"font-weight-bold mb-1 text-dark"},[_vm._v("Plan de Seguridad - "+_vm._s(_vm.paciente.name)+" "+_vm._s(_vm.paciente.nombres))]),_vm._v(" "),_c("div",{staticClass:"small text-muted"},[_vm._v("\n                        Creado: "+_vm._s(_vm.formatDate(plan.fecha))+"\n                      ")])])]),_vm._v(" "),_c("div",{staticClass:"d-flex align-items-center gap-2"},[_c("button",{staticClass:"btn btn-light btn-sm rounded shadow-sm border text-muted",on:{click:function click($event){return _vm.descargarPlanPDF(plan);}}},[_c("i",{staticClass:"fas fa-download me-1"}),_vm._v(" Descargar PDF\n                    ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-light btn-sm rounded shadow-sm border text-dark",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalVerPlanSeguridad"},on:{click:function click($event){return _vm.verPlanSeguridad(plan);}}},[_c("i",{staticClass:"fas fa-eye me-1"}),_vm._v(" Ver Completo\n                    ")])])]),_vm._v(" "),_c("div",{staticClass:"row g-3"},[_c("div",{staticClass:"col-md-4"},[_c("div",{staticClass:"bg-white p-3 rounded border h-100 shadow-sm"},[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-3"},[_vm._m(38,true),_vm._v(" "),_c("span",{staticClass:"badge bg-light text-muted rounded-circle"},[_vm._v(_vm._s(_vm.countItems(plan.senales_advertencia)))])]),_vm._v(" "),_c("ul",{staticClass:"list-unstyled small text-dark mb-0 ps-2",staticStyle:{"list-style-type":"disc"}},_vm._l(_vm.previewItems(plan.senales_advertencia),function(item,idx){return _c("li",{key:idx,staticClass:"mb-1 text-truncate"},[_vm._v(_vm._s(item))]);}),0),_vm._v(" "),_vm.countItems(plan.senales_advertencia)>3?_c("div",{staticClass:"small text-primary mt-2"},[_vm._v("\n                        +"+_vm._s(_vm.countItems(plan.senales_advertencia)-3)+" más...\n                      ")]):_vm._e()])]),_vm._v(" "),_c("div",{staticClass:"col-md-4"},[_c("div",{staticClass:"bg-white p-3 rounded border h-100 shadow-sm"},[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-3"},[_vm._m(39,true),_vm._v(" "),_c("span",{staticClass:"badge bg-light text-muted rounded-circle"},[_vm._v(_vm._s(_vm.countItems(plan.estrategias)))])]),_vm._v(" "),_c("ul",{staticClass:"list-unstyled small text-dark mb-0 ps-2",staticStyle:{"list-style-type":"disc"}},_vm._l(_vm.previewItems(plan.estrategias),function(item,idx){return _c("li",{key:idx,staticClass:"mb-1 text-truncate"},[_vm._v(_vm._s(item))]);}),0),_vm._v(" "),_vm.countItems(plan.estrategias)>3?_c("div",{staticClass:"small text-primary mt-2"},[_vm._v("\n                        +"+_vm._s(_vm.countItems(plan.estrategias)-3)+" más...\n                      ")]):_vm._e()])]),_vm._v(" "),_c("div",{staticClass:"col-md-4"},[_c("div",{staticClass:"bg-white p-3 rounded border h-100 shadow-sm"},[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-3"},[_vm._m(40,true),_vm._v(" "),_c("span",{staticClass:"badge bg-light text-muted rounded-circle"},[_vm._v(_vm._s(_vm.countItems(plan.razones_vivir)))])]),_vm._v(" "),_c("ul",{staticClass:"list-unstyled small text-dark mb-0 ps-2",staticStyle:{"list-style-type":"disc"}},_vm._l(_vm.previewItems(plan.razones_vivir),function(item,idx){return _c("li",{key:idx,staticClass:"mb-1 text-truncate"},[_vm._v(_vm._s(item))]);}),0),_vm._v(" "),_vm.countItems(plan.razones_vivir)>3?_c("div",{staticClass:"small text-primary mt-2"},[_vm._v("\n                        +"+_vm._s(_vm.countItems(plan.razones_vivir)-3)+" más...\n                      ")]):_vm._e()])])])])]);}),0):_c("div",{staticClass:"alert alert-light text-center border py-4 mb-4"},[_c("i",{staticClass:"fas fa-shield-alt text-muted mb-3 fs-2 d-block"}),_vm._v(" "),_c("h6",{staticClass:"text-muted"},[_vm._v("No existen planes de seguridad registrados para este paciente.")])])])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="seguimiento"},attrs:{id:"seguimiento",role:"tabpanel"}},[_vm.fichaView==="botones"?_c("div",{staticClass:"row"},[_c("div",{staticClass:"col-12 mb-4"},[_vm._m(41),_vm._v(" "),_c("p",{staticClass:"text-muted small mb-4"},[_vm._v("Registre el plan de tratamiento recomendado al paciente.")]),_vm._v(" "),_c("div",{staticClass:"row g-4"},[_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border rounded-lg hover-shadow transition",staticStyle:{cursor:"pointer"},on:{click:function click($event){_vm.fichaView="nueva";}}},[_vm._m(42)])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border rounded-lg hover-shadow transition",staticStyle:{cursor:"pointer"},on:{click:function click($event){_vm.fichaView="historica";}}},[_c("div",{staticClass:"card-body text-center p-5"},[_vm._m(43),_vm._v(" "),_c("h5",{staticClass:"font-weight-bold text-dark mb-2"},[_vm._v("Ficha Histórica")]),_vm._v(" "),_c("p",{staticClass:"text-muted small mb-0"},[_vm._v(_vm._s(_vm.paciente.fichas_seguimiento?_vm.paciente.fichas_seguimiento.length:0)+" fichas registradas")])])])])])])]):_vm._e(),_vm._v(" "),_vm.fichaView==="nueva"?_c("div",[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-4"},[_c("h5",{staticClass:"font-weight-bold mb-0"},[_vm._v("Nueva Ficha de Seguimiento")]),_vm._v(" "),_c("button",{staticClass:"btn btn-light btn-sm rounded shadow-sm border",on:{click:function click($event){_vm.fichaView="botones";}}},[_vm._v("\n            Cancelar\n          ")])]),_vm._v(" "),_c("div",{staticClass:"card border-0 shadow-sm rounded-lg mb-4",staticStyle:{"background-color":"#fcfcfc"}},[_c("div",{staticClass:"card-body p-4"},[_c("form",{on:{submit:function submit($event){$event.preventDefault();return _vm.guardarFichaSeguimiento.apply(null,arguments);}}},[_vm._m(44),_vm._v(" "),_c("div",{staticClass:"mb-4 bg-white p-3 border rounded shadow-sm"},[_c("label",{staticClass:"form-label small text-muted"},[_vm._v("Tipo de Paquete")]),_vm._v(" "),_c("select",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevaFicha.tipo,expression:"nuevaFicha.tipo"}],staticClass:"form-select form-select-sm",attrs:{required:""},on:{change:function change($event){var $$selectedVal=Array.prototype.filter.call($event.target.options,function(o){return o.selected;}).map(function(o){var val="_value"in o?o._value:o.value;return val;});_vm.$set(_vm.nuevaFicha,"tipo",$event.target.multiple?$$selectedVal:$$selectedVal[0]);}}},[_c("option",{attrs:{value:"",disabled:""}},[_vm._v("Seleccionar paquete...")]),_vm._v(" "),_c("option",{attrs:{value:"Paquete de sesiones"}},[_vm._v("Paquete de sesiones")]),_vm._v(" "),_c("option",{attrs:{value:"Citas individuales"}},[_vm._v("Citas individuales")]),_vm._v(" "),_c("option",{attrs:{value:"Evaluación"}},[_vm._v("Evaluación")]),_vm._v(" "),_c("option",{attrs:{value:"Otro"}},[_vm._v("Otro")])])]),_vm._v(" "),_vm._m(45),_vm._v(" "),_c("div",{staticClass:"mb-4 bg-white p-3 border rounded shadow-sm"},[_c("div",{staticClass:"mb-3"},[_c("select",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevaFicha.frecuencia,expression:"nuevaFicha.frecuencia"}],staticClass:"form-select form-select-sm",attrs:{required:""},on:{change:function change($event){var $$selectedVal=Array.prototype.filter.call($event.target.options,function(o){return o.selected;}).map(function(o){var val="_value"in o?o._value:o.value;return val;});_vm.$set(_vm.nuevaFicha,"frecuencia",$event.target.multiple?$$selectedVal:$$selectedVal[0]);}}},[_c("option",{attrs:{value:"",disabled:""}},[_vm._v("Seleccionar frecuencia...")]),_vm._v(" "),_c("option",{attrs:{value:"1 vez por semana"}},[_vm._v("1 vez por semana")]),_vm._v(" "),_c("option",{attrs:{value:"Quincenal"}},[_vm._v("Quincenal")]),_vm._v(" "),_c("option",{attrs:{value:"Mensual"}},[_vm._v("Mensual")]),_vm._v(" "),_c("option",{attrs:{value:"Otro"}},[_vm._v("Otro")])])]),_vm._v(" "),_c("div",[_c("label",{staticClass:"form-label small text-muted"},[_vm._v("Motivo")]),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevaFicha.motivo,expression:"nuevaFicha.motivo"}],staticClass:"form-control form-control-sm",attrs:{rows:"2",placeholder:"Motivo de la frecuencia seleccionada...",required:""},domProps:{value:_vm.nuevaFicha.motivo},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevaFicha,"motivo",$event.target.value);}}})])]),_vm._v(" "),_vm._m(46),_vm._v(" "),_c("div",{staticClass:"mb-4 bg-white p-3 border rounded shadow-sm d-flex align-items-center justify-content-between flex-wrap gap-2"},[_c("div",{staticClass:"d-flex align-items-center"},[_c("i",{staticClass:"fas fa-user-md text-success me-2"}),_vm._v(" "),_c("select",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevaFicha.professional_id,expression:"nuevaFicha.professional_id"}],staticClass:"form-select form-select-sm border-0 bg-transparent fw-bold text-dark w-auto",attrs:{required:""},on:{change:function change($event){var $$selectedVal=Array.prototype.filter.call($event.target.options,function(o){return o.selected;}).map(function(o){var val="_value"in o?o._value:o.value;return val;});_vm.$set(_vm.nuevaFicha,"professional_id",$event.target.multiple?$$selectedVal:$$selectedVal[0]);}}},[_c("option",{attrs:{value:"",disabled:""}},[_vm._v("Seleccionar profesional...")]),_vm._v(" "),_vm._l(_vm.professionalsList,function(prof){return _c("option",{key:prof.id,domProps:{value:prof.id}},[_vm._v(_vm._s(prof.name))]);})],2)]),_vm._v(" "),_c("span",{staticClass:"badge bg-light text-muted border"},[_vm._v("Asignado automáticamente")])]),_vm._v(" "),_vm._m(47),_vm._v(" "),_c("div",{staticClass:"mb-4 bg-white p-3 border rounded shadow-sm"},[_vm._l(_vm.nuevaFicha.interconsultas,function(item,index){return _c("div",{key:index,staticClass:"d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom"},[_c("div",{staticClass:"small"},[_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(item.tipo))]),_vm._v(" "),_c("span",{staticClass:"text-muted mx-1"},[_vm._v("-")]),_vm._v(" "),_c("span",[_vm._v(_vm._s(_vm.getProfessionalName(item.professional_id)))]),_vm._v(" "),item.motivo?_c("p",{staticClass:"text-muted mb-0 mt-1"},[_vm._v("Motivo: "+_vm._s(item.motivo))]):_vm._e()]),_vm._v(" "),_c("button",{staticClass:"btn btn-link text-danger p-0",attrs:{type:"button"},on:{click:function click($event){return _vm.eliminarInterconsulta(index);}}},[_c("i",{staticClass:"far fa-trash-alt"})])]);}),_vm._v(" "),_c("div",{staticClass:"row g-2 mb-3"},[_c("div",{staticClass:"col-md-6"},[_c("select",{directives:[{name:"model",rawName:"v-model",value:_vm.tempInterconsulta.tipo,expression:"tempInterconsulta.tipo"}],staticClass:"form-select form-select-sm",on:{change:function change($event){var $$selectedVal=Array.prototype.filter.call($event.target.options,function(o){return o.selected;}).map(function(o){var val="_value"in o?o._value:o.value;return val;});_vm.$set(_vm.tempInterconsulta,"tipo",$event.target.multiple?$$selectedVal:$$selectedVal[0]);}}},[_c("option",{attrs:{value:"",disabled:""}},[_vm._v("Especialidad...")]),_vm._v(" "),_c("option",{attrs:{value:"Psicología"}},[_vm._v("Psicología")]),_vm._v(" "),_c("option",{attrs:{value:"Psiquiatría"}},[_vm._v("Psiquiatría")]),_vm._v(" "),_c("option",{attrs:{value:"Neurología"}},[_vm._v("Neurología")]),_vm._v(" "),_c("option",{attrs:{value:"Terapia de Lenguaje"}},[_vm._v("Terapia de Lenguaje")]),_vm._v(" "),_c("option",{attrs:{value:"Terapia Ocupacional"}},[_vm._v("Terapia Ocupacional")]),_vm._v(" "),_c("option",{attrs:{value:"Nutrición"}},[_vm._v("Nutrición")]),_vm._v(" "),_c("option",{attrs:{value:"Otro"}},[_vm._v("Otro")])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("select",{directives:[{name:"model",rawName:"v-model",value:_vm.tempInterconsulta.professional_id,expression:"tempInterconsulta.professional_id"}],staticClass:"form-select form-select-sm",on:{change:function change($event){var $$selectedVal=Array.prototype.filter.call($event.target.options,function(o){return o.selected;}).map(function(o){var val="_value"in o?o._value:o.value;return val;});_vm.$set(_vm.tempInterconsulta,"professional_id",$event.target.multiple?$$selectedVal:$$selectedVal[0]);}}},[_c("option",{attrs:{value:"",disabled:""}},[_vm._v("Profesional...")]),_vm._v(" "),_vm._l(_vm.professionalsList,function(prof){return _c("option",{key:prof.id,domProps:{value:prof.id}},[_vm._v(_vm._s(prof.name))]);})],2)]),_vm._v(" "),_c("div",{staticClass:"col-12 mt-2"},[_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.tempInterconsulta.motivo,expression:"tempInterconsulta.motivo"}],staticClass:"form-control form-control-sm",attrs:{rows:"1",placeholder:"Motivo de la interconsulta..."},domProps:{value:_vm.tempInterconsulta.motivo},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.tempInterconsulta,"motivo",$event.target.value);}}})])]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary btn-sm rounded-pill px-3",attrs:{type:"button",disabled:!_vm.tempInterconsulta.tipo||!_vm.tempInterconsulta.professional_id},on:{click:_vm.agregarInterconsulta}},[_vm._v("Agregar")]),_vm._v(" "),_vm.tempInterconsulta.tipo||_vm.tempInterconsulta.professional_id?_c("button",{staticClass:"btn btn-light btn-sm rounded-pill px-3 ms-2",attrs:{type:"button"},on:{click:_vm.limpiarInterconsulta}},[_vm._v("Cancelar")]):_vm._e()],2),_vm._v(" "),_vm._m(48),_vm._v(" "),_c("div",{staticClass:"mb-4 bg-white p-3 border rounded shadow-sm"},[_c("div",{staticClass:"mb-3"},[_c("label",{staticClass:"d-block small text-dark fw-bold mb-2"},[_vm._v("Grupo De Habilidades")]),_vm._v(" "),_c("div",{staticClass:"d-flex flex-wrap gap-2"},[_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Grupo De Habilidades - Niños/Adolescentes")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Grupo De Habilidades - Niños/Adolescentes");}}},[_vm.isSelectedRecomendacion("Grupo De Habilidades - Niños/Adolescentes")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Niños/Adolescentes\n                    ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Grupo De Habilidades - Adultos")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Grupo De Habilidades - Adultos");}}},[_vm.isSelectedRecomendacion("Grupo De Habilidades - Adultos")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Adultos\n                    ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Grupo De Habilidades - Terapia Ocupacional")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Grupo De Habilidades - Terapia Ocupacional");}}},[_vm.isSelectedRecomendacion("Grupo De Habilidades - Terapia Ocupacional")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Terapia Ocupacional\n                    ")])])]),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_c("label",{staticClass:"d-block small text-dark fw-bold mb-2"},[_vm._v("Talleres")]),_vm._v(" "),_c("div",{staticClass:"d-flex flex-wrap gap-2"},[_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Talleres - Niños/Adolescentes")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Talleres - Niños/Adolescentes");}}},[_vm.isSelectedRecomendacion("Talleres - Niños/Adolescentes")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Niños/Adolescentes\n                    ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Talleres - Adultos")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Talleres - Adultos");}}},[_vm.isSelectedRecomendacion("Talleres - Adultos")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Adultos\n                    ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Talleres - Terapia Ocupacional")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Talleres - Terapia Ocupacional");}}},[_vm.isSelectedRecomendacion("Talleres - Terapia Ocupacional")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Terapia Ocupacional\n                    ")])])]),_vm._v(" "),_c("div",[_c("label",{staticClass:"d-block small text-dark fw-bold mb-2"},[_vm._v("Otros")]),_vm._v(" "),_c("div",{staticClass:"d-flex flex-wrap gap-2"},[_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Otros - Niños/Adolescentes")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Otros - Niños/Adolescentes");}}},[_vm.isSelectedRecomendacion("Otros - Niños/Adolescentes")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Niños/Adolescentes\n                    ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Otros - Adultos")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Otros - Adultos");}}},[_vm.isSelectedRecomendacion("Otros - Adultos")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Adultos\n                    ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Otros - Terapia Ocupacional")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Otros - Terapia Ocupacional");}}},[_vm.isSelectedRecomendacion("Otros - Terapia Ocupacional")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Terapia Ocupacional\n                    ")])])])]),_vm._v(" "),_c("div",{staticClass:"d-flex justify-content-end gap-2 mt-4 pt-3 border-top"},[_c("button",{staticClass:"btn btn-light border px-4",attrs:{type:"button"},on:{click:function click($event){_vm.fichaView="botones";}}},[_vm._v("Cancelar")]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary px-4",attrs:{type:"submit",disabled:_vm.savingFicha}},[_vm.savingFicha?_c("span",{staticClass:"spinner-border spinner-border-sm me-2",attrs:{role:"status","aria-hidden":"true"}}):_vm._e(),_vm._v("\n                  Guardar Ficha\n                ")])])])])])]):_vm._e(),_vm._v(" "),_vm.fichaView==="historica"?_c("div",[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-4"},[_c("h5",{staticClass:"font-weight-bold mb-0"},[_vm._v("Ficha Histórica")]),_vm._v(" "),_c("button",{staticClass:"btn btn-light btn-sm rounded shadow-sm border",on:{click:function click($event){_vm.fichaView="botones";}}},[_vm._v("\n            Volver\n          ")])]),_vm._v(" "),_vm.paciente.fichas_seguimiento&&_vm.paciente.fichas_seguimiento.length>0?_c("div",_vm._l(_vm.paciente.fichas_seguimiento,function(ficha,index){return _c("div",{key:ficha.id,staticClass:"card border mb-3 rounded-lg hover-shadow transition"},[_c("div",{staticClass:"card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-2"},[_c("div",{staticClass:"d-flex align-items-center"},[_vm._m(49,true),_vm._v(" "),_c("div",[_c("h6",{staticClass:"font-weight-bold text-dark mb-1"},[_vm._v("Ficha "+_vm._s(_vm.paciente.fichas_seguimiento.length-index))]),_vm._v(" "),_c("div",{staticClass:"small text-muted"},[_vm._v("\n                    "+_vm._s(_vm.formatDate(ficha.fecha))+" - "+_vm._s(ficha.tipo)+" - "+_vm._s(ficha.frecuencia)+" - "+_vm._s(_vm.getProfessionalName(ficha.professional_id))+"\n                  ")])])]),_vm._v(" "),_c("div",{staticClass:"d-flex align-items-center gap-3"},[_c("span",{staticClass:"badge","class":index===0?"bg-success bg-opacity-10 border border-success border-opacity-25":"bg-secondary bg-opacity-10 border border-secondary border-opacity-25",staticStyle:{"font-size":"0.75rem","border-radius":"20px",padding:"0.35em 0.8em"}},[_vm._v("\n                  "+_vm._s(index===0?"Activo":"Culminado")+"\n                ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm btn-light border text-primary",on:{click:function click($event){return _vm.verDetalleFicha(ficha);}}},[_c("i",{staticClass:"fas fa-eye"})])])])]);}),0):_c("div",{staticClass:"alert alert-light border text-center p-5 rounded-lg"},[_c("i",{staticClass:"fas fa-file-alt text-muted mb-3 fs-1"}),_vm._v(" "),_c("h6",{staticClass:"text-muted"},[_vm._v("No hay fichas históricas registradas para este paciente.")])])]):_vm._e()]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="recetas"},attrs:{id:"recetas",role:"tabpanel"}},[_c("ul",{staticClass:"nav nav-pills mb-4",attrs:{id:"recetasOrdenesTabs",role:"tablist"}},[_c("li",{staticClass:"nav-item me-2",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link rounded-pill px-4 small border shadow-sm","class":_vm.activePill==="recetas"?"bg-primary text-white active":"bg-white text-dark",staticStyle:{"font-weight":"500"},attrs:{type:"button"},on:{click:function click($event){_vm.activePill="recetas";}}},[_c("i",{staticClass:"fas fa-link me-1"}),_vm._v(" Recetas Médicas\n          ")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link rounded-pill px-4 small border shadow-sm","class":_vm.activePill==="ordenes"?"bg-primary text-white active":"bg-white text-muted",staticStyle:{"font-weight":"500"},attrs:{type:"button"},on:{click:function click($event){_vm.activePill="ordenes";}}},[_c("i",{staticClass:"fas fa-file-invoice me-1"}),_vm._v(" Órdenes Médicas\n          ")])])]),_vm._v(" "),_c("div",{staticClass:"tab-content",attrs:{id:"pills-tabContent"}},[_c("div",{directives:[{name:"show",rawName:"v-show",value:_vm.activePill==="recetas",expression:"activePill === 'recetas'"}]},[_vm._m(50),_vm._v(" "),_vm.paciente.prescriptions&&_vm.paciente.prescriptions.length>0?_c("div",_vm._l(_vm.paciente.prescriptions,function(receta){return _c("div",{key:receta.id,staticClass:"card border border-light shadow-sm mb-4",staticStyle:{"border-radius":"12px",overflow:"hidden"}},[_c("div",{staticClass:"card-body p-4 bg-white"},[_c("div",{staticClass:"d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2"},[_c("div",{staticClass:"d-flex align-items-center"},[_vm._m(51,true),_vm._v(" "),_c("div",[_c("h6",{staticClass:"mb-0 font-weight-bold text-dark fs-5"},[_vm._v("Receta Médica")]),_vm._v(" "),_c("div",{staticClass:"small text-muted mt-1"},[_vm._v("\n                        "+_vm._s(_vm.formatDate(receta.created_at))+" · "+_vm._s(receta.professional?receta.professional.name:"Dr.")+" "),receta.professional&&(receta.professional.cmp||receta.professional.rne)?_c("span",[_vm._v("- CMP "+_vm._s(receta.professional.cmp||"--")+" / RNE "+_vm._s(receta.professional.rne||"--"))]):_vm._e()])])]),_vm._v(" "),_c("div",{staticClass:"d-flex align-items-center gap-2"},[_c("span",{staticClass:"badge bg-success bg-opacity-10 rounded-pill px-3 py-1 border border-success border-opacity-25",staticStyle:{"font-weight":"500"}},[_vm._v("Vigente")]),_vm._v(" "),_c("a",{staticClass:"btn btn-light btn-sm rounded text-muted shadow-sm border",attrs:{href:"/api/pdf/".concat(receta.id,"?token=").concat(_vm.$token),target:"_blank"}},[_c("i",{staticClass:"fas fa-print"})]),_vm._v(" "),_c("a",{staticClass:"btn btn-light btn-sm rounded text-muted shadow-sm border",attrs:{href:"/api/pdf/".concat(receta.id,"?token=").concat(_vm.$token),download:"",target:"_blank"}},[_c("i",{staticClass:"fas fa-download"})])])]),_vm._v(" "),_c("div",{staticClass:"text-muted small mb-3"},[_vm._v("\n                  Diagnóstico: "),_vm.paciente.initial_psychiatric_history&&_vm.paciente.initial_psychiatric_history.diagnostic?_c("span",[_vm._v(_vm._s(_vm.getCieNames(_vm.paciente.initial_psychiatric_history.diagnostic)))]):_c("span",[_vm._v("Evaluación médica general")])]),_vm._v(" "),receta.kairos&&receta.kairos.length>0?_c("div",{staticClass:"d-flex flex-column gap-2 mb-3"},_vm._l(receta.kairos,function(med){return _c("div",{key:med.id,staticClass:"p-3 rounded",staticStyle:{"background-color":"#fcfcfc",border:"1px solid #f0f0f0"}},[_c("div",{staticClass:"d-flex align-items-center mb-1"},[_c("strong",{staticClass:"text-dark me-2"},[_vm._v(_vm._s(med.nombre))]),_vm._v(" "),_c("span",{staticClass:"badge bg-warning bg-opacity-10 rounded-pill px-2 border border-warning border-opacity-25",staticStyle:{"font-size":"0.75rem"}},[_vm._v(_vm._s(med.concentracion||med.presentacion||"Dosis"))])]),_vm._v(" "),_c("div",{staticClass:"small text-muted mb-2"},[_vm._v("\n                      "+_vm._s(med.pivot.amount||"")+" "),med.pivot.indications?_c("span",[_vm._v("- "+_vm._s(med.pivot.indications))]):_vm._e()]),_vm._v(" "),med.pivot.way?_c("div",{staticClass:"small text-primary fst-italic",staticStyle:{color:"#0d6efd"}},[_c("i",{staticClass:"fas fa-exclamation-triangle text-warning me-1"}),_vm._v("\n                      "+_vm._s(med.pivot.way)+"\n                    ")]):_vm._e()]);}),0):_c("div",{staticClass:"p-3 rounded mb-3 text-muted small",staticStyle:{"background-color":"#fcfcfc",border:"1px solid #f0f0f0"}},[_vm._v("\n                  Medicamentos no especificados en la receta digital.\n                ")]),_vm._v(" "),_c("div",{staticClass:"small text-muted mt-2"},[_vm._v("\n                  Válida hasta: "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(_vm.formatDate(receta.effective_date)))])])])]);}),0):_c("div",{staticClass:"alert alert-light border text-center p-5"},[_c("i",{staticClass:"fas fa-capsules text-muted mb-3 fs-1"}),_vm._v(" "),_c("h6",{staticClass:"text-muted"},[_vm._v("No hay recetas registradas")])])]),_vm._v(" "),_c("div",{directives:[{name:"show",rawName:"v-show",value:_vm.activePill==="ordenes",expression:"activePill === 'ordenes'"}]},[_vm._m(52),_vm._v(" "),_vm.allMedicalExams&&_vm.allMedicalExams.length>0?_c("div",[_c("div",{staticClass:"table-responsive"},[_c("table",{staticClass:"table table-hover align-middle"},[_vm._m(53),_vm._v(" "),_c("tbody",_vm._l(_vm.allMedicalExams,function(examData,idx){return _c("tr",{key:idx},[_c("td",[_vm._v(_vm._s(_vm.formatDate(examData.date)))]),_vm._v(" "),_c("td",{staticClass:"fw-bold"},[_vm._v(_vm._s(examData.exam.name))]),_vm._v(" "),_c("td",[_c("span",{staticClass:"badge bg-light text-dark border"},[_vm._v(_vm._s(examData.exam.type===1?"Laboratorio":examData.exam.type===2?"Imagenología":"Otros"))])]),_vm._v(" "),_c("td",{staticClass:"text-muted small"},[_vm._v(_vm._s(examData.doctor))]),_vm._v(" "),_c("td",{staticClass:"text-end"},[_c("a",{staticClass:"btn btn-sm btn-light border text-primary",attrs:{href:_vm.getExamPdfUrl(examData),target:"_blank"}},[_c("i",{staticClass:"fas fa-print"})])])]);}),0)])])]):_c("div",{staticClass:"alert alert-light border text-center p-5"},[_c("i",{staticClass:"fas fa-file-medical text-muted mb-3 fs-1"}),_vm._v(" "),_c("h6",{staticClass:"text-muted"},[_vm._v("No hay órdenes de exámenes registradas")])])])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="pruebas"},attrs:{id:"pruebas",role:"tabpanel"}},[_c("div",{staticClass:"row"},[_vm._m(54),_vm._v(" "),_vm._l(_vm.allTests,function(t,index){return _c("div",{key:t.testName+"_"+(t.id||index),staticClass:"col-md-6 col-lg-4 mb-4"},[_c("div",{staticClass:"card h-100 border-0 shadow-sm",staticStyle:{"border-radius":"10px",overflow:"hidden"}},[_c("div",{staticClass:"card-header bg-primary text-white border-0 py-3"},[_c("div",{staticClass:"d-flex justify-content-between align-items-center"},[_c("h6",{staticClass:"mb-0 font-weight-bold"},[_vm._v(_vm._s(t.testName))]),_vm._v(" "),_c("i",{staticClass:"fas fa-file-signature opacity-50"})])]),_vm._v(" "),_c("div",{staticClass:"card-body bg-light position-relative"},[_c("div",{staticClass:"mb-3"},[_vm._m(55,true),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(_vm.formatDate(t.created_at||t.fecha)))])]),_vm._v(" "),t.score||t.total||t.result?_c("div",{staticClass:"mb-0"},[_vm._m(56,true),_vm._v(" "),_c("span",{staticClass:"badge bg-success rounded-pill px-3 py-2",staticStyle:{"font-size":"0.9rem"}},[_vm._v("\n                  "+_vm._s(t.score||t.total||t.result)+" pts\n                ")])]):_vm._e(),_vm._v(" "),_c("i",{staticClass:"fas fa-clipboard-check position-absolute opacity-10 text-primary",staticStyle:{bottom:"-15px",right:"-15px","font-size":"5rem"}})]),_vm._v(" "),_vm._m(57,true)])]);}),_vm._v(" "),_vm.allTests.length===0?_c("div",{staticClass:"col-12"},[_vm._m(58)]):_vm._e()],2)]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="documentos"},attrs:{id:"documentos",role:"tabpanel"}},[_vm._m(59),_vm._v(" "),_c("div",{staticClass:"d-flex flex-wrap gap-2 mb-4"},[_c("button",{staticClass:"btn btn-sm rounded-pill px-3","class":_vm.filtroDocumento==="Todos"?"btn-primary":"btn-light border text-muted",attrs:{type:"button"},on:{click:function click($event){$event.preventDefault();_vm.filtroDocumento="Todos";}}},[_vm._v("Todos")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3","class":_vm.filtroDocumento==="orden"?"btn-light bg-white border text-dark":"btn-light border text-muted",attrs:{type:"button"},on:{click:function click($event){$event.preventDefault();_vm.filtroDocumento="orden";}}},[_vm._v("Órdenes")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3","class":_vm.filtroDocumento==="resultado"?"btn-light bg-white border text-dark":"btn-light border text-muted",attrs:{type:"button"},on:{click:function click($event){$event.preventDefault();_vm.filtroDocumento="resultado";}}},[_vm._v("Resultados")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3","class":_vm.filtroDocumento==="referencias"?"btn-light bg-white border text-dark":"btn-light border text-muted",attrs:{type:"button"},on:{click:function click($event){$event.preventDefault();_vm.filtroDocumento="referencias";}}},[_vm._v("Referencias")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3","class":_vm.filtroDocumento==="consentimiento"?"btn-light bg-white border text-dark":"btn-light border text-muted",attrs:{type:"button"},on:{click:function click($event){$event.preventDefault();_vm.filtroDocumento="consentimiento";}}},[_vm._v("Consentimientos")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3","class":_vm.filtroDocumento==="recetas"?"btn-light bg-white border text-dark":"btn-light border text-muted",attrs:{type:"button"},on:{click:function click($event){$event.preventDefault();_vm.filtroDocumento="recetas";}}},[_vm._v("Recetas")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3","class":_vm.filtroDocumento==="otro"?"btn-light bg-white border text-dark":"btn-light border text-muted",attrs:{type:"button"},on:{click:function click($event){$event.preventDefault();_vm.filtroDocumento="otro";}}},[_vm._v("Otros")])]),_vm._v(" "),_vm.documentosFiltrados.length>0?_c("div",{staticClass:"row g-3"},_vm._l(_vm.documentosFiltrados,function(doc){return _c("div",{key:doc.id,staticClass:"col-md-6 col-lg-4"},[_c("div",{staticClass:"card h-100 border-light shadow-sm",staticStyle:{"border-radius":"12px","background-color":"#fcfcfc"}},[_c("div",{staticClass:"card-body p-4"},[_c("div",{staticClass:"d-flex align-items-start mb-3"},[_vm._m(60,true),_vm._v(" "),_c("div",{staticStyle:{"min-width":"0"}},[_c("h6",{staticClass:"mb-1 text-dark text-truncate",attrs:{title:doc.nombre}},[_vm._v(_vm._s(doc.nombre))]),_vm._v(" "),_c("span",{staticClass:"badge rounded-pill","class":_vm.getBadgeClassDocumento(doc.tipo)},[_vm._v(_vm._s(_vm.getTipoDocumentoNombre(doc.tipo)))])])]),_vm._v(" "),_c("div",{staticClass:"d-flex justify-content-between align-items-center small text-muted mb-3"},[_c("span",[_c("i",{staticClass:"far fa-calendar-alt me-1"}),_vm._v(" "+_vm._s(_vm.formatDate(doc.created_at||doc.fecha)))])]),_vm._v(" "),_c("div",{staticClass:"d-flex gap-2"},[_c("a",{staticClass:"btn btn-light btn-sm flex-grow-1 border shadow-sm text-dark bg-white rounded-pill",attrs:{href:"/storage/archivos/"+doc.archivo,target:"_blank"}},[_c("i",{staticClass:"fas fa-eye me-1"}),_vm._v(" Ver\n                ")]),_vm._v(" "),_c("a",{staticClass:"btn btn-light btn-sm flex-grow-1 border shadow-sm text-dark bg-white rounded-pill",attrs:{href:"/storage/archivos/"+doc.archivo,download:"",target:"_blank"}},[_c("i",{staticClass:"fas fa-download me-1"}),_vm._v(" Descargar\n                ")])])])])]);}),0):_c("div",{staticClass:"alert alert-light text-center border p-5 mt-3 rounded-lg"},[_c("i",{staticClass:"far fa-folder-open text-muted mb-3 fs-1"}),_vm._v(" "),_c("h6",{staticClass:"text-muted"},[_vm._v("No existen documentos adjuntos en esta categoría.")])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="finanzas"},attrs:{id:"finanzas",role:"tabpanel"}},[_c("div",{staticClass:"row g-3 mb-4"},[_c("div",{staticClass:"col-md-4"},[_c("div",{staticClass:"card border rounded-3 shadow-sm",staticStyle:{"border-color":"#eef2f5 !important"}},[_c("div",{staticClass:"card-body p-4"},[_vm._m(61),_vm._v(" "),_c("div",{staticClass:"fw-bold",staticStyle:{"font-size":"1.5rem",color:"#198754"}},[_vm._v("\n                S/ "+_vm._s(_vm.paciente.deuda_total?parseFloat(_vm.paciente.deuda_total).toFixed(2):"0.00")+"\n              ")])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-4"},[_c("div",{staticClass:"card border rounded-3 shadow-sm",staticStyle:{"border-color":"#eef2f5 !important"}},[_c("div",{staticClass:"card-body p-4"},[_vm._m(62),_vm._v(" "),_c("div",{staticClass:"fw-bold",staticStyle:{"font-size":"1.5rem",color:"#212529"}},[_vm._v("\n                "+_vm._s(_vm.paciente.pagos_pendientes||0)+"\n              ")])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-4"},[_c("div",{staticClass:"card border rounded-3 shadow-sm",staticStyle:{"border-color":"#eef2f5 !important"}},[_c("div",{staticClass:"card-body p-4"},[_vm._m(63),_vm._v(" "),_c("div",{staticClass:"fw-bold",staticStyle:{"font-size":"1.5rem",color:"#198754"}},[_vm._v("\n                S/ "+_vm._s(_vm.paciente.total_pagado?parseFloat(_vm.paciente.total_pagado).toFixed(2):"0.00")+"\n              ")])])])])]),_vm._v(" "),_vm._m(64),_vm._v(" "),_c("div",{staticClass:"card border-0 rounded-3 shadow-sm mb-4"},[_c("div",{staticClass:"card-body p-0"},[_c("div",{staticClass:"table-responsive"},[_c("table",{staticClass:"table table-hover mb-0",staticStyle:{"font-size":"0.9rem"}},[_vm._m(65),_vm._v(" "),_c("tbody",[_vm._l(_vm.paciente.pagos_historial||[],function(pago){return _c("tr",{key:pago.payment_id,staticStyle:{"border-bottom":"1px solid #f8f9fa"}},[_c("td",{staticClass:"align-middle py-3 ps-4"},[_c("span",{staticClass:"text-dark"},[_vm._v(_vm._s(_vm.formatOnlyDate(pago.date)))])]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 fw-bold text-dark"},[_vm._v("\n                    "+_vm._s(pago.concepto||"Consulta")+"\n                  ")]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 text-muted"},[_vm._v("\n                    "+_vm._s(_vm.getPaymentMethodName(pago.metodo_id))+"\n                  ")]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 text-end text-dark"},[_vm._v("\n                    S/ "+_vm._s(pago.monto?parseFloat(pago.monto).toFixed(2):"0.00")+"\n                  ")]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 pe-4"},[pago.estado==2||pago.estado==null?_c("span",{staticClass:"badge rounded-pill px-3 py-2",staticStyle:{"background-color":"#d1fae5",color:"#065f46","font-weight":"500","font-size":"0.78rem"}},[_c("i",{staticClass:"fas fa-check-circle me-1"}),_vm._v(" Pagado\n                    ")]):pago.estado==1?_c("span",{staticClass:"badge rounded-pill px-3 py-2",staticStyle:{"background-color":"#fef3c7",color:"#92400e","font-weight":"500","font-size":"0.78rem"}},[_c("i",{staticClass:"fas fa-clock me-1"}),_vm._v(" Sin pagar\n                    ")]):pago.estado==3?_c("span",{staticClass:"badge rounded-pill px-3 py-2",staticStyle:{"background-color":"#fee2e2",color:"#991b1b","font-weight":"500","font-size":"0.78rem"}},[_c("i",{staticClass:"fas fa-times-circle me-1"}),_vm._v(" Anulado\n                    ")]):_c("span",{staticClass:"badge rounded-pill px-3 py-2",staticStyle:{"background-color":"#fef3c7",color:"#92400e","font-weight":"500","font-size":"0.78rem"}},[_c("i",{staticClass:"fas fa-clock me-1"}),_vm._v(" Pendiente\n                    ")])])]);}),_vm._v(" "),!_vm.paciente.pagos_historial||_vm.paciente.pagos_historial.length===0?_c("tr",[_vm._m(66)]):_vm._e()],2)])])])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="convenios"},attrs:{id:"convenios",role:"tabpanel"}},[_vm._m(67)])]),_vm._v(" "),_c("div",{staticClass:"modal fade",attrs:{id:"modalDetalleFicha",tabindex:"-1","aria-labelledby":"modalDetalleFichaLabel","aria-hidden":"true"}},[_c("div",{staticClass:"modal-dialog modal-lg modal-dialog-centered"},[_c("div",{staticClass:"modal-content border-0 shadow-lg rounded-lg"},[_vm._m(68),_vm._v(" "),_vm.fichaSeleccionada?_c("div",{staticClass:"modal-body p-4"},[_c("div",{staticClass:"row mb-4 g-3"},[_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"p-3 bg-white border rounded shadow-sm h-100"},[_c("p",{staticClass:"text-muted small mb-1"},[_vm._v("Fecha de Creación")]),_vm._v(" "),_c("p",{staticClass:"font-weight-bold mb-0 text-dark"},[_vm._v(_vm._s(_vm.formatDate(_vm.fichaSeleccionada.fecha)))])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"p-3 bg-white border rounded shadow-sm h-100"},[_c("p",{staticClass:"text-muted small mb-1"},[_vm._v("Profesional Asignado")]),_vm._v(" "),_c("p",{staticClass:"font-weight-bold mb-0 text-dark"},[_c("i",{staticClass:"fas fa-user-md text-success me-1"}),_vm._v(" "+_vm._s(_vm.getProfessionalName(_vm.fichaSeleccionada.professional_id)))])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"p-3 bg-white border rounded shadow-sm h-100"},[_c("p",{staticClass:"text-muted small mb-1"},[_vm._v("Tipo de Paquete")]),_vm._v(" "),_c("p",{staticClass:"font-weight-bold mb-0 text-dark"},[_vm._v(_vm._s(_vm.fichaSeleccionada.tipo))])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"p-3 bg-white border rounded shadow-sm h-100"},[_c("p",{staticClass:"text-muted small mb-1"},[_vm._v("Frecuencia")]),_vm._v(" "),_c("p",{staticClass:"font-weight-bold mb-0 text-dark"},[_vm._v(_vm._s(_vm.fichaSeleccionada.frecuencia))])])]),_vm._v(" "),_c("div",{staticClass:"col-12"},[_c("div",{staticClass:"p-3 bg-white border rounded shadow-sm"},[_c("p",{staticClass:"text-muted small mb-1"},[_vm._v("Motivo Frecuencia")]),_vm._v(" "),_c("p",{staticClass:"mb-0 text-dark"},[_vm._v(_vm._s(_vm.fichaSeleccionada.motivo))])])])]),_vm._v(" "),_vm.fichaSeleccionada.interconsultas&&_vm.fichaSeleccionada.interconsultas.length>0?_c("div",{staticClass:"mb-4"},[_vm._m(69),_vm._v(" "),_vm._l(_vm.fichaSeleccionada.interconsultas,function(inter,idx){return _c("div",{key:idx,staticClass:"card border-0 bg-light shadow-sm mb-2"},[_c("div",{staticClass:"card-body p-3"},[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-2"},[_c("span",{staticClass:"badge bg-primary bg-opacity-10 border border-primary px-2 py-1 rounded"},[_vm._v(_vm._s(inter.tipo))]),_vm._v(" "),_c("span",{staticClass:"small text-muted font-weight-bold"},[_c("i",{staticClass:"fas fa-user-md"}),_vm._v(" "+_vm._s(_vm.getProfessionalName(inter.professional_id)))])]),_vm._v(" "),inter.motivo?_c("p",{staticClass:"mb-0 small text-dark mt-2"},[_c("strong",[_vm._v("Motivo:")]),_vm._v(" "+_vm._s(inter.motivo))]):_vm._e()])]);})],2):_vm._e(),_vm._v(" "),_vm.getRecomendacionesParsed(_vm.fichaSeleccionada.recomendaciones).length>0?_c("div",[_vm._m(70),_vm._v(" "),_c("div",{staticClass:"d-flex flex-wrap gap-2"},_vm._l(_vm.getRecomendacionesParsed(_vm.fichaSeleccionada.recomendaciones),function(rec,idx){return _c("span",{key:idx,staticClass:"badge bg-success bg-opacity-10 border border-success p-2 rounded-pill"},[_c("i",{staticClass:"fas fa-check me-1"}),_vm._v(" "+_vm._s(rec)+"\n              ")]);}),0)]):_vm._e()]):_vm._e(),_vm._v(" "),_c("div",{staticClass:"modal-footer border-top-0 pt-0"},[_vm.fichaSeleccionada?_c("a",{staticClass:"btn btn-danger",attrs:{href:"/api/export-ficha-seguimiento/".concat(_vm.fichaSeleccionada.id,"?token=").concat(_vm.$token)}},[_c("i",{staticClass:"fas fa-file-pdf me-2"}),_vm._v(" Descargar PDF\n          ")]):_vm._e(),_vm._v(" "),_c("button",{staticClass:"btn btn-light border px-4",attrs:{type:"button","data-bs-dismiss":"modal"}},[_vm._v("Cerrar")])])])])]),_vm._v(" "),_c("div",{staticClass:"modal fade",attrs:{id:"modalPlanSeguridad",tabindex:"-1","aria-hidden":"true"}},[_c("div",{staticClass:"modal-dialog modal-lg modal-dialog-centered"},[_c("div",{staticClass:"modal-content border-0 shadow-lg rounded-lg"},[_vm._m(71),_vm._v(" "),_c("div",{staticClass:"modal-body p-4 bg-light"},[_c("form",{on:{submit:function submit($event){$event.preventDefault();return _vm.guardarPlanSeguridad.apply(null,arguments);}}},[_c("div",{staticClass:"row g-3"},[_c("div",{staticClass:"col-md-6"},[_vm._m(72),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoPlanSeguridad.senales_advertencia,expression:"nuevoPlanSeguridad.senales_advertencia"}],staticClass:"form-control",attrs:{rows:"3",placeholder:"Pensamientos, imágenes, humor, situaciones, conducta...",required:""},domProps:{value:_vm.nuevoPlanSeguridad.senales_advertencia},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevoPlanSeguridad,"senales_advertencia",$event.target.value);}}})]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_vm._m(73),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoPlanSeguridad.estrategias,expression:"nuevoPlanSeguridad.estrategias"}],staticClass:"form-control",attrs:{rows:"3",placeholder:"Cosas que puedo hacer para distraerme sin contactar a otra persona...",required:""},domProps:{value:_vm.nuevoPlanSeguridad.estrategias},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevoPlanSeguridad,"estrategias",$event.target.value);}}})]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_vm._m(74),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoPlanSeguridad.personas_dis,expression:"nuevoPlanSeguridad.personas_dis"}],staticClass:"form-control",attrs:{rows:"3",placeholder:"Nombres, teléfonos, lugares seguros...",required:""},domProps:{value:_vm.nuevoPlanSeguridad.personas_dis},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevoPlanSeguridad,"personas_dis",$event.target.value);}}})]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_vm._m(75),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoPlanSeguridad.personas_ayuda,expression:"nuevoPlanSeguridad.personas_ayuda"}],staticClass:"form-control",attrs:{rows:"3",placeholder:"Nombres, teléfonos...",required:""},domProps:{value:_vm.nuevoPlanSeguridad.personas_ayuda},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevoPlanSeguridad,"personas_ayuda",$event.target.value);}}})]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_vm._m(76),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoPlanSeguridad.contactos_emergencia,expression:"nuevoPlanSeguridad.contactos_emergencia"}],staticClass:"form-control",attrs:{rows:"3",placeholder:"Clínica, hospital de urgencias, línea de prevención de suicidio...",required:""},domProps:{value:_vm.nuevoPlanSeguridad.contactos_emergencia},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevoPlanSeguridad,"contactos_emergencia",$event.target.value);}}})]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_vm._m(77),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoPlanSeguridad.medidas,expression:"nuevoPlanSeguridad.medidas"}],staticClass:"form-control",attrs:{rows:"3",placeholder:"Eliminar acceso a métodos letales...",required:""},domProps:{value:_vm.nuevoPlanSeguridad.medidas},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevoPlanSeguridad,"medidas",$event.target.value);}}})]),_vm._v(" "),_c("div",{staticClass:"col-12"},[_vm._m(78),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoPlanSeguridad.razones_vivir,expression:"nuevoPlanSeguridad.razones_vivir"}],staticClass:"form-control",attrs:{rows:"3",placeholder:"Aspectos importantes que me mantienen con vida...",required:""},domProps:{value:_vm.nuevoPlanSeguridad.razones_vivir},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevoPlanSeguridad,"razones_vivir",$event.target.value);}}})])]),_vm._v(" "),_c("div",{staticClass:"d-flex justify-content-end gap-2 mt-4 pt-3 border-top"},[_c("button",{staticClass:"btn btn-light border px-4",attrs:{type:"button","data-bs-dismiss":"modal"}},[_vm._v("Cancelar")]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary px-4",attrs:{type:"submit",disabled:_vm.savingPlanSeguridad}},[_vm.savingPlanSeguridad?_c("span",{staticClass:"spinner-border spinner-border-sm me-2",attrs:{role:"status","aria-hidden":"true"}}):_vm._e(),_vm._v("\n                Guardar Plan\n              ")])])])])])])]),_vm._v(" "),_c("div",{staticClass:"modal fade",attrs:{id:"modalVerPlanSeguridad",tabindex:"-1","aria-hidden":"true"}},[_c("div",{staticClass:"modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"},[_c("div",{staticClass:"modal-content border-0 shadow-lg rounded-lg"},[_c("div",{staticClass:"modal-header border-bottom-0 bg-light d-flex align-items-center"},[_vm._m(79),_vm._v(" "),_vm.planSeguridadSeleccionado?_c("div",{staticClass:"ms-auto me-3 small text-muted"},[_vm._v("\n             Creado: "+_vm._s(_vm.formatDate(_vm.planSeguridadSeleccionado.fecha))+"\n          ")]):_vm._e(),_vm._v(" "),_c("button",{staticClass:"btn-close m-0",attrs:{type:"button","data-bs-dismiss":"modal","aria-label":"Close"}})]),_vm._v(" "),_vm.planSeguridadSeleccionado?_c("div",{staticClass:"modal-body p-4"},[_c("div",{staticClass:"row g-4"},[_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border-light shadow-sm"},[_vm._m(80),_vm._v(" "),_c("div",{staticClass:"card-body"},[_c("p",{staticClass:"small text-muted mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.planSeguridadSeleccionado.senales_advertencia))])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border-light shadow-sm"},[_vm._m(81),_vm._v(" "),_c("div",{staticClass:"card-body"},[_c("p",{staticClass:"small text-muted mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.planSeguridadSeleccionado.estrategias))])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border-light shadow-sm"},[_vm._m(82),_vm._v(" "),_c("div",{staticClass:"card-body"},[_c("p",{staticClass:"small text-muted mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.planSeguridadSeleccionado.personas_dis))])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border-light shadow-sm"},[_vm._m(83),_vm._v(" "),_c("div",{staticClass:"card-body"},[_c("p",{staticClass:"small text-muted mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.planSeguridadSeleccionado.personas_ayuda))])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border-light shadow-sm"},[_vm._m(84),_vm._v(" "),_c("div",{staticClass:"card-body"},[_c("p",{staticClass:"small text-muted mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.planSeguridadSeleccionado.contactos_emergencia))])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border-light shadow-sm"},[_vm._m(85),_vm._v(" "),_c("div",{staticClass:"card-body"},[_c("p",{staticClass:"small text-muted mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.planSeguridadSeleccionado.medidas))])])])]),_vm._v(" "),_c("div",{staticClass:"col-12"},[_c("div",{staticClass:"card h-100 border-light shadow-sm"},[_vm._m(86),_vm._v(" "),_c("div",{staticClass:"card-body"},[_c("p",{staticClass:"small text-muted mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.planSeguridadSeleccionado.razones_vivir))])])])])])]):_vm._e(),_vm._v(" "),_c("div",{staticClass:"modal-footer border-top-0 pt-0"},[_c("button",{staticClass:"btn btn-light border px-4",attrs:{type:"button","data-bs-dismiss":"modal"}},[_vm._v("Cerrar")]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary px-4",attrs:{type:"button"},on:{click:function click($event){return _vm.descargarPlanPDF(_vm.planSeguridadSeleccionado);}}},[_c("i",{staticClass:"fas fa-download me-1"}),_vm._v(" Descargar PDF\n          ")])])])])]),_vm._v(" "),_c("div",{staticClass:"modal fade",attrs:{id:"modalSubirDocumento",tabindex:"-1","aria-hidden":"true"}},[_c("div",{staticClass:"modal-dialog modal-dialog-centered"},[_c("div",{staticClass:"modal-content border-0 shadow-lg rounded-lg"},[_vm._m(87),_vm._v(" "),_c("div",{staticClass:"modal-body p-4 bg-light"},[_c("form",{on:{submit:function submit($event){$event.preventDefault();return _vm.subirNuevoDocumento.apply(null,arguments);}}},[_vm._m(88),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_vm._m(89),_vm._v(" "),_c("select",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoDocumentoTipo,expression:"nuevoDocumentoTipo"}],staticClass:"form-select",attrs:{required:""},on:{change:function change($event){var $$selectedVal=Array.prototype.filter.call($event.target.options,function(o){return o.selected;}).map(function(o){var val="_value"in o?o._value:o.value;return val;});_vm.nuevoDocumentoTipo=$event.target.multiple?$$selectedVal:$$selectedVal[0];}}},[_c("option",{attrs:{value:"",disabled:""}},[_vm._v("Seleccione el tipo...")]),_vm._v(" "),_c("option",{attrs:{value:"orden"}},[_vm._v("Orden de Examen")]),_vm._v(" "),_c("option",{attrs:{value:"resultado"}},[_vm._v("Resultado de Laboratorio/Imagen")]),_vm._v(" "),_c("option",{attrs:{value:"referencias"}},[_vm._v("Referencia/Contrarreferencia")]),_vm._v(" "),_c("option",{attrs:{value:"consentimiento"}},[_vm._v("Consentimiento Informado")]),_vm._v(" "),_c("option",{attrs:{value:"recetas"}},[_vm._v("Receta Externa")]),_vm._v(" "),_c("option",{attrs:{value:"otro"}},[_vm._v("Otro Documento")])])]),_vm._v(" "),_c("div",{staticClass:"d-flex justify-content-end gap-2 mt-4 pt-3 border-top"},[_c("button",{staticClass:"btn btn-light border px-4",attrs:{type:"button","data-bs-dismiss":"modal"}},[_vm._v("Cancelar")]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary px-4",attrs:{type:"submit",disabled:_vm.subiendoDocumento}},[_vm.subiendoDocumento?_c("span",{staticClass:"spinner-border spinner-border-sm me-2",attrs:{role:"status","aria-hidden":"true"}}):_vm._e(),_vm._v("\n                Subir Documento\n              ")])])])])])])]),_vm._v(" "),_vm.paciente.has_autotriaje?_c("modal-ver-auto-triaje",{attrs:{"patient-id":_vm.paciente.id}}):_vm._e(),_vm._v(" "),_c("div",{staticClass:"modal fade",attrs:{id:"modalLinkAutotriaje",tabindex:"-1","aria-labelledby":"modalLinkAutotriajeLabel","aria-hidden":"true"}},[_c("div",{staticClass:"modal-dialog modal-dialog-centered"},[_c("div",{staticClass:"modal-content border-0 shadow"},[_vm._m(90),_vm._v(" "),_c("div",{staticClass:"modal-body pb-4"},[_c("p",{staticClass:"text-secondary text-sm mb-3"},[_vm._v("El siguiente enlace es válido únicamente por 1 hora. Envíalo al paciente para que pueda completar su autotriaje.")]),_vm._v(" "),_c("div",{staticClass:"input-group mb-3"},[_c("input",{staticClass:"form-control bg-light",attrs:{type:"text",readonly:"",id:"inputLinkAutotriaje"},domProps:{value:_vm.linkGenerado}}),_vm._v(" "),_c("button",{staticClass:"btn btn-outline-secondary",attrs:{type:"button"},on:{click:_vm.copiarLink}},[_c("i",{staticClass:"far fa-copy"}),_vm._v(" Copiar\n            ")])]),_vm._v(" "),_c("a",{staticClass:"btn btn-success w-100 mt-2","class":{disabled:!_vm.linkGenerado},attrs:{href:"https://api.whatsapp.com/send?text="+encodeURIComponent("Hola, por favor completa tu autotriaje en el siguiente enlace válido por 1 hora:\n\n"+_vm.linkGenerado),target:"_blank"}},[_c("i",{staticClass:"fab fa-whatsapp me-2"}),_vm._v(" Enviar por WhatsApp\n          ")])])])])]),_vm._v(" "),_vm.paciente&&_vm.paciente.id?_c("modal-ver-estados",{attrs:{dataPatient:_vm.paciente,estados:_vm.estados}}):_vm._e(),_vm._v(" "),_c("modal-ver-hobbies",{attrs:{hobbies:_vm.hobbies,id:_vm.queId,misHobbies:_vm.misHobbies}})],1);};var staticRenderFns=[function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"spinner-border text-primary",attrs:{role:"status"}},[_c("span",{staticClass:"visually-hidden"},[_vm._v("Loading...")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold mb-3"},[_c("i",{staticClass:"far fa-calendar text-primary"}),_vm._v(" Próxima Cita")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold mb-3"},[_c("i",{staticClass:"fas fa-file-medical text-success"}),_vm._v(" Última Evolución")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex justify-content-between align-items-center mb-4"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"far fa-clock text-primary"}),_vm._v(" Línea de Tiempo Clínica (Últimas Actividades)")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"fw-bold mb-3"},[_c("i",{staticClass:"fas fa-user text-primary me-2"}),_vm._v("\n                  Información Básica\n                ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"fw-bold mb-3"},[_c("i",{staticClass:"fas fa-phone text-primary me-2"}),_vm._v("\n                  Información de Contacto\n                ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"fw-bold mb-3 text-warning"},[_c("i",{staticClass:"fas fa-exclamation-triangle me-2"}),_vm._v("\n                  Contacto de Emergencia\n                ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"fw-bold mb-3"},[_c("i",{staticClass:"fas fa-calendar text-primary me-2"}),_vm._v("\n                  Información de Registro\n                ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex justify-content-between align-items-center mb-3 mt-1"},[_c("h6",{staticClass:"font-weight-bold mb-0 text-dark d-flex align-items-center"},[_c("i",{staticClass:"fas fa-cube text-primary me-2"}),_vm._v(" Paquetes Contratados\n        ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-outline-secondary btn-sm bg-white text-dark shadow-sm border rounded"},[_c("i",{staticClass:"fas fa-plus me-1"}),_vm._v(" Nuevo Paquete\n        ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex justify-content-between align-items-center mb-3 mt-4"},[_c("h6",{staticClass:"font-weight-bold mb-0 text-dark d-flex align-items-center"},[_c("i",{staticClass:"far fa-calendar-alt text-primary me-2"}),_vm._v(" Historial de Citas\n        ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("thead",{staticClass:"bg-light"},[_c("tr",[_c("th",{staticClass:"border-0 text-muted fw-normal py-3 ps-4",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Fecha")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Tipo")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Profesional")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Estado")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3 pe-4",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Notas")])])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex justify-content-between align-items-center mb-3 mt-4"},[_c("h6",{staticClass:"font-weight-bold mb-0 text-dark d-flex align-items-center"},[_c("i",{staticClass:"fas fa-exclamation-triangle text-warning me-2"}),_vm._v(" Faltas y Reprogramaciones\n        ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-light border-0 py-3"},[_c("h6",{staticClass:"mb-0 text-dark font-weight-bold",staticStyle:{"font-size":"0.95rem"}},[_c("i",{staticClass:"fas fa-times-circle text-danger me-2"}),_vm._v(" Inasistencias (Faltas)\n              ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("td",{staticClass:"align-middle py-3 pe-4 text-muted border-bottom-0 text-end",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_c("span",{staticClass:"badge bg-danger bg-opacity-10 rounded-pill fw-normal px-2 py-1"},[_vm._v("Falta")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-light border-0 py-3"},[_c("h6",{staticClass:"mb-0 text-dark font-weight-bold",staticStyle:{"font-size":"0.95rem"}},[_c("i",{staticClass:"fas fa-sync-alt text-info me-2"}),_vm._v(" Reprogramaciones\n              ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("td",{staticClass:"align-middle py-3 pe-4 text-muted border-bottom-0 text-end",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_c("span",{staticClass:"badge bg-info bg-opacity-10 rounded-pill fw-normal px-2 py-1"},[_vm._v("Reprogramada")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-user-md text-primary me-2"}),_vm._v("MOTIVO DE CONSULTA")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-notes-medical text-primary me-2"}),_vm._v("ANTECEDENTES")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-chart-line text-primary me-2"}),_vm._v("DINÁMICA FAMILIAR / SOCIAL")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-smile-beam text-primary me-2"}),_vm._v("ACTITUD DEL PACIENTE")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-stethoscope text-primary me-2"}),_vm._v("DIAGNÓSTICO INICIAL")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-tasks text-primary me-2"}),_vm._v("PLAN DE TRATAMIENTO")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-file-medical-alt text-success me-2"}),_vm._v("ANTECEDENTES GENERALES")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-thermometer-half text-success me-2"}),_vm._v("SIGNOS Y SÍNTOMAS PRINCIPALES")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-disease text-success me-2"}),_vm._v("ENFERMEDAD ACTUAL")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-brain text-success me-2"}),_vm._v("EXAMEN MENTAL (APC)")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-exclamation-triangle text-success me-2"}),_vm._v("PROBLEMAS DIAGNÓSTICOS")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-stethoscope text-success me-2"}),_vm._v("DIAGNÓSTICO")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-tasks text-success me-2"}),_vm._v("PLAN DE TRATAMIENTO")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold mb-3 mt-4 text-dark px-2 d-flex align-items-center"},[_c("i",{staticClass:"fas fa-clipboard-list text-primary me-2"}),_vm._v(" Evoluciones de Seguimiento\n      ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("span",{staticClass:"text-success"},[_vm._v("Está apreciando "),_c("strong",[_vm._v("todos")]),_vm._v(" los registros de evoluciones.")]);},function(){var _vm=this,_c=_vm._self._c;return _c("small",{staticClass:"text-warning d-block font-weight-bold",staticStyle:{"font-size":"0.65rem"}},[_c("i",{staticClass:"fas fa-stethoscope me-1"}),_vm._v(" TRATAMIENTO / PLAN")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"mt-3"},[_c("button",{staticClass:"btn btn-outline-secondary btn-sm rounded px-3 py-1 text-dark bg-white border shadow-xs",staticStyle:{"font-size":"0.75rem",width:"fit-content"}},[_c("i",{staticClass:"fas fa-plus-square me-1 text-muted"}),_vm._v(" Agregar seguimiento\n                ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h5",{staticClass:"card-title font-weight-bold mb-0"},[_c("i",{staticClass:"fas fa-clipboard-check text-primary me-2"}),_vm._v(" Registro de Triajes")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"rounded-circle bg-light text-info border d-flex justify-content-center align-items-center me-3",staticStyle:{width:"45px",height:"45px","min-width":"45px"}},[_c("i",{staticClass:"fas fa-thermometer-half fs-5"})]);},function(){var _vm=this,_c=_vm._self._c;return _c("h5",{staticClass:"card-title font-weight-bold mb-3 mt-2"},[_c("i",{staticClass:"fas fa-traffic-light text-warning me-2"}),_vm._v(" Seguridad / Semáforo")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h5",{staticClass:"card-title font-weight-bold mb-0"},[_c("i",{staticClass:"fas fa-shield-alt text-danger me-2"}),_vm._v(" Plan de Seguridad\n            ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"rounded-circle bg-danger bg-opacity-10 d-flex justify-content-center align-items-center me-3",staticStyle:{width:"45px",height:"45px","min-width":"45px"}},[_c("i",{staticClass:"fas fa-shield-alt fs-5"})]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"small text-muted font-weight-bold text-uppercase mb-0",staticStyle:{"letter-spacing":"0.5px"}},[_c("i",{staticClass:"fas fa-exclamation-triangle text-warning me-1"}),_vm._v(" Señales de advertencia\n                        ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"small text-muted font-weight-bold text-uppercase mb-0",staticStyle:{"letter-spacing":"0.5px"}},[_c("i",{staticClass:"fas fa-brain text-primary me-1"}),_vm._v(" Estrategias de afrontamiento\n                        ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"small text-muted font-weight-bold text-uppercase mb-0",staticStyle:{"letter-spacing":"0.5px"}},[_c("i",{staticClass:"far fa-smile text-success me-1"}),_vm._v(" Razones para vivir\n                        ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h5",{staticClass:"card-title font-weight-bold mb-1"},[_c("i",{staticClass:"fas fa-clipboard-list text-primary me-2"}),_vm._v(" Ficha de Seguimiento")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-body text-center p-5"},[_c("div",{staticClass:"rounded-circle bg-white bg-opacity-10 text-primary d-flex justify-content-center align-items-center mx-auto mb-3",staticStyle:{width:"60px",height:"60px"}},[_c("i",{staticClass:"fas fa-plus fs-4"})]),_vm._v(" "),_c("h5",{staticClass:"font-weight-bold text-dark mb-2"},[_vm._v("Nueva Ficha")]),_vm._v(" "),_c("p",{staticClass:"text-muted small mb-0"},[_vm._v("Crear un nuevo plan de seguimiento")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"rounded-circle bg-light text-secondary border d-flex justify-content-center align-items-center mx-auto mb-3",staticStyle:{width:"60px",height:"60px"}},[_c("i",{staticClass:"fas fa-file-alt fs-4"})]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold small mb-3"},[_vm._v("I. Seguimiento de Citas "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold small mb-3"},[_vm._v("II. Frecuencia "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold small mb-3"},[_vm._v("III. Profesional "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold small mb-3 d-flex align-items-center"},[_vm._v("IV. Interconsulta "),_c("span",{staticClass:"text-muted ms-1",staticStyle:{"font-weight":"400","font-size":"0.8rem"}},[_vm._v("(Opcional)")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold small mb-3 d-flex align-items-center"},[_vm._v("V. Recomendaciones "),_c("span",{staticClass:"text-muted ms-1",staticStyle:{"font-weight":"400","font-size":"0.8rem"}},[_vm._v("(Opcional)")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"rounded bg-light text-secondary border d-flex justify-content-center align-items-center me-3",staticStyle:{width:"45px",height:"45px"}},[_c("i",{staticClass:"fas fa-file-alt"})]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex justify-content-between align-items-center mb-4"},[_c("h5",{staticClass:"mb-0 font-weight-bold d-flex align-items-center text-dark"},[_c("i",{staticClass:"fas fa-link text-warning me-2",staticStyle:{transform:"rotate(45deg)"}}),_vm._v(" Recetas Médicas\n            ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary rounded-pill px-3 shadow-sm btn-sm"},[_c("i",{staticClass:"fas fa-plus me-1"}),_vm._v(" Nueva Receta\n            ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm",staticStyle:{width:"45px",height:"45px","background-color":"#fff4e6",color:"#ff8c00"}},[_c("i",{staticClass:"fas fa-capsules fs-5"})]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex justify-content-between align-items-center mb-4"},[_c("h5",{staticClass:"mb-0 font-weight-bold d-flex align-items-center text-dark"},[_c("i",{staticClass:"fas fa-file-invoice text-primary me-2"}),_vm._v(" Órdenes Médicas\n            ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary rounded-pill px-3 shadow-sm btn-sm"},[_c("i",{staticClass:"fas fa-plus me-1"}),_vm._v(" Nueva Orden\n            ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("thead",{staticClass:"bg-light"},[_c("tr",[_c("th",{staticClass:"border-0 rounded-start"},[_vm._v("Fecha")]),_vm._v(" "),_c("th",{staticClass:"border-0"},[_vm._v("Examen")]),_vm._v(" "),_c("th",{staticClass:"border-0"},[_vm._v("Tipo")]),_vm._v(" "),_c("th",{staticClass:"border-0"},[_vm._v("Doctor")]),_vm._v(" "),_c("th",{staticClass:"border-0 rounded-end text-end"},[_vm._v("Acciones")])])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"col-12 mb-3"},[_c("h5",{staticClass:"card-title font-weight-bold"},[_c("i",{staticClass:"fas fa-brain text-primary me-2"}),_vm._v(" Pruebas Psicológicas Aplicadas")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("span",{staticClass:"text-muted small d-block mb-1"},[_c("i",{staticClass:"far fa-calendar-alt me-1"}),_vm._v(" Fecha de Aplicación")]);},function(){var _vm=this,_c=_vm._self._c;return _c("span",{staticClass:"text-muted small d-block mb-1"},[_c("i",{staticClass:"fas fa-star me-1 text-warning"}),_vm._v(" Puntuación General")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-footer bg-white border-top-0 py-3 text-center"},[_c("button",{staticClass:"btn btn-sm btn-outline-primary w-100 rounded-pill"},[_c("i",{staticClass:"fas fa-eye me-1"}),_vm._v(" Ver Detalles Completos")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"alert alert-light text-center border p-5"},[_c("i",{staticClass:"fas fa-folder-open text-muted mb-3",staticStyle:{"font-size":"3rem"}}),_vm._v(" "),_c("h6",{staticClass:"text-muted"},[_vm._v("No hay pruebas aplicadas en el registro de este paciente.")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex justify-content-between align-items-center mb-4 mt-2"},[_c("div",[_c("h5",{staticClass:"mb-0 font-weight-bold d-flex align-items-center text-dark"},[_c("i",{staticClass:"fas fa-paperclip text-primary me-2"}),_vm._v(" Documentos Adjuntos\n          ")]),_vm._v(" "),_c("p",{staticClass:"text-muted small mb-0 mt-1"},[_vm._v("Órdenes de examen, resultados y otros documentos")])]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary rounded px-3 shadow-sm",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalSubirDocumento"}},[_c("i",{staticClass:"fas fa-upload me-1"}),_vm._v(" Subir Documento\n        ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"rounded bg-light text-secondary border d-flex justify-content-center align-items-center me-3 flex-shrink-0",staticStyle:{width:"45px",height:"45px","background-color":"#f1f3f5 !important"}},[_c("i",{staticClass:"far fa-file-alt fs-5"})]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"text-muted small mb-2 d-flex align-items-center gap-2"},[_c("i",{staticClass:"fas fa-dollar-sign text-muted"}),_vm._v(" Deuda Total\n              ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"text-muted small mb-2 d-flex align-items-center gap-2"},[_c("i",{staticClass:"far fa-calendar-alt text-muted"}),_vm._v(" Pagos Pendientes\n              ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"text-muted small mb-2 d-flex align-items-center gap-2"},[_c("i",{staticClass:"far fa-credit-card text-muted"}),_vm._v(" Total Pagado\n              ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex align-items-center mb-3"},[_c("i",{staticClass:"far fa-credit-card text-primary me-2"}),_vm._v(" "),_c("h6",{staticClass:"font-weight-bold mb-0 text-dark"},[_vm._v("Historial de Pagos")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("thead",[_c("tr",{staticStyle:{"border-bottom":"1px solid #f1f3f5"}},[_c("th",{staticClass:"border-0 text-muted fw-normal py-3 ps-4",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Fecha")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Concepto")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Método")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3 text-end",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Monto")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3 pe-4",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Estado")])])]);},function(){var _vm=this,_c=_vm._self._c;return _c("td",{staticClass:"text-center text-muted py-5",attrs:{colspan:"5"}},[_c("i",{staticClass:"far fa-folder-open mb-2 d-block",staticStyle:{"font-size":"2rem",opacity:"0.3"}}),_vm._v("\n                    No hay historial de pagos registrado.\n                  ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card border-0 shadow-sm",staticStyle:{"border-radius":"12px","background-color":"#fcfcfc"}},[_c("div",{staticClass:"card-body p-5 text-center"},[_c("div",{staticClass:"mb-4"},[_c("i",{staticClass:"fas fa-handshake text-primary opacity-50",staticStyle:{"font-size":"5rem"}})]),_vm._v(" "),_c("h4",{staticClass:"font-weight-bold text-dark mb-3"},[_vm._v("Convenios, Alianzas y Club")]),_vm._v(" "),_c("p",{staticClass:"text-muted mx-auto",staticStyle:{"max-width":"500px","font-size":"1.1rem"}},[_vm._v("\n              Esta sección está en desarrollo. Próximamente podrá gestionar aquí todos los acuerdos institucionales, beneficios de alianzas estratégicas y membresías de Club.\n           ")]),_vm._v(" "),_c("div",{staticClass:"mt-4"},[_c("span",{staticClass:"badge bg-warning text-dark px-4 py-2 rounded-pill shadow-sm",staticStyle:{"font-size":"1rem"}},[_c("i",{staticClass:"fas fa-tools me-2"}),_vm._v(" Próximamente")])])])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"modal-header border-bottom-0 bg-light"},[_c("h5",{staticClass:"modal-title font-weight-bold",attrs:{id:"modalDetalleFichaLabel"}},[_c("i",{staticClass:"fas fa-clipboard-list text-primary me-2"}),_vm._v(" Detalles de la Ficha de Seguimiento\n          ")]),_vm._v(" "),_c("button",{staticClass:"btn-close",attrs:{type:"button","data-bs-dismiss":"modal","aria-label":"Close"}})]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold mb-3 border-bottom pb-2"},[_c("i",{staticClass:"fas fa-hand-holding-medical text-primary me-2"}),_vm._v(" Interconsultas")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold mb-3 border-bottom pb-2"},[_c("i",{staticClass:"fas fa-tasks text-success me-2"}),_vm._v(" Recomendaciones")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"modal-header border-bottom-0 bg-light"},[_c("h5",{staticClass:"modal-title font-weight-bold"},[_c("i",{staticClass:"fas fa-shield-alt text-danger me-2"}),_vm._v(" Nuevo Plan de Seguridad\n          ")]),_vm._v(" "),_c("button",{staticClass:"btn-close",attrs:{type:"button","data-bs-dismiss":"modal","aria-label":"Close"}})]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Señales de advertencia "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Estrategias de afrontamiento internas "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Personas y entornos sociales de distracción "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Personas a quienes puedo pedir ayuda "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Profesionales / Agencias de emergencia "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Medidas para hacer el entorno más seguro "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Mis Razones para vivir "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h5",{staticClass:"modal-title font-weight-bold mb-0"},[_c("i",{staticClass:"fas fa-shield-alt text-danger me-2"}),_vm._v(" Plan de Seguridad\n          ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-white border-bottom-0 pt-3 pb-0"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"fas fa-exclamation-triangle text-warning me-2"}),_vm._v(" 1. Señales de advertencia")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-white border-bottom-0 pt-3 pb-0"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"fas fa-brain text-primary me-2"}),_vm._v(" 2. Estrategias de afrontamiento internas")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-white border-bottom-0 pt-3 pb-0"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"fas fa-users text-info me-2"}),_vm._v(" 3. Personas y entornos de distracción")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-white border-bottom-0 pt-3 pb-0"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"fas fa-hands-helping text-success me-2"}),_vm._v(" 4. Personas a quienes puedo pedir ayuda")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-white border-bottom-0 pt-3 pb-0"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"fas fa-ambulance text-danger me-2"}),_vm._v(" 5. Profesionales de emergencia")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-white border-bottom-0 pt-3 pb-0"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"fas fa-lock text-secondary me-2"}),_vm._v(" 6. Entorno más seguro")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-white border-bottom-0 pt-3 pb-0"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"far fa-smile-beam text-warning me-2"}),_vm._v(" 7. Razones para vivir")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"modal-header border-bottom-0 bg-light"},[_c("h5",{staticClass:"modal-title font-weight-bold"},[_c("i",{staticClass:"fas fa-upload text-primary me-2"}),_vm._v(" Subir Documento\n          ")]),_vm._v(" "),_c("button",{staticClass:"btn-close",attrs:{type:"button","data-bs-dismiss":"modal","aria-label":"Close"}})]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"mb-3"},[_c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Archivo "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]),_vm._v(" "),_c("input",{staticClass:"form-control",attrs:{type:"file",id:"fileInputDocumento",required:""}})]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Tipo de Documento "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"modal-header border-bottom-0"},[_c("h5",{staticClass:"modal-title font-weight-bold",attrs:{id:"modalLinkAutotriajeLabel"}},[_vm._v("Link de Autotriaje")]),_vm._v(" "),_c("button",{staticClass:"btn-close",attrs:{type:"button","data-bs-dismiss":"modal","aria-label":"Close"}})]);}];render._withStripped=true;
+var render=function render(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"patient-detail-container"},[_c("div",{staticClass:"d-flex align-items-center mb-4 mt-2"},[_c("button",{staticClass:"btn btn-link text-decoration-none px-0",on:{click:function click($event){return _vm.$emit("volver");}}},[_c("i",{staticClass:"fas fa-arrow-left"}),_vm._v(" Volver a Pacientes\n    ")])]),_vm._v(" "),_c("div",{staticClass:"card shadow-sm mb-4 border-0 rounded-lg",staticStyle:{"background-color":"#fcfcfc"}},[!_vm.loading?_c("div",{staticClass:"card-body d-flex justify-content-between align-items-center flex-wrap"},[_c("div",{staticClass:"d-flex align-items-center mb-3 mb-md-0"},[_c("div",{staticClass:"rounded-circle text-primary bg-light border d-flex justify-content-center align-items-center me-3 shadow-sm font-weight-bold",staticStyle:{width:"60px",height:"60px","font-size":"20px"}},[_vm._v("\n          "+_vm._s(_vm.initials)+"\n        ")]),_vm._v(" "),_c("div",[_c("h4",{staticClass:"mb-1 font-weight-bold d-flex align-items-center gap-2"},[_vm._v("\n            "+_vm._s(_vm.paciente.name)+" "+_vm._s(_vm.paciente.nombres)+"\n            "),_vm.paciente.activo||_vm.paciente.activo_sn?_c("span",{staticClass:"badge bg-success",staticStyle:{"font-size":"0.6rem","vertical-align":"middle"}},[_c("i",{staticClass:"fas fa-heart"}),_vm._v(" Activo")]):_vm._e(),_vm._v(" "),_vm._l(_vm.paciente.semaforo_estados.slice(0,5),function(sem){return _c("span",{key:sem.id,staticClass:"badge border bg-warning text-white",staticStyle:{"font-size":"0.6rem","vertical-align":"middle"}},[_c("i",{staticClass:"fas fa-tag text-white me-1"}),_vm._v(" "+_vm._s(_vm.getEstadoNombre(sem.codigo))+"\n            ")]);})],2),_vm._v(" "),_c("div",{staticClass:"text-muted small"},[_vm.paciente.birth_date?_c("span",{staticClass:"me-3"},[_vm._v(_vm._s(_vm.getAge(_vm.paciente.birth_date))+" años - "+_vm._s(_vm.getGender(_vm.paciente.gender)))]):_vm._e(),_vm._v(" "),_c("span",{staticClass:"me-3"},[_vm._v("DNI: "+_vm._s(_vm.paciente.dni))]),_vm._v(" "),_vm.paciente.medical_evolutions?_c("span",[_c("i",{staticClass:"fas fa-history text-muted"}),_vm._v(" "+_vm._s(_vm.paciente.medical_evolutions.length)+" evoluciones en historial")]):_vm._e()])])]),_vm._v(" "),_c("div",{staticClass:"d-flex gap-2 flex-wrap"},[_c("a",{staticClass:"btn btn-light shadow-sm rounded border",attrs:{href:"tel:"+_vm.paciente.phone}},[_c("i",{staticClass:"fas fa-phone"}),_vm._v(" Llamar")]),_vm._v(" "),_c("a",{staticClass:"btn btn-light shadow-sm rounded border",attrs:{href:"https://wa.me/51"+_vm.paciente.phone,target:"_blank"}},[_c("i",{staticClass:"fab fa-whatsapp"}),_vm._v(" WhatsApp")])])]):_vm._e()]),_vm._v(" "),_c("ul",{staticClass:"nav nav-tabs mb-4 px-2",staticStyle:{"border-bottom":"0"},attrs:{id:"patientTabs",role:"tablist"}},[_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-dark","class":{active:_vm.activeTab==="resumen"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="resumen";}}},[_vm._v("Resumen")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="datos"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="datos";}}},[_c("i",{staticClass:"fas fa-user me-1"}),_vm._v(" Datos Personales")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="citas"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="citas";}}},[_c("i",{staticClass:"fas fa-calendar-alt me-1"}),_vm._v(" Citas & Paquetes")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="historial"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="historial";}}},[_c("i",{staticClass:"fas fa-history me-1"}),_vm._v(" Historial Clínico "),_vm.paciente.medical_evolutions?_c("span",[_vm._v("("+_vm._s(_vm.paciente.medical_evolutions.length)+")")]):_vm._e()])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="triaje"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="triaje";}}},[_c("i",{staticClass:"fas fa-heartbeat me-1"}),_vm._v(" Triaje & Seguridad")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="seguimiento"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="seguimiento";}}},[_c("i",{staticClass:"fas fa-clipboard-list me-1"}),_vm._v(" Plan de Intervención\n      ")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="recetas"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="recetas";}}},[_c("i",{staticClass:"fas fa-prescription me-1"}),_vm._v(" Recetas & Órdenes")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="pruebas"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="pruebas";}}},[_c("i",{staticClass:"fas fa-flask me-1"}),_vm._v(" Pruebas Psicológicas")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="documentos"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="documentos";}}},[_c("i",{staticClass:"fas fa-file-contract me-1"}),_vm._v(" Documentos")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="convenios"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="convenios";}}},[_c("i",{staticClass:"fas fa-handshake me-1"}),_vm._v(" Convenios")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link font-weight-bold small text-muted","class":{active:_vm.activeTab==="finanzas"},attrs:{type:"button",role:"tab"},on:{click:function click($event){_vm.activeTab="finanzas";}}},[_c("i",{staticClass:"fas fa-wallet me-1"}),_vm._v("Finanzas")])])]),_vm._v(" "),_vm.loading?_c("div",{staticClass:"text-center my-5"},[_vm._m(0),_vm._v(" "),_c("p",{staticClass:"mt-2 text-muted"},[_vm._v("Cargando información completa del paciente...")])]):_c("div",{staticClass:"tab-content px-2",attrs:{id:"patientTabsContent"}},[_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="resumen"},attrs:{id:"resumen",role:"tabpanel"}},[_c("div",{staticClass:"row"},[_c("div",{staticClass:"col-md-4"},[_c("div",{staticClass:"card shadow-sm border rounded-lg mb-3"},[_c("div",{staticClass:"card-body"},[_vm._m(1),_vm._v(" "),_vm.proximaCita?_c("div",[_c("h5",{staticClass:"mb-1 text-dark"},[_vm._v(_vm._s(_vm.formatDateTime(_vm.proximaCita.date,_vm.proximaCita.hora)))]),_vm._v(" "),_vm.proximaCita.professional?_c("p",{staticClass:"small text-muted mb-0"},[_vm._v(_vm._s(_vm.proximaCita.professional.name))]):_vm._e()]):_c("div",[_c("p",{staticClass:"text-muted mb-0 small"},[_vm._v("No hay citas próximas programadas.")])])])]),_vm._v(" "),_c("div",{staticClass:"card shadow-sm border rounded-lg mb-3"},[_c("div",{staticClass:"card-body"},[_vm._m(2),_vm._v(" "),_vm.ultimaEvolucion?_c("div",[_c("p",{staticClass:"small text-muted mb-1"},[_vm._v(_vm._s(_vm.formatDate(_vm.ultimaEvolucion.date))+" - Dr. "+_vm._s(_vm.ultimaEvolucion.professional?_vm.ultimaEvolucion.professional.name:""))]),_vm._v(" "),_c("p",{staticClass:"small mb-0"},[_vm._v(_vm._s(_vm.ultimaEvolucion.descripcion||"Sin descripción"))])]):_c("div",[_c("p",{staticClass:"text-muted mb-0 small"},[_vm._v("No hay evoluciones registradas.")])])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-8"},[_c("div",{staticClass:"card shadow-sm border rounded-lg h-100"},[_c("div",{staticClass:"card-body p-4"},[_vm._m(3),_vm._v(" "),_c("div",{staticClass:"timeline ms-3 mt-3 content-timeline"},[_vm._l(_vm.timelineActivity.slice(0,5),function(item,index){return _c("div",{key:index,staticClass:"timeline-item pb-3 mb-3 border-bottom"},[_c("div",{staticClass:"d-flex justify-content-between"},[_c("div",[_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(item.type=="Cita"?"Cita Programada":"Evolución Clínica"))]),_vm._v(" "),_c("p",{staticClass:"small text-muted mb-0 mt-1"},[_vm._v(_vm._s(item.desc))]),_vm._v(" "),_c("p",{staticClass:"small text-primary mb-0 mt-1"},[_vm._v(_vm._s(item.profesional))])]),_vm._v(" "),_c("div",{staticClass:"text-end"},[_c("span",{staticClass:"small text-muted"},[_vm._v(_vm._s(_vm.formatDate(item.date)))])])])]);}),_vm._v(" "),_vm.timelineActivity.length===0?_c("div",{staticClass:"text-muted small"},[_vm._v("\n                  No hay actividad reciente.\n                ")]):_vm._e()],2)])])])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="datos"},attrs:{id:"datos",role:"tabpanel"}},[_c("div",{staticClass:"position-relative"},[_c("button",{staticClass:"btn btn-outline-primary btn-sm position-absolute",staticStyle:{top:"0",right:"0"},attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalEdicionPaciente"},on:{click:function click($event){return _vm.$emit("editarPaciente",_vm.paciente);}}},[_c("i",{staticClass:"fas fa-pen"}),_vm._v(" Editar Datos\n        ")]),_vm._v(" "),_c("h4",{staticClass:"mb-4 fw-bold"},[_vm._v("Datos Personales")]),_vm._v(" "),_c("div",{staticClass:"row g-4"},[_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card border-0 shadow-sm h-100"},[_c("div",{staticClass:"card-body"},[_vm._m(4),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Nombre Completo")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.name)+" "+_vm._s(_vm.paciente.nombres))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("DNI")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.dni))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Fecha de Nacimiento")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.birth_date))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Género")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.gender==1?"Masculino":_vm.paciente.gender==2?"Femenino":"Otro"))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Estado Civil")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.marital_status==1?"Soltero":_vm.paciente.marital_status==2?"Casado":_vm.paciente.marital_status==3?"Divorciado":_vm.paciente.marital_status==4?"Viudo":_vm.paciente.marital_status==5?"Conviviente":"—"))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Ocupación")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.occupation||"—"))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Grado de Instrucción")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.instruction_degree==1?"Inicial":_vm.paciente.instruction_degree==2?"Primaria":_vm.paciente.instruction_degree==3?"Secundaria":_vm.paciente.instruction_degree==4?"Superior":_vm.paciente.instruction_degree==5?"Técnico":_vm.paciente.instruction_degree==6?"Ninguno":"—"))])])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card border-0 shadow-sm h-100"},[_c("div",{staticClass:"card-body"},[_vm._m(5),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Teléfono")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.phone))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Email")]),_vm._v(" "),_c("strong",{staticStyle:{"word-break":"break-all"}},[_vm._v("\n                    "+_vm._s(_vm.paciente.email||"—")+"\n                  ")])]),_vm._v(" "),_vm.paciente.address?_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Dirección")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.address.address))])]):_vm._e(),_vm._v(" "),_vm.paciente.address?_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Departamento")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.departamento))])]):_vm._e(),_vm._v(" "),_vm.paciente.address?_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Provincia")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.provincia))])]):_vm._e(),_vm._v(" "),_vm.paciente.address?_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Distrito")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.distrito))])]):_vm._e(),_vm._v(" "),_c("div",[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Referencia")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.reference||"—"))])])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card border-0 shadow-sm h-100"},[_c("div",{staticClass:"card-body"},[_vm._m(6),_vm._v(" "),_vm.paciente.relative&&_vm.paciente.relative.length?_c("div",_vm._l(_vm.paciente.relative,function(rel){return _c("div",{directives:[{name:"show",rawName:"v-show",value:rel.name,expression:"rel.name"}],key:rel.id},[_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Nombre")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(rel.name))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Teléfono")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(rel.phone))])]),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Relación")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(rel.kinship))])]),_vm._v(" "),_vm.paciente.relative.length>1?_c("hr"):_vm._e()]);}),0):_c("div",[_c("small",{staticClass:"text-muted"},[_vm._v("No hay contactos registrados.")])])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card border-0 shadow-sm h-100"},[_c("div",{staticClass:"card-body"},[_vm._m(7),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Fecha de Registro")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.created_at))])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Última Visita")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.last_visit||"—"))])]),_vm._v(" "),_c("div",[_c("small",{staticClass:"text-muted d-block"},[_vm._v("Total de Evoluciones")]),_vm._v(" "),_c("strong",[_vm._v(_vm._s(_vm.paciente.evolutions_count||0)+" registros")])])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-12"},[_c("div",{staticClass:"card border-0 shadow-sm h-100 bg-light"},[_c("div",{staticClass:"card-body"},[_c("div",{staticClass:"row"},[_c("div",{staticClass:"col-md-6 mb-3 mb-md-0"},[_c("h6",{staticClass:"fw-bold mb-3 text-dark d-flex align-items-center"},[_c("i",{staticClass:"fas fa-tags text-primary me-2"}),_vm._v("\n                      Etiquetas de Comportamiento\n                      "),_c("button",{staticClass:"btn btn-link btn-sm text-primary p-0 ms-2",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalVerEstados"},on:{click:function click($event){return _vm.prepararSemaforo();}}},[_c("i",{staticClass:"fas fa-pen"})])]),_vm._v(" "),_vm.paciente.semaforo_estados&&_vm.paciente.semaforo_estados.length>0?_c("div",{staticClass:"d-flex flex-wrap gap-2"},_vm._l(_vm.paciente.semaforo_estados.slice(0,5),function(sem){return _c("span",{key:sem.id,staticClass:"badge border bg-white text-dark shadow-sm px-3 py-2"},[_c("i",{staticClass:"fas fa-tag text-warning me-1"}),_vm._v(" "+_vm._s(_vm.getEstadoNombre(sem.codigo))+"\n                      ")]);}),0):_c("div",[_c("small",{staticClass:"text-muted"},[_vm._v("No hay etiquetas de comportamiento registradas.")])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("h6",{staticClass:"fw-bold mb-3 text-dark d-flex align-items-center"},[_c("i",{staticClass:"fas fa-heart text-danger me-2"}),_vm._v("\n                      Hobbies e Intereses\n                      "),_c("button",{staticClass:"btn btn-link btn-sm text-primary p-0 ms-2",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalVerHobbies"},on:{click:function click($event){return _vm.prepararHobbies();}}},[_c("i",{staticClass:"fas fa-pen"})])]),_vm._v(" "),_vm.getHobbies(_vm.paciente.hobbies).length>0?_c("div",{staticClass:"d-flex flex-wrap gap-2"},_vm._l(_vm.getHobbies(_vm.paciente.hobbies),function(hobbie,index){return _c("span",{key:index,staticClass:"badge bg-info bg-opacity-10 border text-white border-info border-opacity-25 px-3 py-2"},[_vm._v("\n                        "+_vm._s(_vm.hobbies[hobbie]||hobbie)+"\n                      ")]);}),0):_c("div",[_c("small",{staticClass:"text-muted"},[_vm._v("No hay hobbies registrados.")])])])])])])])])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="citas"},attrs:{id:"citas",role:"tabpanel"}},[_vm._m(8),_vm._v(" "),_c("div",{staticClass:"row mb-4"},[_vm._l(_vm.paciente.membresias,function(mem){return _c("div",{key:mem.id,staticClass:"col-md-6"},[_c("div",{staticClass:"card border rounded-3 mb-3 shadow-sm",staticStyle:{"border-color":"#eef2f5 !important"}},[_c("div",{staticClass:"card-body p-4"},[_c("div",{staticClass:"d-flex justify-content-between align-items-start mb-1"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0",staticStyle:{"font-size":"1.05rem"}},[_vm._v(_vm._s(mem.precio?mem.precio.descripcion:"Paquete/Membresía"))]),_vm._v(" "),_c("span",{staticClass:"badge rounded-pill px-3 py-1","class":mem.activo?"bg-success bg-opacity-10":"bg-secondary bg-opacity-10 text-secondary",staticStyle:{"font-weight":"500"}},[_vm._v("\n                  "+_vm._s(mem.activo?"Activo":"Inactivo")+"\n                ")])]),_vm._v(" "),_c("p",{staticClass:"text-muted small mb-4"},[_vm._v("Vence: "+_vm._s(_vm.formatOnlyDate(mem.fin)))]),_vm._v(" "),_c("div",{staticClass:"d-flex justify-content-between align-items-end mb-2"},[_c("span",{staticClass:"text-dark small",staticStyle:{"font-weight":"500"}},[_vm._v("Sesiones usadas")]),_vm._v(" "),_c("span",{staticClass:"text-dark small font-weight-bold"},[_vm._v(_vm._s(mem.sesiones_usadas||0)+" / "+_vm._s(mem.sesiones_totales||6))])]),_vm._v(" "),_c("div",{staticClass:"progress mb-2 rounded-pill",staticStyle:{height:"6px"}},[_c("div",{staticClass:"progress-bar bg-primary",style:{width:(mem.sesiones_usadas||0)/(mem.sesiones_totales||6)*100+"%"},attrs:{role:"progressbar"}}),_vm._v(" "),_c("div",{staticClass:"progress-bar",staticStyle:{"background-color":"#fd7e14"},style:{width:100-(mem.sesiones_usadas||0)/(mem.sesiones_totales||6)*100+"%"},attrs:{role:"progressbar"}})]),_vm._v(" "),_c("small",{staticClass:"text-muted",staticStyle:{"font-size":"0.75rem"}},[_vm._v(_vm._s((mem.sesiones_totales||6)-(mem.sesiones_usadas||0))+" sesiones restantes")])])])]);}),_vm._v(" "),!_vm.paciente.membresias||_vm.paciente.membresias.length==0?_c("div",{staticClass:"col-12"},[_c("div",{staticClass:"alert alert-light border text-center text-muted"},[_vm._v("\n            No tiene paquetes o membresías.\n          ")])]):_vm._e()],2),_vm._v(" "),_vm._m(9),_vm._v(" "),_c("div",{staticClass:"card border rounded-3 shadow-sm mb-4"},[_c("div",{staticClass:"card-body p-0"},[_c("div",{staticClass:"table-responsive"},[_c("table",{staticClass:"table table-hover mb-0",staticStyle:{"font-size":"0.9rem"}},[_vm._m(10),_vm._v(" "),_c("tbody",[_vm._l(_vm.paciente.appointments||[],function(cita){return _c("tr",{key:cita.id},[_c("td",{staticClass:"align-middle py-3 ps-4 border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_c("div",{staticClass:"text-dark fw-bold",staticStyle:{"font-size":"0.9rem"}},[_vm._v(_vm._s(_vm.formatOnlyDate(cita.date)))]),_vm._v(" "),_c("div",{staticClass:"text-muted small"},[_vm._v(_vm._s(_vm.formatOnlyTime(cita.hora)||_vm.formatOnlyTime(cita.date)))])]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 text-dark border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_vm._v("\n                    "+_vm._s(cita.service?cita.service.name:cita.tipo_cita||"Psicológica")+"\n                  ")]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_c("a",{staticClass:"text-primary text-decoration-none",attrs:{href:"#"}},[_vm._v(_vm._s(cita.professional?cita.professional.name:"N/A"))])]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[cita.status==1||cita.status=="Confirmada"?_c("span",{staticClass:"badge bg-primary bg-opacity-10 rounded-pill fw-normal px-3 py-2",staticStyle:{"font-size":"0.8rem"}},[_c("i",{staticClass:"far fa-calendar-check me-1"}),_vm._v(" Confirmada\n                    ")]):cita.status==2||cita.status=="Completada"?_c("span",{staticClass:"badge bg-success bg-opacity-10 rounded-pill fw-normal px-3 py-2",staticStyle:{"font-size":"0.8rem"}},[_c("i",{staticClass:"fas fa-check-circle me-1"}),_vm._v(" Completada\n                    ")]):_c("span",{staticClass:"badge bg-secondary bg-opacity-10 rounded-pill fw-normal px-3 py-2",staticStyle:{"font-size":"0.8rem"}},[_vm._v("\n                      "+_vm._s(_vm.getStatusName(cita.status))+"\n                    ")])]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 pe-4 text-muted border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_vm._v("\n                    "+_vm._s(cita.notas||cita.descripcion||cita.motivo||"—")+"\n                  ")])]);}),_vm._v(" "),!_vm.paciente.appointments||_vm.paciente.appointments.length==0?_c("tr",[_c("td",{staticClass:"text-center text-muted py-4",attrs:{colspan:"5"}},[_vm._v("No tiene citas en el historial")])]):_vm._e()],2)])])])]),_vm._v(" "),_vm._m(11),_vm._v(" "),_c("div",{staticClass:"row"},[_c("div",{staticClass:"col-md-6 mb-4"},[_c("div",{staticClass:"card border rounded-3 shadow-sm h-100"},[_vm._m(12),_vm._v(" "),_c("div",{staticClass:"card-body p-0"},[_c("div",{staticClass:"table-responsive"},[_c("table",{staticClass:"table table-hover mb-0",staticStyle:{"font-size":"0.85rem"}},[_c("tbody",[_vm._l(_vm.faltasCitas,function(cita){return _c("tr",{key:"f-"+cita.id},[_c("td",{staticClass:"align-middle py-3 ps-4 border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_c("div",{staticClass:"text-dark fw-bold"},[_vm._v(_vm._s(_vm.formatOnlyDate(cita.date)))]),_vm._v(" "),_c("div",{staticClass:"text-muted small"},[_vm._v(_vm._s(_vm.formatOnlyTime(cita.hora)||_vm.formatOnlyTime(cita.date)))])]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 text-dark border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_vm._v("\n                        "+_vm._s(cita.service?cita.service.name:cita.tipo_cita||"Psicológica")+"\n                      ")]),_vm._v(" "),_vm._m(13,true)]);}),_vm._v(" "),_vm.faltasCitas.length===0?_c("tr",[_c("td",{staticClass:"text-center text-muted py-4",attrs:{colspan:"3"}},[_vm._v("No registra inasistencias")])]):_vm._e()],2)])])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6 mb-4"},[_c("div",{staticClass:"card border rounded-3 shadow-sm h-100"},[_vm._m(14),_vm._v(" "),_c("div",{staticClass:"card-body p-0"},[_c("div",{staticClass:"table-responsive"},[_c("table",{staticClass:"table table-hover mb-0",staticStyle:{"font-size":"0.85rem"}},[_c("tbody",[_vm._l(_vm.reprogramacionesCitas,function(cita){return _c("tr",{key:"r-"+cita.id},[_c("td",{staticClass:"align-middle py-3 ps-4 border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_c("div",{staticClass:"text-dark fw-bold"},[_vm._v(_vm._s(_vm.formatOnlyDate(cita.date)))]),_vm._v(" "),_c("div",{staticClass:"text-muted small"},[_vm._v(_vm._s(_vm.formatOnlyTime(cita.hora)||_vm.formatOnlyTime(cita.date)))])]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 text-dark border-bottom-0",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_vm._v("\n                        "+_vm._s(cita.service?cita.service.name:cita.tipo_cita||"Psicológica")+"\n                      ")]),_vm._v(" "),_vm._m(15,true)]);}),_vm._v(" "),_vm.reprogramacionesCitas.length===0?_c("tr",[_c("td",{staticClass:"text-center text-muted py-4",attrs:{colspan:"3"}},[_vm._v("No registra reprogramaciones")])]):_vm._e()],2)])])])])])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="historial"},attrs:{id:"historial",role:"tabpanel"}},[_vm.paciente.initial_psychological_history||_vm.paciente.initial_psychiatric_history?_c("div",{staticClass:"accordion mb-4 bg-white shadow-sm rounded-lg",attrs:{id:"accordionInitialHistories"}},[_vm.paciente.initial_psychological_history?_c("div",{staticClass:"accordion-item border-0 border-bottom rounded-top"},[_c("h2",{staticClass:"accordion-header",attrs:{id:"headingPsycho"}},[_c("button",{staticClass:"accordion-button bg-light text-primary font-weight-bold",attrs:{type:"button","data-bs-toggle":"collapse","data-bs-target":"#collapsePsycho","aria-expanded":"true","aria-controls":"collapsePsycho"}},[_vm._v("\n              Evaluación Psicológica Inicial\n              "),_vm.paciente.initial_psychological_history.created_at?_c("span",{staticClass:"ms-3 text-muted small",staticStyle:{"font-weight":"normal"}},[_vm._v("\n                 - "+_vm._s(_vm.formatDate(_vm.paciente.initial_psychological_history.created_at))+"\n              ")]):_vm._e()])]),_vm._v(" "),_c("div",{staticClass:"accordion-collapse collapse show",attrs:{id:"collapsePsycho","aria-labelledby":"headingPsycho","data-bs-parent":"#accordionInitialHistories"}},[_c("div",{staticClass:"accordion-body px-4 py-4",staticStyle:{"background-color":"#fbfcff"}},[_c("div",{staticClass:"mb-3"},[_vm._m(16),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychological_history.illness))])]),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_vm._m(17),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychological_history.antecedent))])]),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_vm._m(18),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychological_history.dynamic))])]),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_vm._m(19),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychological_history.attitude))])]),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_vm._m(20),_vm._v(" "),_c("div",{staticClass:"p-2 rounded bg-white border border-light small text-dark mt-1 shadow-sm"},[_vm._v("\n                  "+_vm._s(_vm.paciente.initial_psychological_history.dx)+"\n                ")])]),_vm._v(" "),_c("div",{staticClass:"mb-0 bg-light p-3 border rounded"},[_vm._m(21),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.paciente.initial_psychological_history.plan))])])])])]):_vm._e(),_vm._v(" "),_vm.paciente.initial_psychiatric_history?_c("div",{staticClass:"accordion-item border-0"},[_c("h2",{staticClass:"accordion-header",attrs:{id:"headingPsychiatric"}},[_c("button",{staticClass:"accordion-button collapsed bg-light text-success font-weight-bold",attrs:{type:"button","data-bs-toggle":"collapse","data-bs-target":"#collapsePsychiatric","aria-expanded":"false","aria-controls":"collapsePsychiatric"}},[_vm._v("\n              Eval. Psiquiátrica Inicial\n              "),_vm.paciente.initial_psychiatric_history.created_at?_c("span",{staticClass:"ms-3 text-muted small",staticStyle:{"font-weight":"normal"}},[_vm._v("\n                - "+_vm._s(_vm.formatDate(_vm.paciente.initial_psychiatric_history.created_at))+"\n              ")]):_vm._e()])]),_vm._v(" "),_c("div",{staticClass:"accordion-collapse collapse",attrs:{id:"collapsePsychiatric","aria-labelledby":"headingPsychiatric","data-bs-parent":"#accordionInitialHistories"}},[_c("div",{staticClass:"accordion-body px-4 py-4",staticStyle:{"background-color":"#f8fdfa"}},[_c("div",{staticClass:"row"},[_c("div",{staticClass:"col-md-6 mb-3"},[_vm._m(22),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.general_antecedent))])]),_vm._v(" "),_c("div",{staticClass:"col-md-6 mb-3"},[_vm._m(23),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.main_signs_symptoms))])]),_vm._v(" "),_c("div",{staticClass:"col-md-6 mb-3"},[_vm._m(24),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.illness))])]),_vm._v(" "),_c("div",{staticClass:"col-md-6 mb-3"},[_vm._m(25),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.apc))])]),_vm._v(" "),_c("div",{staticClass:"col-12 mt-2"},[_c("div",{staticClass:"row bg-white p-3 rounded border mx-0 mb-3 shadow-sm"},[_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Lenguaje")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.languaje))])]),_vm._v(" "),_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Pensamiento")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.thought))])]),_vm._v(" "),_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Afecto")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.affect))])]),_vm._v(" "),_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Percepción")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.percetion))])]),_vm._v(" "),_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Func. Superior")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.superior_function))])]),_vm._v(" "),_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Abstracción")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.abstraction))])]),_vm._v(" "),_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Conciencia")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.conscience))])]),_vm._v(" "),_c("div",{staticClass:"col-md-3 mb-2"},[_c("strong",{staticClass:"small text-muted d-block"},[_vm._v("Insight")]),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.insight))])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6 mb-3"},[_vm._m(26),_vm._v(" "),_c("p",{staticClass:"small mb-0 text-dark"},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.diagnostic_problems))])]),_vm._v(" "),_c("div",{staticClass:"col-md-6 mb-3"},[_vm._m(27),_vm._v(" "),_c("div",{staticClass:"p-2 rounded bg-white border border-light small text-dark shadow-sm"},[_vm._v("\n                     "+_vm._s(_vm.paciente.initial_psychiatric_history.diagnostic)+"\n                  ")])]),_vm._v(" "),_c("div",{staticClass:"col-12 mt-2"},[_c("div",{staticClass:"bg-light p-3 border rounded text-dark"},[_vm._m(28),_vm._v(" "),_c("p",{staticClass:"small mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.paciente.initial_psychiatric_history.plan))])])])])])])]):_vm._e()]):_vm._e(),_vm._v(" "),_vm._m(29),_vm._v(" "),_vm.paciente.medical_evolutions&&_vm.paciente.medical_evolutions.length>0?_c("div",{staticClass:"alert alert-success bg-opacity-10 border-0 py-2 px-3 mb-3 small d-flex align-items-center rounded-lg"},[_c("i",{staticClass:"fas fa-bell me-2 text-success"}),_vm._v(" "),_vm._m(30)]):_vm._e(),_vm._v(" "),_vm.paciente.medical_evolutions&&_vm.paciente.medical_evolutions.length>0?_c("div",{staticClass:"row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4"},_vm._l(_vm.paciente.medical_evolutions,function(evo){return _c("div",{key:evo.id,staticClass:"col"},[_c("div",{staticClass:"card h-100 border-0 shadow-sm rounded-lg evolution-card overflow-hidden"},[_c("div",{staticClass:"p-2 px-3 text-white d-flex justify-content-between align-items-center",style:{backgroundColor:_vm.getEvolutionColor(evo)}},[_c("span",{staticClass:"font-weight-bold small",staticStyle:{"letter-spacing":"0.3px"}},[_vm._v("\n                "+_vm._s(_vm.formatLongDate(evo.date))+" \n                "),_c("span",{staticClass:"opacity-75 ms-1",staticStyle:{"font-weight":"normal"}},[_vm._v("(#"+_vm._s(evo.id)+")")])])]),_vm._v(" "),_c("div",{staticClass:"card-body p-3 d-flex flex-column"},[_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block text-uppercase font-weight-bold",staticStyle:{"font-size":"0.65rem","letter-spacing":"0.5px"}},[_vm._v("Clase")]),_vm._v(" "),_c("div",{staticClass:"d-flex align-items-center"},[_c("span",{staticClass:"small text-dark font-weight-bold"},[_vm._v(_vm._s(_vm.getEvolutionTypeLabel(evo)))])])]),_vm._v(" "),_c("div",{staticClass:"mb-2"},[_c("small",{staticClass:"text-muted d-block text-uppercase font-weight-bold",staticStyle:{"font-size":"0.65rem","letter-spacing":"0.5px"}},[_vm._v("Profesional")]),_vm._v(" "),_c("span",{staticClass:"small text-dark"},[_vm._v(_vm._s(evo.professional?evo.professional.name:"N/A"))])]),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_c("small",{staticClass:"text-muted d-block text-uppercase font-weight-bold",staticStyle:{"font-size":"0.65rem","letter-spacing":"0.5px"}},[_vm._v("Diagnóstico")]),_vm._v(" "),_c("p",{staticClass:"small text-dark mb-0 text-truncate-3",staticStyle:{"line-height":"1.5","white-space":"pre-wrap"}},[_vm._v(_vm._s(evo.content||evo.descripcion))])]),_vm._v(" "),evo.plan?_c("div",{staticClass:"mt-auto pt-2"},[_c("div",{staticClass:"p-2 bg-light rounded border-start border-3 border-warning"},[_vm._m(31,true),_vm._v(" "),_c("p",{staticClass:"small text-muted mb-0 text-truncate-2",staticStyle:{"font-style":"italic","white-space":"pre-wrap"}},[_vm._v(_vm._s(evo.plan))])])]):_vm._e(),_vm._v(" "),_vm._m(32,true)])])]);}),0):_c("div",{staticClass:"card border border-dashed p-5 text-center text-muted rounded-lg mb-4"},[_c("i",{staticClass:"fas fa-folder-open fs-1 mb-3 opacity-25"}),_vm._v(" "),_c("p",{staticClass:"mb-0"},[_vm._v("Aún no cuenta con evoluciones de seguimiento cronológico.")])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="triaje"},attrs:{id:"triaje",role:"tabpanel"}},[_c("div",{staticClass:"row"},[_c("div",{staticClass:"col-12 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2"},[_vm._m(33),_vm._v(" "),_c("div",{staticClass:"d-flex gap-2"},[_vm.paciente.has_autotriaje?_c("button",{staticClass:"btn btn-info btn-sm rounded-pill shadow-sm px-3 text-white",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalVerAutoTriaje"}},[_c("i",{staticClass:"fas fa-eye me-1"}),_vm._v(" Ver autotriaje\n            ")]):_c("button",{staticClass:"btn btn-primary btn-sm rounded-pill shadow-sm px-3",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalVerAutoTriaje"},on:{click:function click($event){$event.preventDefault();return _vm.generarLinkAutotriaje(_vm.paciente);}}},[_c("i",{staticClass:"fas fa-link me-1"}),_vm._v(" Generar Link Autotriaje\n            ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary btn-sm rounded-pill shadow-sm px-3",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalTriaje"},on:{click:function click($event){return _vm.$emit("abrirTriaje",_vm.paciente);}}},[_c("i",{staticClass:"fa-solid fa-lungs me-1"}),_vm._v(" Nuevo Triaje\n            ")])])]),_vm._v(" "),_c("div",{staticClass:"col-12 mb-4"},[_vm.paciente.triajes&&_vm.paciente.triajes.length>0?_c("div",_vm._l(_vm.paciente.triajes,function(tr){return _c("div",{key:tr.id,staticClass:"card border-0 shadow-sm mb-3 rounded-lg",staticStyle:{"background-color":"#fcfcfc"}},[_c("div",{staticClass:"card-body p-4"},[_c("div",{staticClass:"d-flex mb-4"},[_vm._m(34,true),_vm._v(" "),_c("div",[_c("h6",{staticClass:"font-weight-bold mb-1 text-dark"},[_vm._v("Triaje "+_vm._s(_vm.getTriajeReferencia(tr.referencia)))]),_vm._v(" "),_c("div",{staticClass:"small text-muted"},[_c("span",[_vm._v(_vm._s(_vm.formatDateWithTime(tr.fecha||tr.created_at)))]),_vm._v(" "),tr.responsable?_c("span",{staticClass:"mx-1"},[_vm._v("·")]):_vm._e(),_vm._v(" "),tr.responsable?_c("span",[_vm._v("Int. "+_vm._s(tr.responsable))]):_vm._e()])])]),_vm._v(" "),_c("div",{staticClass:"row mb-3"},[_c("div",{staticClass:"col-md-4 mb-3 mb-md-0"},[_c("h6",{staticClass:"small text-muted font-weight-bold text-uppercase mb-3",staticStyle:{"letter-spacing":"0.5px"}},[_vm._v("Signos Vitales")]),_vm._v(" "),_c("div",{staticClass:"d-flex flex-column gap-2 small"},[tr.pa?_c("div",{staticClass:"d-flex align-items-center"},[_c("i",{staticClass:"far fa-heart text-danger me-2",staticStyle:{width:"16px"}}),_vm._v(" "),_c("span",{staticClass:"text-muted me-1"},[_vm._v("PA:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.pa))])]):_vm._e(),_vm._v(" "),tr.fc?_c("div",{staticClass:"d-flex align-items-center"},[_c("span",{staticClass:"text-muted fw-bold me-2",staticStyle:{width:"16px"}},[_vm._v("FC")]),_vm._v(" "),_c("span",{staticClass:"text-muted me-1"},[_vm._v("FC:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.fc)+" "),_c("span",{staticClass:"fw-normal text-muted"},[_vm._v("bpm")])])]):_vm._e(),_vm._v(" "),tr.fr?_c("div",{staticClass:"d-flex align-items-center"},[_c("span",{staticClass:"text-muted fw-bold me-2",staticStyle:{width:"16px"}},[_vm._v("FR")]),_vm._v(" "),_c("span",{staticClass:"text-muted me-1"},[_vm._v("FR:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.fr)+" "),_c("span",{staticClass:"fw-normal text-muted"},[_vm._v("rpm")])])]):_vm._e(),_vm._v(" "),tr.t?_c("div",{staticClass:"d-flex align-items-center"},[_c("i",{staticClass:"fas fa-temperature-low text-info me-2",staticStyle:{width:"16px"}}),_vm._v(" "),_c("span",{staticClass:"text-muted me-1"},[_vm._v("Temp:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.t)+" "),_c("span",{staticClass:"fw-normal text-muted"},[_vm._v("°C")])])]):_vm._e(),_vm._v(" "),tr.saturacion?_c("div",{staticClass:"d-flex align-items-center"},[_c("i",{staticClass:"fas fa-wind text-primary me-2",staticStyle:{width:"16px"}}),_vm._v(" "),_c("span",{staticClass:"text-muted me-1"},[_vm._v("SpO2:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.saturacion)+" "),_c("span",{staticClass:"fw-normal text-muted"},[_vm._v("%")])])]):_vm._e(),_vm._v(" "),tr.peso?_c("div",{staticClass:"d-flex align-items-center"},[_c("span",{staticClass:"text-muted fw-bold me-2",staticStyle:{width:"16px"}},[_vm._v("P.")]),_vm._v(" "),_c("span",{staticClass:"text-muted me-1"},[_vm._v("Peso:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.peso))])]):_vm._e(),_vm._v(" "),tr.talla?_c("div",{staticClass:"d-flex align-items-center"},[_c("span",{staticClass:"text-muted fw-bold me-2",staticStyle:{width:"16px"}},[_vm._v("T.")]),_vm._v(" "),_c("span",{staticClass:"text-muted me-1"},[_vm._v("Talla:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.talla))])]):_vm._e()])]),_vm._v(" "),_c("div",{staticClass:"col-md-4 mb-3 mb-md-0"},[_c("h6",{staticClass:"small text-muted font-weight-bold text-uppercase mb-3",staticStyle:{"letter-spacing":"0.5px"}},[_vm._v("Evaluación y Pruebas")]),_vm._v(" "),_c("div",{staticClass:"d-flex flex-column gap-2 small"},[tr.prioridad?_c("div",[_c("span",{staticClass:"text-muted d-block mb-1"},[_vm._v("Prioridad:")]),_vm._v(" "),_c("span",{staticClass:"badge","class":_vm.getPrioridadClass(tr.prioridad)},[_vm._v(_vm._s(_vm.getPrioridadText(tr.prioridad)))])]):_vm._e(),_vm._v(" "),tr.pruebas?_c("div",{staticClass:"mt-2"},[_c("span",{staticClass:"text-muted d-block mb-1"},[_vm._v("Pruebas Aplicadas:")]),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.pruebas))])]):_vm._e()])]),_vm._v(" "),_c("div",{staticClass:"col-md-4"},[_c("h6",{staticClass:"small text-muted font-weight-bold text-uppercase mb-3",staticStyle:{"letter-spacing":"0.5px"}},[_vm._v("Clínica")]),_vm._v(" "),_c("div",{staticClass:"d-flex flex-column gap-2 small"},[tr.sintomatologia?_c("div",[_c("span",{staticClass:"text-muted me-1"},[_vm._v("Sintomatología:")]),_vm._v(" "),_c("span",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.sintomatologia))])]):_vm._e(),_vm._v(" "),tr.antecedentes?_c("div",[_c("span",{staticClass:"text-muted me-1"},[_vm._v("Antecedentes:")]),_vm._v(" "),_c("span",{staticClass:"text-dark"},[_vm._v(_vm._s(tr.antecedentes))])]):_vm._e()])])]),_vm._v(" "),_c("div",{staticClass:"mt-4"},[tr.motivo?_c("p",{staticClass:"small text-dark mb-3"},[_c("span",{staticClass:"text-muted me-1"},[_vm._v("Motivo:")]),_vm._v(" "+_vm._s(tr.motivo)+"\n                  ")]):_vm._e()])])]);}),0):_c("div",{staticClass:"alert alert-light text-center border py-5 mb-4"},[_c("i",{staticClass:"fas fa-clipboard text-muted mb-3 fs-1 d-block"}),_vm._v(" "),_c("h6",{staticClass:"text-muted"},[_vm._v("No existen registros de triaje para este paciente.")])])]),_vm._v(" "),_c("div",{staticClass:"col-12"},[_vm._m(35),_vm._v(" "),_c("div",{staticClass:"card border"},[_c("div",{staticClass:"card-body p-4"},[_vm.paciente.semaforo_estados&&_vm.paciente.semaforo_estados.length>0?_c("ul",{staticClass:"list-group list-group-flush"},_vm._l(_vm.paciente.semaforo_estados.slice(0,5),function(sem){return _c("li",{key:sem.id,staticClass:"list-group-item px-0"},[_c("strong",[_vm._v(_vm._s(_vm.formatDate(sem.registro)))]),_vm._v(" "),_c("p",{staticClass:"mb-0 small mt-1"},[_vm._v("Código: "+_vm._s(sem.codigo)+" - "),_c("span",{staticClass:"text-muted"},[_vm._v(_vm._s(sem.observaciones))])])]);}),0):_c("p",{staticClass:"text-muted small mb-0"},[_vm._v("Sin registros en el semáforo.")])])])]),_vm._v(" "),_c("div",{staticClass:"col-12 mt-4"},[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-3"},[_vm._m(36),_vm._v(" "),_c("div",{staticClass:"d-flex gap-2"},[_c("button",{staticClass:"btn btn-primary btn-sm rounded-pill shadow-sm px-3 fw-bold",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalPlanSeguridad"},on:{click:_vm.abrirNuevoPlan}},[_c("i",{staticClass:"fas fa-plus me-1"}),_vm._v(" Nuevo Plan\n              ")])])]),_vm._v(" "),_vm.paciente.planes_seguridad&&_vm.paciente.planes_seguridad.length>0?_c("div",_vm._l(_vm.paciente.planes_seguridad,function(plan){return _c("div",{key:plan.id,staticClass:"card border-0 shadow-sm mb-4 rounded-lg",staticStyle:{"background-color":"#fcfcfc"}},[_c("div",{staticClass:"card-body p-4"},[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2"},[_c("div",{staticClass:"d-flex align-items-center"},[_vm._m(37,true),_vm._v(" "),_c("div",[_c("h6",{staticClass:"font-weight-bold mb-1 text-dark"},[_vm._v("Plan de Seguridad - "+_vm._s(_vm.paciente.name)+" "+_vm._s(_vm.paciente.nombres))]),_vm._v(" "),_c("div",{staticClass:"small text-muted"},[_vm._v("\n                        Creado: "+_vm._s(_vm.formatDate(plan.fecha))+"\n                      ")])])]),_vm._v(" "),_c("div",{staticClass:"d-flex align-items-center gap-2"},[_c("button",{staticClass:"btn btn-light btn-sm rounded shadow-sm border text-muted",on:{click:function click($event){return _vm.descargarPlanPDF(plan);}}},[_c("i",{staticClass:"fas fa-download me-1"}),_vm._v(" Descargar PDF\n                    ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-light btn-sm rounded shadow-sm border text-dark",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalVerPlanSeguridad"},on:{click:function click($event){return _vm.verPlanSeguridad(plan);}}},[_c("i",{staticClass:"fas fa-eye me-1"}),_vm._v(" Ver Completo\n                    ")])])]),_vm._v(" "),_c("div",{staticClass:"row g-3"},[_c("div",{staticClass:"col-md-4"},[_c("div",{staticClass:"bg-white p-3 rounded border h-100 shadow-sm"},[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-3"},[_vm._m(38,true),_vm._v(" "),_c("span",{staticClass:"badge bg-light text-muted rounded-circle"},[_vm._v(_vm._s(_vm.countItems(plan.senales_advertencia)))])]),_vm._v(" "),_c("ul",{staticClass:"list-unstyled small text-dark mb-0 ps-2",staticStyle:{"list-style-type":"disc"}},_vm._l(_vm.previewItems(plan.senales_advertencia),function(item,idx){return _c("li",{key:idx,staticClass:"mb-1 text-truncate"},[_vm._v(_vm._s(item))]);}),0),_vm._v(" "),_vm.countItems(plan.senales_advertencia)>3?_c("div",{staticClass:"small text-primary mt-2"},[_vm._v("\n                        +"+_vm._s(_vm.countItems(plan.senales_advertencia)-3)+" más...\n                      ")]):_vm._e()])]),_vm._v(" "),_c("div",{staticClass:"col-md-4"},[_c("div",{staticClass:"bg-white p-3 rounded border h-100 shadow-sm"},[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-3"},[_vm._m(39,true),_vm._v(" "),_c("span",{staticClass:"badge bg-light text-muted rounded-circle"},[_vm._v(_vm._s(_vm.countItems(plan.estrategias)))])]),_vm._v(" "),_c("ul",{staticClass:"list-unstyled small text-dark mb-0 ps-2",staticStyle:{"list-style-type":"disc"}},_vm._l(_vm.previewItems(plan.estrategias),function(item,idx){return _c("li",{key:idx,staticClass:"mb-1 text-truncate"},[_vm._v(_vm._s(item))]);}),0),_vm._v(" "),_vm.countItems(plan.estrategias)>3?_c("div",{staticClass:"small text-primary mt-2"},[_vm._v("\n                        +"+_vm._s(_vm.countItems(plan.estrategias)-3)+" más...\n                      ")]):_vm._e()])]),_vm._v(" "),_c("div",{staticClass:"col-md-4"},[_c("div",{staticClass:"bg-white p-3 rounded border h-100 shadow-sm"},[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-3"},[_vm._m(40,true),_vm._v(" "),_c("span",{staticClass:"badge bg-light text-muted rounded-circle"},[_vm._v(_vm._s(_vm.countItems(plan.razones_vivir)))])]),_vm._v(" "),_c("ul",{staticClass:"list-unstyled small text-dark mb-0 ps-2",staticStyle:{"list-style-type":"disc"}},_vm._l(_vm.previewItems(plan.razones_vivir),function(item,idx){return _c("li",{key:idx,staticClass:"mb-1 text-truncate"},[_vm._v(_vm._s(item))]);}),0),_vm._v(" "),_vm.countItems(plan.razones_vivir)>3?_c("div",{staticClass:"small text-primary mt-2"},[_vm._v("\n                        +"+_vm._s(_vm.countItems(plan.razones_vivir)-3)+" más...\n                      ")]):_vm._e()])])])])]);}),0):_c("div",{staticClass:"alert alert-light text-center border py-4 mb-4"},[_c("i",{staticClass:"fas fa-shield-alt text-muted mb-3 fs-2 d-block"}),_vm._v(" "),_c("h6",{staticClass:"text-muted"},[_vm._v("No existen planes de seguridad registrados para este paciente.")])])])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="seguimiento"},attrs:{id:"seguimiento",role:"tabpanel"}},[_vm.fichaView==="botones"?_c("div",{staticClass:"row"},[_c("div",{staticClass:"col-12 mb-4"},[_vm._m(41),_vm._v(" "),_c("p",{staticClass:"text-muted small mb-4"},[_vm._v("Registre el plan de tratamiento recomendado al paciente.")]),_vm._v(" "),_c("div",{staticClass:"row g-4"},[_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border rounded-lg hover-shadow transition",staticStyle:{cursor:"pointer"},on:{click:function click($event){_vm.fichaView="nueva";}}},[_vm._m(42)])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border rounded-lg hover-shadow transition",staticStyle:{cursor:"pointer"},on:{click:function click($event){_vm.fichaView="historica";}}},[_c("div",{staticClass:"card-body text-center p-5"},[_vm._m(43),_vm._v(" "),_c("h5",{staticClass:"font-weight-bold text-dark mb-2"},[_vm._v("Ficha Histórica")]),_vm._v(" "),_c("p",{staticClass:"text-muted small mb-0"},[_vm._v(_vm._s(_vm.paciente.fichas_seguimiento?_vm.paciente.fichas_seguimiento.length:0)+" fichas registradas")])])])])])])]):_vm._e(),_vm._v(" "),_vm.fichaView==="nueva"?_c("div",[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-4"},[_c("h5",{staticClass:"font-weight-bold mb-0"},[_vm._v("Nueva Ficha de Seguimiento")]),_vm._v(" "),_c("button",{staticClass:"btn btn-light btn-sm rounded shadow-sm border",on:{click:function click($event){_vm.fichaView="botones";}}},[_vm._v("\n            Cancelar\n          ")])]),_vm._v(" "),_c("div",{staticClass:"card border-0 shadow-sm rounded-lg mb-4",staticStyle:{"background-color":"#fcfcfc"}},[_c("div",{staticClass:"card-body p-4"},[_c("form",{on:{submit:function submit($event){$event.preventDefault();return _vm.guardarFichaSeguimiento.apply(null,arguments);}}},[_vm._m(44),_vm._v(" "),_c("div",{staticClass:"mb-4 bg-white p-3 border rounded shadow-sm"},[_c("label",{staticClass:"form-label small text-muted"},[_vm._v("Tipo de Paquete")]),_vm._v(" "),_c("select",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevaFicha.tipo,expression:"nuevaFicha.tipo"}],staticClass:"form-select form-select-sm",attrs:{required:""},on:{change:function change($event){var $$selectedVal=Array.prototype.filter.call($event.target.options,function(o){return o.selected;}).map(function(o){var val="_value"in o?o._value:o.value;return val;});_vm.$set(_vm.nuevaFicha,"tipo",$event.target.multiple?$$selectedVal:$$selectedVal[0]);}}},[_c("option",{attrs:{value:"",disabled:""}},[_vm._v("Seleccionar paquete...")]),_vm._v(" "),_c("option",{attrs:{value:"Paquete de sesiones"}},[_vm._v("Paquete de sesiones")]),_vm._v(" "),_c("option",{attrs:{value:"Citas individuales"}},[_vm._v("Citas individuales")]),_vm._v(" "),_c("option",{attrs:{value:"Evaluación"}},[_vm._v("Evaluación")]),_vm._v(" "),_c("option",{attrs:{value:"Otro"}},[_vm._v("Otro")])])]),_vm._v(" "),_vm._m(45),_vm._v(" "),_c("div",{staticClass:"mb-4 bg-white p-3 border rounded shadow-sm"},[_c("div",{staticClass:"mb-3"},[_c("select",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevaFicha.frecuencia,expression:"nuevaFicha.frecuencia"}],staticClass:"form-select form-select-sm",attrs:{required:""},on:{change:function change($event){var $$selectedVal=Array.prototype.filter.call($event.target.options,function(o){return o.selected;}).map(function(o){var val="_value"in o?o._value:o.value;return val;});_vm.$set(_vm.nuevaFicha,"frecuencia",$event.target.multiple?$$selectedVal:$$selectedVal[0]);}}},[_c("option",{attrs:{value:"",disabled:""}},[_vm._v("Seleccionar frecuencia...")]),_vm._v(" "),_c("option",{attrs:{value:"1 vez por semana"}},[_vm._v("1 vez por semana")]),_vm._v(" "),_c("option",{attrs:{value:"Quincenal"}},[_vm._v("Quincenal")]),_vm._v(" "),_c("option",{attrs:{value:"Mensual"}},[_vm._v("Mensual")]),_vm._v(" "),_c("option",{attrs:{value:"Otro"}},[_vm._v("Otro")])])]),_vm._v(" "),_c("div",[_c("label",{staticClass:"form-label small text-muted"},[_vm._v("Motivo")]),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevaFicha.motivo,expression:"nuevaFicha.motivo"}],staticClass:"form-control form-control-sm",attrs:{rows:"2",placeholder:"Motivo de la frecuencia seleccionada...",required:""},domProps:{value:_vm.nuevaFicha.motivo},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevaFicha,"motivo",$event.target.value);}}})])]),_vm._v(" "),_vm._m(46),_vm._v(" "),_c("div",{staticClass:"mb-4 bg-white p-3 border rounded shadow-sm d-flex align-items-center justify-content-between flex-wrap gap-2"},[_c("div",{staticClass:"d-flex align-items-center"},[_c("i",{staticClass:"fas fa-user-md text-success me-2"}),_vm._v(" "),_c("select",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevaFicha.professional_id,expression:"nuevaFicha.professional_id"}],staticClass:"form-select form-select-sm border-0 bg-transparent fw-bold text-dark w-auto",attrs:{required:""},on:{change:function change($event){var $$selectedVal=Array.prototype.filter.call($event.target.options,function(o){return o.selected;}).map(function(o){var val="_value"in o?o._value:o.value;return val;});_vm.$set(_vm.nuevaFicha,"professional_id",$event.target.multiple?$$selectedVal:$$selectedVal[0]);}}},[_c("option",{attrs:{value:"",disabled:""}},[_vm._v("Seleccionar profesional...")]),_vm._v(" "),_vm._l(_vm.professionalsList,function(prof){return _c("option",{key:prof.id,domProps:{value:prof.id}},[_vm._v(_vm._s(prof.name))]);})],2)]),_vm._v(" "),_c("span",{staticClass:"badge bg-light text-muted border"},[_vm._v("Asignado automáticamente")])]),_vm._v(" "),_vm._m(47),_vm._v(" "),_c("div",{staticClass:"mb-4 bg-white p-3 border rounded shadow-sm"},[_vm._l(_vm.nuevaFicha.interconsultas,function(item,index){return _c("div",{key:index,staticClass:"d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom"},[_c("div",{staticClass:"small"},[_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(item.tipo))]),_vm._v(" "),_c("span",{staticClass:"text-muted mx-1"},[_vm._v("-")]),_vm._v(" "),_c("span",[_vm._v(_vm._s(_vm.getProfessionalName(item.professional_id)))]),_vm._v(" "),item.motivo?_c("p",{staticClass:"text-muted mb-0 mt-1"},[_vm._v("Motivo: "+_vm._s(item.motivo))]):_vm._e()]),_vm._v(" "),_c("button",{staticClass:"btn btn-link text-danger p-0",attrs:{type:"button"},on:{click:function click($event){return _vm.eliminarInterconsulta(index);}}},[_c("i",{staticClass:"far fa-trash-alt"})])]);}),_vm._v(" "),_c("div",{staticClass:"row g-2 mb-3"},[_c("div",{staticClass:"col-md-6"},[_c("select",{directives:[{name:"model",rawName:"v-model",value:_vm.tempInterconsulta.tipo,expression:"tempInterconsulta.tipo"}],staticClass:"form-select form-select-sm",on:{change:function change($event){var $$selectedVal=Array.prototype.filter.call($event.target.options,function(o){return o.selected;}).map(function(o){var val="_value"in o?o._value:o.value;return val;});_vm.$set(_vm.tempInterconsulta,"tipo",$event.target.multiple?$$selectedVal:$$selectedVal[0]);}}},[_c("option",{attrs:{value:"",disabled:""}},[_vm._v("Especialidad...")]),_vm._v(" "),_c("option",{attrs:{value:"Psicología"}},[_vm._v("Psicología")]),_vm._v(" "),_c("option",{attrs:{value:"Psiquiatría"}},[_vm._v("Psiquiatría")]),_vm._v(" "),_c("option",{attrs:{value:"Neurología"}},[_vm._v("Neurología")]),_vm._v(" "),_c("option",{attrs:{value:"Terapia de Lenguaje"}},[_vm._v("Terapia de Lenguaje")]),_vm._v(" "),_c("option",{attrs:{value:"Terapia Ocupacional"}},[_vm._v("Terapia Ocupacional")]),_vm._v(" "),_c("option",{attrs:{value:"Nutrición"}},[_vm._v("Nutrición")]),_vm._v(" "),_c("option",{attrs:{value:"Otro"}},[_vm._v("Otro")])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("select",{directives:[{name:"model",rawName:"v-model",value:_vm.tempInterconsulta.professional_id,expression:"tempInterconsulta.professional_id"}],staticClass:"form-select form-select-sm",on:{change:function change($event){var $$selectedVal=Array.prototype.filter.call($event.target.options,function(o){return o.selected;}).map(function(o){var val="_value"in o?o._value:o.value;return val;});_vm.$set(_vm.tempInterconsulta,"professional_id",$event.target.multiple?$$selectedVal:$$selectedVal[0]);}}},[_c("option",{attrs:{value:"",disabled:""}},[_vm._v("Profesional...")]),_vm._v(" "),_vm._l(_vm.professionalsList,function(prof){return _c("option",{key:prof.id,domProps:{value:prof.id}},[_vm._v(_vm._s(prof.name))]);})],2)]),_vm._v(" "),_c("div",{staticClass:"col-12 mt-2"},[_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.tempInterconsulta.motivo,expression:"tempInterconsulta.motivo"}],staticClass:"form-control form-control-sm",attrs:{rows:"1",placeholder:"Motivo de la interconsulta..."},domProps:{value:_vm.tempInterconsulta.motivo},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.tempInterconsulta,"motivo",$event.target.value);}}})])]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary btn-sm rounded-pill px-3",attrs:{type:"button",disabled:!_vm.tempInterconsulta.tipo||!_vm.tempInterconsulta.professional_id},on:{click:_vm.agregarInterconsulta}},[_vm._v("Agregar")]),_vm._v(" "),_vm.tempInterconsulta.tipo||_vm.tempInterconsulta.professional_id?_c("button",{staticClass:"btn btn-light btn-sm rounded-pill px-3 ms-2",attrs:{type:"button"},on:{click:_vm.limpiarInterconsulta}},[_vm._v("Cancelar")]):_vm._e()],2),_vm._v(" "),_vm._m(48),_vm._v(" "),_c("div",{staticClass:"mb-4 bg-white p-3 border rounded shadow-sm"},[_c("div",{staticClass:"mb-3"},[_c("label",{staticClass:"d-block small text-dark fw-bold mb-2"},[_vm._v("Grupo De Habilidades")]),_vm._v(" "),_c("div",{staticClass:"d-flex flex-wrap gap-2"},[_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Grupo De Habilidades - Niños/Adolescentes")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Grupo De Habilidades - Niños/Adolescentes");}}},[_vm.isSelectedRecomendacion("Grupo De Habilidades - Niños/Adolescentes")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Niños/Adolescentes\n                    ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Grupo De Habilidades - Adultos")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Grupo De Habilidades - Adultos");}}},[_vm.isSelectedRecomendacion("Grupo De Habilidades - Adultos")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Adultos\n                    ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Grupo De Habilidades - Terapia Ocupacional")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Grupo De Habilidades - Terapia Ocupacional");}}},[_vm.isSelectedRecomendacion("Grupo De Habilidades - Terapia Ocupacional")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Terapia Ocupacional\n                    ")])])]),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_c("label",{staticClass:"d-block small text-dark fw-bold mb-2"},[_vm._v("Talleres")]),_vm._v(" "),_c("div",{staticClass:"d-flex flex-wrap gap-2"},[_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Talleres - Niños/Adolescentes")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Talleres - Niños/Adolescentes");}}},[_vm.isSelectedRecomendacion("Talleres - Niños/Adolescentes")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Niños/Adolescentes\n                    ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Talleres - Adultos")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Talleres - Adultos");}}},[_vm.isSelectedRecomendacion("Talleres - Adultos")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Adultos\n                    ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Talleres - Terapia Ocupacional")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Talleres - Terapia Ocupacional");}}},[_vm.isSelectedRecomendacion("Talleres - Terapia Ocupacional")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Terapia Ocupacional\n                    ")])])]),_vm._v(" "),_c("div",[_c("label",{staticClass:"d-block small text-dark fw-bold mb-2"},[_vm._v("Otros")]),_vm._v(" "),_c("div",{staticClass:"d-flex flex-wrap gap-2"},[_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Otros - Niños/Adolescentes")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Otros - Niños/Adolescentes");}}},[_vm.isSelectedRecomendacion("Otros - Niños/Adolescentes")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Niños/Adolescentes\n                    ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Otros - Adultos")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Otros - Adultos");}}},[_vm.isSelectedRecomendacion("Otros - Adultos")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Adultos\n                    ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3 border","class":_vm.isSelectedRecomendacion("Otros - Terapia Ocupacional")?"btn-primary bg-opacity-10 text-primary border-primary":"bg-white text-muted",attrs:{type:"button"},on:{click:function click($event){return _vm.toggleRecomendacion("Otros - Terapia Ocupacional");}}},[_vm.isSelectedRecomendacion("Otros - Terapia Ocupacional")?_c("i",{staticClass:"fas fa-check-circle me-1"}):_c("i",{staticClass:"far fa-circle me-1"}),_vm._v(" Terapia Ocupacional\n                    ")])])])]),_vm._v(" "),_c("div",{staticClass:"d-flex justify-content-end gap-2 mt-4 pt-3 border-top"},[_c("button",{staticClass:"btn btn-light border px-4",attrs:{type:"button"},on:{click:function click($event){_vm.fichaView="botones";}}},[_vm._v("Cancelar")]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary px-4",attrs:{type:"submit",disabled:_vm.savingFicha}},[_vm.savingFicha?_c("span",{staticClass:"spinner-border spinner-border-sm me-2",attrs:{role:"status","aria-hidden":"true"}}):_vm._e(),_vm._v("\n                  Guardar Ficha\n                ")])])])])])]):_vm._e(),_vm._v(" "),_vm.fichaView==="historica"?_c("div",[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-4"},[_c("h5",{staticClass:"font-weight-bold mb-0"},[_vm._v("Ficha Histórica")]),_vm._v(" "),_c("button",{staticClass:"btn btn-light btn-sm rounded shadow-sm border",on:{click:function click($event){_vm.fichaView="botones";}}},[_vm._v("\n            Volver\n          ")])]),_vm._v(" "),_vm.paciente.fichas_seguimiento&&_vm.paciente.fichas_seguimiento.length>0?_c("div",_vm._l(_vm.paciente.fichas_seguimiento,function(ficha,index){return _c("div",{key:ficha.id,staticClass:"card border mb-3 rounded-lg hover-shadow transition"},[_c("div",{staticClass:"card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-2"},[_c("div",{staticClass:"d-flex align-items-center"},[_vm._m(49,true),_vm._v(" "),_c("div",[_c("h6",{staticClass:"font-weight-bold text-dark mb-1"},[_vm._v("Ficha "+_vm._s(_vm.paciente.fichas_seguimiento.length-index))]),_vm._v(" "),_c("div",{staticClass:"small text-muted"},[_vm._v("\n                    "+_vm._s(_vm.formatDate(ficha.fecha))+" - "+_vm._s(ficha.tipo)+" - "+_vm._s(ficha.frecuencia)+" - "+_vm._s(_vm.getProfessionalName(ficha.professional_id))+"\n                  ")])])]),_vm._v(" "),_c("div",{staticClass:"d-flex align-items-center gap-3"},[_c("span",{staticClass:"badge","class":index===0?"bg-success bg-opacity-10 border border-success border-opacity-25":"bg-secondary bg-opacity-10 border border-secondary border-opacity-25",staticStyle:{"font-size":"0.75rem","border-radius":"20px",padding:"0.35em 0.8em"}},[_vm._v("\n                  "+_vm._s(index===0?"Activo":"Culminado")+"\n                ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm btn-light border text-primary",on:{click:function click($event){return _vm.verDetalleFicha(ficha);}}},[_c("i",{staticClass:"fas fa-eye"})])])])]);}),0):_c("div",{staticClass:"alert alert-light border text-center p-5 rounded-lg"},[_c("i",{staticClass:"fas fa-file-alt text-muted mb-3 fs-1"}),_vm._v(" "),_c("h6",{staticClass:"text-muted"},[_vm._v("No hay fichas históricas registradas para este paciente.")])])]):_vm._e()]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="recetas"},attrs:{id:"recetas",role:"tabpanel"}},[_c("ul",{staticClass:"nav nav-pills mb-4",attrs:{id:"recetasOrdenesTabs",role:"tablist"}},[_c("li",{staticClass:"nav-item me-2",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link rounded-pill px-4 small border shadow-sm","class":_vm.activePill==="recetas"?"bg-primary text-white active":"bg-white text-dark",staticStyle:{"font-weight":"500"},attrs:{type:"button"},on:{click:function click($event){_vm.activePill="recetas";}}},[_c("i",{staticClass:"fas fa-link me-1"}),_vm._v(" Recetas Médicas\n          ")])]),_vm._v(" "),_c("li",{staticClass:"nav-item",attrs:{role:"presentation"}},[_c("button",{staticClass:"nav-link rounded-pill px-4 small border shadow-sm","class":_vm.activePill==="ordenes"?"bg-primary text-white active":"bg-white text-muted",staticStyle:{"font-weight":"500"},attrs:{type:"button"},on:{click:function click($event){_vm.activePill="ordenes";}}},[_c("i",{staticClass:"fas fa-file-invoice me-1"}),_vm._v(" Órdenes Médicas\n          ")])])]),_vm._v(" "),_c("div",{staticClass:"tab-content",attrs:{id:"pills-tabContent"}},[_c("div",{directives:[{name:"show",rawName:"v-show",value:_vm.activePill==="recetas",expression:"activePill === 'recetas'"}]},[_vm._m(50),_vm._v(" "),_vm.paciente.prescriptions&&_vm.paciente.prescriptions.length>0?_c("div",_vm._l(_vm.paciente.prescriptions,function(receta){return _c("div",{key:receta.id,staticClass:"card border border-light shadow-sm mb-4",staticStyle:{"border-radius":"12px",overflow:"hidden"}},[_c("div",{staticClass:"card-body p-4 bg-white"},[_c("div",{staticClass:"d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2"},[_c("div",{staticClass:"d-flex align-items-center"},[_vm._m(51,true),_vm._v(" "),_c("div",[_c("h6",{staticClass:"mb-0 font-weight-bold text-dark fs-5"},[_vm._v("Receta Médica")]),_vm._v(" "),_c("div",{staticClass:"small text-muted mt-1"},[_vm._v("\n                        "+_vm._s(_vm.formatDate(receta.created_at))+" · "+_vm._s(receta.professional?receta.professional.name:"Dr.")+" "),receta.professional&&(receta.professional.cmp||receta.professional.rne)?_c("span",[_vm._v("- CMP "+_vm._s(receta.professional.cmp||"--")+" / RNE "+_vm._s(receta.professional.rne||"--"))]):_vm._e()])])]),_vm._v(" "),_c("div",{staticClass:"d-flex align-items-center gap-2"},[_c("span",{staticClass:"badge bg-success bg-opacity-10 rounded-pill px-3 py-1 border border-success border-opacity-25",staticStyle:{"font-weight":"500"}},[_vm._v("Vigente")]),_vm._v(" "),_c("a",{staticClass:"btn btn-light btn-sm rounded text-muted shadow-sm border",attrs:{href:"/api/pdf/".concat(receta.id,"?token=").concat(_vm.$token),target:"_blank"}},[_c("i",{staticClass:"fas fa-print"})]),_vm._v(" "),_c("a",{staticClass:"btn btn-light btn-sm rounded text-muted shadow-sm border",attrs:{href:"/api/pdf/".concat(receta.id,"?token=").concat(_vm.$token),download:"",target:"_blank"}},[_c("i",{staticClass:"fas fa-download"})])])]),_vm._v(" "),_c("div",{staticClass:"text-muted small mb-3"},[_vm._v("\n                  Diagnóstico: "),_vm.paciente.initial_psychiatric_history&&_vm.paciente.initial_psychiatric_history.diagnostic?_c("span",[_vm._v(_vm._s(_vm.getCieNames(_vm.paciente.initial_psychiatric_history.diagnostic)))]):_c("span",[_vm._v("Evaluación médica general")])]),_vm._v(" "),receta.kairos&&receta.kairos.length>0?_c("div",{staticClass:"d-flex flex-column gap-2 mb-3"},_vm._l(receta.kairos,function(med){return _c("div",{key:med.id,staticClass:"p-3 rounded",staticStyle:{"background-color":"#fcfcfc",border:"1px solid #f0f0f0"}},[_c("div",{staticClass:"d-flex align-items-center mb-1"},[_c("strong",{staticClass:"text-dark me-2"},[_vm._v(_vm._s(med.nombre))]),_vm._v(" "),_c("span",{staticClass:"badge bg-warning bg-opacity-10 rounded-pill px-2 border border-warning border-opacity-25",staticStyle:{"font-size":"0.75rem"}},[_vm._v(_vm._s(med.concentracion||med.presentacion||"Dosis"))])]),_vm._v(" "),_c("div",{staticClass:"small text-muted mb-2"},[_vm._v("\n                      "+_vm._s(med.pivot.amount||"")+" "),med.pivot.indications?_c("span",[_vm._v("- "+_vm._s(med.pivot.indications))]):_vm._e()]),_vm._v(" "),med.pivot.way?_c("div",{staticClass:"small text-primary fst-italic",staticStyle:{color:"#0d6efd"}},[_c("i",{staticClass:"fas fa-exclamation-triangle text-warning me-1"}),_vm._v("\n                      "+_vm._s(med.pivot.way)+"\n                    ")]):_vm._e()]);}),0):_c("div",{staticClass:"p-3 rounded mb-3 text-muted small",staticStyle:{"background-color":"#fcfcfc",border:"1px solid #f0f0f0"}},[_vm._v("\n                  Medicamentos no especificados en la receta digital.\n                ")]),_vm._v(" "),_c("div",{staticClass:"small text-muted mt-2"},[_vm._v("\n                  Válida hasta: "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(_vm.formatDate(receta.effective_date)))])])])]);}),0):_c("div",{staticClass:"alert alert-light border text-center p-5"},[_c("i",{staticClass:"fas fa-capsules text-muted mb-3 fs-1"}),_vm._v(" "),_c("h6",{staticClass:"text-muted"},[_vm._v("No hay recetas registradas")])])]),_vm._v(" "),_c("div",{directives:[{name:"show",rawName:"v-show",value:_vm.activePill==="ordenes",expression:"activePill === 'ordenes'"}]},[_vm._m(52),_vm._v(" "),_vm.allMedicalExams&&_vm.allMedicalExams.length>0?_c("div",[_c("div",{staticClass:"table-responsive"},[_c("table",{staticClass:"table table-hover align-middle"},[_vm._m(53),_vm._v(" "),_c("tbody",_vm._l(_vm.allMedicalExams,function(examData,idx){return _c("tr",{key:idx},[_c("td",[_vm._v(_vm._s(_vm.formatDate(examData.date)))]),_vm._v(" "),_c("td",{staticClass:"fw-bold"},[_vm._v(_vm._s(examData.exam.name))]),_vm._v(" "),_c("td",[_c("span",{staticClass:"badge bg-light text-dark border"},[_vm._v(_vm._s(examData.exam.type===1?"Laboratorio":examData.exam.type===2?"Imagenología":"Otros"))])]),_vm._v(" "),_c("td",{staticClass:"text-muted small"},[_vm._v(_vm._s(examData.doctor))]),_vm._v(" "),_c("td",{staticClass:"text-end"},[_c("a",{staticClass:"btn btn-sm btn-light border text-primary",attrs:{href:_vm.getExamPdfUrl(examData),target:"_blank"}},[_c("i",{staticClass:"fas fa-print"})])])]);}),0)])])]):_c("div",{staticClass:"alert alert-light border text-center p-5"},[_c("i",{staticClass:"fas fa-file-medical text-muted mb-3 fs-1"}),_vm._v(" "),_c("h6",{staticClass:"text-muted"},[_vm._v("No hay órdenes de exámenes registradas")])])])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="pruebas"},attrs:{id:"pruebas",role:"tabpanel"}},[_c("div",{staticClass:"row"},[_vm._m(54),_vm._v(" "),_vm._l(_vm.allTests,function(t,index){return _c("div",{key:t.testName+"_"+(t.id||index),staticClass:"col-md-6 col-lg-4 mb-4"},[_c("div",{staticClass:"card h-100 border-0 shadow-sm",staticStyle:{"border-radius":"10px",overflow:"hidden"}},[_c("div",{staticClass:"card-header bg-primary text-white border-0 py-3"},[_c("div",{staticClass:"d-flex justify-content-between align-items-center"},[_c("h6",{staticClass:"mb-0 font-weight-bold"},[_vm._v(_vm._s(t.testName))]),_vm._v(" "),_c("i",{staticClass:"fas fa-file-signature opacity-50"})])]),_vm._v(" "),_c("div",{staticClass:"card-body bg-light position-relative"},[_c("div",{staticClass:"mb-3"},[_vm._m(55,true),_vm._v(" "),_c("strong",{staticClass:"text-dark"},[_vm._v(_vm._s(_vm.formatDate(t.created_at||t.fecha)))])]),_vm._v(" "),t.score||t.total||t.result?_c("div",{staticClass:"mb-0"},[_vm._m(56,true),_vm._v(" "),_c("span",{staticClass:"badge bg-success rounded-pill px-3 py-2",staticStyle:{"font-size":"0.9rem"}},[_vm._v("\n                  "+_vm._s(t.score||t.total||t.result)+" pts\n                ")])]):_vm._e(),_vm._v(" "),_c("i",{staticClass:"fas fa-clipboard-check position-absolute opacity-10 text-primary",staticStyle:{bottom:"-15px",right:"-15px","font-size":"5rem"}})]),_vm._v(" "),_vm._m(57,true)])]);}),_vm._v(" "),_vm.allTests.length===0?_c("div",{staticClass:"col-12"},[_vm._m(58)]):_vm._e()],2)]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="documentos"},attrs:{id:"documentos",role:"tabpanel"}},[_vm._m(59),_vm._v(" "),_c("div",{staticClass:"d-flex flex-wrap gap-2 mb-4"},[_c("button",{staticClass:"btn btn-sm rounded-pill px-3","class":_vm.filtroDocumento==="Todos"?"btn-primary":"btn-light border text-muted",attrs:{type:"button"},on:{click:function click($event){$event.preventDefault();_vm.filtroDocumento="Todos";}}},[_vm._v("Todos")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3","class":_vm.filtroDocumento==="orden"?"btn-light bg-white border text-dark":"btn-light border text-muted",attrs:{type:"button"},on:{click:function click($event){$event.preventDefault();_vm.filtroDocumento="orden";}}},[_vm._v("Órdenes")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3","class":_vm.filtroDocumento==="resultado"?"btn-light bg-white border text-dark":"btn-light border text-muted",attrs:{type:"button"},on:{click:function click($event){$event.preventDefault();_vm.filtroDocumento="resultado";}}},[_vm._v("Resultados")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3","class":_vm.filtroDocumento==="referencias"?"btn-light bg-white border text-dark":"btn-light border text-muted",attrs:{type:"button"},on:{click:function click($event){$event.preventDefault();_vm.filtroDocumento="referencias";}}},[_vm._v("Referencias")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3","class":_vm.filtroDocumento==="consentimiento"?"btn-light bg-white border text-dark":"btn-light border text-muted",attrs:{type:"button"},on:{click:function click($event){$event.preventDefault();_vm.filtroDocumento="consentimiento";}}},[_vm._v("Consentimientos")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3","class":_vm.filtroDocumento==="recetas"?"btn-light bg-white border text-dark":"btn-light border text-muted",attrs:{type:"button"},on:{click:function click($event){$event.preventDefault();_vm.filtroDocumento="recetas";}}},[_vm._v("Recetas")]),_vm._v(" "),_c("button",{staticClass:"btn btn-sm rounded-pill px-3","class":_vm.filtroDocumento==="otro"?"btn-light bg-white border text-dark":"btn-light border text-muted",attrs:{type:"button"},on:{click:function click($event){$event.preventDefault();_vm.filtroDocumento="otro";}}},[_vm._v("Otros")])]),_vm._v(" "),_vm.documentosFiltrados.length>0?_c("div",{staticClass:"row g-3"},_vm._l(_vm.documentosFiltrados,function(doc){return _c("div",{key:doc.id,staticClass:"col-md-6 col-lg-4"},[_c("div",{staticClass:"card h-100 border-light shadow-sm",staticStyle:{"border-radius":"12px","background-color":"#fcfcfc"}},[_c("div",{staticClass:"card-body p-4"},[_c("div",{staticClass:"d-flex align-items-start mb-3"},[_vm._m(60,true),_vm._v(" "),_c("div",{staticStyle:{"min-width":"0"}},[_c("h6",{staticClass:"mb-1 text-dark text-truncate",attrs:{title:doc.nombre}},[_vm._v(_vm._s(doc.nombre))]),_vm._v(" "),_c("span",{staticClass:"badge rounded-pill","class":_vm.getBadgeClassDocumento(doc.tipo)},[_vm._v(_vm._s(_vm.getTipoDocumentoNombre(doc.tipo)))])])]),_vm._v(" "),_c("div",{staticClass:"d-flex justify-content-between align-items-center small text-muted mb-3"},[_c("span",[_c("i",{staticClass:"far fa-calendar-alt me-1"}),_vm._v(" "+_vm._s(_vm.formatDate(doc.created_at||doc.fecha)))])]),_vm._v(" "),_c("div",{staticClass:"d-flex gap-2"},[_c("a",{staticClass:"btn btn-light btn-sm flex-grow-1 border shadow-sm text-dark bg-white rounded-pill",attrs:{href:"/storage/archivos/"+doc.archivo,target:"_blank"}},[_c("i",{staticClass:"fas fa-eye me-1"}),_vm._v(" Ver\n                ")]),_vm._v(" "),_c("a",{staticClass:"btn btn-light btn-sm flex-grow-1 border shadow-sm text-dark bg-white rounded-pill",attrs:{href:"/storage/archivos/"+doc.archivo,download:"",target:"_blank"}},[_c("i",{staticClass:"fas fa-download me-1"}),_vm._v(" Descargar\n                ")])])])])]);}),0):_c("div",{staticClass:"alert alert-light text-center border p-5 mt-3 rounded-lg"},[_c("i",{staticClass:"far fa-folder-open text-muted mb-3 fs-1"}),_vm._v(" "),_c("h6",{staticClass:"text-muted"},[_vm._v("No existen documentos adjuntos en esta categoría.")])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="finanzas"},attrs:{id:"finanzas",role:"tabpanel"}},[_c("div",{staticClass:"row g-3 mb-4"},[_c("div",{staticClass:"col-md-4"},[_c("div",{staticClass:"card border rounded-3 shadow-sm",staticStyle:{"border-color":"#eef2f5 !important"}},[_c("div",{staticClass:"card-body p-4"},[_vm._m(61),_vm._v(" "),_c("div",{staticClass:"fw-bold",staticStyle:{"font-size":"1.5rem",color:"#198754"}},[_vm._v("\n                S/ "+_vm._s(_vm.paciente.deuda_total?parseFloat(_vm.paciente.deuda_total).toFixed(2):"0.00")+"\n              ")])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-4"},[_c("div",{staticClass:"card border rounded-3 shadow-sm",staticStyle:{"border-color":"#eef2f5 !important"}},[_c("div",{staticClass:"card-body p-4"},[_vm._m(62),_vm._v(" "),_c("div",{staticClass:"fw-bold",staticStyle:{"font-size":"1.5rem",color:"#212529"}},[_vm._v("\n                "+_vm._s(_vm.paciente.pagos_pendientes||0)+"\n              ")])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-4"},[_c("div",{staticClass:"card border rounded-3 shadow-sm",staticStyle:{"border-color":"#eef2f5 !important"}},[_c("div",{staticClass:"card-body p-4"},[_vm._m(63),_vm._v(" "),_c("div",{staticClass:"fw-bold",staticStyle:{"font-size":"1.5rem",color:"#198754"}},[_vm._v("\n                S/ "+_vm._s(_vm.paciente.total_pagado?parseFloat(_vm.paciente.total_pagado).toFixed(2):"0.00")+"\n              ")])])])])]),_vm._v(" "),_vm._m(64),_vm._v(" "),_c("div",{staticClass:"card border-0 rounded-3 shadow-sm mb-4"},[_c("div",{staticClass:"card-body p-0"},[_c("div",{staticClass:"table-responsive"},[_c("table",{staticClass:"table table-hover mb-0",staticStyle:{"font-size":"0.9rem"}},[_vm._m(65),_vm._v(" "),_c("tbody",[_vm._l(_vm.paciente.pagos_historial||[],function(pago){return _c("tr",{key:pago.payment_id,staticStyle:{"border-bottom":"1px solid #f8f9fa"}},[_c("td",{staticClass:"align-middle py-3 ps-4"},[_c("span",{staticClass:"text-dark"},[_vm._v(_vm._s(_vm.formatOnlyDate(pago.date)))])]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 fw-bold text-dark"},[_vm._v("\n                    "+_vm._s(pago.concepto||"Consulta")+"\n                  ")]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 text-muted"},[_vm._v("\n                    "+_vm._s(_vm.getPaymentMethodName(pago.metodo_id))+"\n                  ")]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 text-end text-dark"},[_vm._v("\n                    S/ "+_vm._s(pago.monto?parseFloat(pago.monto).toFixed(2):"0.00")+"\n                  ")]),_vm._v(" "),_c("td",{staticClass:"align-middle py-3 pe-4"},[pago.estado==2||pago.estado==null?_c("span",{staticClass:"badge rounded-pill px-3 py-2",staticStyle:{"background-color":"#d1fae5",color:"#065f46","font-weight":"500","font-size":"0.78rem"}},[_c("i",{staticClass:"fas fa-check-circle me-1"}),_vm._v(" Pagado\n                    ")]):pago.estado==1?_c("span",{staticClass:"badge rounded-pill px-3 py-2",staticStyle:{"background-color":"#fef3c7",color:"#92400e","font-weight":"500","font-size":"0.78rem"}},[_c("i",{staticClass:"fas fa-clock me-1"}),_vm._v(" Sin pagar\n                    ")]):pago.estado==3?_c("span",{staticClass:"badge rounded-pill px-3 py-2",staticStyle:{"background-color":"#fee2e2",color:"#991b1b","font-weight":"500","font-size":"0.78rem"}},[_c("i",{staticClass:"fas fa-times-circle me-1"}),_vm._v(" Anulado\n                    ")]):_c("span",{staticClass:"badge rounded-pill px-3 py-2",staticStyle:{"background-color":"#fef3c7",color:"#92400e","font-weight":"500","font-size":"0.78rem"}},[_c("i",{staticClass:"fas fa-clock me-1"}),_vm._v(" Pendiente\n                    ")])])]);}),_vm._v(" "),!_vm.paciente.pagos_historial||_vm.paciente.pagos_historial.length===0?_c("tr",[_vm._m(66)]):_vm._e()],2)])])])])]),_vm._v(" "),_c("div",{staticClass:"tab-pane fade","class":{"show active":_vm.activeTab==="convenios"},attrs:{id:"convenios",role:"tabpanel"}},[_vm._m(67)])]),_vm._v(" "),_c("div",{staticClass:"modal fade",attrs:{id:"modalDetalleFicha",tabindex:"-1","aria-labelledby":"modalDetalleFichaLabel","aria-hidden":"true"}},[_c("div",{staticClass:"modal-dialog modal-lg modal-dialog-centered"},[_c("div",{staticClass:"modal-content border-0 shadow-lg rounded-lg"},[_vm._m(68),_vm._v(" "),_vm.fichaSeleccionada?_c("div",{staticClass:"modal-body p-4"},[_c("div",{staticClass:"row mb-4 g-3"},[_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"p-3 bg-white border rounded shadow-sm h-100"},[_c("p",{staticClass:"text-muted small mb-1"},[_vm._v("Fecha de Creación")]),_vm._v(" "),_c("p",{staticClass:"font-weight-bold mb-0 text-dark"},[_vm._v(_vm._s(_vm.formatDate(_vm.fichaSeleccionada.fecha)))])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"p-3 bg-white border rounded shadow-sm h-100"},[_c("p",{staticClass:"text-muted small mb-1"},[_vm._v("Profesional Asignado")]),_vm._v(" "),_c("p",{staticClass:"font-weight-bold mb-0 text-dark"},[_c("i",{staticClass:"fas fa-user-md text-success me-1"}),_vm._v(" "+_vm._s(_vm.getProfessionalName(_vm.fichaSeleccionada.professional_id)))])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"p-3 bg-white border rounded shadow-sm h-100"},[_c("p",{staticClass:"text-muted small mb-1"},[_vm._v("Tipo de Paquete")]),_vm._v(" "),_c("p",{staticClass:"font-weight-bold mb-0 text-dark"},[_vm._v(_vm._s(_vm.fichaSeleccionada.tipo))])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"p-3 bg-white border rounded shadow-sm h-100"},[_c("p",{staticClass:"text-muted small mb-1"},[_vm._v("Frecuencia")]),_vm._v(" "),_c("p",{staticClass:"font-weight-bold mb-0 text-dark"},[_vm._v(_vm._s(_vm.fichaSeleccionada.frecuencia))])])]),_vm._v(" "),_c("div",{staticClass:"col-12"},[_c("div",{staticClass:"p-3 bg-white border rounded shadow-sm"},[_c("p",{staticClass:"text-muted small mb-1"},[_vm._v("Motivo Frecuencia")]),_vm._v(" "),_c("p",{staticClass:"mb-0 text-dark"},[_vm._v(_vm._s(_vm.fichaSeleccionada.motivo))])])])]),_vm._v(" "),_vm.fichaSeleccionada.interconsultas&&_vm.fichaSeleccionada.interconsultas.length>0?_c("div",{staticClass:"mb-4"},[_vm._m(69),_vm._v(" "),_vm._l(_vm.fichaSeleccionada.interconsultas,function(inter,idx){return _c("div",{key:idx,staticClass:"card border-0 bg-light shadow-sm mb-2"},[_c("div",{staticClass:"card-body p-3"},[_c("div",{staticClass:"d-flex justify-content-between align-items-center mb-2"},[_c("span",{staticClass:"badge bg-primary bg-opacity-10 border border-primary px-2 py-1 rounded"},[_vm._v(_vm._s(inter.tipo))]),_vm._v(" "),_c("span",{staticClass:"small text-muted font-weight-bold"},[_c("i",{staticClass:"fas fa-user-md"}),_vm._v(" "+_vm._s(_vm.getProfessionalName(inter.professional_id)))])]),_vm._v(" "),inter.motivo?_c("p",{staticClass:"mb-0 small text-dark mt-2"},[_c("strong",[_vm._v("Motivo:")]),_vm._v(" "+_vm._s(inter.motivo))]):_vm._e()])]);})],2):_vm._e(),_vm._v(" "),_vm.getRecomendacionesParsed(_vm.fichaSeleccionada.recomendaciones).length>0?_c("div",[_vm._m(70),_vm._v(" "),_c("div",{staticClass:"d-flex flex-wrap gap-2"},_vm._l(_vm.getRecomendacionesParsed(_vm.fichaSeleccionada.recomendaciones),function(rec,idx){return _c("span",{key:idx,staticClass:"badge bg-success bg-opacity-10 border border-success p-2 rounded-pill"},[_c("i",{staticClass:"fas fa-check me-1"}),_vm._v(" "+_vm._s(rec)+"\n              ")]);}),0)]):_vm._e()]):_vm._e(),_vm._v(" "),_c("div",{staticClass:"modal-footer border-top-0 pt-0"},[_vm.fichaSeleccionada?_c("a",{staticClass:"btn btn-danger",attrs:{href:"/api/export-ficha-seguimiento/".concat(_vm.fichaSeleccionada.id,"?token=").concat(_vm.$token)}},[_c("i",{staticClass:"fas fa-file-pdf me-2"}),_vm._v(" Descargar PDF\n          ")]):_vm._e(),_vm._v(" "),_c("button",{staticClass:"btn btn-light border px-4",attrs:{type:"button","data-bs-dismiss":"modal"}},[_vm._v("Cerrar")])])])])]),_vm._v(" "),_c("div",{staticClass:"modal fade",attrs:{id:"modalPlanSeguridad",tabindex:"-1","aria-hidden":"true"}},[_c("div",{staticClass:"modal-dialog modal-lg modal-dialog-centered"},[_c("div",{staticClass:"modal-content border-0 shadow-lg rounded-lg"},[_vm._m(71),_vm._v(" "),_c("div",{staticClass:"modal-body p-4 bg-light"},[_c("form",{on:{submit:function submit($event){$event.preventDefault();return _vm.guardarPlanSeguridad.apply(null,arguments);}}},[_c("div",{staticClass:"row g-3"},[_c("div",{staticClass:"col-md-6"},[_vm._m(72),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoPlanSeguridad.senales_advertencia,expression:"nuevoPlanSeguridad.senales_advertencia"}],staticClass:"form-control",attrs:{rows:"3",placeholder:"Pensamientos, imágenes, humor, situaciones, conducta...",required:""},domProps:{value:_vm.nuevoPlanSeguridad.senales_advertencia},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevoPlanSeguridad,"senales_advertencia",$event.target.value);}}})]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_vm._m(73),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoPlanSeguridad.estrategias,expression:"nuevoPlanSeguridad.estrategias"}],staticClass:"form-control",attrs:{rows:"3",placeholder:"Cosas que puedo hacer para distraerme sin contactar a otra persona...",required:""},domProps:{value:_vm.nuevoPlanSeguridad.estrategias},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevoPlanSeguridad,"estrategias",$event.target.value);}}})]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_vm._m(74),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoPlanSeguridad.personas_dis,expression:"nuevoPlanSeguridad.personas_dis"}],staticClass:"form-control",attrs:{rows:"3",placeholder:"Nombres, teléfonos, lugares seguros...",required:""},domProps:{value:_vm.nuevoPlanSeguridad.personas_dis},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevoPlanSeguridad,"personas_dis",$event.target.value);}}})]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_vm._m(75),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoPlanSeguridad.personas_ayuda,expression:"nuevoPlanSeguridad.personas_ayuda"}],staticClass:"form-control",attrs:{rows:"3",placeholder:"Nombres, teléfonos...",required:""},domProps:{value:_vm.nuevoPlanSeguridad.personas_ayuda},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevoPlanSeguridad,"personas_ayuda",$event.target.value);}}})]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_vm._m(76),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoPlanSeguridad.contactos_emergencia,expression:"nuevoPlanSeguridad.contactos_emergencia"}],staticClass:"form-control",attrs:{rows:"3",placeholder:"Clínica, hospital de urgencias, línea de prevención de suicidio...",required:""},domProps:{value:_vm.nuevoPlanSeguridad.contactos_emergencia},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevoPlanSeguridad,"contactos_emergencia",$event.target.value);}}})]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_vm._m(77),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoPlanSeguridad.medidas,expression:"nuevoPlanSeguridad.medidas"}],staticClass:"form-control",attrs:{rows:"3",placeholder:"Eliminar acceso a métodos letales...",required:""},domProps:{value:_vm.nuevoPlanSeguridad.medidas},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevoPlanSeguridad,"medidas",$event.target.value);}}})]),_vm._v(" "),_c("div",{staticClass:"col-12"},[_vm._m(78),_vm._v(" "),_c("textarea",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoPlanSeguridad.razones_vivir,expression:"nuevoPlanSeguridad.razones_vivir"}],staticClass:"form-control",attrs:{rows:"3",placeholder:"Aspectos importantes que me mantienen con vida...",required:""},domProps:{value:_vm.nuevoPlanSeguridad.razones_vivir},on:{input:function input($event){if($event.target.composing)return;_vm.$set(_vm.nuevoPlanSeguridad,"razones_vivir",$event.target.value);}}})])]),_vm._v(" "),_c("div",{staticClass:"d-flex justify-content-end gap-2 mt-4 pt-3 border-top"},[_c("button",{staticClass:"btn btn-light border px-4",attrs:{type:"button","data-bs-dismiss":"modal"}},[_vm._v("Cancelar")]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary px-4",attrs:{type:"submit",disabled:_vm.savingPlanSeguridad}},[_vm.savingPlanSeguridad?_c("span",{staticClass:"spinner-border spinner-border-sm me-2",attrs:{role:"status","aria-hidden":"true"}}):_vm._e(),_vm._v("\n                Guardar Plan\n              ")])])])])])])]),_vm._v(" "),_c("div",{staticClass:"modal fade",attrs:{id:"modalVerPlanSeguridad",tabindex:"-1","aria-hidden":"true"}},[_c("div",{staticClass:"modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"},[_c("div",{staticClass:"modal-content border-0 shadow-lg rounded-lg"},[_c("div",{staticClass:"modal-header border-bottom-0 bg-light d-flex align-items-center"},[_vm._m(79),_vm._v(" "),_vm.planSeguridadSeleccionado?_c("div",{staticClass:"ms-auto me-3 small text-muted"},[_vm._v("\n             Creado: "+_vm._s(_vm.formatDate(_vm.planSeguridadSeleccionado.fecha))+"\n          ")]):_vm._e(),_vm._v(" "),_c("button",{staticClass:"btn-close m-0",attrs:{type:"button","data-bs-dismiss":"modal","aria-label":"Close"}})]),_vm._v(" "),_vm.planSeguridadSeleccionado?_c("div",{staticClass:"modal-body p-4"},[_c("div",{staticClass:"row g-4"},[_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border-light shadow-sm"},[_vm._m(80),_vm._v(" "),_c("div",{staticClass:"card-body"},[_c("p",{staticClass:"small text-muted mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.planSeguridadSeleccionado.senales_advertencia))])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border-light shadow-sm"},[_vm._m(81),_vm._v(" "),_c("div",{staticClass:"card-body"},[_c("p",{staticClass:"small text-muted mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.planSeguridadSeleccionado.estrategias))])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border-light shadow-sm"},[_vm._m(82),_vm._v(" "),_c("div",{staticClass:"card-body"},[_c("p",{staticClass:"small text-muted mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.planSeguridadSeleccionado.personas_dis))])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border-light shadow-sm"},[_vm._m(83),_vm._v(" "),_c("div",{staticClass:"card-body"},[_c("p",{staticClass:"small text-muted mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.planSeguridadSeleccionado.personas_ayuda))])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border-light shadow-sm"},[_vm._m(84),_vm._v(" "),_c("div",{staticClass:"card-body"},[_c("p",{staticClass:"small text-muted mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.planSeguridadSeleccionado.contactos_emergencia))])])])]),_vm._v(" "),_c("div",{staticClass:"col-md-6"},[_c("div",{staticClass:"card h-100 border-light shadow-sm"},[_vm._m(85),_vm._v(" "),_c("div",{staticClass:"card-body"},[_c("p",{staticClass:"small text-muted mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.planSeguridadSeleccionado.medidas))])])])]),_vm._v(" "),_c("div",{staticClass:"col-12"},[_c("div",{staticClass:"card h-100 border-light shadow-sm"},[_vm._m(86),_vm._v(" "),_c("div",{staticClass:"card-body"},[_c("p",{staticClass:"small text-muted mb-0",staticStyle:{"white-space":"pre-wrap"}},[_vm._v(_vm._s(_vm.planSeguridadSeleccionado.razones_vivir))])])])])])]):_vm._e(),_vm._v(" "),_c("div",{staticClass:"modal-footer border-top-0 pt-0"},[_c("button",{staticClass:"btn btn-light border px-4",attrs:{type:"button","data-bs-dismiss":"modal"}},[_vm._v("Cerrar")]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary px-4",attrs:{type:"button"},on:{click:function click($event){return _vm.descargarPlanPDF(_vm.planSeguridadSeleccionado);}}},[_c("i",{staticClass:"fas fa-download me-1"}),_vm._v(" Descargar PDF\n          ")])])])])]),_vm._v(" "),_c("div",{staticClass:"modal fade",attrs:{id:"modalSubirDocumento",tabindex:"-1","aria-hidden":"true"}},[_c("div",{staticClass:"modal-dialog modal-dialog-centered"},[_c("div",{staticClass:"modal-content border-0 shadow-lg rounded-lg"},[_vm._m(87),_vm._v(" "),_c("div",{staticClass:"modal-body p-4 bg-light"},[_c("form",{on:{submit:function submit($event){$event.preventDefault();return _vm.subirNuevoDocumento.apply(null,arguments);}}},[_vm._m(88),_vm._v(" "),_c("div",{staticClass:"mb-3"},[_vm._m(89),_vm._v(" "),_c("select",{directives:[{name:"model",rawName:"v-model",value:_vm.nuevoDocumentoTipo,expression:"nuevoDocumentoTipo"}],staticClass:"form-select",attrs:{required:""},on:{change:function change($event){var $$selectedVal=Array.prototype.filter.call($event.target.options,function(o){return o.selected;}).map(function(o){var val="_value"in o?o._value:o.value;return val;});_vm.nuevoDocumentoTipo=$event.target.multiple?$$selectedVal:$$selectedVal[0];}}},[_c("option",{attrs:{value:"",disabled:""}},[_vm._v("Seleccione el tipo...")]),_vm._v(" "),_c("option",{attrs:{value:"orden"}},[_vm._v("Orden de Examen")]),_vm._v(" "),_c("option",{attrs:{value:"resultado"}},[_vm._v("Resultado de Laboratorio/Imagen")]),_vm._v(" "),_c("option",{attrs:{value:"referencias"}},[_vm._v("Referencia/Contrarreferencia")]),_vm._v(" "),_c("option",{attrs:{value:"consentimiento"}},[_vm._v("Consentimiento Informado")]),_vm._v(" "),_c("option",{attrs:{value:"recetas"}},[_vm._v("Receta Externa")]),_vm._v(" "),_c("option",{attrs:{value:"otro"}},[_vm._v("Otro Documento")])])]),_vm._v(" "),_c("div",{staticClass:"d-flex justify-content-end gap-2 mt-4 pt-3 border-top"},[_c("button",{staticClass:"btn btn-light border px-4",attrs:{type:"button","data-bs-dismiss":"modal"}},[_vm._v("Cancelar")]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary px-4",attrs:{type:"submit",disabled:_vm.subiendoDocumento}},[_vm.subiendoDocumento?_c("span",{staticClass:"spinner-border spinner-border-sm me-2",attrs:{role:"status","aria-hidden":"true"}}):_vm._e(),_vm._v("\n                Subir Documento\n              ")])])])])])])]),_vm._v(" "),_vm.paciente.has_autotriaje?_c("modal-ver-auto-triaje",{attrs:{"patient-id":_vm.paciente.id}}):_vm._e(),_vm._v(" "),_c("div",{staticClass:"modal fade",attrs:{id:"modalLinkAutotriaje",tabindex:"-1","aria-labelledby":"modalLinkAutotriajeLabel","aria-hidden":"true"}},[_c("div",{staticClass:"modal-dialog modal-dialog-centered"},[_c("div",{staticClass:"modal-content border-0 shadow"},[_vm._m(90),_vm._v(" "),_c("div",{staticClass:"modal-body pb-4"},[_c("p",{staticClass:"text-secondary text-sm mb-3"},[_vm._v("El siguiente enlace es válido únicamente por 1 hora. Envíalo al paciente para que pueda completar su autotriaje.")]),_vm._v(" "),_c("div",{staticClass:"input-group mb-3"},[_c("input",{staticClass:"form-control bg-light",attrs:{type:"text",readonly:"",id:"inputLinkAutotriaje"},domProps:{value:_vm.linkGenerado}}),_vm._v(" "),_c("button",{staticClass:"btn btn-outline-secondary",attrs:{type:"button"},on:{click:_vm.copiarLink}},[_c("i",{staticClass:"far fa-copy"}),_vm._v(" Copiar\n            ")])]),_vm._v(" "),_c("a",{staticClass:"btn btn-success w-100 mt-2","class":{disabled:!_vm.linkGenerado},attrs:{href:"https://api.whatsapp.com/send?text="+encodeURIComponent("Hola, por favor completa tu autotriaje en el siguiente enlace válido por 1 hora:\n\n"+_vm.linkGenerado),target:"_blank"}},[_c("i",{staticClass:"fab fa-whatsapp me-2"}),_vm._v(" Enviar por WhatsApp\n          ")])])])])]),_vm._v(" "),_vm.paciente&&_vm.paciente.id?_c("modal-ver-estados",{attrs:{dataPatient:_vm.paciente,estados:_vm.estados}}):_vm._e(),_vm._v(" "),_c("modal-ver-hobbies",{attrs:{hobbies:_vm.hobbies,id:_vm.queId,misHobbies:_vm.misHobbies}})],1);};var staticRenderFns=[function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"spinner-border text-primary",attrs:{role:"status"}},[_c("span",{staticClass:"visually-hidden"},[_vm._v("Loading...")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold mb-3"},[_c("i",{staticClass:"far fa-calendar text-primary"}),_vm._v(" Próxima Cita")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold mb-3"},[_c("i",{staticClass:"fas fa-file-medical text-success"}),_vm._v(" Última Evolución")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex justify-content-between align-items-center mb-4"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"far fa-clock text-primary"}),_vm._v(" Línea de Tiempo Clínica (Últimas Actividades)")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"fw-bold mb-3"},[_c("i",{staticClass:"fas fa-user text-primary me-2"}),_vm._v("\n                  Información Básica\n                ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"fw-bold mb-3"},[_c("i",{staticClass:"fas fa-phone text-primary me-2"}),_vm._v("\n                  Información de Contacto\n                ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"fw-bold mb-3 text-warning"},[_c("i",{staticClass:"fas fa-exclamation-triangle me-2"}),_vm._v("\n                  Contacto de Emergencia\n                ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"fw-bold mb-3"},[_c("i",{staticClass:"fas fa-calendar text-primary me-2"}),_vm._v("\n                  Información de Registro\n                ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex justify-content-between align-items-center mb-3 mt-1"},[_c("h6",{staticClass:"font-weight-bold mb-0 text-dark d-flex align-items-center"},[_c("i",{staticClass:"fas fa-cube text-primary me-2"}),_vm._v(" Paquetes Contratados\n        ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-outline-secondary btn-sm bg-white text-dark shadow-sm border rounded"},[_c("i",{staticClass:"fas fa-plus me-1"}),_vm._v(" Nuevo Paquete\n        ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex justify-content-between align-items-center mb-3 mt-4"},[_c("h6",{staticClass:"font-weight-bold mb-0 text-dark d-flex align-items-center"},[_c("i",{staticClass:"far fa-calendar-alt text-primary me-2"}),_vm._v(" Historial de Citas\n        ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("thead",{staticClass:"bg-light"},[_c("tr",[_c("th",{staticClass:"border-0 text-muted fw-normal py-3 ps-4",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Fecha")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Tipo")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Profesional")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Estado")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3 pe-4",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Notas")])])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex justify-content-between align-items-center mb-3 mt-4"},[_c("h6",{staticClass:"font-weight-bold mb-0 text-dark d-flex align-items-center"},[_c("i",{staticClass:"fas fa-exclamation-triangle text-warning me-2"}),_vm._v(" Faltas y Reprogramaciones\n        ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-light border-0 py-3"},[_c("h6",{staticClass:"mb-0 text-dark font-weight-bold",staticStyle:{"font-size":"0.95rem"}},[_c("i",{staticClass:"fas fa-times-circle text-danger me-2"}),_vm._v(" Inasistencias (Faltas)\n              ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("td",{staticClass:"align-middle py-3 pe-4 text-muted border-bottom-0 text-end",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_c("span",{staticClass:"badge bg-danger bg-opacity-10 rounded-pill fw-normal px-2 py-1"},[_vm._v("Falta")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-light border-0 py-3"},[_c("h6",{staticClass:"mb-0 text-dark font-weight-bold",staticStyle:{"font-size":"0.95rem"}},[_c("i",{staticClass:"fas fa-sync-alt text-info me-2"}),_vm._v(" Reprogramaciones\n              ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("td",{staticClass:"align-middle py-3 pe-4 text-muted border-bottom-0 text-end",staticStyle:{"border-bottom":"1px solid #f1f3f5 !important"}},[_c("span",{staticClass:"badge bg-info bg-opacity-10 rounded-pill fw-normal px-2 py-1"},[_vm._v("Reprogramada")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-user-md text-primary me-2"}),_vm._v("MOTIVO DE CONSULTA")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-notes-medical text-primary me-2"}),_vm._v("ANTECEDENTES")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-chart-line text-primary me-2"}),_vm._v("DINÁMICA FAMILIAR / SOCIAL")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-smile-beam text-primary me-2"}),_vm._v("ACTITUD DEL PACIENTE")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-stethoscope text-primary me-2"}),_vm._v("DIAGNÓSTICO INICIAL")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-tasks text-primary me-2"}),_vm._v("PLAN DE TRATAMIENTO")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-file-medical-alt text-success me-2"}),_vm._v("ANTECEDENTES GENERALES")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-thermometer-half text-success me-2"}),_vm._v("SIGNOS Y SÍNTOMAS PRINCIPALES")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-disease text-success me-2"}),_vm._v("ENFERMEDAD ACTUAL")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-brain text-success me-2"}),_vm._v("EXAMEN MENTAL (APC)")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-exclamation-triangle text-success me-2"}),_vm._v("PROBLEMAS DIAGNÓSTICOS")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-stethoscope text-success me-2"}),_vm._v("DIAGNÓSTICO")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"text-secondary fw-bold small"},[_c("i",{staticClass:"fas fa-tasks text-success me-2"}),_vm._v("PLAN DE TRATAMIENTO")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold mb-3 mt-4 text-dark px-2 d-flex align-items-center"},[_c("i",{staticClass:"fas fa-clipboard-list text-primary me-2"}),_vm._v(" Evoluciones de Seguimiento\n      ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("span",{staticClass:"text-success"},[_vm._v("Está apreciando "),_c("strong",[_vm._v("todos")]),_vm._v(" los registros de evoluciones.")]);},function(){var _vm=this,_c=_vm._self._c;return _c("small",{staticClass:"text-warning d-block font-weight-bold",staticStyle:{"font-size":"0.65rem"}},[_c("i",{staticClass:"fas fa-stethoscope me-1"}),_vm._v(" TRATAMIENTO / PLAN")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"mt-3"},[_c("button",{staticClass:"btn btn-outline-secondary btn-sm rounded px-3 py-1 text-dark bg-white border shadow-xs",staticStyle:{"font-size":"0.75rem",width:"fit-content"}},[_c("i",{staticClass:"fas fa-plus-square me-1 text-muted"}),_vm._v(" Agregar seguimiento\n                ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h5",{staticClass:"card-title font-weight-bold mb-0"},[_c("i",{staticClass:"fas fa-clipboard-check text-primary me-2"}),_vm._v(" Registro de Triajes")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"rounded-circle bg-light text-info border d-flex justify-content-center align-items-center me-3",staticStyle:{width:"45px",height:"45px","min-width":"45px"}},[_c("i",{staticClass:"fas fa-thermometer-half fs-5"})]);},function(){var _vm=this,_c=_vm._self._c;return _c("h5",{staticClass:"card-title font-weight-bold mb-3 mt-2"},[_c("i",{staticClass:"fas fa-traffic-light text-warning me-2"}),_vm._v(" Seguridad / Semáforo")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h5",{staticClass:"card-title font-weight-bold mb-0"},[_c("i",{staticClass:"fas fa-shield-alt text-danger me-2"}),_vm._v(" Plan de Seguridad\n            ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"rounded-circle bg-danger bg-opacity-10 d-flex justify-content-center align-items-center me-3",staticStyle:{width:"45px",height:"45px","min-width":"45px"}},[_c("i",{staticClass:"fas fa-shield-alt fs-5"})]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"small text-muted font-weight-bold text-uppercase mb-0",staticStyle:{"letter-spacing":"0.5px"}},[_c("i",{staticClass:"fas fa-exclamation-triangle text-warning me-1"}),_vm._v(" Señales de advertencia\n                        ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"small text-muted font-weight-bold text-uppercase mb-0",staticStyle:{"letter-spacing":"0.5px"}},[_c("i",{staticClass:"fas fa-brain text-primary me-1"}),_vm._v(" Estrategias de afrontamiento\n                        ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"small text-muted font-weight-bold text-uppercase mb-0",staticStyle:{"letter-spacing":"0.5px"}},[_c("i",{staticClass:"far fa-smile text-success me-1"}),_vm._v(" Razones para vivir\n                        ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h5",{staticClass:"card-title font-weight-bold mb-1"},[_c("i",{staticClass:"fas fa-clipboard-list text-primary me-2"}),_vm._v(" Ficha de Seguimiento")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-body text-center p-5"},[_c("div",{staticClass:"rounded-circle bg-white bg-opacity-10 text-primary d-flex justify-content-center align-items-center mx-auto mb-3",staticStyle:{width:"60px",height:"60px"}},[_c("i",{staticClass:"fas fa-plus fs-4"})]),_vm._v(" "),_c("h5",{staticClass:"font-weight-bold text-dark mb-2"},[_vm._v("Nueva Ficha")]),_vm._v(" "),_c("p",{staticClass:"text-muted small mb-0"},[_vm._v("Crear un nuevo plan de seguimiento")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"rounded-circle bg-light text-secondary border d-flex justify-content-center align-items-center mx-auto mb-3",staticStyle:{width:"60px",height:"60px"}},[_c("i",{staticClass:"fas fa-file-alt fs-4"})]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold small mb-3"},[_vm._v("I. Seguimiento de Citas "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold small mb-3"},[_vm._v("II. Frecuencia "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold small mb-3"},[_vm._v("III. Profesional "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold small mb-3 d-flex align-items-center"},[_vm._v("IV. Interconsulta "),_c("span",{staticClass:"text-muted ms-1",staticStyle:{"font-weight":"400","font-size":"0.8rem"}},[_vm._v("(Opcional)")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold small mb-3 d-flex align-items-center"},[_vm._v("V. Recomendaciones "),_c("span",{staticClass:"text-muted ms-1",staticStyle:{"font-weight":"400","font-size":"0.8rem"}},[_vm._v("(Opcional)")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"rounded bg-light text-secondary border d-flex justify-content-center align-items-center me-3",staticStyle:{width:"45px",height:"45px"}},[_c("i",{staticClass:"fas fa-file-alt"})]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex justify-content-between align-items-center mb-4"},[_c("h5",{staticClass:"mb-0 font-weight-bold d-flex align-items-center text-dark"},[_c("i",{staticClass:"fas fa-link text-warning me-2",staticStyle:{transform:"rotate(45deg)"}}),_vm._v(" Recetas Médicas\n            ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary rounded-pill px-3 shadow-sm btn-sm"},[_c("i",{staticClass:"fas fa-plus me-1"}),_vm._v(" Nueva Receta\n            ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm",staticStyle:{width:"45px",height:"45px","background-color":"#fff4e6",color:"#ff8c00"}},[_c("i",{staticClass:"fas fa-capsules fs-5"})]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex justify-content-between align-items-center mb-4"},[_c("h5",{staticClass:"mb-0 font-weight-bold d-flex align-items-center text-dark"},[_c("i",{staticClass:"fas fa-file-invoice text-primary me-2"}),_vm._v(" Órdenes Médicas\n            ")]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary rounded-pill px-3 shadow-sm btn-sm"},[_c("i",{staticClass:"fas fa-plus me-1"}),_vm._v(" Nueva Orden\n            ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("thead",{staticClass:"bg-light"},[_c("tr",[_c("th",{staticClass:"border-0 rounded-start"},[_vm._v("Fecha")]),_vm._v(" "),_c("th",{staticClass:"border-0"},[_vm._v("Examen")]),_vm._v(" "),_c("th",{staticClass:"border-0"},[_vm._v("Tipo")]),_vm._v(" "),_c("th",{staticClass:"border-0"},[_vm._v("Doctor")]),_vm._v(" "),_c("th",{staticClass:"border-0 rounded-end text-end"},[_vm._v("Acciones")])])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"col-12 mb-3"},[_c("h5",{staticClass:"card-title font-weight-bold"},[_c("i",{staticClass:"fas fa-brain text-primary me-2"}),_vm._v(" Pruebas Psicológicas Aplicadas")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("span",{staticClass:"text-muted small d-block mb-1"},[_c("i",{staticClass:"far fa-calendar-alt me-1"}),_vm._v(" Fecha de Aplicación")]);},function(){var _vm=this,_c=_vm._self._c;return _c("span",{staticClass:"text-muted small d-block mb-1"},[_c("i",{staticClass:"fas fa-star me-1 text-warning"}),_vm._v(" Puntuación General")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-footer bg-white border-top-0 py-3 text-center"},[_c("button",{staticClass:"btn btn-sm btn-outline-primary w-100 rounded-pill"},[_c("i",{staticClass:"fas fa-eye me-1"}),_vm._v(" Ver Detalles Completos")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"alert alert-light text-center border p-5"},[_c("i",{staticClass:"fas fa-folder-open text-muted mb-3",staticStyle:{"font-size":"3rem"}}),_vm._v(" "),_c("h6",{staticClass:"text-muted"},[_vm._v("No hay pruebas aplicadas en el registro de este paciente.")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex justify-content-between align-items-center mb-4 mt-2"},[_c("div",[_c("h5",{staticClass:"mb-0 font-weight-bold d-flex align-items-center text-dark"},[_c("i",{staticClass:"fas fa-paperclip text-primary me-2"}),_vm._v(" Documentos Adjuntos\n          ")]),_vm._v(" "),_c("p",{staticClass:"text-muted small mb-0 mt-1"},[_vm._v("Órdenes de examen, resultados y otros documentos")])]),_vm._v(" "),_c("button",{staticClass:"btn btn-primary rounded px-3 shadow-sm",attrs:{"data-bs-toggle":"modal","data-bs-target":"#modalSubirDocumento"}},[_c("i",{staticClass:"fas fa-upload me-1"}),_vm._v(" Subir Documento\n        ")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"rounded bg-light text-secondary border d-flex justify-content-center align-items-center me-3 flex-shrink-0",staticStyle:{width:"45px",height:"45px","background-color":"#f1f3f5 !important"}},[_c("i",{staticClass:"far fa-file-alt fs-5"})]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"text-muted small mb-2 d-flex align-items-center gap-2"},[_c("i",{staticClass:"fas fa-dollar-sign text-muted"}),_vm._v(" Deuda Total\n              ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"text-muted small mb-2 d-flex align-items-center gap-2"},[_c("i",{staticClass:"far fa-calendar-alt text-muted"}),_vm._v(" Pagos Pendientes\n              ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"text-muted small mb-2 d-flex align-items-center gap-2"},[_c("i",{staticClass:"far fa-credit-card text-muted"}),_vm._v(" Total Pagado\n              ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"d-flex align-items-center mb-3"},[_c("i",{staticClass:"far fa-credit-card text-primary me-2"}),_vm._v(" "),_c("h6",{staticClass:"font-weight-bold mb-0 text-dark"},[_vm._v("Historial de Pagos")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("thead",[_c("tr",{staticStyle:{"border-bottom":"1px solid #f1f3f5"}},[_c("th",{staticClass:"border-0 text-muted fw-normal py-3 ps-4",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Fecha")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Concepto")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Método")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3 text-end",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Monto")]),_vm._v(" "),_c("th",{staticClass:"border-0 text-muted fw-normal py-3 pe-4",staticStyle:{"font-size":"0.85rem"}},[_vm._v("Estado")])])]);},function(){var _vm=this,_c=_vm._self._c;return _c("td",{staticClass:"text-center text-muted py-5",attrs:{colspan:"5"}},[_c("i",{staticClass:"far fa-folder-open mb-2 d-block",staticStyle:{"font-size":"2rem",opacity:"0.3"}}),_vm._v("\n                    No hay historial de pagos registrado.\n                  ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card border-0 shadow-sm",staticStyle:{"border-radius":"12px","background-color":"#fcfcfc"}},[_c("div",{staticClass:"card-body p-5 text-center"},[_c("div",{staticClass:"mb-4"},[_c("i",{staticClass:"fas fa-handshake text-primary opacity-50",staticStyle:{"font-size":"5rem"}})]),_vm._v(" "),_c("h4",{staticClass:"font-weight-bold text-dark mb-3"},[_vm._v("Convenios, Alianzas y Club")]),_vm._v(" "),_c("p",{staticClass:"text-muted mx-auto",staticStyle:{"max-width":"500px","font-size":"1.1rem"}},[_vm._v("\n              Esta sección está en desarrollo. Próximamente podrá gestionar aquí todos los acuerdos institucionales, beneficios de alianzas estratégicas y membresías de Club.\n           ")]),_vm._v(" "),_c("div",{staticClass:"mt-4"},[_c("span",{staticClass:"badge bg-warning text-dark px-4 py-2 rounded-pill shadow-sm",staticStyle:{"font-size":"1rem"}},[_c("i",{staticClass:"fas fa-tools me-2"}),_vm._v(" Próximamente")])])])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"modal-header border-bottom-0 bg-light"},[_c("h5",{staticClass:"modal-title font-weight-bold",attrs:{id:"modalDetalleFichaLabel"}},[_c("i",{staticClass:"fas fa-clipboard-list text-primary me-2"}),_vm._v(" Detalles de la Ficha de Seguimiento\n          ")]),_vm._v(" "),_c("button",{staticClass:"btn-close",attrs:{type:"button","data-bs-dismiss":"modal","aria-label":"Close"}})]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold mb-3 border-bottom pb-2"},[_c("i",{staticClass:"fas fa-hand-holding-medical text-primary me-2"}),_vm._v(" Interconsultas")]);},function(){var _vm=this,_c=_vm._self._c;return _c("h6",{staticClass:"font-weight-bold mb-3 border-bottom pb-2"},[_c("i",{staticClass:"fas fa-tasks text-success me-2"}),_vm._v(" Recomendaciones")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"modal-header border-bottom-0 bg-light"},[_c("h5",{staticClass:"modal-title font-weight-bold"},[_c("i",{staticClass:"fas fa-shield-alt text-danger me-2"}),_vm._v(" Nuevo Plan de Seguridad\n          ")]),_vm._v(" "),_c("button",{staticClass:"btn-close",attrs:{type:"button","data-bs-dismiss":"modal","aria-label":"Close"}})]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Señales de advertencia "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Estrategias de afrontamiento internas "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Personas y entornos sociales de distracción "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Personas a quienes puedo pedir ayuda "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Profesionales / Agencias de emergencia "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Medidas para hacer el entorno más seguro "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Mis Razones para vivir "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("h5",{staticClass:"modal-title font-weight-bold mb-0"},[_c("i",{staticClass:"fas fa-shield-alt text-danger me-2"}),_vm._v(" Plan de Seguridad\n          ")]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-white border-bottom-0 pt-3 pb-0"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"fas fa-exclamation-triangle text-warning me-2"}),_vm._v(" 1. Señales de advertencia")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-white border-bottom-0 pt-3 pb-0"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"fas fa-brain text-primary me-2"}),_vm._v(" 2. Estrategias de afrontamiento internas")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-white border-bottom-0 pt-3 pb-0"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"fas fa-users text-info me-2"}),_vm._v(" 3. Personas y entornos de distracción")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-white border-bottom-0 pt-3 pb-0"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"fas fa-hands-helping text-success me-2"}),_vm._v(" 4. Personas a quienes puedo pedir ayuda")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-white border-bottom-0 pt-3 pb-0"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"fas fa-ambulance text-danger me-2"}),_vm._v(" 5. Profesionales de emergencia")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-white border-bottom-0 pt-3 pb-0"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"fas fa-lock text-secondary me-2"}),_vm._v(" 6. Entorno más seguro")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"card-header bg-white border-bottom-0 pt-3 pb-0"},[_c("h6",{staticClass:"font-weight-bold text-dark mb-0"},[_c("i",{staticClass:"far fa-smile-beam text-warning me-2"}),_vm._v(" 7. Razones para vivir")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"modal-header border-bottom-0 bg-light"},[_c("h5",{staticClass:"modal-title font-weight-bold"},[_c("i",{staticClass:"fas fa-upload text-primary me-2"}),_vm._v(" Subir Documento\n          ")]),_vm._v(" "),_c("button",{staticClass:"btn-close",attrs:{type:"button","data-bs-dismiss":"modal","aria-label":"Close"}})]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"mb-3"},[_c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Archivo "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]),_vm._v(" "),_c("input",{staticClass:"form-control",attrs:{type:"file",id:"fileInputDocumento",required:""}})]);},function(){var _vm=this,_c=_vm._self._c;return _c("label",{staticClass:"form-label font-weight-bold small text-dark"},[_vm._v("Tipo de Documento "),_c("span",{staticClass:"text-danger"},[_vm._v("*")])]);},function(){var _vm=this,_c=_vm._self._c;return _c("div",{staticClass:"modal-header border-bottom-0"},[_c("h5",{staticClass:"modal-title font-weight-bold",attrs:{id:"modalLinkAutotriajeLabel"}},[_vm._v("Link de Autotriaje")]),_vm._v(" "),_c("button",{staticClass:"btn-close",attrs:{type:"button","data-bs-dismiss":"modal","aria-label":"Close"}})]);}];render._withStripped=true;
 
 /***/ }),
 
@@ -3971,7 +3976,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-plus"
-  }), _vm._v(" Nueva Cita")]), _vm._v(" "), _vm._m(7), _vm._v(" "), _c("router-link", {
+  }), _vm._v(" Nueva Cita")]), _vm._v(" "), _c("router-link", {
     staticClass: "btn btn-white border shadow-sm mb-2",
     attrs: {
       to: "/recepcionista/paquetes"
@@ -3980,7 +3985,7 @@ var render = function render() {
     staticClass: "fas fa-box"
   }), _vm._v(" Nuevo Paquete")])], 1)]), _vm._v(" "), _c("div", {
     staticClass: "d-flex justify-content-between align-items-center mb-2"
-  }, [_vm._m(8), _vm._v(" "), _c("button", {
+  }, [_vm._m(7), _vm._v(" "), _c("button", {
     staticClass: "btn btn-sm btn-toggle-charts",
     on: {
       click: function click($event) {
@@ -4062,7 +4067,7 @@ var render = function render() {
     staticClass: "table-responsive custom-table-container"
   }, [_c("table", {
     staticClass: "table table-hover align-middle"
-  }, [_vm._m(9), _vm._v(" "), _c("tbody", _vm._l(_vm.busqueda, function (paciente, index) {
+  }, [_vm._m(8), _vm._v(" "), _c("tbody", _vm._l(_vm.busqueda, function (paciente, index) {
     return _c("tr", {
       key: index,
       staticClass: "patient-row"
@@ -4086,7 +4091,7 @@ var render = function render() {
       staticClass: "fas fa-cross me-1 text-muted"
     }) : _vm._e(), _vm._v("\n                    " + _vm._s((paciente.name + " " + (paciente.nombres || "")).trim().toLowerCase()) + "\n                  ")]), _vm._v(" "), _c("p", {
       staticClass: "text-xs text-secondary mb-0"
-    }, [_vm._v("\n                    " + _vm._s(_vm.calculateAge(paciente.birth_date)) + " años • " + _vm._s(paciente.gender == 1 ? "Masculino" : paciente.gender == 0 ? "Femenino" : "Other") + "\n                  ")])])])]), _vm._v(" "), _vm._m(10, true), _vm._v(" "), _c("td", {
+    }, [_vm._v("\n                    " + _vm._s(_vm.calculateAge(paciente.birth_date)) + " años • " + _vm._s(paciente.gender == 1 ? "Masculino" : paciente.gender == 0 ? "Femenino" : "Other") + "\n                  ")])])])]), _vm._v(" "), _vm._m(9, true), _vm._v(" "), _c("td", {
       staticClass: "text-center"
     }, [paciente.proximaCita && paciente.proximaCita.length > 0 ? _c("span", {
       staticClass: "text-xs font-weight-bold text-secondary"
@@ -4149,7 +4154,7 @@ var render = function render() {
       attrs: {
         "aria-labelledby": "dropdownMenu" + index
       }
-    }, [_vm._m(11, true), _vm._v(" "), _c("li", [_c("a", {
+    }, [_vm._m(10, true), _vm._v(" "), _c("li", [_c("a", {
       staticClass: "dropdown-item",
       attrs: {
         href: "#",
@@ -4227,7 +4232,7 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fas fa-traffic-light me-2"
-    }), _vm._v(" Estado de Actitud\n                      ")])]) : _vm._e(), _vm._v(" "), _vm._m(12, true), _vm._v(" "), _vm._m(13, true), _vm._v(" "), _c("li", [_c("a", {
+    }), _vm._v(" Estado de Actitud\n                      ")])]) : _vm._e(), _vm._v(" "), _vm._m(11, true), _vm._v(" "), _vm._m(12, true), _vm._v(" "), _c("li", [_c("a", {
       staticClass: "dropdown-item",
       attrs: {
         href: "#",
@@ -4334,9 +4339,9 @@ var render = function render() {
     staticClass: "card-body p-4"
   }, [_c("div", {
     staticClass: "d-flex justify-content-between align-items-center mb-4"
-  }, [_vm._m(14), _vm._v(" "), _c("div", {
+  }, [_vm._m(13), _vm._v(" "), _c("div", {
     staticClass: "input-group w-auto"
-  }, [_vm._m(15), _vm._v(" "), _c("input", {
+  }, [_vm._m(14), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -4364,7 +4369,7 @@ var render = function render() {
     staticClass: "table-responsive"
   }, [_c("table", {
     staticClass: "table table-hover align-middle mb-0"
-  }, [_vm._m(16), _vm._v(" "), _c("tbody", [_vm._l(_vm.clientesCumple, function (cliente, index) {
+  }, [_vm._m(15), _vm._v(" "), _c("tbody", [_vm._l(_vm.clientesCumple, function (cliente, index) {
     return _c("tr", {
       key: "cumple_" + index
     }, [_c("td", {
@@ -4407,7 +4412,7 @@ var render = function render() {
     })]) : _c("span", {
       staticClass: "text-muted small"
     }, [_vm._v("Sin número")])])]);
-  }), _vm._v(" "), _vm.clientesCumple.length === 0 ? _c("tr", [_vm._m(17)]) : _vm._e()], 2)])])])])]) : _vm.vistaActual === "detalle" ? _c("DetallePaciente", {
+  }), _vm._v(" "), _vm.clientesCumple.length === 0 ? _c("tr", [_vm._m(16)]) : _vm._e()], 2)])])])])]) : _vm.vistaActual === "detalle" ? _c("DetallePaciente", {
     ref: "detallePaciente",
     attrs: {
       pacienteId: _vm.dataPaciente.id
@@ -4511,7 +4516,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-dialog-centered"
   }, [_c("div", {
     staticClass: "modal-content border-0 shadow"
-  }, [_vm._m(18), _vm._v(" "), _c("div", {
+  }, [_vm._m(17), _vm._v(" "), _c("div", {
     staticClass: "modal-body pb-4"
   }, [_c("p", {
     staticClass: "text-secondary text-sm mb-3"
@@ -4628,14 +4633,6 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fas fa-user-plus"
   }), _vm._v(" Nuevo Paciente")]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("button", {
-    staticClass: "btn btn-white border shadow-sm mr-2 mb-2"
-  }, [_c("i", {
-    staticClass: "far fa-credit-card"
-  }), _vm._v(" Cobrar Deuda")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -5297,10 +5294,10 @@ render._withStripped = true;
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496":
-/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496 ***!
-  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -5320,24 +5317,33 @@ var render = function render() {
       "aria-hidden": "true"
     }
   }, [_c("div", {
-    staticClass: "modal-dialog modal-lg modal-dialog-centered"
+    staticClass: "modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
   }, [_c("div", {
-    staticClass: "modal-content"
+    staticClass: "modal-content border-0 shadow-lg",
+    staticStyle: {
+      "border-radius": "20px",
+      overflow: "hidden"
+    }
   }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
+    staticClass: "modal-body px-4 pt-4"
   }, [_c("form", {
-    attrs: {
-      action: ""
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.updatePatient.apply(null, arguments);
+      }
     }
   }, [_c("div", {
-    staticClass: "form-group row"
+    staticClass: "section-container mb-4"
+  }, [_vm._m(1), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
   }, [_c("div", {
-    staticClass: "col-sm-6"
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Dni")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("DNI / DOCUMENTO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5347,9 +5353,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "dni",
-      id: "dni",
-      placeholder: "Dni del paciente"
+      placeholder: "DNI del paciente"
     },
     domProps: {
       value: _vm.dataPatient.dni
@@ -5360,13 +5364,13 @@ var render = function render() {
         _vm.$set(_vm.dataPatient, "dni", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Teléfono")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("TELÉFONO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5376,9 +5380,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "phone",
-      id: "phone",
-      placeholder: "Telefono del paciente"
+      placeholder: "Celular"
     },
     domProps: {
       value: _vm.dataPatient.phone
@@ -5389,25 +5391,23 @@ var render = function render() {
         _vm.$set(_vm.dataPatient, "phone", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Paciente")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("APELLIDOS")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.dataPatient.name,
       expression: "dataPatient.name"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control text-uppercase",
     attrs: {
       type: "text",
-      name: "name",
-      id: "name",
-      placeholder: "Apellidos del paciente"
+      placeholder: "Apellidos"
     },
     domProps: {
       value: _vm.dataPatient.name
@@ -5418,25 +5418,23 @@ var render = function render() {
         _vm.$set(_vm.dataPatient, "name", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Paciente")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("NOMBRES")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.dataPatient.nombres,
       expression: "dataPatient.nombres"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control text-uppercase",
     attrs: {
       type: "text",
-      name: "nombres",
-      id: "nombres",
-      placeholder: "Nombres del paciente"
+      placeholder: "Nombres"
     },
     domProps: {
       value: _vm.dataPatient.nombres
@@ -5448,182 +5446,12 @@ var render = function render() {
       }
     }
   })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
+    staticClass: "col-md-6"
   }, [_c("div", {
-    staticClass: "col-sm-6"
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Dirección")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.dataPatient.address.address,
-      expression: "dataPatient.address.address"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      name: "address",
-      id: "address",
-      placeholder: "Direccion del paciente"
-    },
-    domProps: {
-      value: _vm.dataPatient.address.address
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.dataPatient.address, "address", $event.target.value);
-      }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Correo electrónico")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.dataPatient.email,
-      expression: "dataPatient.email"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "email",
-      name: "email",
-      id: "email",
-      placeholder: "Correo electrónico"
-    },
-    domProps: {
-      value: _vm.dataPatient.email
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.dataPatient, "email", $event.target.value);
-      }
-    }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
-  }, [_c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Departamento")]), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.dataPatient.address.department,
-      expression: "dataPatient.address.department"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "department"
-    },
-    on: {
-      change: [function ($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.dataPatient.address, "department", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }, function ($event) {
-        return _vm.moverProvincias(true);
-      }]
-    }
-  }, _vm._l(_vm.ubigeo.departamentos, function (departamento) {
-    return _c("option", {
-      domProps: {
-        value: departamento.idDepa
-      }
-    }, [_vm._v(_vm._s(departamento.departamento))]);
-  }), 0)]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Provincia")]), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.dataPatient.address.province,
-      expression: "dataPatient.address.province"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "provincia"
-    },
-    on: {
-      change: [function ($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.dataPatient.address, "province", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }, function ($event) {
-        return _vm.moverDistritos();
-      }]
-    }
-  }, _vm._l(_vm.provincias, function (provincia) {
-    return _c("option", {
-      domProps: {
-        value: provincia.idProv
-      }
-    }, [_vm._v(_vm._s(provincia.provincia))]);
-  }), 0)]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Distrito")]), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.dataPatient.address.district,
-      expression: "dataPatient.address.district"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "distrito"
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.dataPatient.address, "district", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }
-    }
-  }, _vm._l(_vm.distritos, function (distrito) {
-    return _c("option", {
-      domProps: {
-        value: distrito.idDist
-      }
-    }, [_vm._v(_vm._s(distrito.distrito))]);
-  }), 0)])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
-  }, [_c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Fecha de nacimiento")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("FECHA DE NACIMIENTO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5632,9 +5460,7 @@ var render = function render() {
     }],
     staticClass: "form-control",
     attrs: {
-      type: "date",
-      name: "birth_date",
-      id: "birth_date"
+      type: "date"
     },
     domProps: {
       value: _vm.dataPatient.birth_date
@@ -5645,13 +5471,13 @@ var render = function render() {
         _vm.$set(_vm.dataPatient, "birth_date", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Género")]), _vm._v(" "), _c("select", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("GÉNERO")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5659,9 +5485,6 @@ var render = function render() {
       expression: "dataPatient.gender"
     }],
     staticClass: "form-select",
-    attrs: {
-      id: "sexo"
-    },
     on: {
       change: function change($event) {
         var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
@@ -5689,13 +5512,175 @@ var render = function render() {
     domProps: {
       value: 3
     }
-  }, [_vm._v("LGTB+")])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  }, [_vm._v("LGTB+")])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "section-container mb-4"
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
+  }, [_c("div", {
+    staticClass: "col-md-12"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("DIRECCIÓN")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.dataPatient.address.address,
+      expression: "dataPatient.address.address"
+    }],
+    staticClass: "form-control",
     attrs: {
-      "for": "name"
+      type: "text",
+      placeholder: "Dirección completa"
+    },
+    domProps: {
+      value: _vm.dataPatient.address.address
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.dataPatient.address, "address", $event.target.value);
+      }
     }
-  }, [_vm._v("Ocupación")]), _vm._v(" "), _c("input", {
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-12"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("CORREO ELECTRÓNICO")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.dataPatient.email,
+      expression: "dataPatient.email"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "email",
+      placeholder: "email@ejemplo.com"
+    },
+    domProps: {
+      value: _vm.dataPatient.email
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.dataPatient, "email", $event.target.value);
+      }
+    }
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("DEPARTAMENTO")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.dataPatient.address.department,
+      expression: "dataPatient.address.department"
+    }],
+    staticClass: "form-select",
+    on: {
+      change: [function ($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.dataPatient.address, "department", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }, function ($event) {
+        return _vm.moverProvincias(true);
+      }]
+    }
+  }, _vm._l(_vm.ubigeo.departamentos, function (departamento) {
+    return _c("option", {
+      key: departamento.idDepa,
+      domProps: {
+        value: departamento.idDepa
+      }
+    }, [_vm._v(_vm._s(departamento.departamento))]);
+  }), 0)])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("PROVINCIA")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.dataPatient.address.province,
+      expression: "dataPatient.address.province"
+    }],
+    staticClass: "form-select",
+    on: {
+      change: [function ($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.dataPatient.address, "province", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }, function ($event) {
+        return _vm.moverDistritos();
+      }]
+    }
+  }, _vm._l(_vm.provincias, function (provincia) {
+    return _c("option", {
+      key: provincia.idProv,
+      domProps: {
+        value: provincia.idProv
+      }
+    }, [_vm._v(_vm._s(provincia.provincia))]);
+  }), 0)])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("DISTRITO")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.dataPatient.address.district,
+      expression: "dataPatient.address.district"
+    }],
+    staticClass: "form-select",
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.dataPatient.address, "district", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, _vm._l(_vm.distritos, function (distrito) {
+    return _c("option", {
+      key: distrito.idDist,
+      domProps: {
+        value: distrito.idDist
+      }
+    }, [_vm._v(_vm._s(distrito.distrito))]);
+  }), 0)])])])]), _vm._v(" "), _c("div", {
+    staticClass: "section-container mb-4"
+  }, [_vm._m(3), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
+  }, [_c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("OCUPACIÓN")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5705,9 +5690,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "occupation",
-      id: "occupation",
-      placeholder: "Ocuación del paciente"
+      placeholder: "Ocupación"
     },
     domProps: {
       value: _vm.dataPatient.occupation
@@ -5719,16 +5702,12 @@ var render = function render() {
       }
     }
   })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
+    staticClass: "col-md-4"
   }, [_c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("div", {
-    staticClass: "form-group"
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Estado Civil")]), _vm._v(" "), _c("select", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("ESTADO CIVIL")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5736,10 +5715,6 @@ var render = function render() {
       expression: "dataPatient.marital_status"
     }],
     staticClass: "form-select",
-    attrs: {
-      name: "marital_status",
-      id: "marital_status"
-    },
     on: {
       change: function change($event) {
         var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
@@ -5772,14 +5747,12 @@ var render = function render() {
       value: "5"
     }
   }, [_vm._v("Conviviente")])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+    staticClass: "col-md-4"
   }, [_c("div", {
-    staticClass: "form-group"
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Grado de instrucción")]), _vm._v(" "), _c("select", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("GRADO INSTRUCCIÓN")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5787,10 +5760,6 @@ var render = function render() {
       expression: "dataPatient.instruction_degree"
     }],
     staticClass: "form-select",
-    attrs: {
-      name: "instruction_degree",
-      id: "instruction_degree"
-    },
     on: {
       change: function change($event) {
         var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
@@ -5822,24 +5791,21 @@ var render = function render() {
     attrs: {
       value: "5"
     }
-  }, [_vm._v("Tecnico")]), _vm._v(" "), _c("option", {
+  }, [_vm._v("Técnico")]), _vm._v(" "), _c("option", {
     attrs: {
       value: "6"
     }
-  }, [_vm._v("Sin instrucción")])])])])]), _vm._v(" "), _c("hr"), _vm._v(" "), _c("h5", {
-    staticClass: "modal-title",
-    attrs: {
-      id: "exampleModalLabel"
-    }
-  }, [_vm._v(" Datos del familiar")]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
+  }, [_vm._v("Sin instrucción")])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "section-container mb-4"
+  }, [_vm._m(4), _vm._v(" "), _vm.dataPatient.relative && _vm.dataPatient.relative.length > 0 ? _c("div", {
+    staticClass: "row g-3 mb-3 p-3 rounded-4 bg-light border-0 mx-0"
+  }, [_vm._m(5), _vm._v(" "), _c("div", {
+    staticClass: "col-md-12"
   }, [_c("div", {
-    staticClass: "col-sm-12"
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Nombre del primer contacto")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("NOMBRE COMPLETO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5849,9 +5815,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "relative_name",
-      id: "relativename",
-      placeholder: "Nombre de pariente"
+      placeholder: "Nombre"
     },
     domProps: {
       value: _vm.dataPatient.relative[0].name
@@ -5862,13 +5826,13 @@ var render = function render() {
         _vm.$set(_vm.dataPatient.relative[0], "name", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Telefono")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("TELÉFONO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5878,9 +5842,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "relative_phone",
-      id: "relativephone",
-      placeholder: "Telefono de pariente"
+      placeholder: "Celular"
     },
     domProps: {
       value: _vm.dataPatient.relative[0].phone
@@ -5891,13 +5853,13 @@ var render = function render() {
         _vm.$set(_vm.dataPatient.relative[0], "phone", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Parentesco")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("PARENTESCO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5907,9 +5869,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "kinship",
-      id: "kinship",
-      placeholder: "Parentesco"
+      placeholder: "Ej: Madre, Padre..."
     },
     domProps: {
       value: _vm.dataPatient.relative[0].kinship
@@ -5920,15 +5880,15 @@ var render = function render() {
         _vm.$set(_vm.dataPatient.relative[0], "kinship", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
+  })])])]) : _vm._e(), _vm._v(" "), _vm.dataPatient.relative && _vm.dataPatient.relative.length > 1 ? _c("div", {
+    staticClass: "row g-3 p-3 rounded-4 bg-light border-0 mx-0"
+  }, [_vm._m(6), _vm._v(" "), _c("div", {
+    staticClass: "col-md-12"
   }, [_c("div", {
-    staticClass: "col-sm-12"
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Nombre del segundo contacto")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("NOMBRE COMPLETO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5938,9 +5898,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "relative_name",
-      id: "relativename",
-      placeholder: "Nombre de pariente"
+      placeholder: "Nombre"
     },
     domProps: {
       value: _vm.dataPatient.relative[1].name
@@ -5951,13 +5909,13 @@ var render = function render() {
         _vm.$set(_vm.dataPatient.relative[1], "name", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Telefono")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("TELÉFONO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5967,9 +5925,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "relative_phone",
-      id: "relativephone",
-      placeholder: "Telefono de pariente"
+      placeholder: "Celular"
     },
     domProps: {
       value: _vm.dataPatient.relative[1].phone
@@ -5980,13 +5936,13 @@ var render = function render() {
         _vm.$set(_vm.dataPatient.relative[1], "phone", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "input-group-modern"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Parentesco")]), _vm._v(" "), _c("input", {
+    staticClass: "small font-weight-bold text-muted"
+  }, [_vm._v("PARENTESCO")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -5996,9 +5952,7 @@ var render = function render() {
     staticClass: "form-control",
     attrs: {
       type: "text",
-      name: "kinship",
-      id: "kinship",
-      placeholder: "Parentesco"
+      placeholder: "Ej: Amigo, Tío..."
     },
     domProps: {
       value: _vm.dataPatient.relative[1].kinship
@@ -6009,19 +5963,18 @@ var render = function render() {
         _vm.$set(_vm.dataPatient.relative[1], "kinship", $event.target.value);
       }
     }
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "modal-footer border-0"
+  })])])]) : _vm._e()])])]), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer border-0 pb-4 px-4 pt-0"
   }, [_c("button", {
-    staticClass: "btn btn-outline-danger",
+    staticClass: "btn btn-light rounded-pill px-4 font-weight-bold",
     attrs: {
       type: "button",
       "data-bs-dismiss": "modal"
     }
   }, [_vm._v("Cancelar")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-outline-primary",
+    staticClass: "btn btn-primary rounded-pill px-5 font-weight-bold shadow-sm",
     attrs: {
-      type: "button",
-      "data-bs-dismiss": "modal"
+      type: "button"
     },
     on: {
       click: function click($event) {
@@ -6029,32 +5982,83 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-sync-alt"
-  }), _vm._v(" Actualizar")])])])])]);
+    staticClass: "fas fa-save mr-2"
+  }), _vm._v(" Actualizar Datos\n\t\t\t\t")])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header"
-  }, [_c("h5", {
-    staticClass: "modal-title",
-    attrs: {
-      id: "exampleModalLabel"
-    }
-  }, [_vm._v(" Datos del Paciente")]), _vm._v(" "), _c("button", {
-    staticClass: "close",
+    staticClass: "modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center"
+  }, [_c("div", {
+    staticClass: "icon-header-container mr-3"
+  }, [_c("i", {
+    staticClass: "fas fa-user-edit text-primary h4 mb-0"
+  })]), _vm._v(" "), _c("div", [_c("h5", {
+    staticClass: "modal-title font-weight-bold text-dark mb-1"
+  }, [_vm._v("Editar Datos del Paciente")]), _vm._v(" "), _c("p", {
+    staticClass: "small text-muted mb-0"
+  }, [_vm._v("Actualiza la información personal y de contacto")])])]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close-custom",
     attrs: {
       type: "button",
-      id: "btnCerrarEdPac",
       "data-bs-dismiss": "modal",
-      "aria-label": "Close"
+      "aria-label": "Close",
+      id: "btnCerrarEdPac"
     }
-  }, [_c("span", {
-    attrs: {
-      "aria-hidden": "true"
-    }
-  }, [_vm._v("×")])])]);
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "section-label mb-3"
+  }, [_c("i", {
+    staticClass: "fas fa-user-circle mr-2 text-primary"
+  }), _vm._v(" DATOS PERSONALES\n\t\t\t\t\t\t")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "section-label mb-3"
+  }, [_c("i", {
+    staticClass: "fas fa-map-marker-alt mr-2 text-primary"
+  }), _vm._v(" UBICACIÓN Y CONTACTO\n\t\t\t\t\t\t")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "section-label mb-3"
+  }, [_c("i", {
+    staticClass: "fas fa-info-circle mr-2 text-primary"
+  }), _vm._v(" INFORMACIÓN ADICIONAL\n\t\t\t\t\t\t")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "section-label mb-3"
+  }, [_c("i", {
+    staticClass: "fas fa-phone-alt mr-2 text-primary"
+  }), _vm._v(" CONTACTOS DE EMERGENCIA\n\t\t\t\t\t\t")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "col-md-12"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-primary mb-1"
+  }, [_vm._v("PRIMER CONTACTO")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "col-md-12"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-primary mb-1"
+  }, [_vm._v("SEGUNDO CONTACTO")])]);
 }];
 render._withStripped = true;
 
@@ -8243,10 +8247,10 @@ render._withStripped = true;
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4":
-/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4 ***!
-  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -8266,31 +8270,49 @@ var render = function render() {
       "aria-hidden": "true"
     }
   }, [_c("div", {
-    staticClass: "modal-dialog modal-lg"
+    staticClass: "modal-dialog modal-lg modal-dialog-centered"
   }, [_c("div", {
-    staticClass: "modal-content"
-  }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
-  }, [_c("p", {
-    staticClass: "mb-0 lead"
-  }, [_vm._v("Paciente: " + _vm._s(_vm.dataPatient.name))]), _vm._v(" "), _c("div", {
-    staticClass: "card mb-2"
+    staticClass: "modal-content border-0 shadow-lg",
+    staticStyle: {
+      "border-radius": "20px",
+      overflow: "hidden"
+    }
   }, [_c("div", {
-    staticClass: "card-body"
+    staticClass: "modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between"
   }, [_c("div", {
-    staticClass: "row"
+    staticClass: "d-flex align-items-center"
+  }, [_vm._m(0), _vm._v(" "), _c("div", [_c("h5", {
+    staticClass: "modal-title font-weight-bold text-dark mb-1"
+  }, [_vm._v("Estado del paciente")]), _vm._v(" "), _c("p", {
+    staticClass: "small text-muted mb-0"
+  }, [_vm._v("Paciente: "), _c("span", {
+    staticClass: "font-weight-bold text-primary"
+  }, [_vm._v(_vm._s(_vm.dataPatient.name))])])])]), _vm._v(" "), _vm._m(1)]), _vm._v(" "), _c("div", {
+    staticClass: "modal-body px-4 pt-4"
   }, [_c("div", {
-    staticClass: "col-sm-3"
-  }, [_c("select", {
+    staticClass: "card border-0 shadow-sm rounded-4 mb-4",
+    staticStyle: {
+      background: "#f8f9fc",
+      border: "1px solid #f1f3f9!important"
+    }
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("div", {
+    staticClass: "row align-items-center"
+  }, [_c("div", {
+    staticClass: "col-md-4 mb-3 mb-md-0"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted mb-2"
+  }, [_vm._v("CALIFICACIÓN")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.semaforo.codigo,
       expression: "semaforo.codigo"
     }],
-    staticClass: "form-select text-capitalize",
-    attrs: {
-      id: ""
+    staticClass: "form-select rounded-pill border-0 shadow-sm px-3 text-capitalize",
+    staticStyle: {
+      height: "45px"
     },
     on: {
       change: function change($event) {
@@ -8305,24 +8327,29 @@ var render = function render() {
     }
   }, _vm._l(_vm.estados, function (estado) {
     return _c("option", {
-      staticClass: "text-capitalize",
+      key: estado.id,
       domProps: {
         value: estado.id
       }
     }, [_vm._v(_vm._s(estado.valor))]);
   }), 0)]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("input", {
+    staticClass: "col-md-5 mb-3 mb-md-0"
+  }, [_c("label", {
+    staticClass: "small font-weight-bold text-muted mb-2"
+  }, [_vm._v("DETALLES / OBSERVACIONES")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.semaforo.observaciones,
       expression: "semaforo.observaciones"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control rounded-pill border-0 shadow-sm px-3",
+    staticStyle: {
+      height: "45px"
+    },
     attrs: {
       type: "text",
-      placeholder: "Detalles"
+      placeholder: "Ingresa detalles..."
     },
     domProps: {
       value: _vm.semaforo.observaciones
@@ -8334,49 +8361,76 @@ var render = function render() {
       }
     }
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-3"
+    staticClass: "col-md-3 mt-md-4"
   }, [_c("button", {
-    staticClass: "btn btn-outline-secondary",
+    staticClass: "btn btn-primary w-100 rounded-pill font-weight-bold shadow-sm",
+    staticStyle: {
+      height: "45px"
+    },
     on: {
       click: function click($event) {
         return _vm.enviarSemaforo();
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-share"
-  }), _vm._v(" Enviar")])])]), _vm._v(" "), _c("p", {
-    staticClass: "mt-2 mb-0"
-  }, [_vm._v("Detalle: " + _vm._s(_vm.verDetalle(_vm.semaforo.codigo)))])])]), _vm._v(" "), _c("table", {
-    staticClass: "table table-striped"
-  }, [_vm._m(1), _vm._v(" "), _c("tbody", _vm._l(_vm.dataPatient.semaforo, function (semaf, index) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.fechaLatam(semaf.registro)))]), _vm._v(" "), _c("td", {
-      staticClass: "text-capitalize"
-    }, [_vm._v(_vm._s(_vm.queCodigo(semaf.codigo)))]), _vm._v(" "), _c("td", {
-      staticClass: "text-capitalize"
-    }, [_vm._v(_vm._s(semaf.observaciones))]), _vm._v(" "), _c("td", [_c("button", {
-      staticClass: "btn btn-danger btn-sm",
+    staticClass: "fas fa-paper-plane mr-1"
+  }), _vm._v(" Actualizar\n\t\t\t\t\t\t\t\t")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mt-3 bg-white p-2 px-3 rounded-3 border-dashed small",
+    staticStyle: {
+      border: "1px dashed #dee2e6!important"
+    }
+  }, [_c("span", {
+    staticClass: "text-muted"
+  }, [_vm._v("Detalle del estado seleccionado:")]), _vm._v(" "), _c("span", {
+    staticClass: "font-weight-bold text-dark"
+  }, [_vm._v(_vm._s(_vm.verDetalle(_vm.semaforo.codigo)))])])])]), _vm._v(" "), _c("div", {
+    staticClass: "table-responsive rounded-4 border overflow-hidden"
+  }, [_c("table", {
+    staticClass: "table table-hover mb-0"
+  }, [_vm._m(2), _vm._v(" "), _c("tbody", [_vm._l(_vm.dataPatient.semaforo, function (semaf, index) {
+    return _c("tr", {
+      key: index
+    }, [_c("td", {
+      staticClass: "px-4 py-3 align-middle text-muted small"
+    }, [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", {
+      staticClass: "px-4 py-3 align-middle small"
+    }, [_vm._v(_vm._s(_vm.fechaLatam(semaf.registro)))]), _vm._v(" "), _c("td", {
+      staticClass: "px-4 py-3 align-middle"
+    }, [_c("span", {
+      staticClass: "badge-custom",
+      "class": _vm.badgeColor(semaf.codigo)
+    }, [_vm._v("\n\t\t\t\t\t\t\t\t\t\t" + _vm._s(_vm.queCodigo(semaf.codigo)) + "\n\t\t\t\t\t\t\t\t\t")])]), _vm._v(" "), _c("td", {
+      staticClass: "px-4 py-3 align-middle small text-capitalize text-muted"
+    }, [_vm._v(_vm._s(semaf.observaciones))]), _vm._v(" "), _c("td", {
+      staticClass: "px-4 py-3 align-middle text-center"
+    }, [_c("button", {
+      staticClass: "btn btn-soft-danger btn-sm rounded-circle shadow-none",
+      attrs: {
+        title: "Eliminar"
+      },
       on: {
         click: function click($event) {
           return _vm.eliminarEstado(semaf.id, index);
         }
       }
     }, [_c("i", {
-      staticClass: "fas fa-trash"
+      staticClass: "fas fa-trash-alt"
     })])])]);
-  }), 0)])])])])]);
+  }), _vm._v(" "), !_vm.dataPatient.semaforo || _vm.dataPatient.semaforo.length === 0 ? _c("tr", [_vm._m(3)]) : _vm._e()], 2)])])]), _vm._v(" "), _vm._m(4)])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header bg-primary text-white"
-  }, [_c("h5", {
-    staticClass: "modal-title",
-    attrs: {
-      id: "infoModalLabel"
-    }
-  }, [_vm._v("Perfil del paciente")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-danger",
+    staticClass: "icon-header-container mr-3"
+  }, [_c("i", {
+    staticClass: "fas fa-traffic-light text-primary h4 mb-0"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("button", {
+    staticClass: "btn-close-custom",
     attrs: {
       type: "button",
       "data-bs-dismiss": "modal",
@@ -8384,11 +8438,58 @@ var staticRenderFns = [function () {
     }
   }, [_c("i", {
     staticClass: "fas fa-times"
-  })])]);
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("N°")]), _vm._v(" "), _c("th", [_vm._v("Fecha")]), _vm._v(" "), _c("th", [_vm._v("Calificación")]), _vm._v(" "), _c("th", [_vm._v("Detalle")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
+  return _c("thead", {
+    staticStyle: {
+      background: "#f8f9fc"
+    }
+  }, [_c("tr", [_c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3",
+    staticStyle: {
+      width: "60px"
+    }
+  }, [_vm._v("N°")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3"
+  }, [_vm._v("FECHA")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3"
+  }, [_vm._v("ESTADO")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3"
+  }, [_vm._v("OBSERVACIONES")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3 text-center",
+    staticStyle: {
+      width: "80px"
+    }
+  }, [_vm._v("@")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("td", {
+    staticClass: "text-center py-5",
+    attrs: {
+      colspan: "5"
+    }
+  }, [_c("div", {
+    staticClass: "py-2"
+  }, [_c("i", {
+    staticClass: "fas fa-history fa-3x text-light mb-3"
+  }), _vm._v(" "), _c("p", {
+    staticClass: "text-muted mb-0"
+  }, [_vm._v("No hay historial de estados registrado")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modal-footer border-0 pb-4 px-4"
+  }, [_c("button", {
+    staticClass: "btn btn-light rounded-pill px-4 font-weight-bold",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Cerrar")])]);
 }];
 render._withStripped = true;
 
@@ -9145,10 +9246,10 @@ render._withStripped = true;
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600":
-/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600 ***!
-  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -9167,25 +9268,33 @@ var render = function render() {
       "aria-hidden": "true"
     }
   }, [_c("div", {
-    staticClass: "modal-dialog"
+    staticClass: "modal-dialog modal-dialog-centered"
   }, [_c("div", {
-    staticClass: "modal-content"
+    staticClass: "modal-content border-0 shadow-lg",
+    staticStyle: {
+      "border-radius": "20px",
+      overflow: "hidden"
+    }
   }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
+    staticClass: "modal-body px-4 pt-4"
   }, [_c("div", {
-    staticClass: "card mb-2"
+    staticClass: "card border-0 shadow-sm rounded-4 mb-4",
+    staticStyle: {
+      background: "#f8f9fc",
+      border: "1px solid #f1f3f9!important"
+    }
   }, [_c("div", {
-    staticClass: "card-body"
+    staticClass: "card-body p-3"
   }, [_c("div", {
-    staticClass: "row"
+    staticClass: "row align-items-center"
   }, [_c("div", {
-    staticClass: "col-sm-6"
-  }, [[_c("VSelect", {
+    staticClass: "col-sm-8 mb-2 mb-sm-0"
+  }, [_c("VSelect", {
     attrs: {
-      addClass: "text-capitalize",
+      addClass: "text-capitalize modern-vselect",
       searchable: true,
       searchPlaceholder: "Buscar hobbies",
-      defaultTitle: "Hobbies",
+      defaultTitle: "Selecciona un hobbie",
       searchNotFound: "No hay resultados",
       options: _vm.actividades
     },
@@ -9196,60 +9305,117 @@ var render = function render() {
       },
       expression: "selected"
     }
-  })]], 2), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
+  })], 1), _vm._v(" "), _c("div", {
+    staticClass: "col-sm-4"
   }, [_c("button", {
-    staticClass: "btn btn-outline-secondary",
+    staticClass: "btn btn-primary w-100 rounded-pill font-weight-bold shadow-sm",
     on: {
       click: function click($event) {
         return _vm.addHobbie();
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-paperclip"
-  }), _vm._v(" Agregar")])])])])]), _vm._v(" "), _c("table", {
-    staticClass: "table"
+    staticClass: "fas fa-plus mr-1"
+  }), _vm._v(" Agregar\n\t\t\t\t\t\t\t\t")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "table-responsive rounded-4 border overflow-hidden"
+  }, [_c("table", {
+    staticClass: "table table-hover mb-0"
   }, [_vm._m(1), _vm._v(" "), _c("tbody", [_vm._l(_vm.misHobbies, function (hobbie, index) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", {
-      staticClass: "text-capitalize"
-    }, [_vm._v(_vm._s(_vm.hobbies[hobbie]))]), _vm._v(" "), _c("td", [_c("button", {
-      staticClass: "btn btn-outlihe-danger",
+    return _c("tr", {
+      key: index
+    }, [_c("td", {
+      staticClass: "px-4 py-3 align-middle text-muted small"
+    }, [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", {
+      staticClass: "px-4 py-3 align-middle font-weight-bold text-dark text-capitalize"
+    }, [_vm._v(_vm._s(_vm.hobbies[hobbie]))]), _vm._v(" "), _c("td", {
+      staticClass: "px-4 py-3 align-middle text-center"
+    }, [_c("button", {
+      staticClass: "btn btn-soft-danger btn-sm rounded-circle shadow-none",
+      attrs: {
+        title: "Eliminar"
+      },
       on: {
         click: function click($event) {
           return _vm.borrarHobbie(index);
         }
       }
     }, [_c("i", {
-      staticClass: "fa-solid fa-eraser"
+      staticClass: "fas fa-trash-alt"
     })])])]);
-  }), _vm._v(" "), _vm.misHobbies.length === 0 ? _c("tr", [_c("td", {
-    attrs: {
-      colspan: "4"
-    }
-  }, [_vm._v("No existen hobbies")])]) : _vm._e()], 2)])])])])]);
+  }), _vm._v(" "), _vm.misHobbies.length === 0 ? _c("tr", [_vm._m(2)]) : _vm._e()], 2)])])]), _vm._v(" "), _vm._m(3)])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header border-0"
-  }, [_c("h1", {
-    staticClass: "modal-title fs-5",
-    attrs: {
-      id: "exampleModalLabel"
-    }
-  }, [_vm._v("Hobbies del paciente")]), _vm._v(" "), _c("button", {
-    staticClass: "btn-close",
+    staticClass: "modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center"
+  }, [_c("div", {
+    staticClass: "icon-header-container mr-3"
+  }, [_c("i", {
+    staticClass: "fas fa-heart text-primary h4 mb-0"
+  })]), _vm._v(" "), _c("div", [_c("h5", {
+    staticClass: "modal-title font-weight-bold text-dark mb-1"
+  }, [_vm._v("Hobbies del paciente")]), _vm._v(" "), _c("p", {
+    staticClass: "small text-muted mb-0"
+  }, [_vm._v("Gestiona las actividades favoritas del paciente")])])]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close-custom",
     attrs: {
       type: "button",
       "data-bs-dismiss": "modal",
       "aria-label": "Close"
     }
-  })]);
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("N°")]), _vm._v(" "), _c("th", [_vm._v("Hobbie")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
+  return _c("thead", {
+    staticStyle: {
+      background: "#f8f9fc"
+    }
+  }, [_c("tr", [_c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3",
+    staticStyle: {
+      width: "60px"
+    }
+  }, [_vm._v("N°")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3"
+  }, [_vm._v("HOBBIE")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 small font-weight-bold text-muted px-4 py-3 text-center",
+    staticStyle: {
+      width: "80px"
+    }
+  }, [_vm._v("@")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("td", {
+    staticClass: "text-center py-5",
+    attrs: {
+      colspan: "3"
+    }
+  }, [_c("div", {
+    staticClass: "py-2"
+  }, [_c("i", {
+    staticClass: "fas fa-layer-group fa-3x text-light mb-3"
+  }), _vm._v(" "), _c("p", {
+    staticClass: "text-muted mb-0"
+  }, [_vm._v("No existen hobbies registrados")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modal-footer border-0 pb-4 px-4"
+  }, [_c("button", {
+    staticClass: "btn btn-light rounded-pill px-4 font-weight-bold",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Cerrar")])]);
 }];
 render._withStripped = true;
 
@@ -9348,6 +9514,29 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.custom-table-container[data-v-f3308
 
 /***/ }),
 
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.icon-header-container[data-v-46429496] {\n  background: #f0f7ff;\n  width: 44px;\n  height: 44px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 12px;\n}\n.btn-close-custom[data-v-46429496] {\n  background: #f8f9fa;\n  border: none;\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  color: #adb5bd;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  transition: all 0.2s;\n  cursor: pointer;\n}\n.btn-close-custom[data-v-46429496]:hover { background: #e9ecef; color: #495057;\n}\n.section-label[data-v-46429496] {\n  font-size: 0.75rem;\n  font-weight: 800;\n  color: #adb5bd;\n  letter-spacing: 1px;\n  text-transform: uppercase;\n  display: flex;\n  align-items: center;\n}\n.input-group-modern[data-v-46429496] {\n\tdisplay: flex;\n\tflex-direction: column;\n\tgap: 4px;\n}\n.input-group-modern label[data-v-46429496] {\n\tmargin-bottom: 0;\n\tmargin-left: 4px;\n}\n.input-group-modern .form-control[data-v-46429496], \n.input-group-modern .form-select[data-v-46429496] {\n\tborder-radius: 12px!important;\n\tborder: 1px solid #e9ecef!important;\n\tpadding: 10px 15px!important;\n\tbackground: #fcfdfe!important;\n\tfont-size: 0.9rem!important;\n\ttransition: all 0.2s;\n}\n.input-group-modern .form-control[data-v-46429496]:focus, \n.input-group-modern .form-select[data-v-46429496]:focus {\n\tborder-color: #0d6efd!important;\n\tbackground: #fff!important;\n\tbox-shadow: 0 0 0 4px rgba(13, 110, 253, 0.05)!important;\n}\n.bg-light[data-v-46429496] {\n\tbackground-color: #f8f9fc!important;\n}\n.mr-3[data-v-46429496] { margin-right: 1rem;\n}\n.mr-2[data-v-46429496] { margin-right: 0.5rem;\n}\n.font-weight-bold[data-v-46429496] { font-weight: 700!important;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=0&id=163c320f&lang=css":
 /*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=0&id=163c320f&lang=css ***!
@@ -9417,6 +9606,29 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.modal-content[data-v-085f439b] {\r\
 
 /***/ }),
 
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.icon-header-container[data-v-53bfa8f4] {\r\n  background: #f0f7ff;\r\n  width: 44px;\r\n  height: 44px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  border-radius: 12px;\n}\n.btn-close-custom[data-v-53bfa8f4] {\r\n  background: #f8f9fa;\r\n  border: none;\r\n  width: 32px;\r\n  height: 32px;\r\n  border-radius: 50%;\r\n  color: #adb5bd;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  transition: all 0.2s;\r\n  cursor: pointer;\n}\n.btn-close-custom[data-v-53bfa8f4]:hover { background: #e9ecef; color: #495057;\n}\n.badge-custom[data-v-53bfa8f4] {\r\n\tpadding: 4px 12px;\r\n\tborder-radius: 50px;\r\n\tfont-size: 0.75rem;\r\n\tfont-weight: 700;\r\n\ttext-transform: uppercase;\n}\n.badge-success-soft[data-v-53bfa8f4] { background: #e7fcf3; color: #0ca678; border: 1px solid #c3fae8;\n}\n.badge-warning-soft[data-v-53bfa8f4] { background: #fff9db; color: #f08c00; border: 1px solid #fff3bf;\n}\n.badge-danger-soft[data-v-53bfa8f4] { background: #fff5f5; color: #e03131; border: 1px solid #ffe3e3;\n}\n.badge-secondary-soft[data-v-53bfa8f4] { background: #f1f3f5; color: #495057; border: 1px solid #e9ecef;\n}\n.btn-soft-danger[data-v-53bfa8f4] {\r\n\tbackground: #fff5f5;\r\n\tcolor: #e03131;\r\n\tborder: none;\r\n\twidth: 32px;\r\n\theight: 32px;\r\n\ttransition: all 0.2s;\n}\n.btn-soft-danger[data-v-53bfa8f4]:hover {\r\n\tbackground: #ffc9c9;\r\n\tcolor: #c92a2a;\n}\n.table th[data-v-53bfa8f4] {\r\n\tletter-spacing: 0.5px;\r\n\tborder-bottom: 1px solid #f1f3f9!important;\n}\n.table tr[data-v-53bfa8f4] {\r\n\ttransition: background 0.2s;\n}\n.table tr[data-v-53bfa8f4]:hover {\r\n\tbackground: #fcfdfe!important;\n}\n.mr-3[data-v-53bfa8f4] { margin-right: 1rem;\n}\n.mr-1[data-v-53bfa8f4] { margin-right: 0.25rem;\n}\n.font-weight-bold[data-v-53bfa8f4] { font-weight: 700!important;\n}\n.border-dashed[data-v-53bfa8f4] { border-style: dashed!important;\n}\r\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/OffVerMembresias.vue?vue&type=style&index=0&id=be9696e2&scoped=true&lang=css":
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/OffVerMembresias.vue?vue&type=style&index=0&id=be9696e2&scoped=true&lang=css ***!
@@ -9440,10 +9652,10 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.btn-secondary[data-v-be9696e2]:hove
 
 /***/ }),
 
-/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css":
-/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css ***!
-  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -9456,7 +9668,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.v-select-toggle, .v-dropdown-item{font-size: 15px!important;}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.icon-header-container[data-v-5e47f600] {\r\n  background: #f0f7ff;\r\n  width: 44px;\r\n  height: 44px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  border-radius: 12px;\n}\n.btn-close-custom[data-v-5e47f600] {\r\n  background: #f8f9fa;\r\n  border: none;\r\n  width: 32px;\r\n  height: 32px;\r\n  border-radius: 50%;\r\n  color: #adb5bd;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  transition: all 0.2s;\r\n  cursor: pointer;\n}\n.btn-close-custom[data-v-5e47f600]:hover { background: #e9ecef; color: #495057;\n}\n.btn-soft-danger[data-v-5e47f600] {\r\n\tbackground: #fff5f5;\r\n\tcolor: #e03131;\r\n\tborder: none;\r\n\twidth: 32px;\r\n\theight: 32px;\r\n\ttransition: all 0.2s;\n}\n.btn-soft-danger[data-v-5e47f600]:hover {\r\n\tbackground: #ffc9c9;\r\n\tcolor: #c92a2a;\n}\n.modern-vselect[data-v-5e47f600] .v-select-toggle {\r\n\tborder-radius: 50px!important;\r\n\tborder: 1px solid #dee2e6!important;\r\n\tpadding: 8px 20px!important;\r\n\tbackground: #fff!important;\r\n\tfont-size: 14px!important;\n}\n.table th[data-v-5e47f600] {\r\n\tletter-spacing: 0.5px;\r\n\tborder-bottom: 1px solid #f1f3f9!important;\n}\n.table tr[data-v-5e47f600] {\r\n\ttransition: background 0.2s;\n}\n.table tr[data-v-5e47f600]:hover {\r\n\tbackground: #fcfdfe!important;\n}\n.mr-3[data-v-5e47f600] { margin-right: 1rem;\n}\n.mr-1[data-v-5e47f600] { margin-right: 0.25rem;\n}\n.font-weight-bold[data-v-5e47f600] { font-weight: 700!important;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -9579,6 +9791,35 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css":
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_style_index_0_id_46429496_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_style_index_0_id_46429496_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_style_index_0_id_46429496_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=0&id=163c320f&lang=css":
 /*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=0&id=163c320f&lang=css ***!
@@ -9666,6 +9907,35 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_style_index_0_id_53bfa8f4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_style_index_0_id_53bfa8f4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_style_index_0_id_53bfa8f4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/OffVerMembresias.vue?vue&type=style&index=0&id=be9696e2&scoped=true&lang=css":
 /*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/OffVerMembresias.vue?vue&type=style&index=0&id=be9696e2&scoped=true&lang=css ***!
@@ -9695,10 +9965,10 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
-/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css":
-/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -9707,7 +9977,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css");
 
             
 
@@ -9716,11 +9986,11 @@ var options = {};
 options.insert = "head";
 options.singleton = false;
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -10138,23 +10408,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ModalEditarPaciente_vue_vue_type_template_id_46429496__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalEditarPaciente.vue?vue&type=template&id=46429496 */ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496");
+/* harmony import */ var _ModalEditarPaciente_vue_vue_type_template_id_46429496_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true */ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true");
 /* harmony import */ var _ModalEditarPaciente_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModalEditarPaciente.vue?vue&type=script&lang=js */ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _ModalEditarPaciente_vue_vue_type_style_index_0_id_46429496_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css */ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _ModalEditarPaciente_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _ModalEditarPaciente_vue_vue_type_template_id_46429496__WEBPACK_IMPORTED_MODULE_0__.render,
-  _ModalEditarPaciente_vue_vue_type_template_id_46429496__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _ModalEditarPaciente_vue_vue_type_template_id_46429496_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _ModalEditarPaciente_vue_vue_type_template_id_46429496_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "46429496",
   null
   
 )
@@ -10372,23 +10644,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ModalVerEstados_vue_vue_type_template_id_53bfa8f4__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalVerEstados.vue?vue&type=template&id=53bfa8f4 */ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4");
+/* harmony import */ var _ModalVerEstados_vue_vue_type_template_id_53bfa8f4_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true */ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true");
 /* harmony import */ var _ModalVerEstados_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModalVerEstados.vue?vue&type=script&lang=js */ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _ModalVerEstados_vue_vue_type_style_index_0_id_53bfa8f4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css */ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _ModalVerEstados_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _ModalVerEstados_vue_vue_type_template_id_53bfa8f4__WEBPACK_IMPORTED_MODULE_0__.render,
-  _ModalVerEstados_vue_vue_type_template_id_53bfa8f4__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _ModalVerEstados_vue_vue_type_template_id_53bfa8f4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _ModalVerEstados_vue_vue_type_template_id_53bfa8f4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "53bfa8f4",
   null
   
 )
@@ -10564,9 +10838,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=template&id=5e47f600 */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600");
+/* harmony import */ var _ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true");
 /* harmony import */ var _ModalVerHobbies_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=script&lang=js */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=script&lang=js");
-/* harmony import */ var _ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css");
+/* harmony import */ var _ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css */ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css");
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -10578,11 +10852,11 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _ModalVerHobbies_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__.render,
-  _ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "5e47f600",
   null
   
 )
@@ -11022,18 +11296,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496":
-/*!**************************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496 ***!
-  \**************************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true":
+/*!**************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true ***!
+  \**************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_template_id_46429496__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_template_id_46429496__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_template_id_46429496_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_template_id_46429496_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_template_id_46429496__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalEditarPaciente.vue?vue&type=template&id=46429496 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_template_id_46429496_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=template&id=46429496&scoped=true");
 
 
 /***/ }),
@@ -11118,18 +11392,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4":
-/*!**********************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4 ***!
-  \**********************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true":
+/*!**********************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true ***!
+  \**********************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_template_id_53bfa8f4__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_template_id_53bfa8f4__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_template_id_53bfa8f4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_template_id_53bfa8f4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_template_id_53bfa8f4__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerEstados.vue?vue&type=template&id=53bfa8f4 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_template_id_53bfa8f4_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=template&id=53bfa8f4&scoped=true");
 
 
 /***/ }),
@@ -11198,18 +11472,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600":
-/*!*******************************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600 ***!
-  \*******************************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true":
+/*!*******************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true ***!
+  \*******************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=template&id=5e47f600 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_template_id_5e47f600_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=template&id=5e47f600&scoped=true");
 
 
 /***/ }),
@@ -11262,6 +11536,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css":
+/*!****************************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css ***!
+  \****************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalEditarPaciente_vue_vue_type_style_index_0_id_46429496_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalEditarPaciente.vue?vue&type=style&index=0&id=46429496&scoped=true&lang=css");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=0&id=163c320f&lang=css":
 /*!************************************************************************************************************************************!*\
   !*** ./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=0&id=163c320f&lang=css ***!
@@ -11298,6 +11584,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css":
+/*!************************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css ***!
+  \************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerEstados_vue_vue_type_style_index_0_id_53bfa8f4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalVerEstados.vue?vue&type=style&index=0&id=53bfa8f4&scoped=true&lang=css");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/recepcionista/components/pacientes/OffVerMembresias.vue?vue&type=style&index=0&id=be9696e2&scoped=true&lang=css":
 /*!*************************************************************************************************************************************************!*\
   !*** ./resources/js/components/recepcionista/components/pacientes/OffVerMembresias.vue?vue&type=style&index=0&id=be9696e2&scoped=true&lang=css ***!
@@ -11310,14 +11608,14 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css":
-/*!*********************************************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css ***!
-  \*********************************************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css":
+/*!*********************************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css ***!
+  \*********************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&lang=css");
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalVerHobbies_vue_vue_type_style_index_0_id_5e47f600_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/reportes/ModalVerHobbies.vue?vue&type=style&index=0&id=5e47f600&scoped=true&lang=css");
 
 
 /***/ }),

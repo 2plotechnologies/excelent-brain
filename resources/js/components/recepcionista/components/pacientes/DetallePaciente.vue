@@ -44,36 +44,45 @@
         <button class="nav-link font-weight-bold small text-dark" :class="{ active: activeTab === 'resumen' }" @click="activeTab = 'resumen'" type="button" role="tab" >Resumen</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'datos' }" @click="activeTab = 'datos'" type="button" role="tab" >Datos Personales</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'datos' }" @click="activeTab = 'datos'" type="button" role="tab" >
+          <i class="fas fa-user me-1"></i> Datos Personales</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'citas' }" @click="activeTab = 'citas'" type="button" role="tab" >Citas & Paquetes</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'citas' }" @click="activeTab = 'citas'" type="button" role="tab" >
+          <i class="fas fa-calendar-alt me-1"></i> Citas & Paquetes</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'historial' }" @click="activeTab = 'historial'" type="button" role="tab" >Historial Clínico <span v-if="paciente.medical_evolutions">({{ paciente.medical_evolutions.length }})</span></button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'historial' }" @click="activeTab = 'historial'" type="button" role="tab" >
+          <i class="fas fa-history me-1"></i> Historial Clínico <span v-if="paciente.medical_evolutions">({{ paciente.medical_evolutions.length }})</span></button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'triaje' }" @click="activeTab = 'triaje'" type="button" role="tab" >Triaje & Seguridad</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'triaje' }" @click="activeTab = 'triaje'" type="button" role="tab" >
+          <i class="fas fa-heartbeat me-1"></i> Triaje & Seguridad</button>
       </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'seguimiento' }" @click="activeTab = 'seguimiento'" type="button" role="tab" >
-          <i class="fas fa-clipboard-list me-1"></i> Ficha de Seguimiento
+          <i class="fas fa-clipboard-list me-1"></i> Plan de Intervención
         </button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'recetas' }" @click="activeTab = 'recetas'" type="button" role="tab" >Recetas & Órdenes</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'recetas' }" @click="activeTab = 'recetas'" type="button" role="tab" >
+          <i class="fas fa-prescription me-1"></i> Recetas & Órdenes</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'pruebas' }" @click="activeTab = 'pruebas'" type="button" role="tab" >Pruebas Psicológicas</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'pruebas' }" @click="activeTab = 'pruebas'" type="button" role="tab" >
+          <i class="fas fa-flask me-1"></i> Pruebas Psicológicas</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'documentos' }" @click="activeTab = 'documentos'" type="button" role="tab">Documentos</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'documentos' }" @click="activeTab = 'documentos'" type="button" role="tab">
+          <i class="fas fa-file-contract me-1"></i> Documentos</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'convenios' }" @click="activeTab = 'convenios'" type="button" role="tab" >Convenios</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'convenios' }" @click="activeTab = 'convenios'" type="button" role="tab" >
+          <i class="fas fa-handshake me-1"></i> Convenios</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'finanzas' }" @click="activeTab = 'finanzas'" type="button" role="tab" >Finanzas</button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'finanzas' }" @click="activeTab = 'finanzas'" type="button" role="tab" >
+          <i class="fas fa-wallet me-1"></i>Finanzas</button>
       </li>
     </ul>
 

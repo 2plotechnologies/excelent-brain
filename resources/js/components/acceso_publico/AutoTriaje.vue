@@ -477,7 +477,10 @@ export default {
     this.token = this.$route.params.token
 
     try {
-      await axios.get(`/api/cuestionario/${this.token}`)
+      const res = await axios.get(`/api/cuestionario/${this.token}`)
+      if (res.data.patient) {
+        this.fillForm(res.data.patient)
+      }
       this.loaded = true
     } catch (e) {
       if (e.response && e.response.status === 403) {
@@ -504,6 +507,37 @@ export default {
       } finally {
         this.submitting = false;
       }
+    },
+    fillForm(patient) {
+      // name = apellido, nombres = nombre
+      const fullName = `${patient.nombres || ''} ${patient.name || ''}`.trim();
+      this.form.nombre = fullName;
+      this.form.edad = this.getAge(patient.birth_date);
+      this.form.documento = patient.dni || '';
+      this.form.telefono = patient.phone || '';
+      this.form.email = patient.email || '';
+      
+      // Firma digital inicial
+      this.form.nombre_confirmacion = fullName;
+
+      // Contacto de emergencia (usar el primero si existe)
+      if (patient.relative && patient.relative.length > 0) {
+        const rel = patient.relative[0];
+        this.form.emergencia.nombre = rel.name || '';
+        this.form.emergencia.telefono = rel.phone || '';
+        this.form.emergencia.relacion = rel.kinship || '';
+      }
+    },
+    getAge(dateString) {
+      if (!dateString) return '';
+      const today = new Date();
+      const birthDate = new Date(dateString);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+      }
+      return age;
     }
   }
 }

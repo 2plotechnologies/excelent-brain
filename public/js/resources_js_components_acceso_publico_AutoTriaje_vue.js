@@ -92,6 +92,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   mounted: function mounted() {
     var _this = this;
     return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+      var res;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
@@ -100,22 +101,26 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             _context.next = 4;
             return axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/cuestionario/".concat(_this.token));
           case 4:
+            res = _context.sent;
+            if (res.data.patient) {
+              _this.fillForm(res.data.patient);
+            }
             _this.loaded = true;
-            _context.next = 10;
+            _context.next = 12;
             break;
-          case 7:
-            _context.prev = 7;
+          case 9:
+            _context.prev = 9;
             _context.t0 = _context["catch"](1);
             if (_context.t0.response && _context.t0.response.status === 403) {
               _this.error = _context.t0.response.data.message || 'Link inválido o expirado';
             } else {
               _this.error = 'Ocurrió un error o el enlace es inválido';
             }
-          case 10:
+          case 12:
           case "end":
             return _context.stop();
         }
-      }, _callee, null, [[1, 7]]);
+      }, _callee, null, [[1, 9]]);
     }))();
   },
   methods: {
@@ -155,6 +160,37 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           }
         }, _callee2, null, [[1, 8, 11, 14]]);
       }))();
+    },
+    fillForm: function fillForm(patient) {
+      // name = apellido, nombres = nombre
+      var fullName = "".concat(patient.nombres || '', " ").concat(patient.name || '').trim();
+      this.form.nombre = fullName;
+      this.form.edad = this.getAge(patient.birth_date);
+      this.form.documento = patient.dni || '';
+      this.form.telefono = patient.phone || '';
+      this.form.email = patient.email || '';
+
+      // Firma digital inicial
+      this.form.nombre_confirmacion = fullName;
+
+      // Contacto de emergencia (usar el primero si existe)
+      if (patient.relative && patient.relative.length > 0) {
+        var rel = patient.relative[0];
+        this.form.emergencia.nombre = rel.name || '';
+        this.form.emergencia.telefono = rel.phone || '';
+        this.form.emergencia.relacion = rel.kinship || '';
+      }
+    },
+    getAge: function getAge(dateString) {
+      if (!dateString) return '';
+      var today = new Date();
+      var birthDate = new Date(dateString);
+      var age = today.getFullYear() - birthDate.getFullYear();
+      var m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || m === 0 && today.getDate() < birthDate.getDate()) {
+        age--;
+      }
+      return age;
     }
   }
 });
