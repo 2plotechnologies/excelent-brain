@@ -52,20 +52,22 @@ class HorasTrabajadasController extends Controller
 
         $horasTrabajadasMinutos = 0;
         foreach ($citasTrabajadas as $cita) {
+            $minutos = 0;
             if ($cita->duracion) {
-                $horasTrabajadasMinutos += $cita->duracion;
+                $minutos = (int)$cita->duracion;
             } else if ($cita->hora_inicio && $cita->hora_fin) {
                 $inicio = Carbon::parse($cita->hora_inicio);
                 $fin = Carbon::parse($cita->hora_fin);
-                $horasTrabajadasMinutos += $inicio->diffInMinutes($fin);
+                $minutos = $inicio->diffInMinutes($fin);
             } else if ($cita->schedule_id) {
                 $sch = $schedules->where('id', $cita->schedule_id)->first();
                 if ($sch && $sch->check_time && $sch->departure_date) {
                     $inicio = Carbon::parse($sch->check_time);
                     $fin = Carbon::parse($sch->departure_date);
-                    $horasTrabajadasMinutos += $inicio->diffInMinutes($fin);
+                    $minutos = $inicio->diffInMinutes($fin);
                 }
             }
+            $horasTrabajadasMinutos += max(0, $minutos);
         }
 
         // Obtener citas que son bloqueos (status 7)
@@ -79,12 +81,12 @@ class HorasTrabajadasController extends Controller
         $horasNoTrabajadasMinutos = max(0, $horasProgramadasMinutos - $horasTrabajadasMinutos);
 
         return response()->json([
-            'horas_programadas' => round($horasProgramadasMinutos / 60, 2),
-            'horas_trabajadas' => round($horasTrabajadasMinutos / 60, 2),
-            'horas_no_trabajadas' => round($horasNoTrabajadasMinutos / 60, 2),
-            'minutos_programados' => $horasProgramadasMinutos,
-            'minutos_trabajados' => $horasTrabajadasMinutos,
-            'minutos_no_trabajados' => $horasNoTrabajadasMinutos,
+            'horas_programadas' => max(0, round($horasProgramadasMinutos / 60, 2)),
+            'horas_trabajadas' => max(0, round($horasTrabajadasMinutos / 60, 2)),
+            'horas_no_trabajadas' => max(0, round($horasNoTrabajadasMinutos / 60, 2)),
+            'minutos_programados' => max(0, $horasProgramadasMinutos),
+            'minutos_trabajados' => max(0, $horasTrabajadasMinutos),
+            'minutos_no_trabajados' => max(0, $horasNoTrabajadasMinutos),
             'bloqueos' => $bloqueos
         ]);
     }
