@@ -216,7 +216,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context.next = 2;
               return (0,_helpers_httpAxios__WEBPACK_IMPORTED_MODULE_3__.saveExams)({
                 patient_id: _this.dataPersonalPatient.patient_id,
-                professional_id: _this.$attrs.dataUser.id,
+                professional_id: _this.$attrs.dataUser && _this.$attrs.dataUser.id || _this.$attrs.professional && _this.$attrs.professional.id,
                 exam: JSON.stringify({
                   name: _this.name,
                   result: _this.values

@@ -164,7 +164,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       var formData = new FormData();
       formData.append('result', percent);
       formData.append('patient_id', this.patient_id);
-      formData.append('professional_id', this.$attrs.professional.id);
+      formData.append('professional_id', this.$attrs.dataUser && this.$attrs.dataUser.id || this.$attrs.professional && this.$attrs.professional.id);
       this.axios.post('/api/saveZungDep', formData, config).then(function (result) {
         _this.$swal('Resultados regitrados correctamente');
       })["catch"](function (err) {

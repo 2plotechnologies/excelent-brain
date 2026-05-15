@@ -178,7 +178,7 @@
                 let formData = new FormData()
                 formData.append('result', this.suma)
                 formData.append('patient_id', this.patient_id)
-                formData.append('professional_id', this.$attrs.dataUser.id)
+                formData.append('professional_id', (this.$attrs.dataUser && this.$attrs.dataUser.id) || (this.$attrs.professional && this.$attrs.professional.id))
 				formData.append('resultados', JSON.stringify(this.objs))
 
                 this.axios.post('/api/saveBurns', formData, config)

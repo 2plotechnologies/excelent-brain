@@ -100,6 +100,21 @@
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'resumen' }" id="resumen" role="tabpanel">
         <div class="row">
           <div class="col-md-4">
+            <!-- Altas Médicas -->
+            <div class="card shadow-sm border rounded-lg mb-3" v-if="paciente.discharges && paciente.discharges.length > 0">
+              <div class="card-body">
+                <h6 class="font-weight-bold mb-3 text-info"><i class="fas fa-certificate me-2"></i> Altas Médicas</h6>
+                <div v-for="alta in paciente.discharges" :key="alta.id" class="mb-3 border-bottom pb-2">
+                  <p class="small mb-1 d-flex justify-content-between align-items-center">
+                    <span class="badge bg-info bg-opacity-10 border border-info border-opacity-25">{{ alta.type == 1 ? 'Psicológica' : 'Psiquiátrica' }}</span>
+                    <span class="text-muted" style="font-size: 0.75rem;">{{ formatDate(alta.created_at) }}</span>
+                  </p>
+                  <p class="small text-dark mb-1" style="font-style: italic;">"{{ alta.comments }}"</p>
+                  <p class="small text-muted mb-0" v-if="alta.professional"><i class="fas fa-user-md me-1"></i>{{ alta.professional.name }}</p>
+                </div>
+              </div>
+            </div>
+
             <div class="card shadow-sm border rounded-lg mb-3">
               <div class="card-body">
                 <h6 class="font-weight-bold mb-3"><i class="far fa-calendar text-primary"></i> Próxima Cita</h6>
@@ -1389,18 +1404,25 @@
                   <strong class="text-dark">{{ formatDate(t.created_at || t.fecha) }}</strong>
                 </div>
                 
-                <div v-if="t.score || t.total || t.result" class="mb-0">
+                <div v-if="t.score || t.total || t.result !== undefined || t.resultado" class="mb-0">
                   <span class="text-muted small d-block mb-1"><i class="fas fa-star me-1 text-warning"></i> Puntuación General</span>
                   <span class="badge bg-success rounded-pill px-3 py-2" style="font-size: 0.9rem;">
-                    {{ t.score || t.total || t.result }} pts
+                    {{ t.score || t.total || t.result || t.resultado }} pts
                   </span>
                 </div>
                 
+                <div v-if="t.diagnostico && typeof t.diagnostico === 'string'" class="mb-0 mt-2">
+                  <span class="text-muted small d-block mb-1"><i class="fas fa-stethoscope me-1 text-info"></i> Diagnóstico</span>
+                  <p class="mb-0 small text-dark" style="line-height: 1.3;">{{ t.diagnostico }}</p>
+                </div>
+                
                 <!-- Background decoration -->
-                <i class="fas fa-clipboard-check position-absolute opacity-10 text-primary" style="bottom: -15px; right: -15px; font-size: 5rem;"></i>
+                <i class="fas fa-clipboard-check position-absolute text-primary" style="bottom: -15px; right: -15px; font-size: 5rem; opacity: 0.05; z-index: 0;"></i>
               </div>
-              <div class="card-footer bg-white border-top-0 py-3 text-center">
-                <button class="btn btn-sm btn-outline-primary w-100 rounded-pill"><i class="fas fa-eye me-1"></i> Ver Detalles Completos</button>
+              <div class="card-footer bg-white border-top-0 py-3 text-center" style="position: relative; z-index: 1;">
+                <button class="btn btn-sm btn-outline-primary w-100 rounded-pill" data-bs-toggle="modal" data-bs-target="#modalDetallePrueba" @click="selectedTest = t">
+                  <i class="fas fa-eye me-1"></i> Ver Detalles Completos
+                </button>
               </div>
             </div>
           </div>
@@ -1918,6 +1940,53 @@
     <!-- Modal Ver Estados / Etiquetas -->
     <modal-ver-estados v-if="paciente && paciente.id" :dataPatient="paciente" :estados="estados"></modal-ver-estados>
 
+    <!-- Modal Detalle Prueba Psicológica -->
+    <div class="modal fade" id="modalDetallePrueba" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-lg">
+          <div class="modal-header border-bottom-0 bg-light d-flex align-items-center">
+            <h5 class="modal-title font-weight-bold mb-0">
+              <i class="fas fa-brain text-primary me-2"></i> Detalles de Evaluación: {{ selectedTest ? selectedTest.testName : '' }}
+            </h5>
+            <div class="ms-auto me-3 small text-muted" v-if="selectedTest">
+               Aplicado: {{ selectedTest ? formatDate(selectedTest.created_at || selectedTest.fecha) : '' }}
+            </div>
+            <button type="button" class="btn-close m-0" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4" v-if="selectedTest">
+            <div class="alert alert-primary border-0 shadow-sm d-flex align-items-center mb-4">
+              <i class="fas fa-star fa-2x me-3 text-warning"></i>
+              <div>
+                <h6 class="mb-1 font-weight-bold">Puntuación General</h6>
+                <span class="fs-5">{{ selectedTest.score || selectedTest.total || selectedTest.result || selectedTest.resultado || 'N/A' }} pts</span>
+              </div>
+            </div>
+
+            <div class="card border-light shadow-sm mb-4" v-if="selectedTest.diagnostico && typeof selectedTest.diagnostico === 'string'">
+              <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                <h6 class="font-weight-bold text-dark mb-0"><i class="fas fa-stethoscope text-info me-2"></i> Diagnóstico</h6>
+              </div>
+              <div class="card-body">
+                <p class="text-muted mb-0" style="white-space: pre-wrap;">{{ selectedTest.diagnostico }}</p>
+              </div>
+            </div>
+
+            <div class="card border-light shadow-sm">
+              <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                <h6 class="font-weight-bold text-dark mb-0"><i class="fas fa-list-alt text-secondary me-2"></i> Resultados Detallados Raw</h6>
+              </div>
+              <div class="card-body bg-light rounded m-3 p-3" style="max-height: 300px; overflow-y: auto;">
+                <pre class="mb-0 small text-muted" style="white-space: pre-wrap; word-break: break-word;">{{ JSON.stringify(selectedTest.rawResult || selectedTest.resultados || selectedTest.exam || selectedTest, null, 2) }}</pre>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-top-0 bg-light">
+            <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal Hobbies -->
     <modal-ver-hobbies :hobbies="hobbies" :id="queId" :misHobbies="misHobbies"></modal-ver-hobbies>
   </div>
@@ -1978,6 +2047,7 @@ export default {
       },
       planSeguridadSeleccionado: null,
       savingPlanSeguridad: false,
+      selectedTest: null,
       filtroDocumento: 'Todos',
       nuevoDocumentoTipo: '',
       subiendoDocumento: false,
@@ -2038,17 +2108,51 @@ export default {
             combined.push({
               ...i, 
               testName: name, 
-              dateStamp: isNaN(time) ? 0 : time
+              dateStamp: isNaN(time) ? 0 : time,
+              diagnostico: i.resultados || i.diagnostico
             });
           });
         }
       }
-      addTest(p.scrs, 'SCR');
-      addTest(p.burns, 'Burnout');
-      addTest(p.gads, 'GAD-7');
-      addTest(p.zung_anxieties, 'Zung Ansiedad');
-      addTest(p.zung_depressions, 'Zung Depresión');
+      addTest(p.scrs, 'SRQ - 18');
+      addTest(p.burns, 'Ansiedad de Burns');
+      addTest(p.gads, 'GAD - 7');
+      addTest(p.zung_anxieties, 'Ansiedad de Zung');
+      addTest(p.zung_depressions, 'Depresión de Zung');
       addTest(p.millons, 'Millon');
+
+      if (p.exams_list && Array.isArray(p.exams_list)) {
+        p.exams_list.forEach(e => {
+          try {
+            let examData = JSON.parse(e.exam);
+            let nameStr = examData.name;
+            let humanName = nameStr.toUpperCase();
+            
+            if (nameStr === 'phq') humanName = 'PHQ - 9';
+            else if (nameStr === 'phq-15') humanName = 'PHQ - 15';
+            else if (nameStr === 'gad') humanName = 'GAD - 7';
+            else if (nameStr === 'mdq') humanName = 'MDQ';
+            else if (nameStr === 'bdi' || nameStr === 'bdi-2') humanName = 'BDI - 2';
+            else if (nameStr === 'srq') humanName = 'SRQ - 18';
+
+            let d = e.created_at || examData.result?.created_at;
+            let time = 0;
+            if (d) {
+              time = new Date(d.replace(' ', 'T')).getTime();
+            }
+
+            combined.push({
+              ...e,
+              testName: humanName,
+              dateStamp: isNaN(time) ? 0 : time,
+              score: examData.result?.suma !== undefined ? examData.result.suma : examData.result?.resultado,
+              diagnostico: examData.result?.resultado && examData.result?.suma !== undefined ? examData.result.resultado : null
+            });
+          } catch(err) {
+            console.error('Error parsing exam data', err);
+          }
+        });
+      }
       
       return combined.sort((a,b) => b.dateStamp - a.dateStamp);
     },

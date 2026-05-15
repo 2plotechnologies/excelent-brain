@@ -9,6 +9,8 @@ class Discharge extends Model
 {
     use HasFactory;
 
+    protected $table = 'discharges';
+
     protected $fillable = [
         'patient_id',
         'professional_id',

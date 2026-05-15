@@ -1118,8 +1118,8 @@ class PatientController extends Controller
 				},
 				'medical_evolutions.professional',
 				'medical_evolutions.typeEvolution',
-				'initial_psychiatric_history',
-				'initial_psychological_history'
+				'discharges',
+				'discharges.professional'
 			])->find($id);
 
 			if (!$patient) {
@@ -1128,9 +1128,13 @@ class PatientController extends Controller
 
 			// Additional Data via DB queries or other models.
 			if($patient->address) {
-				$patient->departamento = DB::table('ubdepartamento')->where('idDepa', $patient->address->department)->first()->departamento;
-				$patient->provincia = DB::table('ubprovincia')->where('idProv', $patient->address->province)->first()->provincia;
-				$patient->distrito = DB::table('ubdistrito')->where('idDist', $patient->address->district)->first()->distrito;
+				$dep = DB::table('ubdepartamento')->where('idDepa', $patient->address->department)->first();
+				$prov = DB::table('ubprovincia')->where('idProv', $patient->address->province)->first();
+				$dist = DB::table('ubdistrito')->where('idDist', $patient->address->district)->first();
+				
+				$patient->departamento = $dep ? $dep->departamento : '—';
+				$patient->provincia = $prov ? $prov->provincia : '—';
+				$patient->distrito = $dist ? $dist->distrito : '—';
 			}
 			$patient->triajes = DB::table('triaje')->where('patient_id', $id)->orderBy('id', 'desc')->get();
 			$patient->fichas_seguimiento = FichaSeguimiento::with('interconsultas')
@@ -1181,6 +1185,7 @@ class PatientController extends Controller
 			$patient->zung_anxieties = DB::table('zung_anxieties')->where('patient_id', $id)->get();
 			$patient->zung_depressions = DB::table('zung_depressions')->where('patient_id', $id)->get();
 			$patient->millons = DB::table('millons')->where('patient_id', $id)->get();
+			$patient->exams_list = DB::table('exams')->where('patient_id', $id)->get();
 
 			$patient->has_autotriaje = DB::table('patient_questionnaire_answers')->where('patient_id', $id)->exists();
 
