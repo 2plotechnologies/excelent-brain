@@ -7192,7 +7192,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       horario: [],
       descuentoPorcentaje: 0,
       monedas: [],
-      monedaAdelanto: 1
+      monedaAdelanto: 1,
+      past_appointments: 0
     };
   },
   mounted: function mounted() {
@@ -7416,6 +7417,16 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.nextStep();
     },
     seleccionarServicio: function seleccionarServicio(id) {
+      var precioSeleccionado = this.precios.find(function (p) {
+        return p.id == id;
+      });
+      if (precioSeleccionado) {
+        var age = moment__WEBPACK_IMPORTED_MODULE_2___default()().diff(moment__WEBPACK_IMPORTED_MODULE_2___default()(this.cita.birth_date), 'years');
+        if (precioSeleccionado.target_age == 1 && age >= 18) {
+          alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().error('Un paciente mayor de edad no puede tomar citas de niños', 5);
+          return;
+        }
+      }
       this.cita.type = id;
       this.precioDinamico();
       this.nextStep();
@@ -7803,6 +7814,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.razonRebaja = '';
       this.cita.vivo = 1;
       this.monedaAdelanto = 1;
+      this.past_appointments = 0;
+      this.precioNuevo = true;
     },
     reniec: function reniec() {
       var _this10 = this;
@@ -7822,6 +7835,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.axios.get("/api/buscarPacienteDB/" + this.cita.dni).then(function (res) {
         if (res.data.patient == null) {
           //Buscar en reniec, nuevo
+          _this10.past_appointments = 0;
+          _this10.precioNuevo = true;
           if (_this10.cita.type_dni == 1) {
             //window.axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
             _this10.axios.get("/api/buscarDni/" + _this10.cita.dni).then(function (response) {
@@ -7897,6 +7912,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           _this10.cita.membresia = res.data.membresia;
           _this10.cita.recomendation = res.data.patient.recomendation;
           _this10.cita.recomendacion_comentario = res.data.patient.recomendacion_comentario;
+          _this10.past_appointments = res.data.cant_citas_pasadas || 0;
+          if (_this10.past_appointments < 2) {
+            _this10.precioNuevo = true;
+          }
           _this10.patientNew = true;
           _this10.moverProvincias(false);
           _this10.moverDistritos();
@@ -8112,7 +8131,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         this.fechaManual = this.fechaElegida;
         this.horaManualId = this.horaElegida.id;
         this.cita.schedule_id = this.horaElegida.id;
-        this.horariosDisponibles = [this.horaElegida];
+        this.buscarHorariosManual();
       }
     }
   },
@@ -9226,6 +9245,12 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         }, _callee);
       }))();
     },
+    refreshAll: function refreshAll() {
+      this.listar();
+      if (this.$refs.dashboardCitasRef) {
+        this.$refs.dashboardCitasRef.fetchDashboardData();
+      }
+    },
     buscarRecetas: function buscarRecetas(id) {
       var _this2 = this;
       this.axios("/api/verRecetaPorId/".concat(id)).then(function (res) {
@@ -9969,8 +9994,8 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
 
       // Ordenar por hora de inicio
       ocupadas.sort(function (a, b) {
-        var t1 = a.schedule && a.schedule.check_time ? a.schedule.check_time : '23:59:59';
-        var t2 = b.schedule && b.schedule.check_time ? b.schedule.check_time : '23:59:59';
+        var t1 = a.hora_inicio ? a.hora_inicio : a.schedule && a.schedule.check_time ? a.schedule.check_time : '23:59:59';
+        var t2 = b.hora_inicio ? b.hora_inicio : b.schedule && b.schedule.check_time ? b.schedule.check_time : '23:59:59';
         return t1.localeCompare(t2);
       });
 
@@ -9979,8 +10004,8 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       var currentCluster = [];
       var clusterEnd = '00:00:00';
       ocupadas.forEach(function (cita) {
-        var start = cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00';
-        var end = cita.schedule && cita.schedule.departure_date ? cita.schedule.departure_date : '00:00:00';
+        var start = cita.hora_inicio ? cita.hora_inicio : cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00';
+        var end = cita.hora_fin ? cita.hora_fin : cita.schedule && cita.schedule.departure_date ? cita.schedule.departure_date : '00:00:00';
         if (currentCluster.length === 0) {
           currentCluster.push(cita);
           clusterEnd = end;
@@ -10057,17 +10082,29 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       // Para si quisieramos sincronizar etiquetas Y al moverse, en este layout CSS grid-lines abarca todo
     },
     mostrarTooltip: function mostrarTooltip(e, cita, doctor) {
-      var horaRango = this.formatHora(cita.schedule ? cita.schedule.check_time : '') + ' - ' + this.formatHora(cita.schedule ? cita.schedule.departure_date : '');
-      var estado = 'Sin Confirmar';
-      if (cita.status == 2) estado = 'Confirmado';
-      if (cita.status == 3) estado = 'Anulado';
-      if (cita.status == 4) estado = 'Reprogramado';
-      this.tooltipData = {
-        paciente: cita.patient.name.split(' ')[0] + ' ' + cita.patient.nombres.split(' ')[0],
-        hora: horaRango,
-        doctor: doctor.name,
-        estado: estado
-      };
+      var esLibre = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      var horaRango = "";
+      if (esLibre) {
+        horaRango = this.formatHora(cita.check_time) + ' - ' + this.formatHora(cita.departure_date);
+        this.tooltipData = {
+          paciente: 'HORARIO DISPONIBLE',
+          hora: horaRango,
+          doctor: doctor.name,
+          estado: 'Libre'
+        };
+      } else {
+        horaRango = this.formatHora(cita.hora_inicio || (cita.schedule ? cita.schedule.check_time : '')) + ' - ' + this.formatHora(cita.hora_fin || (cita.schedule ? cita.schedule.departure_date : ''));
+        var estado = 'Sin Confirmar';
+        if (cita.status == 2) estado = 'Confirmado';
+        if (cita.status == 3) estado = 'Anulado';
+        if (cita.status == 4) estado = 'Reprogramado';
+        this.tooltipData = {
+          paciente: cita.patient.name.split(' ')[0] + ' ' + cita.patient.nombres.split(' ')[0],
+          hora: horaRango,
+          doctor: doctor.name,
+          estado: estado
+        };
+      }
       this.moverTooltip(e);
     },
     moverTooltip: function moverTooltip(e) {
@@ -10170,6 +10207,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     },
     actualizarListadoCitas: function actualizarListadoCitas() {
       this.obtenerHorarios();
+      this.$emit('actualizarListadoCitas');
     },
     verHorariosAyer: function verHorariosAyer() {
       this.fecha = moment__WEBPACK_IMPORTED_MODULE_0___default()().subtract(1, 'day').format('YYYY-MM-DD');
@@ -10224,18 +10262,57 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     },
     abrirTiemposEspera: function abrirTiemposEspera(cita) {
       this.citaTemp = cita;
+    },
+    mandarVacioAutomatico: function mandarVacioAutomatico(cita) {
+      var _this9 = this;
+      var doc = this.doctores.find(function (d) {
+        return d.id == cita.professional_id;
+      });
+      if (!doc || !doc.horarios) return;
+
+      // Encontrar el primer horario libre
+      var proximo = doc.horarios.find(function (h) {
+        return h.libre == 1;
+      });
+      if (!proximo) {
+        this.$swal.fire('No hay espacios', 'No se encontraron horarios vacíos para este profesional hoy.', 'warning');
+        return;
+      }
+      this.$swal.fire({
+        title: 'Mover a sitio vacío',
+        text: "\xBFDesea mover esta cita al horario de las ".concat(this.formatHora(proximo.check_time), "?"),
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, mover',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#3085d6'
+      }).then(function (result) {
+        if (result.isConfirmed) {
+          var payload = _objectSpread(_objectSpread({}, cita), {}, {
+            schedule_id: proximo.id,
+            user_id: _this9.idUsuario
+          });
+          _this9.axios.put("/api/mandarVacio/".concat(cita.id), payload).then(function (res) {
+            _this9.$swal.fire('Éxito', 'La cita ha sido movida al espacio vacío.', 'success');
+            _this9.obtenerHorarios();
+          })["catch"](function (err) {
+            console.error(err);
+            _this9.$swal.fire('Error', 'No se pudo mover la cita.', 'error');
+          });
+        }
+      });
     }
   },
   mounted: function mounted() {
-    var _this9 = this;
+    var _this10 = this;
     this.axios.get('/api/user').then(function (res) {
-      _this9.idUsuario = parseInt(res.data.user.id);
+      _this10.idUsuario = parseInt(res.data.user.id);
     });
     this.listarProfesionales();
     this.listarPrecios();
     this.$nextTick(function () {
-      if (_this9.$refs.bodyScroll && _this9.$refs.headerScroll) {
-        _this9.$refs.headerScroll.scrollLeft = _this9.$refs.bodyScroll.scrollLeft;
+      if (_this10.$refs.bodyScroll && _this10.$refs.headerScroll) {
+        _this10.$refs.headerScroll.scrollLeft = _this10.$refs.bodyScroll.scrollLeft;
       }
     });
   }
@@ -11229,6 +11306,18 @@ var render = function render() {
   }, [_c("i", {
     staticClass: "fas fa-retweet"
   }), _vm._v(" Intercambiar\n            ")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-link text-muted p-0 small",
+    attrs: {
+      title: "Mover a sitio Vacio"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.$emit("moverVacio", _vm.cita);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-share-square"
+  }), _vm._v(" Mover a Vacio\n            ")]), _vm._v(" "), _c("button", {
     staticClass: "btn btn-link text-muted p-0 small",
     attrs: {
       "data-bs-toggle": "modal",
@@ -13721,7 +13810,8 @@ var render = function render() {
     staticClass: "form-check-input",
     attrs: {
       type: "checkbox",
-      id: "checkNuevo"
+      id: "checkNuevo",
+      disabled: _vm.past_appointments < 2
     },
     domProps: {
       checked: Array.isArray(_vm.precioNuevo) ? _vm._i(_vm.precioNuevo, null) > -1 : _vm.precioNuevo
@@ -17725,7 +17815,9 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "mt-4"
-  }, [_c("dashboard-citas")], 1)]), _vm._v(" "), _c("div", {
+  }, [_c("dashboard-citas", {
+    ref: "dashboardCitasRef"
+  })], 1)]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
     attrs: {
       id: "inicio-tab",
@@ -17991,6 +18083,9 @@ var render = function render() {
     attrs: {
       nombreUser: _vm.nombreUser,
       idSede: _vm.idSede
+    },
+    on: {
+      actualizarListadoCitas: _vm.refreshAll
     }
   })], 1)])]), _vm._v(" "), _vm.cita ? _c("pago-modal", {
     attrs: {
@@ -17999,14 +18094,14 @@ var render = function render() {
     },
     on: {
       actualizarAdelanto: _vm.actualizarAdelantoTable,
-      actualizar: _vm.listar
+      actualizar: _vm.refreshAll
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita ? _c("modal-estado", {
     attrs: {
       dataCit: _vm.cita
     },
     on: {
-      actualizar: _vm.listar
+      actualizar: _vm.refreshAll
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita ? _c("modal-patient", {
     attrs: {
@@ -18021,6 +18116,9 @@ var render = function render() {
     attrs: {
       dataCit: _vm.cita,
       idUsuario: _vm.idUsuario
+    },
+    on: {
+      ocultarCita: _vm.refreshAll
     }
   }) : _vm._e(), _vm._v(" "), _c("modalVerRecetasRepetido", {
     attrs: {
@@ -18434,7 +18532,8 @@ var render = function render() {
     staticClass: "doctors-header-container d-flex flex-grow-1",
     staticStyle: {
       "overflow-x": "auto",
-      "overflow-y": "hidden"
+      "overflow-y": "hidden",
+      "min-width": "0"
     }
   }, [_vm._l(_vm.doctoresFiltrados, function (doctor) {
     return _c("div", {
@@ -18495,7 +18594,8 @@ var render = function render() {
     staticStyle: {
       "overflow-x": "auto",
       "overflow-y": "hidden",
-      position: "relative"
+      position: "relative",
+      "min-width": "0"
     },
     on: {
       scroll: _vm.syncScrollX
@@ -18531,11 +18631,18 @@ var render = function render() {
         attrs: {
           "data-bs-toggle": "modal",
           "data-bs-target": "#modalNuevaCita",
-          title: "Click para nueva cita"
+          title: "Nueva cita: " + _vm.formatHora(horaFree.check_time) + " - " + _vm.formatHora(horaFree.departure_date)
         },
         on: {
           click: function click($event) {
             return _vm.crearCitaEnSlot(doctor, horaFree);
+          },
+          mouseover: function mouseover($event) {
+            return _vm.mostrarTooltip($event, horaFree, doctor, true);
+          },
+          mouseleave: _vm.ocultarTooltip,
+          mousemove: function mousemove($event) {
+            return _vm.moverTooltip($event);
           }
         }
       });
@@ -18543,7 +18650,7 @@ var render = function render() {
       return _c("div", {
         key: "ocup-" + horaOcup.id,
         staticClass: "booked-slot shadow-sm p-1",
-        style: [_vm.slotStyle(horaOcup.schedule ? horaOcup.schedule.check_time : null, horaOcup.schedule ? horaOcup.schedule.departure_date : null, horaOcup), {
+        style: [_vm.slotStyle(horaOcup.hora_inicio || (horaOcup.schedule ? horaOcup.schedule.check_time : null), horaOcup.hora_fin || (horaOcup.schedule ? horaOcup.schedule.departure_date : null), horaOcup), {
           borderLeft: "4px solid " + _vm.stringToColor(doctor.name)
         }],
         attrs: {
@@ -18574,19 +18681,82 @@ var render = function render() {
         }
       }, [_c("i", {
         "class": horaOcup.mode == 1 ? "far fa-user" : "fas fa-desktop"
-      }), _vm._v(" \n\t\t\t\t\t\t\t\t\t\t" + _vm._s(horaOcup.patient.name.split(" ")[0]) + " " + _vm._s(horaOcup.patient.nombres.split(" ")[0]) + "\n\t\t\t\t\t\t\t\t\t")]), _vm._v(" "), _c("i", {
-        staticClass: "fas fa-dollar-sign ml-1",
+      }), _vm._v(" \n\t\t\t\t\t\t\t\t\t\t" + _vm._s(horaOcup.patient.name.split(" ")[0]) + " " + _vm._s(horaOcup.patient.nombres.split(" ")[0]) + "\n\t\t\t\t\t\t\t\t\t")]), _vm._v(" "), _c("div", {
+        staticClass: "d-flex align-items-center"
+      }, [horaOcup.status == 5 ? _c("svg", {
+        staticClass: "text-success me-1",
+        attrs: {
+          xmlns: "http://www.w3.org/2000/svg",
+          width: "12",
+          height: "12",
+          viewBox: "0 0 24 24",
+          fill: "none",
+          stroke: "currentColor",
+          "stroke-width": "3",
+          "stroke-linecap": "round",
+          "stroke-linejoin": "round"
+        }
+      }, [_c("path", {
+        attrs: {
+          d: "M22 11.08V12a10 10 0 1 1-5.93-9.14"
+        }
+      }), _c("polyline", {
+        attrs: {
+          points: "22 4 12 14.01 9 11.01"
+        }
+      })]) : horaOcup.attention || horaOcup.status == 2 ? _c("svg", {
+        staticClass: "text-info me-1",
+        attrs: {
+          xmlns: "http://www.w3.org/2000/svg",
+          width: "12",
+          height: "12",
+          viewBox: "0 0 24 24",
+          fill: "none",
+          stroke: "currentColor",
+          "stroke-width": "3",
+          "stroke-linecap": "round",
+          "stroke-linejoin": "round"
+        }
+      }, [_c("path", {
+        attrs: {
+          d: "M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"
+        }
+      })]) : _c("svg", {
+        staticClass: "text-warning me-1",
+        attrs: {
+          xmlns: "http://www.w3.org/2000/svg",
+          width: "12",
+          height: "12",
+          viewBox: "0 0 24 24",
+          fill: "none",
+          stroke: "currentColor",
+          "stroke-width": "3",
+          "stroke-linecap": "round",
+          "stroke-linejoin": "round"
+        }
+      }, [_c("circle", {
+        attrs: {
+          cx: "12",
+          cy: "12",
+          r: "10"
+        }
+      }), _c("polyline", {
+        attrs: {
+          points: "12 6 12 12 16 14"
+        }
+      })]), _vm._v(" "), _c("i", {
+        staticClass: "fas fa-dollar-sign",
         "class": horaOcup.payment && horaOcup.payment.pay_status == 1 ? "text-danger" : "text-success",
         staticStyle: {
           "font-size": "0.75rem"
         }
-      })]), _vm._v(" "), _c("div", {
+      })])]), _vm._v(" "), _c("div", {
         staticClass: "text-muted mt-1 text-truncate",
         staticStyle: {
           "font-size": "0.65rem",
           "line-height": "1"
         }
-      }, [_vm._v("\n\t\t\t\t\t\t\t\t\t" + _vm._s(_vm.formatHora(horaOcup.schedule ? horaOcup.schedule.check_time : "")) + " - " + _vm._s(_vm.formatHora(horaOcup.schedule ? horaOcup.schedule.departure_date : "")) + "\n\t\t\t\t\t\t\t\t")])])]);
+      }, [_vm._v("\n\t\t\t\t\t\t\t\t\t" + _vm._s(_vm.formatHora(horaOcup.hora_inicio || (horaOcup.schedule ? horaOcup.schedule.check_time : ""))) + " - " + _vm._s(_vm.formatHora(horaOcup.hora_fin || (horaOcup.schedule ? horaOcup.schedule.departure_date : ""))) + "\n\t\t\t\t\t\t\t\t")])])]);
     })], 2);
   })], 2)])]), _vm._v(" "), _c("div", {
     directives: [{
@@ -18637,6 +18807,7 @@ var render = function render() {
       changeMode: _vm.changeMode,
       openModal: _vm.distribuirAperturaModal,
       intercambiar: _vm.intercambiarHorario,
+      moverVacio: _vm.mandarVacioAutomatico,
       eliminar: _vm.validarYEliminar,
       buscarRecetas: _vm.buscarRecetas,
       tiemposEspera: _vm.abrirTiemposEspera
@@ -21277,7 +21448,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.calendar-wrapper[data-v-992bc26a] { display: flex; flex-direction: column; border-radius: 8px; overflow: hidden; transform: translateZ(0);\n}\n.doctor-header[data-v-992bc26a],\n.doctor-column[data-v-992bc26a] {\n\tmin-width: 250px;\n\tmax-width: 250px;\n\tflex: 0 0 250px;\n\tbackground-color: rgba(0,0,0,0.03);\n}\n.time-slot-label[data-v-992bc26a] { height: 90px;\n} /* 60 minutos * 1.5px/min = 90px */\n.grid-line[data-v-992bc26a] { height: 90px; box-sizing: border-box;\n}\n.free-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; opacity: 1; cursor: pointer; transition: opacity 0.2s, background 0.2s; background: #ffffff; border-radius: 4px; box-sizing: border-box; border: 1px solid rgba(0,0,0,0.05);\n}\n.free-slot[data-v-992bc26a]:hover { background: rgba(28, 200, 138, 0.1); border: 1px dashed #1cc88a;\n}\n.booked-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; cursor: pointer; transition: transform 0.1s; border-radius: 6px; overflow: hidden; background-color: rgba(248, 249, 252, 0.7);}\n.booked-slot[data-v-992bc26a]:hover { transform: scale(1.02); z-index: 10!important;\n}\n.booked-content[data-v-992bc26a] { padding: 4px; border-radius: 4px;\n}\n.doctors-header-container[data-v-992bc26a]::-webkit-scrollbar { display: none;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.calendar-wrapper[data-v-992bc26a] { \n\tdisplay: flex; \n\tflex-direction: column; \n\tborder-radius: 8px; \n\tposition: relative; \n\tbackground: white;\n\twidth: 100%;\n}\n.calendar-header[data-v-992bc26a] {\n\tposition: sticky;\n\ttop: 0;\n\tz-index: 100;\n\tbackground-color: #f8f9fc !important;\n\tborder-top-left-radius: 8px;\n\tborder-top-right-radius: 8px;\n\tbox-shadow: 0 2px 4px rgba(0,0,0,0.05);\n}\n.doctor-header[data-v-992bc26a],\n.doctor-column[data-v-992bc26a] {\n\tmin-width: 250px;\n\tmax-width: 250px;\n\tflex: 0 0 250px;\n\tbackground-color: rgba(0,0,0,0.03);\n}\n.time-slot-label[data-v-992bc26a] { height: 90px;\n} /* 60 minutos * 1.5px/min = 90px */\n.grid-line[data-v-992bc26a] { height: 90px; box-sizing: border-box;\n}\n.free-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; opacity: 1; cursor: pointer; transition: opacity 0.2s, background 0.2s; background: #ffffff; border-radius: 4px; box-sizing: border-box; border: 1px solid rgba(0,0,0,0.05);\n}\n.free-slot[data-v-992bc26a]:hover { background: rgba(28, 200, 138, 0.1); border: 1px dashed #1cc88a;\n}\n.booked-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; cursor: pointer; transition: transform 0.1s; border-radius: 6px; overflow: hidden; background-color: rgba(248, 249, 252, 0.7);}\n.booked-slot[data-v-992bc26a]:hover { transform: scale(1.02); z-index: 10!important;\n}\n.booked-content[data-v-992bc26a] { padding: 4px; border-radius: 4px;\n}\n.doctors-header-container[data-v-992bc26a]::-webkit-scrollbar { display: none;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -21301,7 +21472,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.alertify-notifier .ajs-message{width: 400px!important;}\n.alertify-notifier.ajs-right .ajs-message.ajs-visible { right: 400px!important;\n}\n.alertify-notifier .ajs-message.ajs-success{\n\t\tbackground: rgb(22 205 65 / 95%)!important;\n    text-shadow: none!important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n#content-wrapper { overflow-x: hidden !important; overflow-y: visible !important;\n}\n.alertify-notifier .ajs-message{width: 400px!important;}\n.alertify-notifier.ajs-right .ajs-message.ajs-visible { right: 400px!important;\n}\n.alertify-notifier .ajs-message.ajs-success{\n\t\tbackground: rgb(22 205 65 / 95%)!important;\n    text-shadow: none!important;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

@@ -126,7 +126,15 @@
             </div>
             <div class="mb-3">
                 <label class="form-label font-weight-bold">Motivo</label>
-                <input type="text" class="form-control" v-model="bloqueo.motivo" placeholder="Ej: Cumpleaños, Permiso médico">
+                <select class="form-select form-control" v-model="bloqueo.motivo">
+                    <option value="" disabled>Seleccione un motivo</option>
+                    <option value="CUMPLEAÑOS --> RETRIBUIDO">CUMPLEAÑOS --> RETRIBUIDO</option>
+                    <option value="PERMISOS --> NO RETRIBUIDO">PERMISOS --> NO RETRIBUIDO</option>
+                    <option value="VACACIONES --> RETRIBUIDO">VACACIONES --> RETRIBUIDO</option>
+                    <option value="APOYO A GRABACIONES --> RETRIBUIDO">APOYO A GRABACIONES --> RETRIBUIDO</option>
+                    <option value="APOYO A GRUPOS TERAPEUTICOS --> RETRIBUIDO">APOYO A GRUPOS TERAPEUTICOS --> RETRIBUIDO</option>
+                    <option value="OTROS APOYOS --> RETRIBUIDO">OTROS APOYOS --> RETRIBUIDO</option>
+                </select>
             </div>
           </div>
           <div class="modal-footer border-0 bg-light">

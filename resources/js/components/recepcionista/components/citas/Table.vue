@@ -54,7 +54,7 @@
 				<!-- Tab Dashboard (Nueva) -->
 				<div class="tab-pane fade show active" id="tab-dashboard" role="tabpanel" aria-labelledby="dashboard-tab" tabindex="0">
 					<div class="mt-4">
-						<dashboard-citas></dashboard-citas>
+						<dashboard-citas ref="dashboardCitasRef"></dashboard-citas>
 					</div>
 				</div>
 				<!-- Fin Tab Dashboard -->
@@ -253,18 +253,18 @@
 					<vista-calendario :profesionales="profesionales" ></vista-calendario>
 				</div>
 				<div class="tab-pane fade" id="cuaderno-tab" role="tabpanel" aria-labelledby="cuaderno-tab" tabindex="0">
-					<vista-cuaderno :nombreUser="nombreUser" :idSede="idSede" ></vista-cuaderno>
+					<vista-cuaderno :nombreUser="nombreUser" :idSede="idSede" @actualizarListadoCitas="refreshAll" ></vista-cuaderno>
 				</div>
 				<!-- Fin de segunda tab -->
 			</div>
 
     </div>
 
-    <pago-modal v-if="cita" :cita="cita" :idUsuario="idUsuario" @actualizarAdelanto="actualizarAdelantoTable" @actualizar="listar"></pago-modal>
-    <modal-estado  v-if="cita" :dataCit="cita" @actualizar="listar"></modal-estado>
+    <pago-modal v-if="cita" :cita="cita" :idUsuario="idUsuario" @actualizarAdelanto="actualizarAdelantoTable" @actualizar="refreshAll"></pago-modal>
+    <modal-estado  v-if="cita" :dataCit="cita" @actualizar="refreshAll"></modal-estado>
     <modal-patient v-if="cita" :dataCit="cita"></modal-patient>
     <info-modal v-if="cita" :dataCit="cita" :precios="precios"></info-modal>
-    <reprog-modal v-if="cita" :dataCit="cita" :idUsuario="idUsuario"></reprog-modal>
+    <reprog-modal v-if="cita" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="refreshAll"></reprog-modal>
 		<modalVerRecetasRepetido :prescriptions="recetas"></modalVerRecetasRepetido>
     
   </div>
@@ -341,6 +341,12 @@ export default {
 
       this.cita = null;
     },
+		refreshAll() {
+			this.listar();
+			if(this.$refs.dashboardCitasRef) {
+				this.$refs.dashboardCitasRef.fetchDashboardData();
+			}
+		},
 		buscarRecetas(id){
 			this.axios(`/api/verRecetaPorId/${id}`)
 			.then(res =>{
@@ -583,7 +589,8 @@ export default {
 			await this.axios.get('/api/listarPreciosTodos')
 			.then( response => this.precios = response.data)
 		},
-		
+	
+
   },
 
   created () {

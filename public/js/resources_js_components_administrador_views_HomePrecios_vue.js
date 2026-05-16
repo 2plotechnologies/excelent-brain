@@ -112,7 +112,8 @@ __webpack_require__.r(__webpack_exports__);
     return {
       precioNuevo: {
         nombre: '',
-        tipo: 1
+        tipo: 1,
+        target_age: 0
       }
     };
   },
@@ -593,7 +594,46 @@ var render = function render() {
     attrs: {
       value: "4"
     }
-  }, [_vm._v("Membresía")])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Membresía")])]), _vm._v(" "), _c("label", {
+    attrs: {
+      "for": ""
+    }
+  }, [_vm._v("Edades permitidas")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.precioNuevo.target_age,
+      expression: "precioNuevo.target_age"
+    }],
+    staticClass: "form-select",
+    attrs: {
+      name: "",
+      id: ""
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.precioNuevo, "target_age", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "0"
+    }
+  }, [_vm._v("Ambos")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "1"
+    }
+  }, [_vm._v("Niños")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "2"
+    }
+  }, [_vm._v("Adultos")])])]), _vm._v(" "), _c("div", {
     staticClass: "modal-footer"
   }, [_c("button", {
     staticClass: "btn btn-primary",

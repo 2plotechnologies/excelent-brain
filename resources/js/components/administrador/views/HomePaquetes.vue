@@ -283,6 +283,27 @@
     </div>
 
     <div v-else-if="vistaActiva === 'deudas'" class="debts-view" :key="'deudas'">
+      <!-- Buscador y Filtros de Deudas -->
+      <div class="d-flex justify-content-between mb-4 flex-wrap gap-3 align-items-center">
+        <div class="search-box">
+          <i class="fas fa-search search-icon"></i>
+          <input 
+            type="text" 
+            class="form-control" 
+            placeholder="Buscar deudor por nombre..." 
+            v-model="busquedaDeudas"
+          >
+        </div>
+        
+        <div class="d-flex align-items-center gap-2">
+          <span class="filter-label text-muted text-nowrap" style="width: auto;">Filtrar Mes:</span>
+          <input type="month" class="form-control" v-model="filtroMesDeudas" style="max-width: 200px;">
+          <button class="btn btn-light border" @click="filtroMesDeudas = ''" v-if="filtroMesDeudas" title="Limpiar filtro de mes">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
       <div class="row g-3 mb-4">
         <div class="col-md-4">
           <div class="debt-summary-card">
@@ -365,15 +386,9 @@
                   <h6 class="mb-0 fw-bold">{{ paqueteSeleccionado.patient_name }} {{ paqueteSeleccionado.patient_nombres }}</h6>
                 </div>
               </div>
-              <div class="col-md-4 border-end ps-4">
+              <div class="col-md-6">
                 <p class="text-uppercase text-muted small fw-bold mb-1">Total Pendiente (Deuda)</p>
                 <h4 class="mb-0 text-danger fw-bold">S/ {{ parseFloat(paqueteSeleccionado.debe).toFixed(2) }}</h4>
-              </div>
-              <div class="col-md-4 ps-4">
-                <p class="text-uppercase text-muted small fw-bold mb-1">Método de Pago</p>
-                <select class="form-select form-select-sm" v-model="metodoPago">
-                  <option v-for="moneda in monedas" :key="moneda.id" :value="moneda.id">{{ moneda.tipo }}</option>
-                </select>
               </div>
             </div>
             
@@ -385,6 +400,7 @@
                     <th class="py-3">Fecha de Vencimiento</th>
                     <th>Motivo</th>
                     <th>Estado</th>
+                    <th>Método Pago</th>
                     <th class="text-end">Monto a Pagar</th>
                     <th class="text-center">Acción</th>
                   </tr>
@@ -417,6 +433,12 @@
                     <td>
                       <span v-if="cuota.estado == 2" class="badge bg-success-subtle border border-success-subtle text-success">Pagado</span>
                       <span v-else class="badge bg-warning-subtle border border-warning-subtle text-warning">Pendiente</span>
+                    </td>
+                    <td>
+                      <select v-if="cuota.estado == 1" class="form-select form-select-sm" v-model="cuota.metodo_pago_id" style="min-width: 130px;">
+                        <option v-for="moneda in monedas" :key="moneda.id" :value="moneda.id">{{ moneda.tipo }}</option>
+                      </select>
+                      <span v-else-if="cuota.metodo_pago_nombre" class="small text-muted">{{ cuota.metodo_pago_nombre }}</span>
                     </td>
                     <td class="text-end fw-bold">
                       S/ {{ parseFloat(cuota.monto).toFixed(2) }}
@@ -501,7 +523,7 @@
     </div>
 
     <!-- Paginación -->
-    <div class="d-flex justify-content-center mt-4" v-if="vistaActiva === 'paquetes' && pagination.last_page > 1" :key="'paquetes'">
+    <div class="d-flex justify-content-center mt-4" v-if="vistaActiva === 'paquetes' && pagination.last_page > 1" :key="'paquetes-pagination'">
       <nav aria-label="Page navigation">
         <ul class="pagination shadow-sm">
           <li class="page-item" :class="{'disabled': pagination.current_page === 1}">
@@ -728,6 +750,8 @@ export default {
       editandoDeudaId: null,
       formEditDeuda: { fecha: '', motivo: '' },
       procesandoFraccion: false,
+      busquedaDeudas: '',
+      filtroMesDeudas: new Date().toISOString().substring(0, 7), // YYYY-MM
       nuevaSesion: {
         idProfesional: '',
         fecha: new Date().toISOString().split('T')[0],
@@ -752,8 +776,28 @@ export default {
       return pagesArray;
     },
     deudasPendientes() {
-      //if (this.vistaActiva !== 'deudas') return [];
-      return this.paquetesFiltrados.filter((paquete) => parseFloat(paquete.debe || 0) > 0);
+      return this.paquetesFiltrados.filter((paquete) => {
+        // Filtrar solo los que tienen deuda
+        if (!(parseFloat(paquete.debe || 0) > 0)) return false;
+
+        // Filtro de búsqueda por nombre
+        if (this.busquedaDeudas) {
+          const term = this.busquedaDeudas.toLowerCase();
+          const nombreCompleto = `${paquete.patient_name} ${paquete.patient_nombres}`.toLowerCase();
+          if (!nombreCompleto.includes(term)) return false;
+        }
+
+        // Filtro por mes (buscamos si alguna de sus cuotas pendientes es del mes seleccionado)
+        if (this.filtroMesDeudas && paquete.deudas) {
+          const tieneCuotaEnMes = paquete.deudas.some(cuota => {
+            if (cuota.estado != 1) return false; // Solo cuotas pendientes
+            return cuota.fecha.substring(0, 7) === this.filtroMesDeudas;
+          });
+          if (!tieneCuotaEnMes) return false;
+        }
+
+        return true;
+      });
     },
     deudaResumen() {
       return this.deudasPendientes.reduce((acc, deuda) => {
@@ -790,12 +834,14 @@ export default {
       if(this.loading) return;
       this.loading = true;
       try {
+        const isDeudas = this.vistaActiva === 'deudas';
         const response = await this.axios.get(`/api/listarPaquetes`, {
           params: {
             page: page,
-            busqueda: this.busqueda,
-            estado: this.filtroEstado,
-            tipo: this.filtroTipo
+            busqueda: isDeudas ? '' : this.busqueda,
+            estado: isDeudas ? 0 : this.filtroEstado,
+            tipo: isDeudas ? -1 : this.filtroTipo,
+            all: isDeudas ? 1 : 0
           }
         });
         
@@ -806,7 +852,24 @@ export default {
         if (this.paqueteSeleccionado) {
           const updatedPaquete = this.paquetesFiltrados.find(p => p.id === this.paqueteSeleccionado.id);
           if (updatedPaquete) {
+            // Preservar métodos de pago seleccionados antes de actualizar
+            const metodosPrevios = {};
+            if (this.paqueteSeleccionado.deudas) {
+              this.paqueteSeleccionado.deudas.forEach(d => {
+                if (d.metodo_pago_id) metodosPrevios[d.id] = d.metodo_pago_id;
+              });
+            }
+            
             this.paqueteSeleccionado = updatedPaquete;
+
+            // Reasignar o inicializar métodos de pago
+            if (this.paqueteSeleccionado.deudas) {
+              this.paqueteSeleccionado.deudas.forEach(d => {
+                if (d.estado == 1) {
+                  this.$set(d, 'metodo_pago_id', metodosPrevios[d.id] || 1);
+                }
+              });
+            }
           }
         }
         
@@ -1096,12 +1159,13 @@ export default {
           precio: cuota.monto,
           tipo: 8, 
           idMembresia: this.paqueteSeleccionado.id,
-          idMoneda: this.metodoPago
+          idMoneda: cuota.metodo_pago_id || this.metodoPago
         };
 
         await this.axios.post('/api/pagarDeudaMembresia', payload);
         
-        cuota.estado = 2; 
+        cuota.estado = 2;
+        cuota.metodo_pago_nombre = this.monedas.find(m => m.id == (cuota.metodo_pago_id || 1))?.tipo;
         this.cargarPaquetes(this.pagination.current_page);
         
       } catch (error) {
@@ -1113,6 +1177,16 @@ export default {
     },
     abrirModalPago(paquete) {
       this.paqueteSeleccionado = paquete;
+      
+      // Inicializar métodos de pago para cada cuota pendiente
+      if (this.paqueteSeleccionado.deudas) {
+        this.paqueteSeleccionado.deudas.forEach(cuota => {
+          if (cuota.estado == 1 && !cuota.metodo_pago_id) {
+            this.$set(cuota, 'metodo_pago_id', 1); // Por defecto Efectivo (ID 1 suele ser efectivo)
+          }
+        });
+      }
+      
       this.mostrarModalPago = true;
     },
     abrirModalReporte(paquete, editar = false) {
@@ -1232,6 +1306,23 @@ export default {
         } finally {
           this.procesandoFraccion = false;
         }
+      }
+    }
+  },
+  watch: {
+    vistaActiva(newVal) {
+      if (newVal === 'deudas') {
+        // Al entrar a deudas, resetear filtros a valores por defecto y cargar todo
+        this.busquedaDeudas = '';
+        this.filtroMesDeudas = new Date().toISOString().substring(0, 7);
+        // Cargar página 1 de paquetes para asegurar que tenemos la data fresca
+        this.cargarPaquetes(1);
+      } else {
+        // Al volver a paquetes, resetear búsqueda general y filtros
+        this.busqueda = '';
+        this.filtroEstado = 0;
+        this.filtroTipo = -1;
+        this.cargarPaquetes(1);
       }
     }
   }

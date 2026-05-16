@@ -59,8 +59,7 @@ class PaqueteController extends Controller
         }
         if (!empty($busqueda)) {
             $query->where(function($q) use ($busqueda) {
-                $q->where('pt.name', 'LIKE', "%{$busqueda}%")
-                  ->orWhere('pt.nombres', 'LIKE', "%{$busqueda}%")
+                $q->where(DB::raw("CONCAT(pt.name, ' ', IFNULL(pt.nombres, ''))"), 'LIKE', "%{$busqueda}%")
                   ->orWhere('pt.dni', 'LIKE', "%{$busqueda}%")
                   ->orWhere('p.descripcion', 'LIKE', "%{$busqueda}%");
             });
@@ -89,7 +88,13 @@ class PaqueteController extends Controller
         $metricas['vencidas'] = $vencidas;
 
         // Paginate results to 15 per page to fix timeout
-        $paginated = $query->orderBy('membresias.inicio', 'desc')->paginate(15);
+        // But allow returning all if requested for the Deudas tab
+        if ($request->has('all') && $request->input('all') == 1) {
+            $results = $query->orderBy('membresias.inicio', 'desc')->get();
+            $paginated = new \Illuminate\Pagination\LengthAwarePaginator($results, $results->count(), $results->count() ?: 1, 1);
+        } else {
+            $paginated = $query->orderBy('membresias.inicio', 'desc')->paginate(15);
+        }
 
         foreach ($paginated as $membresia) {
             $citas = Appointment::where('idMembresia', $membresia->id)

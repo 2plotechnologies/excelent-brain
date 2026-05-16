@@ -50,7 +50,7 @@
 				</div>
 				<!-- Cabecera Doctores (Eje X scrolleable) -->
 				<div class="doctors-header-container d-flex flex-grow-1" ref="headerScroll"
-					style="overflow-x: auto; overflow-y: hidden;">
+					style="overflow-x: auto; overflow-y: hidden; min-width: 0;">
 					<div class="doctor-header text-center py-2 border-right text-dark" v-for="doctor in doctoresFiltrados" :key="'h-'+doctor.id">
 						<div>
 							<span class="badge badge-pill mt-1" :style="'background-color: ' + stringToColor(doctor.name)"> &nbsp; </span>
@@ -77,7 +77,7 @@
 				</div>
 				<!-- Columnas de doctores locales -->
 				<div class="doctors-body-container d-flex flex-grow-1"
-					style="overflow-x: auto; overflow-y: hidden; position: relative;"
+					style="overflow-x: auto; overflow-y: hidden; position: relative; min-width: 0;"
 					ref="bodyScroll"
 					@scroll="syncScrollX">
 					<!-- Malla de fondo (grid lines) -->
@@ -93,13 +93,16 @@
 								:style="slotStyle(horaFree.check_time, horaFree.departure_date)"
 								@click="crearCitaEnSlot(doctor, horaFree)" 
 								data-bs-toggle="modal" data-bs-target="#modalNuevaCita"
-								title="Click para nueva cita">
+								:title="'Nueva cita: ' + formatHora(horaFree.check_time) + ' - ' + formatHora(horaFree.departure_date)"
+								@mouseover="mostrarTooltip($event, horaFree, doctor, true)"
+								@mouseleave="ocultarTooltip"
+								@mousemove="moverTooltip($event)">
 						</div>
 
 						<!-- Slots Ocupados (Citas) -->
 						<div v-for="(horaOcup, hIndex) in getHorasOcupadas(doctor.id)" :key="'ocup-'+horaOcup.id" 
 								class="booked-slot shadow-sm p-1" 
-								:style="[slotStyle(horaOcup.schedule ? horaOcup.schedule.check_time : null, horaOcup.schedule ? horaOcup.schedule.departure_date : null, horaOcup), { borderLeft: '4px solid ' + stringToColor(doctor.name) }]"
+								:style="[slotStyle(horaOcup.hora_inicio || (horaOcup.schedule ? horaOcup.schedule.check_time : null), horaOcup.hora_fin || (horaOcup.schedule ? horaOcup.schedule.departure_date : null), horaOcup), { borderLeft: '4px solid ' + stringToColor(doctor.name) }]"
 								@click="abrirDetallesCita(horaOcup)"
 								@mouseover="mostrarTooltip($event, horaOcup, doctor)"
 								@mouseleave="ocultarTooltip"
@@ -113,12 +116,19 @@
 										<i :class="horaOcup.mode == 1 ? 'far fa-user' : 'fas fa-desktop'"></i> 
 										{{ horaOcup.patient.name.split(' ')[0] }} {{ horaOcup.patient.nombres.split(' ')[0] }}
 									</div>
-									<i class="fas fa-dollar-sign ml-1" style="font-size: 0.75rem;" :class="horaOcup.payment && horaOcup.payment.pay_status == 1 ? 'text-danger':'text-success'"></i>
+									<div class="d-flex align-items-center">
+										<!-- Iconos de estado de atención (Pendiente, Confirmada, Atendida) -->
+										<svg v-if="horaOcup.status == 5" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-success me-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+										<svg v-else-if="horaOcup.attention || horaOcup.status == 2" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-info me-1"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg>
+										<svg v-else xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-warning me-1"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+										
+										<i class="fas fa-dollar-sign" style="font-size: 0.75rem;" :class="horaOcup.payment && horaOcup.payment.pay_status == 1 ? 'text-danger':'text-success'"></i>
+									</div>
 								</div>
 								
 								<!-- Segunda línea: Tiempo (se cortará si no hay alto suficiente) -->
 								<div class="text-muted mt-1 text-truncate" style="font-size: 0.65rem; line-height: 1;">
-									{{ formatHora(horaOcup.schedule ? horaOcup.schedule.check_time : '') }} - {{ formatHora(horaOcup.schedule ? horaOcup.schedule.departure_date : '') }}
+									{{ formatHora(horaOcup.hora_inicio || (horaOcup.schedule ? horaOcup.schedule.check_time : '')) }} - {{ formatHora(horaOcup.hora_fin || (horaOcup.schedule ? horaOcup.schedule.departure_date : '')) }}
 								</div>
 							</div>
 
@@ -146,6 +156,7 @@
 			@changeMode="changeMode"
 			@openModal="distribuirAperturaModal"
 			@intercambiar="intercambiarHorario"
+			@moverVacio="mandarVacioAutomatico"
 			@eliminar="validarYEliminar"
 			@buscarRecetas="buscarRecetas"
 			@tiemposEspera="abrirTiemposEspera"
@@ -314,8 +325,8 @@
 				
 				// Ordenar por hora de inicio
 				ocupadas.sort((a, b) => {
-					let t1 = a.schedule && a.schedule.check_time ? a.schedule.check_time : '23:59:59';
-					let t2 = b.schedule && b.schedule.check_time ? b.schedule.check_time : '23:59:59';
+					let t1 = a.hora_inicio ? a.hora_inicio : (a.schedule && a.schedule.check_time ? a.schedule.check_time : '23:59:59');
+					let t2 = b.hora_inicio ? b.hora_inicio : (b.schedule && b.schedule.check_time ? b.schedule.check_time : '23:59:59');
 					return t1.localeCompare(t2);
 				});
 
@@ -325,8 +336,8 @@
 				let clusterEnd = '00:00:00';
 				
 				ocupadas.forEach(cita => {
-					let start = cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00';
-					let end = cita.schedule && cita.schedule.departure_date ? cita.schedule.departure_date : '00:00:00';
+					let start = cita.hora_inicio ? cita.hora_inicio : (cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00');
+					let end = cita.hora_fin ? cita.hora_fin : (cita.schedule && cita.schedule.departure_date ? cita.schedule.departure_date : '00:00:00');
 					
 					if(currentCluster.length === 0) {
 						currentCluster.push(cita);
@@ -400,20 +411,31 @@
 			syncScroll(e){
 				// Para si quisieramos sincronizar etiquetas Y al moverse, en este layout CSS grid-lines abarca todo
 			},
-			mostrarTooltip(e, cita, doctor) {
-				let horaRango = this.formatHora(cita.schedule ? cita.schedule.check_time : '') + ' - ' + this.formatHora(cita.schedule ? cita.schedule.departure_date : '');
-				
-				let estado = 'Sin Confirmar';
-				if(cita.status == 2) estado = 'Confirmado';
-				if(cita.status == 3) estado = 'Anulado';
-				if(cita.status == 4) estado = 'Reprogramado';
+			mostrarTooltip(e, cita, doctor, esLibre = false) {
+				let horaRango = "";
+				if(esLibre){
+					horaRango = this.formatHora(cita.check_time) + ' - ' + this.formatHora(cita.departure_date);
+					this.tooltipData = {
+						paciente: 'HORARIO DISPONIBLE',
+						hora: horaRango,
+						doctor: doctor.name,
+						estado: 'Libre'
+					};
+				} else {
+					horaRango = this.formatHora(cita.hora_inicio || (cita.schedule ? cita.schedule.check_time : '')) + ' - ' + this.formatHora(cita.hora_fin || (cita.schedule ? cita.schedule.departure_date : ''));
+					
+					let estado = 'Sin Confirmar';
+					if(cita.status == 2) estado = 'Confirmado';
+					if(cita.status == 3) estado = 'Anulado';
+					if(cita.status == 4) estado = 'Reprogramado';
 
-				this.tooltipData = {
-					paciente: cita.patient.name.split(' ')[0] + ' ' + cita.patient.nombres.split(' ')[0],
-					hora: horaRango,
-					doctor: doctor.name,
-					estado: estado
-				};
+					this.tooltipData = {
+						paciente: cita.patient.name.split(' ')[0] + ' ' + cita.patient.nombres.split(' ')[0],
+						hora: horaRango,
+						doctor: doctor.name,
+						estado: estado
+					};
+				}
 				this.moverTooltip(e);
 			},
 			moverTooltip(e) {
@@ -493,7 +515,10 @@
 				await this.axios.get('/api/listarPreciosTodos')
 				.then( response => this.precios = response.data)
 			},
-			actualizarListadoCitas(){ this.obtenerHorarios(); },
+			actualizarListadoCitas(){ 
+				this.obtenerHorarios(); 
+				this.$emit('actualizarListadoCitas');
+			},
 			verHorariosAyer(){ this.fecha = moment().subtract(1, 'day').format('YYYY-MM-DD'); this.obtenerHorarios(); },
 			verHorariosHoy(){ this.fecha = moment().format('YYYY-MM-DD'); this.obtenerHorarios(); },
 			verHorariosMañana(){ this.fecha = moment().add(1, 'day').format('YYYY-MM-DD'); this.obtenerHorarios(); },
@@ -534,6 +559,41 @@
 			},
 			abrirTiemposEspera(cita) {
 				this.citaTemp = cita;
+			},
+			mandarVacioAutomatico(cita) {
+				let doc = this.doctores.find(d => d.id == cita.professional_id);
+				if(!doc || !doc.horarios) return;
+				
+				// Encontrar el primer horario libre
+				let proximo = doc.horarios.find(h => h.libre == 1);
+				
+				if(!proximo) {
+					this.$swal.fire('No hay espacios', 'No se encontraron horarios vacíos para este profesional hoy.', 'warning');
+					return;
+				}
+
+				this.$swal.fire({
+					title: 'Mover a sitio vacío',
+					text: `¿Desea mover esta cita al horario de las ${this.formatHora(proximo.check_time)}?`,
+					icon: 'question',
+					showCancelButton: true,
+					confirmButtonText: 'Sí, mover',
+					cancelButtonText: 'Cancelar',
+					confirmButtonColor: '#3085d6',
+				}).then((result) => {
+					if (result.isConfirmed) {
+						let payload = { ...cita, schedule_id: proximo.id, user_id: this.idUsuario };
+						this.axios.put(`/api/mandarVacio/${cita.id}`, payload)
+						.then(res => {
+							this.$swal.fire('Éxito', 'La cita ha sido movida al espacio vacío.', 'success');
+							this.obtenerHorarios();
+						})
+						.catch(err => {
+							console.error(err);
+							this.$swal.fire('Error', 'No se pudo mover la cita.', 'error');
+						});
+					}
+				});
 			}
 		},
 		mounted(){
@@ -554,7 +614,24 @@
 </script>
 
 <style scoped>
-	.calendar-wrapper { display: flex; flex-direction: column; border-radius: 8px; overflow: hidden; transform: translateZ(0); }
+	.calendar-wrapper { 
+		display: flex; 
+		flex-direction: column; 
+		border-radius: 8px; 
+		position: relative; 
+		background: white;
+		width: 100%;
+	}
+	.calendar-header {
+		position: -webkit-sticky;
+		position: sticky;
+		top: 0;
+		z-index: 100;
+		background-color: #f8f9fc !important;
+		border-top-left-radius: 8px;
+		border-top-right-radius: 8px;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+	}
 	.doctor-header,
 	.doctor-column {
 		min-width: 250px;
@@ -573,6 +650,7 @@
 	.doctors-header-container::-webkit-scrollbar { display: none; }
 </style>
 <style>
+	#content-wrapper { overflow-x: hidden !important; overflow-y: visible !important; }
 	.alertify-notifier .ajs-message{width: 400px!important;}
 	.alertify-notifier.ajs-right .ajs-message.ajs-visible { right: 400px!important; }
 	.alertify-notifier .ajs-message.ajs-success{
