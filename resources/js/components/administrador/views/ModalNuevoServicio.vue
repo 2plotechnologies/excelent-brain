@@ -17,6 +17,12 @@
 						<option value="6">Nutrición</option>
 						<option value="4">Membresía</option>
 					</select>
+					<label for="">Edades permitidas</label>
+					<select name="" id="" class="form-select" v-model="precioNuevo.target_age">
+						<option value="0">Ambos</option>
+						<option value="1">Niños</option>
+						<option value="2">Adultos</option>
+					</select>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="crearPrecio()">Crear servicio</button>
@@ -33,7 +39,7 @@ export default {
 	data() {
 		return {
 			precioNuevo:{
-				nombre:'', tipo:1
+				nombre:'', tipo:1, target_age: 0
 			}
 		}
 	},

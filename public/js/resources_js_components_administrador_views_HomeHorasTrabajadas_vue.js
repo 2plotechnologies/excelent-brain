@@ -562,28 +562,55 @@ var render = function render() {
     staticClass: "mb-3"
   }, [_c("label", {
     staticClass: "form-label font-weight-bold"
-  }, [_vm._v("Motivo")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Motivo")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.bloqueo.motivo,
       expression: "bloqueo.motivo"
     }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      placeholder: "Ej: Cumpleaños, Permiso médico"
-    },
-    domProps: {
-      value: _vm.bloqueo.motivo
-    },
+    staticClass: "form-select form-control",
     on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.bloqueo, "motivo", $event.target.value);
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.bloqueo, "motivo", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
       }
     }
-  })])]), _vm._v(" "), _c("div", {
+  }, [_c("option", {
+    attrs: {
+      value: "",
+      disabled: ""
+    }
+  }, [_vm._v("Seleccione un motivo")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "CUMPLEAÑOS --> RETRIBUIDO"
+    }
+  }, [_vm._v("CUMPLEAÑOS --> RETRIBUIDO")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "PERMISOS --> NO RETRIBUIDO"
+    }
+  }, [_vm._v("PERMISOS --> NO RETRIBUIDO")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "VACACIONES --> RETRIBUIDO"
+    }
+  }, [_vm._v("VACACIONES --> RETRIBUIDO")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "APOYO A GRABACIONES --> RETRIBUIDO"
+    }
+  }, [_vm._v("APOYO A GRABACIONES --> RETRIBUIDO")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "APOYO A GRUPOS TERAPEUTICOS --> RETRIBUIDO"
+    }
+  }, [_vm._v("APOYO A GRUPOS TERAPEUTICOS --> RETRIBUIDO")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "OTROS APOYOS --> RETRIBUIDO"
+    }
+  }, [_vm._v("OTROS APOYOS --> RETRIBUIDO")])])])]), _vm._v(" "), _c("div", {
     staticClass: "modal-footer border-0 bg-light"
   }, [_c("button", {
     staticClass: "btn btn-secondary",

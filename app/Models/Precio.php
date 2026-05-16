@@ -9,7 +9,7 @@ class Precio extends Model
 {
     public $timestamps = false;
     use HasFactory;
-    protected $fillable=['descripcion', 'nuevos', 'continuos', 'especialMembresias', 'idClasificacion', 'sesiones', 'servicio', 'meses'];
+    protected $fillable=['descripcion', 'nuevos', 'continuos', 'especialMembresias', 'idClasificacion', 'sesiones', 'servicio', 'meses', 'target_age'];
     //Relacion uno a uno Appointment-Payment
     public function appointment()
     {

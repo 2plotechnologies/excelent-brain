@@ -415,6 +415,10 @@ class PatientController extends Controller
 			->orderBy('fin', 'desc')
 			->with('precio')
 			->first();
+
+			$cant_citas_pasadas = Appointment::where('patient_id', $paciente->id)
+				->where('status', 3) // 3 = Atendido
+				->count();
 			
 			//Verificar si tiene membresía activa
 			/* $membresia = DB::table('membresias as m')
@@ -431,7 +435,8 @@ class PatientController extends Controller
 				'patient'=>$paciente,
 				'relacion' => $relaciones,
 				'deudas' => $deudas,
-				'membresia' => $membresia
+				'membresia' => $membresia,
+				'cant_citas_pasadas' => $cant_citas_pasadas
 				]);
 		}else{
 			return response()->json([ 'patient'=>$paciente ]);

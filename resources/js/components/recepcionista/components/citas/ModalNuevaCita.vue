@@ -333,7 +333,7 @@
 								<div class="row align-items-center mt-3">
 									<div class="col-sm-6 text-sm-start text-center mb-3 mb-sm-0">
 										<div class="form-check form-switch custom-switch d-inline-block">
-											<input class="form-check-input" type="checkbox" id="checkNuevo" v-model="precioNuevo" @change="precioDinamico()">
+											<input class="form-check-input" type="checkbox" id="checkNuevo" v-model="precioNuevo" @change="precioDinamico()" :disabled="past_appointments < 2">
 											<label class="form-check-label ms-2" for="checkNuevo">{{ precioNuevo ? 'Paciente Nuevo' : 'Paciente Continuante' }}</label>
 										</div>
 									</div>
@@ -716,7 +716,7 @@ export default {
 			ubigeo: {departamentos:[], provincias:[], distritos:[]},
 			provincias:[], distritos:[],
 			token:'087d16c0688f5150268342d085a55d54b5064c7649596011f03b35b935899a50',
-			horario:[], descuentoPorcentaje:0, monedas:[], monedaAdelanto:1
+			horario:[], descuentoPorcentaje:0, monedas:[], monedaAdelanto:1, past_appointments: 0
 		}
 	},
 	mounted(){
@@ -925,6 +925,14 @@ export default {
 			this.nextStep();
 		},
 		seleccionarServicio(id) {
+			let precioSeleccionado = this.precios.find(p => p.id == id);
+			if (precioSeleccionado) {
+				let age = moment().diff(moment(this.cita.birth_date), 'years');
+				if (precioSeleccionado.target_age == 1 && age >= 18) {
+					alertify.error('Un paciente mayor de edad no puede tomar citas de niños', 5);
+					return;
+				}
+			}
 			this.cita.type = id;
 			this.precioDinamico();
 			this.nextStep();
@@ -1183,7 +1191,7 @@ export default {
 			this.cita.contacto2= ''; this.cita.contacto_celular2= ''; this.cita.parentezco2='';
 			this.etiqueta =''; this.descuentoAdelanto = 0; this.descuentoPorcentaje=0; this.descuentoPorcentual=0;
 			this.tieneAdelanto=false; this.tieneDescuento=false; this.tieneRebaja=false; this.razonAdelanto=''; this.razonRebaja=''
-			this.cita.vivo=1; this.monedaAdelanto=1
+			this.cita.vivo=1; this.monedaAdelanto=1; this.past_appointments=0; this.precioNuevo=true;
 		},
 		reniec(){ 
 			if (this.switchReciec === 0) return;
@@ -1204,6 +1212,8 @@ export default {
 			this.axios.get("/api/buscarPacienteDB/"+this.cita.dni)
 			.then(res => {
 				if (res.data.patient == null) { //Buscar en reniec, nuevo
+					this.past_appointments = 0;
+					this.precioNuevo = true;
 					if(this.cita.type_dni==1){
 						//window.axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
 						this.axios.get("/api/buscarDni/"+this.cita.dni)
@@ -1284,6 +1294,10 @@ export default {
 					this.cita.membresia = res.data.membresia;
 					this.cita.recomendation = res.data.patient.recomendation;
 					this.cita.recomendacion_comentario = res.data.patient.recomendacion_comentario;
+					this.past_appointments = res.data.cant_citas_pasadas || 0;
+					if(this.past_appointments < 2) {
+						this.precioNuevo = true;
+					}
 					this.patientNew = true;
 					this.moverProvincias(false)
 					this.moverDistritos()
@@ -1434,7 +1448,7 @@ export default {
 				this.fechaManual = this.fechaElegida;
 				this.horaManualId = this.horaElegida.id;
 				this.cita.schedule_id = this.horaElegida.id;
-				this.horariosDisponibles = [this.horaElegida];
+				this.buscarHorariosManual();
 			}
 		}
 	},

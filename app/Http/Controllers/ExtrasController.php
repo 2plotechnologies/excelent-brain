@@ -937,6 +937,7 @@ class ExtrasController extends Controller
 	}
 
 	public function pagarDeudaMembresia(Request $request){
+		$numero_cuota = DB::table('deudas')->where('id', $request->input('idDeuda'))->value('numero_cuota') ?? 0;
 		$idSede = DB::table('users')->where('id', $request->input('user_id'))->value('IdSede'); 
 		$deuda = DB::table('deudas')->where('id', $request->input('idDeuda'))->first();
 		$idMembresia = $request->input('idMembresia') ?: ($deuda ? $deuda->idMembresia : null);
@@ -979,7 +980,7 @@ class ExtrasController extends Controller
 				$pagoExtra->continuo = 3;
 				$pagoExtra->idMembresia = $idMembresia;
 				$pagoExtra->user_id = $request->input('user_id');
-				$pagoExtra->numero_cuota = $numeroCuota;
+				$pagoExtra->numero_cuota = $numero_cuota;
 				// Asignar la IdSede que corresponde al usuario
 				$pagoExtra->idSede = $idSede;
 				$pagoExtra->patient_id = $idPaciente;
@@ -1095,6 +1096,7 @@ class ExtrasController extends Controller
 			'continuos' => 0,
 			'sesiones' => 0,
 			'servicio' => in_array($request->input('precioNuevo.tipo'), [1,2,3,6]) ? 1 : 0,
+			'target_age' => $request->input('precioNuevo.target_age', 0),
 		]);
 		return response()->json([ 'mensaje' => 'Registro exitoso' ]);
 	}

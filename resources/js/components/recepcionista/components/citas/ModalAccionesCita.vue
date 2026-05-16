@@ -169,6 +169,9 @@
               <button @click="$emit('intercambiar', cita)" data-bs-target="#modalIntercambio" data-bs-toggle="modal" class="btn btn-link text-muted p-0 small" title="Intercambiar">
                 <i class="fas fa-retweet"></i> Intercambiar
               </button>
+              <button @click="$emit('moverVacio', cita)" class="btn btn-link text-muted p-0 small" title="Mover a sitio Vacio">
+                <i class="fas fa-share-square"></i> Mover a Vacio
+              </button>
               <button @click="$emit('buscarRecetas', cita.patient.id)" data-bs-toggle="modal" data-bs-target="#recetasModal" class="btn btn-link text-muted p-0 small" title="Recetas">
                 <i class="fas fa-file-medical"></i> Recetas
               </button>
