@@ -18519,7 +18519,10 @@ var render = function render() {
   })], 2), _vm._v(" "), _c("div", {
     staticClass: "calendar-wrapper bg-white shadow-sm border",
     staticStyle: {
-      "border-radius": "8px"
+      "border-radius": "8px",
+      height: "calc(100vh - 215px)",
+      "overflow-y": "auto",
+      "overflow-x": "hidden"
     }
   }, [_c("div", {
     staticClass: "calendar-header d-flex border-bottom bg-light",
@@ -18535,7 +18538,17 @@ var render = function render() {
       "overflow-y": "hidden",
       "min-width": "0"
     }
-  }, [_vm._l(_vm.doctoresFiltrados, function (doctor) {
+  }, [_vm.cargando ? _c("div", {
+    key: "header-cargando",
+    staticClass: "py-3 px-3 w-100 text-center text-primary align-self-center my-4"
+  }, [_c("i", {
+    staticClass: "fas fa-circle-notch fa-spin fa-2x mb-2"
+  }), _c("br"), _vm._v(" "), _c("span", {
+    staticClass: "font-weight-bold"
+  }, [_vm._v("Obteniendo agenda...")])]) : _vm.doctoresFiltrados.length === 0 ? _c("div", {
+    key: "header-vacio",
+    staticClass: "py-3 px-3 w-100 text-center text-muted align-self-center my-4 font-weight-bold"
+  }, [_vm._v("\n\t\t\t\t\t\tNo hay profesionales para mostrar el día de hoy.\n\t\t\t\t\t")]) : _vm._l(_vm.doctoresFiltrados, function (doctor) {
     return _c("div", {
       key: "h-" + doctor.id,
       staticClass: "doctor-header text-center py-2 border-right text-dark"
@@ -18552,20 +18565,8 @@ var render = function render() {
     }, [_vm._v(_vm._s(doctor.name.split(" ")[0]) + " " + _vm._s(doctor.name.split(" ")[1] || ""))]), _vm._v(" "), _c("small", {
       staticClass: "text-muted"
     }, [_vm._v(_vm._s(_vm.citasPorDoctor(doctor.id)) + " citas")])]);
-  }), _vm._v(" "), _vm.cargando ? _c("div", {
-    staticClass: "py-3 px-3 w-100 text-center text-primary align-self-center my-4"
-  }, [_c("i", {
-    staticClass: "fas fa-circle-notch fa-spin fa-2x mb-2"
-  }), _c("br"), _vm._v(" "), _c("span", {
-    staticClass: "font-weight-bold"
-  }, [_vm._v("Obteniendo agenda...")])]) : _vm.doctoresFiltrados.length == 0 ? _c("div", {
-    staticClass: "py-3 px-3 w-100 text-center text-muted align-self-center my-4 font-weight-bold"
-  }, [_vm._v("No hay profesionales para mostrar el día de hoy.")]) : _vm._e()], 2)]), _vm._v(" "), _c("div", {
+  })], 2)]), _vm._v(" "), _c("div", {
     staticClass: "calendar-body d-flex",
-    staticStyle: {
-      height: "100%",
-      "overflow-y": "auto"
-    },
     on: {
       scroll: _vm.syncScroll
     }
@@ -21448,7 +21449,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.calendar-wrapper[data-v-992bc26a] { \n\tdisplay: flex; \n\tflex-direction: column; \n\tborder-radius: 8px; \n\tposition: relative; \n\tbackground: white;\n\twidth: 100%;\n}\n.calendar-header[data-v-992bc26a] {\n\tposition: sticky;\n\ttop: 0;\n\tz-index: 100;\n\tbackground-color: #f8f9fc !important;\n\tborder-top-left-radius: 8px;\n\tborder-top-right-radius: 8px;\n\tbox-shadow: 0 2px 4px rgba(0,0,0,0.05);\n}\n.doctor-header[data-v-992bc26a],\n.doctor-column[data-v-992bc26a] {\n\tmin-width: 250px;\n\tmax-width: 250px;\n\tflex: 0 0 250px;\n\tbackground-color: rgba(0,0,0,0.03);\n}\n.time-slot-label[data-v-992bc26a] { height: 90px;\n} /* 60 minutos * 1.5px/min = 90px */\n.grid-line[data-v-992bc26a] { height: 90px; box-sizing: border-box;\n}\n.free-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; opacity: 1; cursor: pointer; transition: opacity 0.2s, background 0.2s; background: #ffffff; border-radius: 4px; box-sizing: border-box; border: 1px solid rgba(0,0,0,0.05);\n}\n.free-slot[data-v-992bc26a]:hover { background: rgba(28, 200, 138, 0.1); border: 1px dashed #1cc88a;\n}\n.booked-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; cursor: pointer; transition: transform 0.1s; border-radius: 6px; overflow: hidden; background-color: rgba(248, 249, 252, 0.7);}\n.booked-slot[data-v-992bc26a]:hover { transform: scale(1.02); z-index: 10!important;\n}\n.booked-content[data-v-992bc26a] { padding: 4px; border-radius: 4px;\n}\n.doctors-header-container[data-v-992bc26a]::-webkit-scrollbar { display: none;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.calendar-wrapper[data-v-992bc26a] { \n\tdisplay: flex; \n\tflex-direction: column; \n\tborder-radius: 8px; \n\tposition: relative; \n\tbackground: white;\n\twidth: 100%;\n}\n.calendar-header[data-v-992bc26a] {\n\tposition: sticky;\n\ttop: 0;\n\tz-index: 100;\n\tbackground-color: #f8f9fc !important;\n\tborder-top-left-radius: 8px;\n\tborder-top-right-radius: 8px;\n\tbox-shadow: 0 2px 4px rgba(0,0,0,0.05);\n\twidth: 100%;\n}\n.doctor-header[data-v-992bc26a],\n.doctor-column[data-v-992bc26a] {\n\tmin-width: 250px;\n\tmax-width: 250px;\n\tflex: 0 0 250px;\n\tbackground-color: rgba(0,0,0,0.03);\n}\n.time-slot-label[data-v-992bc26a] { height: 90px;\n} /* 60 minutos * 1.5px/min = 90px */\n.grid-line[data-v-992bc26a] { height: 90px; box-sizing: border-box;\n}\n.free-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; opacity: 1; cursor: pointer; transition: opacity 0.2s, background 0.2s; background: #ffffff; border-radius: 4px; box-sizing: border-box; border: 1px solid rgba(0,0,0,0.05);\n}\n.free-slot[data-v-992bc26a]:hover { background: rgba(28, 200, 138, 0.1); border: 1px dashed #1cc88a;\n}\n.booked-slot[data-v-992bc26a] { position: absolute; width: calc(100% - 10px); left: 5px; cursor: pointer; transition: transform 0.1s; border-radius: 6px; overflow: hidden; background-color: rgba(248, 249, 252, 0.7);}\n.booked-slot[data-v-992bc26a]:hover { transform: scale(1.02); z-index: 10!important;\n}\n.booked-content[data-v-992bc26a] { padding: 4px; border-radius: 4px;\n}\n.doctors-header-container[data-v-992bc26a]::-webkit-scrollbar { display: none;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

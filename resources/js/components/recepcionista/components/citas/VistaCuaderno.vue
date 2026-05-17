@@ -41,7 +41,7 @@
 		</div>
 
 		<!-- Contenedor del Calendario Grid -->
-		<div class="calendar-wrapper bg-white shadow-sm border" style="border-radius: 8px;">
+		<div class="calendar-wrapper bg-white shadow-sm border" style="border-radius: 8px; height: calc(100vh - 215px); overflow-y: auto; overflow-x: hidden;">
 			
 			<div class="calendar-header d-flex border-bottom bg-light" style="border-top-left-radius: 8px; border-top-right-radius: 8px;">
 				<!-- Cabecera Esquina (Eje Y) -->
@@ -51,24 +51,31 @@
 				<!-- Cabecera Doctores (Eje X scrolleable) -->
 				<div class="doctors-header-container d-flex flex-grow-1" ref="headerScroll"
 					style="overflow-x: auto; overflow-y: hidden; min-width: 0;">
-					<div class="doctor-header text-center py-2 border-right text-dark" v-for="doctor in doctoresFiltrados" :key="'h-'+doctor.id">
-						<div>
-							<span class="badge badge-pill mt-1" :style="'background-color: ' + stringToColor(doctor.name)"> &nbsp; </span>
-							<strong class="mx-1">{{doctor.profession}}</strong>
-						</div>
-						<div class="font-weight-bold text-truncate px-1" :title="doctor.name">{{doctor.name.split(' ')[0]}} {{doctor.name.split(' ')[1] || ''}}</div>
-						<small class="text-muted">{{ citasPorDoctor(doctor.id) }} citas</small>
-					</div>
-					<div v-if="cargando" class="py-3 px-3 w-100 text-center text-primary align-self-center my-4">
+					<!-- Estado: cargando -->
+					<div v-if="cargando" key="header-cargando" class="py-3 px-3 w-100 text-center text-primary align-self-center my-4">
 						<i class="fas fa-circle-notch fa-spin fa-2x mb-2"></i><br>
 						<span class="font-weight-bold">Obteniendo agenda...</span>
 					</div>
-					<div v-else-if="doctoresFiltrados.length == 0" class="py-3 px-3 w-100 text-center text-muted align-self-center my-4 font-weight-bold">No hay profesionales para mostrar el día de hoy.</div>
+					<!-- Estado: sin profesionales -->
+					<div v-else-if="doctoresFiltrados.length === 0" key="header-vacio" class="py-3 px-3 w-100 text-center text-muted align-self-center my-4 font-weight-bold">
+						No hay profesionales para mostrar el día de hoy.
+					</div>
+					<!-- Estado: profesionales disponibles -->
+					<template v-else>
+						<div class="doctor-header text-center py-2 border-right text-dark" v-for="doctor in doctoresFiltrados" :key="'h-'+doctor.id">
+							<div>
+								<span class="badge badge-pill mt-1" :style="'background-color: ' + stringToColor(doctor.name)"> &nbsp; </span>
+								<strong class="mx-1">{{doctor.profession}}</strong>
+							</div>
+							<div class="font-weight-bold text-truncate px-1" :title="doctor.name">{{doctor.name.split(' ')[0]}} {{doctor.name.split(' ')[1] || ''}}</div>
+							<small class="text-muted">{{ citasPorDoctor(doctor.id) }} citas</small>
+						</div>
+					</template>
 				</div>
 			</div>
 
 			<!-- Cuerpo del Calendario -->
-			<div class="calendar-body d-flex" style="height: 100%; overflow-y: auto;" @scroll="syncScroll">
+			<div class="calendar-body d-flex" @scroll="syncScroll">
 				<!-- Eje Y Horas -->
 				<div class="time-axis border-right bg-white" style="min-width: 60px;">
 					<div class="time-slot-label text-center text-muted small position-relative" v-for="hora in horasGrid" :key="'lbl-'+hora">
@@ -631,6 +638,7 @@
 		border-top-left-radius: 8px;
 		border-top-right-radius: 8px;
 		box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+		width: 100%;
 	}
 	.doctor-header,
 	.doctor-column {
