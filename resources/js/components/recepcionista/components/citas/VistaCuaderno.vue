@@ -328,7 +328,7 @@
 				return doc.horarios.filter(h => h.libre == 1);
 			},
 			getHorasOcupadas(idProf) {
-				let ocupadas = this.horasMalas.filter(h => h.professional_id == idProf && parseInt(h.status) !== 5);
+				let ocupadas = this.horasMalas.filter(h => h.professional_id == idProf);
 				
 				// Ordenar por hora de inicio
 				ocupadas.sort((a, b) => {

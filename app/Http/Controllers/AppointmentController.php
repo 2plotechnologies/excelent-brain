@@ -1483,10 +1483,25 @@ public function getPatientsPerMonth($date,$id){
 
 	public function registrarHora(Request $request){
 		$cita = Appointment::where('id', $request->input('idCita'))->first();
-		$cita->update([
+		
+		$updateData = [
 			'entrance' => $request->input('entrance'),
 			'attention' => $request->input('attention'),
-		]);
+		];
+
+		if ($request->has('departure') && $request->input('departure')) {
+			$updateData['hora_fin'] = $request->input('departure');
+			
+			// Calcular duración exacta
+			$hora_inicio = $cita->hora_inicio ?: ($cita->schedule ? $cita->schedule->check_time : null);
+			if ($hora_inicio) {
+				$updateData['duracion'] = \Carbon\Carbon::parse($request->input('departure'))->diffInMinutes(\Carbon\Carbon::parse($hora_inicio));
+			}
+			$updateData['status'] = 5; // Atendido
+		}
+
+		$cita->update($updateData);
+
 		return response()->json(['mensaje' => 'Ok']);
 	}
 }

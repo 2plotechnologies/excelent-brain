@@ -74,11 +74,15 @@
                 <div class="time-value" v-if="cita.entrance">{{ horaLatam2(cita.entrance) }}</div>
                 <button v-else @click="$emit('tiemposEspera', cita)" data-bs-toggle="modal" data-bs-target="#modalTiemposEspera" class="btn btn-registrar btn-sm">Registrar</button>
               </div>
-              <div class="time-item px-2 border-left border-right">
+              <div class="time-item px-2 border-left">
                 <div class="time-label">Hora de atención</div>
                 <div class="time-value">{{ cita.attention ? horaLatam2(cita.attention) : '—' }}</div>
               </div>
-              <div class="time-item px-2">
+              <div class="time-item px-2 border-left">
+                <div class="time-label">Hora de fin</div>
+                <div class="time-value">{{ cita.hora_fin ? horaLatam2(cita.hora_fin) : '—' }}</div>
+              </div>
+              <div class="time-item px-2 border-left">
                 <div class="time-label">Tiempo espera</div>
                 <div class="time-value">{{ calcularEspera() }}</div>
               </div>

@@ -27,7 +27,7 @@
           
           <div class="time-control-container p-3 mb-4">
             <div class="row">
-              <div class="col-6 border-right">
+              <div class="col-4 border-right">
                 <div class="text-center px-2">
                   <div class="time-icon mb-2"><i class="fa-solid fa-location-dot text-primary h5"></i></div>
                   <label class="section-label d-block mb-1">Hora de llegada</label>
@@ -42,13 +42,13 @@
                   
                   <div class="mt-3">
                     <small class="text-muted d-block" style="font-size: 0.7rem; line-height: 1.1;">
-                      Faltan <span class="font-weight-bold text-capitalize text-dark">{{calcularFaltante}}</span> para su cita
+                      Faltan <span class="font-weight-bold text-capitalize text-dark">{{calcularFaltante}}</span>
                     </small>
                   </div>
                 </div>
               </div>
               
-              <div class="col-6">
+              <div class="col-4 border-right">
                 <div class="text-center px-2">
                   <div class="time-icon mb-2"><i class="fa-solid fa-stethoscope text-info h5"></i></div>
                   <label class="section-label d-block mb-1">Hora de atención</label>
@@ -60,6 +60,24 @@
                   <button v-else class="btn btn-action btn-outline-info btn-sm w-100" @click="registrar('atención')" data-bs-dismiss="modal">
                     <i class="fa-solid fa-clock mr-1"></i> Asignar
                   </button>
+                </div>
+              </div>
+
+              <div class="col-4">
+                <div class="text-center px-2">
+                  <div class="time-icon mb-2"><i class="fa-solid fa-flag-checkered text-success h5"></i></div>
+                  <label class="section-label d-block mb-1">Hora de fin</label>
+                  
+                  <div v-if="cita.hora_fin?.length>0">
+                    <div class="time-value text-dark mb-1 font-weight-bold">{{ horaLatam(cita.hora_fin) }}</div>
+                    <span class="badge status-badge-success badge-status"><i class="fas fa-check"></i> Registrado</span>
+                  </div>
+                  <div v-else>
+                    <input type="time" v-model="departureTime" class="form-control form-control-sm mb-2 text-center font-weight-bold" />
+                    <button class="btn btn-action btn-outline-success btn-sm w-100" @click="registrar('fin')" data-bs-dismiss="modal" :disabled="!departureTime">
+                      <i class="fa-solid fa-check mr-1"></i> Finalizar
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -79,23 +97,37 @@ export default{
 	props:['cita'],
 	
 	data(){ return{
-		entrance: null, attention: null
+		entrance: null, attention: null, departureTime: null
 	}},
 	methods:{
 		async registrar(tipo){
-			switch (tipo) {
-				case 'llegada': this.cita.entrance = moment().format('HH:mm:ss'); break;
-				case 'atención': this.cita.attention = moment().format('HH:mm:ss'); break;
-				default: break;
-			}
-			await this.axios.post('/api/registrarHora',{
-				tipo,
+			let payload = {
 				idCita: this.cita.id,
 				entrance: this.cita.entrance,
 				attention: this.cita.attention
-			})
+			};
+
+			switch (tipo) {
+				case 'llegada': 
+					this.cita.entrance = moment().format('HH:mm:ss'); 
+					payload.entrance = this.cita.entrance;
+					break;
+				case 'atención': 
+					this.cita.attention = moment().format('HH:mm:ss'); 
+					payload.attention = this.cita.attention;
+					break;
+				case 'fin':
+					payload.departure = this.departureTime;
+					break;
+				default: break;
+			}
+			await this.axios.post('/api/registrarHora', payload)
 				.then(response => {
 					if(response.data?.mensaje == 'Ok'){
+						if (tipo === 'fin') {
+							this.cita.hora_fin = this.departureTime;
+							this.cita.status = 5; // Atendido
+						}
 						this.$emit('actualizar', 'sksks')
 						alertify.notify('<i class="fa-regular fa-calendar-check"></i> Datos actualizados' , 'success', 5);
 					}

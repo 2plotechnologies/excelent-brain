@@ -8483,42 +8483,53 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   data: function data() {
     return {
       entrance: null,
-      attention: null
+      attention: null,
+      departureTime: null
     };
   },
   methods: {
     registrar: function registrar(tipo) {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var payload;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              _context.t0 = tipo;
-              _context.next = _context.t0 === 'llegada' ? 3 : _context.t0 === 'atención' ? 5 : 7;
-              break;
-            case 3:
-              _this.cita.entrance = moment__WEBPACK_IMPORTED_MODULE_1___default()().format('HH:mm:ss');
-              return _context.abrupt("break", 8);
-            case 5:
-              _this.cita.attention = moment__WEBPACK_IMPORTED_MODULE_1___default()().format('HH:mm:ss');
-              return _context.abrupt("break", 8);
-            case 7:
-              return _context.abrupt("break", 8);
-            case 8:
-              _context.next = 10;
-              return _this.axios.post('/api/registrarHora', {
-                tipo: tipo,
+              payload = {
                 idCita: _this.cita.id,
                 entrance: _this.cita.entrance,
                 attention: _this.cita.attention
-              }).then(function (response) {
+              };
+              _context.t0 = tipo;
+              _context.next = _context.t0 === 'llegada' ? 4 : _context.t0 === 'atención' ? 7 : _context.t0 === 'fin' ? 10 : 12;
+              break;
+            case 4:
+              _this.cita.entrance = moment__WEBPACK_IMPORTED_MODULE_1___default()().format('HH:mm:ss');
+              payload.entrance = _this.cita.entrance;
+              return _context.abrupt("break", 13);
+            case 7:
+              _this.cita.attention = moment__WEBPACK_IMPORTED_MODULE_1___default()().format('HH:mm:ss');
+              payload.attention = _this.cita.attention;
+              return _context.abrupt("break", 13);
+            case 10:
+              payload.departure = _this.departureTime;
+              return _context.abrupt("break", 13);
+            case 12:
+              return _context.abrupt("break", 13);
+            case 13:
+              _context.next = 15;
+              return _this.axios.post('/api/registrarHora', payload).then(function (response) {
                 var _response$data;
                 if (((_response$data = response.data) === null || _response$data === void 0 ? void 0 : _response$data.mensaje) == 'Ok') {
+                  if (tipo === 'fin') {
+                    _this.cita.hora_fin = _this.departureTime;
+                    _this.cita.status = 5; // Atendido
+                  }
                   _this.$emit('actualizar', 'sksks');
                   alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('<i class="fa-regular fa-calendar-check"></i> Datos actualizados', 'success', 5);
                 }
               });
-            case 10:
+            case 15:
             case "end":
               return _context.stop();
           }
@@ -9989,7 +10000,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     },
     getHorasOcupadas: function getHorasOcupadas(idProf) {
       var ocupadas = this.horasMalas.filter(function (h) {
-        return h.professional_id == idProf && parseInt(h.status) !== 5;
+        return h.professional_id == idProf;
       });
 
       // Ordenar por hora de inicio
@@ -11144,13 +11155,19 @@ var render = function render() {
       }
     }
   }, [_vm._v("Registrar")])]), _vm._v(" "), _c("div", {
-    staticClass: "time-item px-2 border-left border-right"
+    staticClass: "time-item px-2 border-left"
   }, [_c("div", {
     staticClass: "time-label"
   }, [_vm._v("Hora de atención")]), _vm._v(" "), _c("div", {
     staticClass: "time-value"
   }, [_vm._v(_vm._s(_vm.cita.attention ? _vm.horaLatam2(_vm.cita.attention) : "—"))])]), _vm._v(" "), _c("div", {
-    staticClass: "time-item px-2"
+    staticClass: "time-item px-2 border-left"
+  }, [_c("div", {
+    staticClass: "time-label"
+  }, [_vm._v("Hora de fin")]), _vm._v(" "), _c("div", {
+    staticClass: "time-value"
+  }, [_vm._v(_vm._s(_vm.cita.hora_fin ? _vm.horaLatam2(_vm.cita.hora_fin) : "—"))])]), _vm._v(" "), _c("div", {
+    staticClass: "time-item px-2 border-left"
   }, [_c("div", {
     staticClass: "time-label"
   }, [_vm._v("Tiempo espera")]), _vm._v(" "), _c("div", {
@@ -16583,7 +16600,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
 /* harmony export */ });
 var render = function render() {
-  var _vm$cita$entrance, _vm$cita$attention;
+  var _vm$cita$entrance, _vm$cita$attention, _vm$cita$hora_fin;
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
@@ -16626,7 +16643,7 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "row"
   }, [_c("div", {
-    staticClass: "col-6 border-right"
+    staticClass: "col-4 border-right"
   }, [_c("div", {
     staticClass: "text-center px-2"
   }, [_vm._m(2), _vm._v(" "), _c("label", {
@@ -16655,8 +16672,8 @@ var render = function render() {
     }
   }, [_vm._v("\n                      Faltan "), _c("span", {
     staticClass: "font-weight-bold text-capitalize text-dark"
-  }, [_vm._v(_vm._s(_vm.calcularFaltante))]), _vm._v(" para su cita\n                    ")])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-6"
+  }, [_vm._v(_vm._s(_vm.calcularFaltante))])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-4 border-right"
   }, [_c("div", {
     staticClass: "text-center px-2"
   }, [_vm._m(4), _vm._v(" "), _c("label", {
@@ -16675,7 +16692,48 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fa-solid fa-clock mr-1"
-  }), _vm._v(" Asignar\n                  ")])])])])])]) : _vm._e()])])])]);
+  }), _vm._v(" Asignar\n                  ")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-4"
+  }, [_c("div", {
+    staticClass: "text-center px-2"
+  }, [_vm._m(6), _vm._v(" "), _c("label", {
+    staticClass: "section-label d-block mb-1"
+  }, [_vm._v("Hora de fin")]), _vm._v(" "), ((_vm$cita$hora_fin = _vm.cita.hora_fin) === null || _vm$cita$hora_fin === void 0 ? void 0 : _vm$cita$hora_fin.length) > 0 ? _c("div", [_c("div", {
+    staticClass: "time-value text-dark mb-1 font-weight-bold"
+  }, [_vm._v(_vm._s(_vm.horaLatam(_vm.cita.hora_fin)))]), _vm._v(" "), _vm._m(7)]) : _c("div", [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.departureTime,
+      expression: "departureTime"
+    }],
+    staticClass: "form-control form-control-sm mb-2 text-center font-weight-bold",
+    attrs: {
+      type: "time"
+    },
+    domProps: {
+      value: _vm.departureTime
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.departureTime = $event.target.value;
+      }
+    }
+  }), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-action btn-outline-success btn-sm w-100",
+    attrs: {
+      "data-bs-dismiss": "modal",
+      disabled: !_vm.departureTime
+    },
+    on: {
+      click: function click($event) {
+        return _vm.registrar("fin");
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-check mr-1"
+  }), _vm._v(" Finalizar\n                    ")])])])])])])]) : _vm._e()])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -16721,6 +16779,22 @@ var staticRenderFns = [function () {
     staticClass: "time-icon mb-2"
   }, [_c("i", {
     staticClass: "fa-solid fa-stethoscope text-info h5"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "badge status-badge-success badge-status"
+  }, [_c("i", {
+    staticClass: "fas fa-check"
+  }), _vm._v(" Registrado")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "time-icon mb-2"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-flag-checkered text-success h5"
   })]);
 }, function () {
   var _vm = this,
