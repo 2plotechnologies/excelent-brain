@@ -431,6 +431,9 @@ export default {
       async fetchDashboardData() {
           try {
               let { data } = await this.axios.get('/api/dashboardModuloCitas');
+              if (data && data.citasHoy) {
+                  data.citasHoy = data.citasHoy.filter(c => c.status !== 7 && (!c.patient || c.patient.dni !== 'BLOQUEO'));
+              }
               this.dashData = data;
               
               // Estado de citas hoy

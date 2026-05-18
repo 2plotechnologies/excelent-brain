@@ -17,7 +17,7 @@ class DashboardController extends Controller
         $pacientesActivos = Patient::where('activo', true)->where('dni', '<>', 'BLOQUEO')->count();
 
         //Citas de hoy count.
-        $citasHoy = Appointment::whereDate('date', today())->count();
+        $citasHoy = Appointment::whereDate('date', today())->where('status', '<>', 7)->count();
 
         //Ingresos del dia count.
         $ingresosHoy = Payment::whereDate('created_at', today())->sum('price');
@@ -40,7 +40,7 @@ class DashboardController extends Controller
         $totalAlertas = $alertasSOS + $alertasDeudas + $alertasRecetasCount;
 
         //Listar citas de hoy.
-        $citasHoy = Appointment::with('patient')->whereDate('date', today())->get();
+        $citasHoy = Appointment::with('patient')->whereDate('date', today())->where('status', '<>', 7)->get();
 
         //Alertas activas (No existe el modelo, usar sql crudo).
         $sos = DB::table('sos')->join('patients', 'sos.IdPaciente', '=', 'patients.id')->where('sos.activo', true)->where('patients.dni', '<>', 'BLOQUEO')->get();
@@ -103,7 +103,7 @@ class DashboardController extends Controller
         $ingresosHoy = Payment::whereDate('created_at', today())->sum('price');
 
         //Con cita hoy.
-        $conCitaHoy = Appointment::whereDate('date', today())->count();
+        $conCitaHoy = Appointment::whereDate('date', today())->where('status', '<>', 7)->count();
 
         //Con deuda.
         $conDeuda = DB::table('deudas')->where('estado', '1')->whereYear('fecha', today()->year)->whereMonth('fecha', today()->month)->count();
@@ -153,7 +153,7 @@ class DashboardController extends Controller
 
     public function dashboardModuloCitas(){
         //Total de citas hoy.
-        $totalCitasHoy = Appointment::whereDate('date', today())->count();
+        $totalCitasHoy = Appointment::whereDate('date', today())->where('status', '<>', 7)->count();
 
         //Total de citas pendientes.
         $totalCitasPendientes = Appointment::where('status', '1')->where('date', today())->count();
@@ -174,6 +174,7 @@ class DashboardController extends Controller
         $citasSemanalesPorTipo = DB::table('appointments as a')
             ->join('precios as p', 'a.type', '=', 'p.id')
             ->select('p.descripcion', DB::raw('count(*) as total'))
+            ->where('a.status', '<>', 7)
             ->where('a.date', '>=', today()->startOfWeek())
             ->where('a.date', '<=', today()->endOfWeek())
             ->groupBy('p.descripcion')
@@ -204,7 +205,7 @@ class DashboardController extends Controller
             ->get();
 
             //Listar citas de hoy con relaciones.
-            $citasHoy = Appointment::with(['patient', 'professional', 'precio', 'payment', 'membresia', 'schedule', 'faltas'])->whereDate('date', today())->orderBy('date', 'asc')->get();
+            $citasHoy = Appointment::with(['patient', 'professional', 'precio', 'payment', 'membresia', 'schedule', 'faltas'])->whereDate('date', today())->where('status', '<>', 7)->orderBy('date', 'asc')->get();
 
         //Retornar los datos al dashboard en JSON.
         return response()->json([

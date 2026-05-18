@@ -33,7 +33,6 @@ class ScheduleController extends Controller
             ->where('appointments.date', '>=', date('Y-m-d'))
 						->where('appointments.status', '<>', 6) //limbo
 						->where('appointments.status', '<>', 4)
-						->where('appointments.status', '<>', 5)
             ->with('schedule')
             ->get();
         
@@ -85,7 +84,7 @@ class ScheduleController extends Controller
 				->whereColumn('appointments.professional_id', 'schedules.professional_id')
 				->whereDate('appointments.date', $fecha)
 				->whereColumn('appointments.schedule_id', 'schedules.id')
-				->whereIn('appointments.status', [1,2]);
+				->whereIn('appointments.status', [1,2,5]);
 			})
 			->get();
 
@@ -97,7 +96,6 @@ class ScheduleController extends Controller
 			       
         $appointment = Appointment::whereDate('appointments.date', '=', $fecha)
         ->where('appointments.status', '<>', 6) //limbo
-        ->where('appointments.status', '<>', 5) //eliminados
         ->where('appointments.status', '<>', 4)
         ->where('appointments.status', '<>', 3)
         ->with('schedule')
@@ -283,12 +281,8 @@ class ScheduleController extends Controller
                 'departure_date' => $departure_date
             ]);
 
-            $duracion = \Carbon\Carbon::parse($departure_date)->diffInMinutes(\Carbon\Carbon::parse($check_time));
-            
             Appointment::where('schedule_id', $id)->update([
-                'hora_inicio' => $check_time,
-                'hora_fin' => $departure_date,
-                'duracion' => $duracion
+                'hora_inicio' => $check_time
             ]);
 
             return response()->json([

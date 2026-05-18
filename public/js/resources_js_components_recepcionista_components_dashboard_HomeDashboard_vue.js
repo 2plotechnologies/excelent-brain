@@ -55,7 +55,9 @@ moment__WEBPACK_IMPORTED_MODULE_0___default().locale('es');
         var data = res.data;
         _this.dashboardData = {
           pacientesActivos: data.pacientesActivos || 0,
-          citasHoy: data.citasHoy || [],
+          citasHoy: (data.citasHoy || []).filter(function (c) {
+            return c.status !== 7 && (!c.patient || c.patient.dni !== 'BLOQUEO');
+          }),
           ingresosHoy: data.ingresosHoy || 0,
           alertasSOS: data.alertasSOS || 0,
           alertasDeudas: data.alertasDeudas || 0,

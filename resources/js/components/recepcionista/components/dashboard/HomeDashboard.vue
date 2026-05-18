@@ -311,7 +311,7 @@ export default {
                     let data = res.data;
                     this.dashboardData = {
                         pacientesActivos: data.pacientesActivos || 0,
-                        citasHoy: data.citasHoy || [],
+                        citasHoy: (data.citasHoy || []).filter(c => c.status !== 7 && (!c.patient || c.patient.dni !== 'BLOQUEO')),
                         ingresosHoy: data.ingresosHoy || 0,
                         alertasSOS: data.alertasSOS || 0,
                         alertasDeudas: data.alertasDeudas || 0,

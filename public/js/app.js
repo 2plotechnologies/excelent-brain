@@ -6066,6 +6066,11 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
             case 3:
               _yield$_this8$axios$g = _context2.sent;
               data = _yield$_this8$axios$g.data;
+              if (data && data.citasHoy) {
+                data.citasHoy = data.citasHoy.filter(function (c) {
+                  return c.status !== 7 && (!c.patient || c.patient.dni !== 'BLOQUEO');
+                });
+              }
               _this8.dashData = data;
 
               // Estado de citas hoy
@@ -6127,17 +6132,17 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
               _this8.ocupacionObj = Object.assign({}, _this8.ocupacionObj);
               _this8.estadosCitasHoyObj = Object.assign({}, _this8.estadosCitasHoyObj);
               _this8.tiposSemanaObj = Object.assign({}, _this8.tiposSemanaObj);
-              _context2.next = 19;
+              _context2.next = 20;
               break;
-            case 16:
-              _context2.prev = 16;
+            case 17:
+              _context2.prev = 17;
               _context2.t0 = _context2["catch"](0);
               console.error("Error fetching Dashboard Citas:", _context2.t0);
-            case 19:
+            case 20:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[0, 16]]);
+        }, _callee2, null, [[0, 17]]);
       }))();
     },
     formatHora: function formatHora(hora) {
@@ -10003,10 +10008,34 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         return h.professional_id == idProf;
       });
 
-      // Ordenar por hora de inicio
+      // Map computed properties first, including attention shift
+      ocupadas.forEach(function (cita) {
+        var start = cita.attention ? cita.attention : cita.hora_inicio ? cita.hora_inicio : cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00';
+        cita._computed_start = start;
+        var end = cita.hora_fin;
+        if (!end && cita.duracion && start !== '00:00:00') {
+          end = moment__WEBPACK_IMPORTED_MODULE_0___default()(start, 'HH:mm:ss').add(cita.duracion, 'minutes').format('HH:mm:ss');
+        }
+        if (!end && start !== '00:00:00') {
+          // Calculate planned duration in minutes
+          var planDur = 15; // default fallback
+          if (cita.schedule && cita.schedule.check_time && cita.schedule.departure_date) {
+            var t1 = moment__WEBPACK_IMPORTED_MODULE_0___default()(cita.schedule.check_time, 'HH:mm:ss');
+            var t2 = moment__WEBPACK_IMPORTED_MODULE_0___default()(cita.schedule.departure_date, 'HH:mm:ss');
+            planDur = t2.diff(t1, 'minutes');
+          }
+          end = moment__WEBPACK_IMPORTED_MODULE_0___default()(start, 'HH:mm:ss').add(planDur, 'minutes').format('HH:mm:ss');
+        }
+        if (!end) {
+          end = cita.schedule && cita.schedule.departure_date ? cita.schedule.departure_date : '00:00:00';
+        }
+        cita._computed_end = end;
+      });
+
+      // Ordenar por hora de inicio (_computed_start)
       ocupadas.sort(function (a, b) {
-        var t1 = a.hora_inicio ? a.hora_inicio : a.schedule && a.schedule.check_time ? a.schedule.check_time : '23:59:59';
-        var t2 = b.hora_inicio ? b.hora_inicio : b.schedule && b.schedule.check_time ? b.schedule.check_time : '23:59:59';
+        var t1 = a._computed_start || '23:59:59';
+        var t2 = b._computed_start || '23:59:59';
         return t1.localeCompare(t2);
       });
 
@@ -10015,8 +10044,8 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       var currentCluster = [];
       var clusterEnd = '00:00:00';
       ocupadas.forEach(function (cita) {
-        var start = cita.hora_inicio ? cita.hora_inicio : cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00';
-        var end = cita.hora_fin ? cita.hora_fin : cita.schedule && cita.schedule.departure_date ? cita.schedule.departure_date : '00:00:00';
+        var start = cita._computed_start;
+        var end = cita._computed_end;
         if (currentCluster.length === 0) {
           currentCluster.push(cita);
           clusterEnd = end;
@@ -10092,6 +10121,9 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     syncScroll: function syncScroll(e) {
       // Para si quisieramos sincronizar etiquetas Y al moverse, en este layout CSS grid-lines abarca todo
     },
+    isBlocked: function isBlocked(cita) {
+      return cita && (cita.status == 7 || cita.patient && cita.patient.dni === 'BLOQUEO');
+    },
     mostrarTooltip: function mostrarTooltip(e, cita, doctor) {
       var esLibre = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
       var horaRango = "";
@@ -10103,8 +10135,16 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
           doctor: doctor.name,
           estado: 'Libre'
         };
-      } else {
+      } else if (this.isBlocked(cita)) {
         horaRango = this.formatHora(cita.hora_inicio || (cita.schedule ? cita.schedule.check_time : '')) + ' - ' + this.formatHora(cita.hora_fin || (cita.schedule ? cita.schedule.departure_date : ''));
+        this.tooltipData = {
+          paciente: 'HORARIO BLOQUEADO',
+          hora: horaRango,
+          doctor: doctor.name,
+          estado: cita.recomendation || 'Bloqueo'
+        };
+      } else {
+        horaRango = this.formatHora(cita.hora_inicio || (cita.schedule ? cita.schedule.check_time : '')) + ' - ' + this.formatHora(cita._computed_end);
         var estado = 'Sin Confirmar';
         if (cita.status == 2) estado = 'Confirmado';
         if (cita.status == 3) estado = 'Anulado';
@@ -10138,6 +10178,16 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       this.prepararAutomaticos(dIndex, hIndex);
     },
     abrirDetallesCita: function abrirDetallesCita(citaMalas) {
+      if (this.isBlocked(citaMalas)) {
+        this.$swal.fire({
+          title: 'Horario Bloqueado',
+          text: "Este horario est\xE1 bloqueado: ".concat(citaMalas.recomendation || 'Bloqueo de horario'),
+          icon: 'info',
+          confirmButtonColor: '#4e73df',
+          confirmButtonText: 'Aceptar'
+        });
+        return;
+      }
       this.cita = citaMalas;
       this.indexElegido = this.horasMalas.findIndex(function (x) {
         return x.id == citaMalas.id;
@@ -18725,12 +18775,12 @@ var render = function render() {
       return _c("div", {
         key: "ocup-" + horaOcup.id,
         staticClass: "booked-slot shadow-sm p-1",
-        style: [_vm.slotStyle(horaOcup.hora_inicio || (horaOcup.schedule ? horaOcup.schedule.check_time : null), horaOcup.hora_fin || (horaOcup.schedule ? horaOcup.schedule.departure_date : null), horaOcup), {
-          borderLeft: "4px solid " + _vm.stringToColor(doctor.name)
+        style: [_vm.slotStyle(horaOcup._computed_start, horaOcup._computed_end, horaOcup), {
+          borderLeft: _vm.isBlocked(horaOcup) ? "4px solid #dc3545" : "4px solid " + _vm.stringToColor(doctor.name)
         }],
         attrs: {
-          "data-bs-toggle": "modal",
-          "data-bs-target": "#modalAccionesCita"
+          "data-bs-toggle": _vm.isBlocked(horaOcup) ? null : "modal",
+          "data-bs-target": _vm.isBlocked(horaOcup) ? null : "#modalAccionesCita"
         },
         on: {
           click: function click($event) {
@@ -18744,7 +18794,24 @@ var render = function render() {
             return _vm.moverTooltip($event);
           }
         }
-      }, [_c("div", {
+      }, [_vm.isBlocked(horaOcup) ? _c("div", {
+        staticClass: "booked-content h-100 position-relative overflow-hidden d-flex flex-column bg-light",
+        staticStyle: {
+          background: "repeating-linear-gradient(45deg, #f8f9fc, #f8f9fc 10px, #eaecf4 10px, #eaecf4 20px) !important"
+        }
+      }, [_vm._m(1, true), _vm._v(" "), _c("div", {
+        staticClass: "text-dark mt-1 text-truncate font-weight-bold",
+        staticStyle: {
+          "font-size": "0.7rem",
+          "line-height": "1.1"
+        }
+      }, [_vm._v("\n\t\t\t\t\t\t\t\t\t" + _vm._s(horaOcup.recomendation || "Bloqueo") + "\n\t\t\t\t\t\t\t\t")]), _vm._v(" "), _c("div", {
+        staticClass: "text-muted mt-1 text-truncate",
+        staticStyle: {
+          "font-size": "0.65rem",
+          "line-height": "1"
+        }
+      }, [_vm._v("\n\t\t\t\t\t\t\t\t\t" + _vm._s(_vm.formatHora(horaOcup._computed_start)) + " - " + _vm._s(_vm.formatHora(horaOcup._computed_end)) + "\n\t\t\t\t\t\t\t\t")])]) : _c("div", {
         staticClass: "booked-content h-100 position-relative overflow-hidden d-flex flex-column",
         "class": _vm.bgPorSemaforo(horaOcup)
       }, [_c("div", {
@@ -18831,7 +18898,7 @@ var render = function render() {
           "font-size": "0.65rem",
           "line-height": "1"
         }
-      }, [_vm._v("\n\t\t\t\t\t\t\t\t\t" + _vm._s(_vm.formatHora(horaOcup.hora_inicio || (horaOcup.schedule ? horaOcup.schedule.check_time : ""))) + " - " + _vm._s(_vm.formatHora(horaOcup.hora_fin || (horaOcup.schedule ? horaOcup.schedule.departure_date : ""))) + "\n\t\t\t\t\t\t\t\t")])])]);
+      }, [_vm._v("\n\t\t\t\t\t\t\t\t\t" + _vm._s(_vm.formatHora(horaOcup._computed_start)) + " - " + _vm._s(_vm.formatHora(horaOcup._computed_end)) + "\n\t\t\t\t\t\t\t\t")])])]);
     })], 2);
   })], 2)])]), _vm._v(" "), _c("div", {
     directives: [{
@@ -18955,6 +19022,20 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "far fa-clock"
   })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center w-100"
+  }, [_c("div", {
+    staticClass: "font-weight-bold text-truncate lh-1",
+    staticStyle: {
+      "font-size": "0.75rem",
+      color: "#dc3545"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-ban me-1"
+  }), _vm._v(" Bloqueado\n\t\t\t\t\t\t\t\t\t")])]);
 }];
 render._withStripped = true;
 

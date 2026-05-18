@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2665],{2665:(e,s,n)=>{n.r(s),n.d(s,{default:()=>t});const r={props:["nombreUser","idSede"]};const t=(0,n(4486).A)(r,(function(){var e=this,s=e._self._c;return s("main",[s("table-citas",{attrs:{nombreUser:e.nombreUser,idSede:e.idSede}})],1)}),[],!1,null,null,null).exports}}]);

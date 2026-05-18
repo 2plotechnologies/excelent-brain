@@ -152,8 +152,8 @@ class AppointmentController extends Controller
 
             $scheduleInfo = Schedule::find($request->get('schedule_id'));
             $hora_inicio = $scheduleInfo ? $scheduleInfo->check_time : null;
-            $hora_fin = $scheduleInfo ? $scheduleInfo->departure_date : null;
-            $duracion = ($hora_inicio && $hora_fin) ? \Carbon\Carbon::parse($hora_fin)->diffInMinutes(\Carbon\Carbon::parse($hora_inicio)) : null;
+            $hora_fin = null;
+            $duracion = null;
 
 		/* $condition = Patient::where('dni', '=', $request->dni)
 		->with('medical_evolutions')
@@ -460,7 +460,7 @@ class AppointmentController extends Controller
 					
 					if (!$bloqueoOcupado) {
 						$hora_inicio_bloq = $nextSchedule->check_time;
-						$hora_fin_bloq = \Carbon\Carbon::parse($hora_inicio_bloq)->addMinutes(15)->format('H:i:s');
+						$hora_fin_bloq = null;
 						Appointment::create([
 							'professional_id' => $request->get('professional_id'),
 							'date' => $request->get('date'),
@@ -468,7 +468,7 @@ class AppointmentController extends Controller
 							'clasification' => 1,
 							'type' => $request->get('type'),
 							'patient_condition' => '1',
-							'recomendation' => '',
+							'recomendation' => 'Bloqueo automático de 15 min tras consulta inicial',
 							'mode' => 1,
 							'link' => '',
 							'status' => 2, // Confirmado para que ocupe espacio y no aparezca pendiente
@@ -883,8 +883,8 @@ Medical_evolution::create([
 
 		$scheduleInfo = Schedule::find($request->get('schedule_id'));
 		$hora_inicio = $scheduleInfo ? $scheduleInfo->check_time : null;
-		$hora_fin = $scheduleInfo ? $scheduleInfo->departure_date : null;
-		$duracion = ($hora_inicio && $hora_fin) ? \Carbon\Carbon::parse($hora_fin)->diffInMinutes(\Carbon\Carbon::parse($hora_inicio)) : null;
+		$hora_fin = null;
+		$duracion = null;
 
 		$nuevaCita = Appointment::create([
 			'professional_id' => $request->get('professional_id'),

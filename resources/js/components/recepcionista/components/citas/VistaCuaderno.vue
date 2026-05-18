@@ -109,14 +109,31 @@
 						<!-- Slots Ocupados (Citas) -->
 						<div v-for="(horaOcup, hIndex) in getHorasOcupadas(doctor.id)" :key="'ocup-'+horaOcup.id" 
 								class="booked-slot shadow-sm p-1" 
-								:style="[slotStyle(horaOcup.hora_inicio || (horaOcup.schedule ? horaOcup.schedule.check_time : null), horaOcup.hora_fin || (horaOcup.schedule ? horaOcup.schedule.departure_date : null), horaOcup), { borderLeft: '4px solid ' + stringToColor(doctor.name) }]"
+								:style="[slotStyle(horaOcup._computed_start, horaOcup._computed_end, horaOcup), { borderLeft: isBlocked(horaOcup) ? '4px solid #dc3545' : '4px solid ' + stringToColor(doctor.name) }]"
 								@click="abrirDetallesCita(horaOcup)"
 								@mouseover="mostrarTooltip($event, horaOcup, doctor)"
 								@mouseleave="ocultarTooltip"
 								@mousemove="moverTooltip($event)"
-								data-bs-toggle="modal" data-bs-target="#modalAccionesCita">
+								:data-bs-toggle="isBlocked(horaOcup) ? null : 'modal'" 
+								:data-bs-target="isBlocked(horaOcup) ? null : '#modalAccionesCita'">
 							
-							<div class="booked-content h-100 position-relative overflow-hidden d-flex flex-column" :class="bgPorSemaforo(horaOcup)">
+							<!-- Blocked Slot View -->
+							<div v-if="isBlocked(horaOcup)" class="booked-content h-100 position-relative overflow-hidden d-flex flex-column bg-light" style="background: repeating-linear-gradient(45deg, #f8f9fc, #f8f9fc 10px, #eaecf4 10px, #eaecf4 20px) !important;">
+								<div class="d-flex justify-content-between align-items-center w-100">
+									<div class="font-weight-bold text-truncate lh-1" style="font-size: 0.75rem; color: #dc3545;">
+										<i class="fas fa-ban me-1"></i> Bloqueado
+									</div>
+								</div>
+								<div class="text-dark mt-1 text-truncate font-weight-bold" style="font-size: 0.7rem; line-height: 1.1;">
+									{{ horaOcup.recomendation || 'Bloqueo' }}
+								</div>
+								<div class="text-muted mt-1 text-truncate" style="font-size: 0.65rem; line-height: 1;">
+									{{ formatHora(horaOcup._computed_start) }} - {{ formatHora(horaOcup._computed_end) }}
+								</div>
+							</div>
+
+							<!-- Standard Appointment View -->
+							<div v-else class="booked-content h-100 position-relative overflow-hidden d-flex flex-column" :class="bgPorSemaforo(horaOcup)">
 								<!-- Primera línea siempre visible: Nombre y Pago -->
 								<div class="d-flex justify-content-between align-items-center w-100">
 									<div class="font-weight-bold text-truncate lh-1" style="font-size: 0.75rem;">
@@ -135,7 +152,7 @@
 								
 								<!-- Segunda línea: Tiempo (se cortará si no hay alto suficiente) -->
 								<div class="text-muted mt-1 text-truncate" style="font-size: 0.65rem; line-height: 1;">
-									{{ formatHora(horaOcup.hora_inicio || (horaOcup.schedule ? horaOcup.schedule.check_time : '')) }} - {{ formatHora(horaOcup.hora_fin || (horaOcup.schedule ? horaOcup.schedule.departure_date : '')) }}
+									{{ formatHora(horaOcup._computed_start) }} - {{ formatHora(horaOcup._computed_end) }}
 								</div>
 							</div>
 
@@ -330,10 +347,35 @@
 			getHorasOcupadas(idProf) {
 				let ocupadas = this.horasMalas.filter(h => h.professional_id == idProf);
 				
-				// Ordenar por hora de inicio
+				// Map computed properties first, including attention shift
+				ocupadas.forEach(cita => {
+					let start = cita.attention ? cita.attention : (cita.hora_inicio ? cita.hora_inicio : (cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00'));
+					cita._computed_start = start;
+
+					let end = cita.hora_fin;
+					if (!end && cita.duracion && start !== '00:00:00') {
+						end = moment(start, 'HH:mm:ss').add(cita.duracion, 'minutes').format('HH:mm:ss');
+					}
+					if (!end && start !== '00:00:00') {
+						// Calculate planned duration in minutes
+						let planDur = 15; // default fallback
+						if (cita.schedule && cita.schedule.check_time && cita.schedule.departure_date) {
+							let t1 = moment(cita.schedule.check_time, 'HH:mm:ss');
+							let t2 = moment(cita.schedule.departure_date, 'HH:mm:ss');
+							planDur = t2.diff(t1, 'minutes');
+						}
+						end = moment(start, 'HH:mm:ss').add(planDur, 'minutes').format('HH:mm:ss');
+					}
+					if (!end) {
+						end = cita.schedule && cita.schedule.departure_date ? cita.schedule.departure_date : '00:00:00';
+					}
+					cita._computed_end = end;
+				});
+
+				// Ordenar por hora de inicio (_computed_start)
 				ocupadas.sort((a, b) => {
-					let t1 = a.hora_inicio ? a.hora_inicio : (a.schedule && a.schedule.check_time ? a.schedule.check_time : '23:59:59');
-					let t2 = b.hora_inicio ? b.hora_inicio : (b.schedule && b.schedule.check_time ? b.schedule.check_time : '23:59:59');
+					let t1 = a._computed_start || '23:59:59';
+					let t2 = b._computed_start || '23:59:59';
 					return t1.localeCompare(t2);
 				});
 
@@ -343,8 +385,8 @@
 				let clusterEnd = '00:00:00';
 				
 				ocupadas.forEach(cita => {
-					let start = cita.hora_inicio ? cita.hora_inicio : (cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00');
-					let end = cita.hora_fin ? cita.hora_fin : (cita.schedule && cita.schedule.departure_date ? cita.schedule.departure_date : '00:00:00');
+					let start = cita._computed_start;
+					let end = cita._computed_end;
 					
 					if(currentCluster.length === 0) {
 						currentCluster.push(cita);
@@ -418,6 +460,9 @@
 			syncScroll(e){
 				// Para si quisieramos sincronizar etiquetas Y al moverse, en este layout CSS grid-lines abarca todo
 			},
+			isBlocked(cita) {
+				return cita && (cita.status == 7 || (cita.patient && cita.patient.dni === 'BLOQUEO'));
+			},
 			mostrarTooltip(e, cita, doctor, esLibre = false) {
 				let horaRango = "";
 				if(esLibre){
@@ -428,8 +473,16 @@
 						doctor: doctor.name,
 						estado: 'Libre'
 					};
-				} else {
+				} else if (this.isBlocked(cita)) {
 					horaRango = this.formatHora(cita.hora_inicio || (cita.schedule ? cita.schedule.check_time : '')) + ' - ' + this.formatHora(cita.hora_fin || (cita.schedule ? cita.schedule.departure_date : ''));
+					this.tooltipData = {
+						paciente: 'HORARIO BLOQUEADO',
+						hora: horaRango,
+						doctor: doctor.name,
+						estado: cita.recomendation || 'Bloqueo'
+					};
+				} else {
+					horaRango = this.formatHora(cita.hora_inicio || (cita.schedule ? cita.schedule.check_time : '')) + ' - ' + this.formatHora(cita._computed_end);
 					
 					let estado = 'Sin Confirmar';
 					if(cita.status == 2) estado = 'Confirmado';
@@ -461,6 +514,16 @@
 				this.prepararAutomaticos(dIndex, hIndex);
 			},
 			abrirDetallesCita(citaMalas) {
+				if (this.isBlocked(citaMalas)) {
+					this.$swal.fire({
+						title: 'Horario Bloqueado',
+						text: `Este horario está bloqueado: ${citaMalas.recomendation || 'Bloqueo de horario'}`,
+						icon: 'info',
+						confirmButtonColor: '#4e73df',
+						confirmButtonText: 'Aceptar'
+					});
+					return;
+				}
 				this.cita = citaMalas;
 				this.indexElegido = this.horasMalas.findIndex(x => x.id == citaMalas.id);
 			},

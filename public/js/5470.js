@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[5470],{3089:(e,n,l)=>{l.r(n),l.d(n,{default:()=>s});const s=(0,l(4486).A)({},(function(){return(0,this._self._c)("h1",[this._v("Bienvenido")])}),[],!1,null,null,null).exports}}]);
