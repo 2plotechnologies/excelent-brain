@@ -424,7 +424,7 @@
             <div class="card border rounded-3 mb-3 shadow-sm" style="border-color: #eef2f5 !important;">
               <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-start mb-1">
-                  <h6 class="font-weight-bold text-dark mb-0" style="font-size: 1.05rem;">{{ mem.precio ? mem.precio.descripcion : 'Paquete/Membresía' }}</h6>
+                  <h6 class="font-weight-bold text-dark mb-0" style="font-size: 1.05rem;">{{ mem.precio ? mem.precio.descripcion : 'Paquete' }}</h6>
                   <span class="badge rounded-pill px-3 py-1" :class="mem.activo ? 'bg-success bg-opacity-10' : 'bg-secondary bg-opacity-10 text-secondary'" style="font-weight: 500;">
                     {{ mem.activo ? 'Activo' : 'Inactivo' }}
                   </span>
@@ -447,7 +447,7 @@
           </div>
           <div v-if="!paciente.membresias || paciente.membresias.length == 0" class="col-12">
             <div class="alert alert-light border text-center text-muted">
-              No tiene paquetes o membresías.
+              No tiene paquetes.
             </div>
           </div>
         </div>
@@ -1615,7 +1615,7 @@
              </div>
              <h4 class="font-weight-bold text-dark mb-3">Convenios, Alianzas y Club</h4>
              <p class="text-muted mx-auto" style="max-width: 500px; font-size: 1.1rem;">
-                Esta sección está en desarrollo. Próximamente podrá gestionar aquí todos los acuerdos institucionales, beneficios de alianzas estratégicas y membresías de Club.
+                Esta sección está en desarrollo. Próximamente podrá gestionar aquí todos los acuerdos institucionales, beneficios de alianzas estratégicas y suscripciones de Club.
              </p>
              <div class="mt-4">
                <span class="badge bg-warning text-dark px-4 py-2 rounded-pill shadow-sm" style="font-size: 1rem;"><i class="fas fa-tools me-2"></i> Próximamente</span>
@@ -2504,7 +2504,7 @@ export default {
       if (id == 1) return '#e74c3c'; // Psiquiatrica - Red
       if (id == 2) return '#fd7e14'; // Psicológica - Orange
       if (id == 3) return '#27ae60'; // Certificado - Green
-      if (id == 5) return '#0d6efd'; // Membresía - Blue
+      if (id == 5) return '#0d6efd'; // Paquete - Blue
       if (id == 6) return '#20c997'; // Nutrición - Teal
       return '#6c757d'; // Default
     },

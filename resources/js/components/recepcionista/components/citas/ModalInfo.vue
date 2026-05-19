@@ -84,7 +84,7 @@
     data() {
       return{
         data: null,
-				clasificaciones:{1:'Psiquiátrico', 2:'Psicológico', 3:'Certificado', 4:'Kurame', 5:'Clínica de día', 6:'Por membresía'}
+				clasificaciones:{1:'Psiquiátrico', 2:'Psicológico', 3:'Certificado', 4:'Kurame', 5:'Clínica de día', 6:'Por paquete'}
       }
     },
     

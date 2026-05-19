@@ -257,7 +257,7 @@
 						<span v-if="payment.type==5">Pago de cita</span>
 						<span v-if="payment.type==3">Informe</span>
 						<span v-if="payment.type==2">Paquete Kurame</span>
-						<span v-if="payment.type==1">Paquete Membresía</span>
+						<span v-if="payment.type==1">Paquete</span>
 						<span v-if="payment.type==0">Certificado</span>
 					</td>
 					<td class="text-capitalize"> <span>{{queMoneda(payment.moneda)}}</span> </td>

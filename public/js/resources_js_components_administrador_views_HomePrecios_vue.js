@@ -295,7 +295,7 @@ var staticRenderFns = [function () {
     _c = _vm._self._c;
   return _c("p", {
     staticClass: "text-muted"
-  }, [_c("strong", [_vm._v("Precios de Kurame y Membresías")])]);
+  }, [_c("strong", [_vm._v("Precios de Kurame y Paquetes")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -410,7 +410,7 @@ var render = function render() {
     attrs: {
       "for": ""
     }
-  }, [_vm._v("Precio especial para pacientes que tienen membresía activa")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Precio especial para pacientes que tienen paquete activo")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -594,7 +594,7 @@ var render = function render() {
     attrs: {
       value: "4"
     }
-  }, [_vm._v("Membresía")])]), _vm._v(" "), _c("label", {
+  }, [_vm._v("Paquete")])]), _vm._v(" "), _c("label", {
     attrs: {
       "for": ""
     }

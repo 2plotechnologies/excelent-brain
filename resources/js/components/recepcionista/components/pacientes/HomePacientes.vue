@@ -279,7 +279,7 @@
                     <!-- Membresías -->
                     <li v-if="paciente.vivo==1">
                       <a class="dropdown-item" href="#" data-bs-toggle="offcanvas" data-bs-target="#offVerMembresias" @click="queId = paciente.id; nombrePaciente= paciente.name + ' ' + paciente.nombres; dataPaciente = paciente">
-                        <i class="far fa-star me-2 text-warning"></i> Paquetes / Membresías
+                        <i class="far fa-star me-2 text-warning"></i> Paquetes
                       </a>
                     </li>
 

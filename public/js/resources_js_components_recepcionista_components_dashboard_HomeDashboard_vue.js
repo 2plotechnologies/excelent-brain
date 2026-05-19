@@ -349,7 +349,7 @@ var render = function render() {
       staticClass: "mb-1 text-muted small"
     }, [_c("i", {
       staticClass: "fas fa-file-invoice-dollar mr-1"
-    }), _vm._v(_vm._s(deuda.motivo || "Membresía / Servicio") + "\n                                        ")]), _vm._v(" "), _c("small", {
+    }), _vm._v(_vm._s(deuda.motivo || "Paquete / Servicio") + "\n                                        ")]), _vm._v(" "), _c("small", {
       staticClass: "text-muted"
     }, [_c("i", {
       staticClass: "far fa-calendar-alt mr-1"

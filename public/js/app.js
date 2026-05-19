@@ -6925,7 +6925,7 @@ __webpack_require__.r(__webpack_exports__);
         3: 'Certificado',
         4: 'Kurame',
         5: 'Clínica de día',
-        6: 'Por membresía'
+        6: 'Por paquete'
       }
     };
   },

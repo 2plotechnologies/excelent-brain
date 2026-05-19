@@ -88,7 +88,7 @@
 									@if($extra_payment->type == 0)
 									Certificado
 									@elseif($extra_payment->type == 1)
-									Paquete de Membresía
+									Paquete
 									@elseif($extra_payment->type == 2)
 									Paquete de Kurame
 									@elseif($extra_payment->type == 3)

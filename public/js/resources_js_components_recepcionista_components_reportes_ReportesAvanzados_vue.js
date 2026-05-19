@@ -361,7 +361,7 @@ __webpack_require__.r(__webpack_exports__);
       },
       filtroAnual: false,
       filtro: -1,
-      equipo: ['Psicología', 'Psiquiatría', 'Certificado', 'Kurame', 'Membresía']
+      equipo: ['Psicología', 'Psiquiatría', 'Certificado', 'Kurame', 'Paquete']
     };
   },
   methods: {
@@ -1696,7 +1696,7 @@ var render = function render() {
     attrs: {
       "for": "btnradio5"
     }
-  }, [_vm._v("Membresía")])]), _vm._v(" "), _c("table", {
+  }, [_vm._v("Paquete")])]), _vm._v(" "), _c("table", {
     staticClass: "table table-sm table-hover"
   }, [_vm._m(1), _vm._v(" "), _c("tbody", [_vm._l(_vm.resultados, function (resultado, index) {
     return _c("tr", {
@@ -1765,7 +1765,7 @@ var render = function render() {
   }), _vm._v(" "), _vm.idReporte == 7 ? _c("div", [_c("table", {
     staticClass: "table table-sm table-hover"
   }, [_vm._m(8), _vm._v(" "), _c("tbody", _vm._l(_vm.resultados.servicios, function (servicio, index) {
-    return _c("tr", [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", [servicio.idClasificacion == 1 ? _c("span", [_vm._v("Psiquiatría")]) : _vm._e(), _vm._v(" "), servicio.idClasificacion == 2 ? _c("span", [_vm._v("Psicología")]) : _vm._e(), _vm._v(" "), servicio.idClasificacion == 3 ? _c("span", [_vm._v("Certificado")]) : _vm._e(), _vm._v(" "), servicio.idClasificacion == 4 ? _c("span", [_vm._v("Membresía")]) : _vm._e(), _vm._v(" "), _c("span", [_vm._v(_vm._s(servicio.descripcion))])]), _vm._v(" "), _c("td", [_vm.suma[servicio.id] ? _c("span", [_vm._v(_vm._s(_vm.suma[servicio.id].confirmado))]) : _c("span", [_vm._v("0")])]), _vm._v(" "), _c("td", [_vm.suma[servicio.id] ? _c("span", [_vm._v(_vm._s(_vm.suma[servicio.id].pagado))]) : _c("span", [_vm._v("0")])]), _vm._v(" "), _c("td", [_vm._v("S/ "), _vm.suma[servicio.id] ? _c("span", [_vm._v(_vm._s(parseFloat(_vm.suma[servicio.id].monto).toFixed(2)))]) : _c("span", [_vm._v("0.00")])])]);
+    return _c("tr", [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", [servicio.idClasificacion == 1 ? _c("span", [_vm._v("Psiquiatría")]) : _vm._e(), _vm._v(" "), servicio.idClasificacion == 2 ? _c("span", [_vm._v("Psicología")]) : _vm._e(), _vm._v(" "), servicio.idClasificacion == 3 ? _c("span", [_vm._v("Certificado")]) : _vm._e(), _vm._v(" "), servicio.idClasificacion == 4 ? _c("span", [_vm._v("Paquete")]) : _vm._e(), _vm._v(" "), _c("span", [_vm._v(_vm._s(servicio.descripcion))])]), _vm._v(" "), _c("td", [_vm.suma[servicio.id] ? _c("span", [_vm._v(_vm._s(_vm.suma[servicio.id].confirmado))]) : _c("span", [_vm._v("0")])]), _vm._v(" "), _c("td", [_vm.suma[servicio.id] ? _c("span", [_vm._v(_vm._s(_vm.suma[servicio.id].pagado))]) : _c("span", [_vm._v("0")])]), _vm._v(" "), _c("td", [_vm._v("S/ "), _vm.suma[servicio.id] ? _c("span", [_vm._v(_vm._s(parseFloat(_vm.suma[servicio.id].monto).toFixed(2)))]) : _c("span", [_vm._v("0.00")])])]);
   }), 0)])]) : _vm._e(), _vm._v(" "), _vm.idReporte == 7 ? _c("div", [_c("p", [_vm._v("Ojo: Recuerde que la nueva lista de servicios se aplicó a partir de Julio 2023")]), _vm._v(" "), _vm._l(_vm.resultados.servicios, function (servicio) {
     return _c("table", {
       staticClass: "table table-sm table-hover"

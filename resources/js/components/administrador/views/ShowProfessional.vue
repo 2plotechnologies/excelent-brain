@@ -176,7 +176,7 @@
             <td>{{ extra_payment.date }}</td>
             <td>
              <p v-if=" extra_payment.type === 0">Certificado</p>
-             <p v-else-if=" extra_payment.type === 1">Paquete Membresía</p> 
+             <p v-else-if=" extra_payment.type === 1">Paquete</p> 
              <p v-else-if=" extra_payment.type === 2">Paquete Kurame</p> 
              <p v-else-if=" extra_payment.type === 3">Informe</p>
              <p v-else-if=" extra_payment.type === 4">Otros</p>

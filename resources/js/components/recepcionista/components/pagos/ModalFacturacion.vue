@@ -494,9 +494,9 @@ export default{
 				this.facturacion.ruc = newVal.dniCliente
 				this.buscarReniec()
 				if( parseInt(newVal.idMembresia) >0 )
-					this.facturacion.conceptoPago = 'Pago de membresía'
+					this.facturacion.conceptoPago = 'Pago de paquete'
 				else{
-					const servicio = {"0":"Certificado","1":"Paquete Membresía","2":"Paquete Kurame","3":"Informe","4":"Otros","5":"Pago de cita","7":"Pago de membresía","8":"Adelanto de cita","15":"Pago de membresía","16":"Revaluación gratuita"}
+					const servicio = {"0":"Certificado","1":"Paquete","2":"Paquete Kurame","3":"Informe","4":"Otros","5":"Pago de cita","7":"Pago de paquete","8":"Adelanto de cita","15":"Pago de paquete","16":"Revaluación gratuita"}
 					this.facturacion.conceptoPago = servicio[newVal.type]+' '+ newVal.detalle.replace(/\//g, '-');
 
 				}

@@ -513,7 +513,8 @@ class ExtrasController extends Controller
     // Obtener la IdSede del usuario
     $idSede = DB::table('users')->where('id', $request->input('user_id'))->value('IdSede');
 		$hoy = Carbon::now();
-		$fin = $hoy->addMonths($request->input('meses'));
+		$meses = (int) $request->input('meses', 0);
+		$fin = $hoy->addMonths($meses);
 
     // Insertar en la tabla membresias
     $idMembresia = DB::table('membresias')->insertGetId([

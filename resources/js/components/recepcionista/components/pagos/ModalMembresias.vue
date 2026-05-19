@@ -11,7 +11,7 @@
 				</div>
 				<div class="modal-body px-4 pb-4">
 					
-					<!-- Paciente -->
+					<!-- Paciente. -->
 					<div class="mb-4 mt-2">
 						<label class="form-label text-secondary small fw-medium mb-1">Paciente <span class="text-danger">*</span></label>
 						<div class="position-relative" v-if="!pacienteElegido.id">
@@ -43,33 +43,144 @@
 
 					<!-- Tipo de Paquete -->
 					<div class="mb-4">
-						<label class="form-label text-secondary small fw-medium mb-1">Especialidad del Paquete <span class="text-danger">*</span></label>
-						<select class="form-select" id="sltMembresia" v-model="membresia.tipo" @change="calcularFechas()">
-							<option v-for="precio in precios" :value="precio.id">{{ precio.descripcion }}</option>
-						</select>
-						
-						<!-- Card estilo imagen cuando se selecciona -->
-						<div class="row mt-3" v-if="membresia.tipo">
+						<label class="form-label text-secondary small fw-medium mb-2">Tipo de Paquete <span class="text-danger">*</span></label>
+						<div class="row g-3">
 							<div class="col-md-4">
-								<div class="card border-primary shadow-sm h-100" style="background-color: #f0f7ff;">
-									<div class="card-body text-center py-3 d-flex flex-column justify-content-center">
-										<div class="text-primary fw-medium mb-1">{{ descripcionPaqueteElegido }}</div>
-										<div class="small text-muted" v-if="cantSesiones">S/ {{ (mostrarPrecio / cantSesiones).toFixed(2) }}/sesión</div>
+								<div class="card h-100 cursor-pointer transition-all" 
+									 :class="selectedTipoPaquete === 'sesiones' ? 'border-primary card-paquete-selected' : 'border-secondary border-opacity-25'"
+									 @click="seleccionarTipo('sesiones')" style="cursor: pointer;">
+									<div class="card-body text-center py-3">
+										<i class="fa-solid fa-cube fs-4 mb-2" :class="selectedTipoPaquete === 'sesiones' ? 'text-primary' : 'text-muted'"></i>
+										<div class="fw-medium" :class="selectedTipoPaquete === 'sesiones' ? 'text-primary' : 'text-dark'">Por Sesiones</div>
+										<div class="small text-muted mt-1" style="font-size: 0.75rem;">4, 6 u 8 sesiones</div>
 									</div>
 								</div>
 							</div>
-							<div class="col-md-4" v-if="cantSesiones">
-								<div class="card border-primary shadow-sm h-100" style="background-color: #f0f7ff;">
-									<div class="card-body text-center py-3 d-flex flex-column justify-content-center">
-										<div class="text-primary fw-bold fs-5 mb-0">{{ cantSesiones }}</div>
-										<div class="small text-muted mt-1">S/ {{ mostrarPrecio }} en total</div>
+							<div class="col-md-4">
+								<div class="card h-100 cursor-pointer transition-all" 
+									 :class="selectedTipoPaquete === 'tiempo' ? 'border-primary card-paquete-selected' : 'border-secondary border-opacity-25'"
+									 @click="seleccionarTipo('tiempo')" style="cursor: pointer;">
+									<div class="card-body text-center py-3">
+										<i class="fa-solid fa-stopwatch fs-4 mb-2" :class="selectedTipoPaquete === 'tiempo' ? 'text-primary' : 'text-muted'"></i>
+										<div class="fw-medium" :class="selectedTipoPaquete === 'tiempo' ? 'text-primary' : 'text-dark'">Por Tiempo</div>
+										<div class="small text-muted mt-1" style="font-size: 0.75rem;">15 o 30 días</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="card h-100 cursor-pointer transition-all" 
+									 :class="selectedTipoPaquete === 'sucamec' ? 'border-primary card-paquete-selected' : 'border-secondary border-opacity-25'"
+									 @click="seleccionarTipo('sucamec')" style="cursor: pointer;">
+									<div class="card-body text-center py-3">
+										<i class="fa-solid fa-shield-halved fs-4 mb-2" :class="selectedTipoPaquete === 'sucamec' ? 'text-primary' : 'text-muted'"></i>
+										<div class="fw-medium" :class="selectedTipoPaquete === 'sucamec' ? 'text-primary' : 'text-dark'">Sucamec</div>
+										<div class="small text-muted mt-1" style="font-size: 0.75rem;">Nuevo o Renovación</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<!-- Profesional -->
+					<!-- Especialidad (Solo para Sesiones y Tiempo) -->
+					<div class="mb-4" v-if="selectedTipoPaquete === 'sesiones' || selectedTipoPaquete === 'tiempo'">
+						<label class="form-label text-secondary small fw-medium mb-2">Especialidad del Paquete <span class="text-danger">*</span></label>
+						<div class="row g-3">
+							<div class="col-md-4">
+								<div class="card h-100 cursor-pointer transition-all" 
+									 :class="selectedEspecialidadPaquete === 'psicologica' ? 'border-primary card-paquete-selected' : 'border-secondary border-opacity-25'"
+									 @click="seleccionarEspecialidad('psicologica')" style="cursor: pointer;">
+									<div class="card-body text-center py-3">
+										<div class="fw-medium" :class="selectedEspecialidadPaquete === 'psicologica' ? 'text-primary' : 'text-dark'">Psicológica</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="card h-100 cursor-pointer transition-all" 
+									 :class="selectedEspecialidadPaquete === 'psiquiatrica' ? 'border-primary card-paquete-selected' : 'border-secondary border-opacity-25'"
+									 @click="seleccionarEspecialidad('psiquiatrica')" style="cursor: pointer;">
+									<div class="card-body text-center py-3">
+										<div class="fw-medium" :class="selectedEspecialidadPaquete === 'psiquiatrica' ? 'text-primary' : 'text-dark'">Psiquiátrica</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="card h-100 cursor-pointer transition-all" 
+									 :class="selectedEspecialidadPaquete === 'nutricional' ? 'border-primary card-paquete-selected' : 'border-secondary border-opacity-25'"
+									 @click="seleccionarEspecialidad('nutricional')" style="cursor: pointer;">
+									<div class="card-body text-center py-3">
+										<div class="fw-medium" :class="selectedEspecialidadPaquete === 'nutricional' ? 'text-primary' : 'text-dark'">Nutricional</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Opciones de Subtipo (Sesiones, Tiempo o Sucamec) -->
+					<div class="mb-4" v-if="selectedTipoPaquete">
+						<label class="form-label text-secondary small fw-medium mb-2">
+							{{ selectedTipoPaquete === 'sesiones' ? 'Número de Sesiones' : (selectedTipoPaquete === 'tiempo' ? 'Duración' : 'Trámite') }}
+							<span class="text-danger">*</span>
+						</label>
+						
+						<!-- Opciones para Sesiones -->
+						<div class="row g-3" v-if="selectedTipoPaquete === 'sesiones'">
+							<div class="col-md-4" v-for="sesion in ['4', '6', '8']" :key="sesion">
+								<div class="card h-100 cursor-pointer transition-all" 
+									 :class="selectedSubtipoPaquete === sesion ? 'border-primary card-paquete-selected' : 'border-secondary border-opacity-25'"
+									 @click="seleccionarSubtipo(sesion)" style="cursor: pointer;">
+									<div class="card-body text-center py-3">
+										<div class="fw-bold fs-5 mb-1" :class="selectedSubtipoPaquete === sesion ? 'text-primary' : 'text-dark'">{{ sesion }}</div>
+										<div class="small text-muted" v-if="obtenerPrecioSubtipo(sesion)">S/ {{ obtenerPrecioSubtipo(sesion) }}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<!-- Opciones para Tiempo -->
+						<div class="row g-3" v-if="selectedTipoPaquete === 'tiempo'">
+							<div class="col-md-6" v-for="dia in ['15', '30']" :key="dia">
+								<div class="card h-100 cursor-pointer transition-all" 
+									 :class="selectedSubtipoPaquete === dia ? 'border-primary card-paquete-selected' : 'border-secondary border-opacity-25'"
+									 @click="seleccionarSubtipo(dia)" style="cursor: pointer;">
+									<div class="card-body text-center py-3">
+										<div class="fw-bold fs-5 mb-1" :class="selectedSubtipoPaquete === dia ? 'text-primary' : 'text-dark'">{{ dia }} Días</div>
+										<div class="small text-muted" v-if="obtenerPrecioSubtipo(dia)">S/ {{ obtenerPrecioSubtipo(dia) }}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<!-- Opciones para Sucamec -->
+						<div class="row g-3" v-if="selectedTipoPaquete === 'sucamec'">
+							<div class="col-md-6">
+								<div class="card h-100 cursor-pointer transition-all" 
+									 :class="selectedSubtipoPaquete === 'nuevo' ? 'border-primary card-paquete-selected' : 'border-secondary border-opacity-25'"
+									 @click="seleccionarSubtipo('nuevo')" style="cursor: pointer;">
+									<div class="card-body text-center py-3">
+										<div class="fw-bold fs-5 mb-1" :class="selectedSubtipoPaquete === 'nuevo' ? 'text-primary' : 'text-dark'">Nuevo</div>
+										<div class="small text-muted" v-if="obtenerPrecioSubtipo('nuevo')">S/ {{ obtenerPrecioSubtipo('nuevo') }}</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="card h-100 cursor-pointer transition-all" 
+									 :class="selectedSubtipoPaquete === 'renovacion' ? 'border-primary card-paquete-selected' : 'border-secondary border-opacity-25'"
+									 @click="seleccionarSubtipo('renovacion')" style="cursor: pointer;">
+									<div class="card-body text-center py-3">
+										<div class="fw-bold fs-5 mb-1" :class="selectedSubtipoPaquete === 'renovacion' ? 'text-primary' : 'text-dark'">Renovación</div>
+										<div class="small text-muted" v-if="obtenerPrecioSubtipo('renovacion')">S/ {{ obtenerPrecioSubtipo('renovacion') }}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<!-- Alerta de no encontrado -->
+						<div class="alert alert-warning mt-3 py-2 small d-flex align-items-center" v-if="!membresia.tipo && selectedSubtipoPaquete && (selectedTipoPaquete === 'sucamec' || selectedEspecialidadPaquete)">
+							<i class="fa-solid fa-triangle-exclamation me-2"></i> No se encontró un precio configurado para esta combinación en la base de datos.
+						</div>
+					</div>
+
+					<!-- Profesional. -->
 					<div class="mb-4">
 						<label class="form-label text-secondary small fw-medium mb-1">Profesional <span class="text-danger">*</span></label>
 						<select class="form-select" id="sltDoctor" v-model="doctorSeleccionado" @change="listarhorario()">
@@ -78,7 +189,7 @@
 						</select>
 					</div>
 
-					<!-- Precio y Cuotas -->
+					<!-- Precio y Cuotas. -->
 					<div class="card border-0 mb-4" style="background-color: #f8f9fa; border-radius: 1rem;">
 						<div class="card-body p-4">
 							<h6 class="fw-bold mb-4 d-flex align-items-center" style="color: #2b3b5a;">
@@ -164,8 +275,10 @@
 				</div>
 				<div class="modal-footer border-top-0 pt-0 px-4 pb-4">
 					<button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancelar</button>
-					<button type="button" class="btn btn-primary px-4" @click="guardar()">
-						<i class="fa-solid fa-cube me-2"></i> Crear Paquete
+					<button type="button" class="btn btn-primary px-4" @click="guardar()" :disabled="guardando">
+						<i class="fa-solid fa-circle-notch fa-spin me-2" v-if="guardando"></i>
+						<i class="fa-solid fa-cube me-2" v-else></i>
+						Crear Paquete
 					</button>
 				</div>
 
@@ -182,9 +295,10 @@ export default {
 	data() {
 		return { // vista: 'buscar',
 			txtBusqueda: '', pacientes: [], indexGlobal: null, pacienteElegido: {}, precios: [],
-			membresia: { tipo: 15, cuotas: 1, precio: 0, fin: moment().add(1, 'month').format('YYYY-MM-DD'), descuento:0, conDescuento:false },
+			membresia: { tipo: null, cuotas: 1, precio: 0, fin: moment().add(1, 'month').format('YYYY-MM-DD'), descuento:0, conDescuento:false },
 			fechas: [], activaResultados: false, nuevaFecha: { fecha: moment().format('YYYY-MM-DD') },
 			doctores: [], horarios: [], horariosAll: [], hoursProfessional: [], schedulesInvalid: {}, horasSolas: [], horasMalas: [], dayWeek: { 0: 'Lunes', 1: "Martes", 2: "Miercoles", 3: "Jueves", 4: "Viernes", 5: "Sabado", 6: "Domingo", }, doctorSeleccionado: -1, sesionesAcumuladas:[], idHorario:'', comentarios:'',
+			selectedTipoPaquete: '', selectedEspecialidadPaquete: '', selectedSubtipoPaquete: '', guardando: false
 		}
 	},
 	props: ['idUsuario', 'vista'],
@@ -237,6 +351,7 @@ export default {
 		},
 		calcularFechas() {
 			this.fechas = [];
+			if (!this.membresia.tipo) return;
 			const precioBase = this.mostrarPrecio ;
 			const precioParcial = Math.ceil((precioBase / this.membresia.cuotas)*10)/10
 			var hoy = moment()
@@ -253,6 +368,66 @@ export default {
 			}
 			this.membresia.fin = this.membresia.tipo==47 ?  moment().add(1,'year').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD')
 			this.balancearMontos(0);
+		},
+		seleccionarTipo(tipo) {
+			if (this.selectedTipoPaquete !== tipo) {
+				this.selectedTipoPaquete = tipo;
+				this.selectedEspecialidadPaquete = '';
+				this.selectedSubtipoPaquete = '';
+				this.evaluarPaqueteSeleccionado();
+			}
+		},
+		seleccionarEspecialidad(especialidad) {
+			if (this.selectedEspecialidadPaquete !== especialidad) {
+				this.selectedEspecialidadPaquete = especialidad;
+				this.evaluarPaqueteSeleccionado();
+			}
+		},
+		seleccionarSubtipo(subtipo) {
+			if (this.selectedSubtipoPaquete !== subtipo) {
+				this.selectedSubtipoPaquete = subtipo;
+				this.evaluarPaqueteSeleccionado();
+			}
+		},
+		evaluarPaqueteSeleccionado() {
+			let buscar = false;
+			if (this.selectedTipoPaquete === 'sesiones' || this.selectedTipoPaquete === 'tiempo') {
+				if (this.selectedEspecialidadPaquete && this.selectedSubtipoPaquete) buscar = true;
+			} else if (this.selectedTipoPaquete === 'sucamec') {
+				if (this.selectedSubtipoPaquete) buscar = true;
+			}
+			
+			if (buscar) {
+				let paqueteEncontrado = this.precios.find(p => 
+					p.paquete_tipo === this.selectedTipoPaquete &&
+					(p.paquete_especialidad === this.selectedEspecialidadPaquete || p.paquete_tipo === 'sucamec') &&
+					p.paquete_subtipo === this.selectedSubtipoPaquete
+				);
+				
+				if (paqueteEncontrado) {
+					this.membresia.tipo = paqueteEncontrado.id;
+					this.calcularFechas();
+				} else {
+					this.membresia.tipo = null;
+					this.fechas = [];
+				}
+			} else {
+				this.membresia.tipo = null;
+				this.fechas = [];
+			}
+		},
+		obtenerPrecioSubtipo(subtipo) {
+			let paquete = null;
+			if (this.selectedTipoPaquete === 'sucamec') {
+				paquete = this.precios.find(p => p.paquete_tipo === 'sucamec' && p.paquete_subtipo === subtipo);
+			} else if (this.selectedEspecialidadPaquete) {
+				paquete = this.precios.find(p => 
+					p.paquete_tipo === this.selectedTipoPaquete &&
+					p.paquete_especialidad === this.selectedEspecialidadPaquete &&
+					p.paquete_subtipo === subtipo
+				);
+			}
+			return paquete ? parseFloat(paquete.nuevos).toFixed(2) : null;
 		},
 		balancearMontos(editedIndex) {
 			const descuento = 0//this.membresia.descuento ?? 0;
@@ -286,12 +461,16 @@ export default {
 				alertify.notify('<i class="fa-solid fa-bomb"></i> Seleccione un paciente', 'danger', 10);
 				return false;
 			}
+			if(!this.membresia.tipo) {
+				alertify.notify('<i class="fa-solid fa-bomb"></i> Seleccione un paquete válido', 'danger', 10);
+				return false;
+			}
 			if (this.membresia.cuotas <= 0){
 				alertify.notify('<i class="fa-solid fa-bomb"></i> El número de cuotas mínimo debe ser 1', 'danger', 10);
 				return false;
 			}
 			if (!this.membresia.fin){
-				alertify.notify('<i class="fa-solid fa-bomb"></i> Ingrese el último día de la memebresía', 'danger', 10);
+				alertify.notify('<i class="fa-solid fa-bomb"></i> Ingrese el último día del paquete', 'danger', 10);
 				return false;
 			}
 
@@ -302,7 +481,11 @@ export default {
 				this.comentarios = (this.membresia.descuento >0) ? 'Descuento por: S/ ' + this.membresia.descuento + ' '+ this.comentarios: this.comentarios
 			}
 				
-			var mem = document.getElementById("sltMembresia");
+			this.guardando = true;
+
+			let nombreMembresiaSeleccionada = '';
+			let pkg = this.precios.find(p => p.id == this.membresia.tipo);
+			if (pkg) nombreMembresiaSeleccionada = pkg.descripcion;
 
 			let datos = new FormData();
 			datos.append('idPaciente', this.pacienteElegido.id)
@@ -310,7 +493,7 @@ export default {
 			datos.append('motivo', this.pacienteElegido.id)
 			datos.append('membresia', JSON.stringify(this.membresia))
 			datos.append('user_id', this.idUsuario)
-			datos.append('nombreMembresia', mem.options[mem.selectedIndex].text )
+			datos.append('nombreMembresia', nombreMembresiaSeleccionada )
 			datos.append('fechas', JSON.stringify(this.fechas))
 			datos.append('fechas_membresias', JSON.stringify(this.sesionesAcumuladas))
 			datos.append('comentarios', this.comentarios )
@@ -318,27 +501,34 @@ export default {
 			datos.append('num_sesion', 0 )
 			datos.append('descuento', this.membresia.descuento )
 
-			const servidor = await fetch('/api/guardarMembresia', {
-							method: 'POST',
-							body: datos,
-							headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-			})
-			
-			const respuesta = await servidor.json();
-			if (respuesta.mensaje) {
-				this.pacienteElegido = {}
-				this.fechas = []
-				this.$swal({
-					title: 'Se guardó la membresía',
-					showConfirmButton: false,
-					icon:'success',
-					timer: 1000
-				});
-				alertify.notify('<i class="fa-regular fa-calendar-check"></i> Membresía guardada', 'success', 10);
-				this.$emit('membresiaGuardada');
-			} else
-				alertify.notify('<i class="fa-regular fa-bomb"></i> Hubo un error guardando', 'danger', 10);
-			
+			try {
+				const servidor = await fetch('/api/guardarMembresia', {
+								method: 'POST',
+								body: datos,
+								headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+				})
+				
+				const respuesta = await servidor.json();
+				this.guardando = false;
+				if (respuesta.mensaje) {
+					this.pacienteElegido = {}
+					this.fechas = []
+					this.$swal({
+						title: 'Se guardó el paquete',
+						showConfirmButton: false,
+						icon:'success',
+						timer: 1000
+					});
+					alertify.notify('<i class="fa-regular fa-calendar-check"></i> Paquete guardado', 'success', 10);
+					this.$emit('membresiaGuardada');
+				} else {
+					alertify.notify('<i class="fa-regular fa-bomb"></i> Hubo un error guardando', 'danger', 10);
+				}
+			} catch (error) {
+				console.error(error);
+				this.guardando = false;
+				alertify.notify('<i class="fa-regular fa-bomb"></i> Hubo un error de conexión', 'danger', 10);
+			}
 		},
 		async listarProfesionales() {
 			await this.axios.get('/api/profesional')
@@ -436,4 +626,15 @@ export default {
 	}
 }
 </script>
-<style></style>
+<style scoped>
+.card-paquete-selected {
+	background-color: #f0f7ff !important;
+	box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+}
+.cursor-pointer {
+	cursor: pointer;
+}
+.transition-all {
+	transition: all 0.2s ease-in-out;
+}
+</style>

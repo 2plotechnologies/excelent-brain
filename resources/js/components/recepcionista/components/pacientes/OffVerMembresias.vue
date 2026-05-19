@@ -7,7 +7,7 @@
 		<div class="offcanvas-body">
 			<div>
 				<p><strong>Paciente:</strong> <span>{{nombrePaciente}}</span></p>
-				<p><strong>Membresías asignadas:</strong></p>
+				<p><strong>Paquetes asignados:</strong></p>
 			</div>
 			<div class="accordion" id="accordionExample">
 				<div class="accordion-item" v-for="(membresia, index) in membresias" @click="membresiaActiva = membresia">
@@ -67,11 +67,11 @@
 							<p v-if="membresia.deudas.length==0">No hay deudas pendientes</p>
 
 							<button class="mt-2 btn btn-secondary " data-bs-target="#modalVerCitas" data-bs-toggle="modal" @click="pedirCitasMembresia(membresia)"> <i class="fa-solid fa-list"></i> Ver fechas de citas</button>
-							<button class="mt-2 btn btn-danger" @click="anular(index)"><i class="fa-solid fa-ban"></i> Anular membresía</button>
+							<button class="mt-2 btn btn-danger" @click="anular(index)"><i class="fa-solid fa-ban"></i> Anular paquete</button>
 						</div>
 					</div>
 				</div>
-				<div v-if="membresias.length==0">El paciente no tiene membresías asignadas</div>
+				<div v-if="membresias.length==0">El paciente no tiene paquetes asignados</div>
 			</div>
 		</div>
 
@@ -80,13 +80,13 @@
 			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
 					<div class="modal-header border-0">
-						<h1 class="modal-title fs-5" id="exampleModalLabel">Citas programadas para membresías</h1>
+						<h1 class="modal-title fs-5" id="exampleModalLabel">Citas programadas para paquetes</h1>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
 						<div class="row">
 							<div class="col">
-								<p><strong>Membresía seleccionada:</strong>
+								<p><strong>Paquete seleccionado:</strong>
 									<span v-if="parseInt(membresiaActiva.sesiones) == 12">{{ membresiaActiva.descripcion }} + Lectura de resultaos</span>
 									<span v-else>{{ membresiaActiva.descripcion }}</span>
 								</p>
@@ -105,7 +105,7 @@
 									</template>
 								</template>
 								<template v-if="tipoMembresia(membresiaActiva) == 'tiempo'">
-									<span>Límite de la membresía: <i class="fa-regular fa-clock"></i> {{ fechaLatam(membresiaActiva.fin) }}</span>
+									<span>Límite del paquete: <i class="fa-regular fa-clock"></i> {{ fechaLatam(membresiaActiva.fin) }}</span>
 									<button v-if="calcularMesesMembresia() " class="btn btn-outline-primary"  @click="activarFechas=true" data-bs-target="#modalProximaCita" data-bs-toggle="modal"><i class="fa-solid fa-plus"></i> Agregar cita</button>
 								</template>
 							</div>
@@ -228,7 +228,7 @@ export default{
 			$('#modalAmpliarFechaMembresia').modal('show')
 		},
 		anular(index){
-			if(confirm(`¿Desea anular la membresía ${this.membresias[index].descripcion}?`)){
+			if(confirm(`¿Desea anular el paquete ${this.membresias[index].descripcion}?`)){
 				this.axios.post('/api/anularMembresia/', { id: this.membresias[index].id} )
 				.then(resp => location.reload())
 			}

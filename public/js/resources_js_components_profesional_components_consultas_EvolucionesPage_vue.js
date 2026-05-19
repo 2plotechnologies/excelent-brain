@@ -946,7 +946,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         2: 'Psicología',
         3: 'Certificado',
         4: 'Kurame',
-        5: 'Membresía',
+        5: 'Paquete',
         6: 'Nutrición',
         7: 'Terapista',
         8: 'Otro'

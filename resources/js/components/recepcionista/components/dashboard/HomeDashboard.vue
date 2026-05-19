@@ -232,7 +232,7 @@
                                                 <small class="text-danger font-weight-bold">S/ {{ deuda.monto }}</small>
                                             </div>
                                             <p class="mb-1 text-muted small">
-                                                <i class="fas fa-file-invoice-dollar mr-1"></i>{{ deuda.motivo || 'Membresía / Servicio' }}
+                                                <i class="fas fa-file-invoice-dollar mr-1"></i>{{ deuda.motivo || 'Paquete / Servicio' }}
                                             </p>
                                             <small class="text-muted"><i class="far fa-calendar-alt mr-1"></i>Vence: {{ deuda.fecha }}</small>
                                         </li>

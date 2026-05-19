@@ -1,6 +1,6 @@
 <template>
   <div class="paquetes-container pb-5">
-    <!-- Header Area -->
+    <!-- Header Area. -->
     <div class="d-flex justify-content-between align-items-center mb-4 mt-2 header-section">
       <div class="d-flex align-items-center gap-3">
         <h1 class="h3 mb-0 text-gray-800 fw-bold d-flex align-items-center">
@@ -95,7 +95,7 @@
         <div class="d-flex gap-2 ms-3 flex-wrap">
           <button class="btn btn-sm btn-filter" :class="{'active': filtroTipo === -1}" @click="setFiltroTipo(-1)">Todos</button>
           <button class="btn btn-sm btn-filter" :class="{'active': filtroTipo === 1}" @click="setFiltroTipo(1)">Consulta / Psicológica</button>
-          <button class="btn btn-sm btn-filter" :class="{'active': filtroTipo === 0}" @click="setFiltroTipo(0)">Membresía Ext.</button>
+          <button class="btn btn-sm btn-filter" :class="{'active': filtroTipo === 0}" @click="setFiltroTipo(0)">Paquete Ext.</button>
         </div>
       </div>
     </div>
@@ -373,7 +373,7 @@
       <div v-if="mostrarModalPago" class="vue-modal-overlay" @click.self="mostrarModalPago = false">
         <div class="vue-modal-box modal-lg">
           <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title"><i class="fas fa-file-invoice-dollar me-2"></i> Pagar Cuotas de Membresía</h5>
+            <h5 class="modal-title"><i class="fas fa-file-invoice-dollar me-2"></i> Pagar Cuotas de Paquete</h5>
             <button type="button" class="btn-close btn-close-white" @click="mostrarModalPago = false" aria-label="Close"></button>
           </div>
           <div class="modal-body p-4" v-if="paqueteSeleccionado">
@@ -1051,7 +1051,7 @@ export default {
     getTipoBadge(idClasificacion) {
       if(idClasificacion == 1) return 'Psicológica';
       if(idClasificacion == 2) return 'Psiquiátrica';
-      if(idClasificacion == 5) return 'Membresía Ext.';
+      if(idClasificacion == 5) return 'Paquete Ext.';
       return 'Consulta';
     },
     toggleHistory(id) {

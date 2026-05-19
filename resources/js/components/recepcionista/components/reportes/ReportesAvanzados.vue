@@ -67,7 +67,7 @@
 						<input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off" @click="filtro=4">
 						<label class="btn btn-outline-primary" for="btnradio4">Kurame</label>
 						<input type="radio" class="btn-check" name="btnradio" id="btnradio5" autocomplete="off" @click="filtro=5">
-						<label class="btn btn-outline-primary" for="btnradio5">Membresía</label>
+						<label class="btn btn-outline-primary" for="btnradio5">Paquete</label>
 					</div>
 					<table class="table table-sm table-hover">
 						<thead>
@@ -227,7 +227,7 @@
 									<span v-if="servicio.idClasificacion==1">Psiquiatría</span>
 									<span v-if="servicio.idClasificacion==2">Psicología</span>
 									<span v-if="servicio.idClasificacion==3">Certificado</span>
-									<span v-if="servicio.idClasificacion==4">Membresía</span>
+									<span v-if="servicio.idClasificacion==4">Paquete</span>
 									<span>{{ servicio.descripcion }}</span>
 								</td>
 								<td> <span v-if="suma[servicio.id]">{{ suma[servicio.id].confirmado  }}</span> <span v-else>0</span></td>
@@ -683,7 +683,7 @@ import moment from 'moment';
 				{id: 8, valor: 'insatisfecho', detalle: 'suele quejarse de los servicios'},
 				{id: 9, valor: 'peligroso', detalle: 'paciente con amenazas o actos de violencia.'},
 			], suma:{}, sumaTodoMedio:0, profesionales:[{id:7, name:'Recepción'}], elegido:{name:'', phone:'', motivo:''}, filtroAnual:false, filtro:-1,
-			equipo:['Psicología', 'Psiquiatría', 'Certificado', 'Kurame', 'Membresía']
+			equipo:['Psicología', 'Psiquiatría', 'Certificado', 'Kurame', 'Paquete']
 		}},
 		methods:{
 			cargarDatos(){

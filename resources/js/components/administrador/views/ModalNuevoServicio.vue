@@ -15,7 +15,7 @@
 						<option value="2">Psicología</option>
 						<option value="3">Certificabdos</option>
 						<option value="6">Nutrición</option>
-						<option value="4">Membresía</option>
+						<option value="4">Paquete</option>
 					</select>
 					<label for="">Edades permitidas</label>
 					<select name="" id="" class="form-select" v-model="precioNuevo.target_age">

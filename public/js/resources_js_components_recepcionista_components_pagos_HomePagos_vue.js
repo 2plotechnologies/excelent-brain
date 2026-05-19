@@ -1301,17 +1301,17 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         if (newVal.voucher) return;
         this.facturacion.ruc = newVal.dniCliente;
         this.buscarReniec();
-        if (parseInt(newVal.idMembresia) > 0) this.facturacion.conceptoPago = 'Pago de membresía';else {
+        if (parseInt(newVal.idMembresia) > 0) this.facturacion.conceptoPago = 'Pago de paquete';else {
           var servicio = {
             "0": "Certificado",
-            "1": "Paquete Membresía",
+            "1": "Paquete",
             "2": "Paquete Kurame",
             "3": "Informe",
             "4": "Otros",
             "5": "Pago de cita",
-            "7": "Pago de membresía",
+            "7": "Pago de paquete",
             "8": "Adelanto de cita",
-            "15": "Pago de membresía",
+            "15": "Pago de paquete",
             "16": "Revaluación gratuita"
           };
           this.facturacion.conceptoPago = servicio[newVal.type] + ' ' + newVal.detalle.replace(/\//g, '-');
@@ -1358,7 +1358,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       pacienteElegido: {},
       precios: [],
       membresia: {
-        tipo: 15,
+        tipo: null,
         cuotas: 1,
         precio: 0,
         fin: moment__WEBPACK_IMPORTED_MODULE_0___default()().add(1, 'month').format('YYYY-MM-DD'),
@@ -1389,7 +1389,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       doctorSeleccionado: -1,
       sesionesAcumuladas: [],
       idHorario: '',
-      comentarios: ''
+      comentarios: '',
+      selectedTipoPaquete: '',
+      selectedEspecialidadPaquete: '',
+      selectedSubtipoPaquete: '',
+      guardando: false
     };
   },
   props: ['idUsuario', 'vista'],
@@ -1468,6 +1472,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     calcularFechas: function calcularFechas() {
       this.fechas = [];
+      if (!this.membresia.tipo) return;
       var precioBase = this.mostrarPrecio;
       var precioParcial = Math.ceil(precioBase / this.membresia.cuotas * 10) / 10;
       var hoy = moment__WEBPACK_IMPORTED_MODULE_0___default()();
@@ -1484,6 +1489,64 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
       this.membresia.fin = this.membresia.tipo == 47 ? moment__WEBPACK_IMPORTED_MODULE_0___default()().add(1, 'year').format('YYYY-MM-DD') : moment__WEBPACK_IMPORTED_MODULE_0___default()().format('YYYY-MM-DD');
       this.balancearMontos(0);
+    },
+    seleccionarTipo: function seleccionarTipo(tipo) {
+      if (this.selectedTipoPaquete !== tipo) {
+        this.selectedTipoPaquete = tipo;
+        this.selectedEspecialidadPaquete = '';
+        this.selectedSubtipoPaquete = '';
+        this.evaluarPaqueteSeleccionado();
+      }
+    },
+    seleccionarEspecialidad: function seleccionarEspecialidad(especialidad) {
+      if (this.selectedEspecialidadPaquete !== especialidad) {
+        this.selectedEspecialidadPaquete = especialidad;
+        this.evaluarPaqueteSeleccionado();
+      }
+    },
+    seleccionarSubtipo: function seleccionarSubtipo(subtipo) {
+      if (this.selectedSubtipoPaquete !== subtipo) {
+        this.selectedSubtipoPaquete = subtipo;
+        this.evaluarPaqueteSeleccionado();
+      }
+    },
+    evaluarPaqueteSeleccionado: function evaluarPaqueteSeleccionado() {
+      var _this3 = this;
+      var buscar = false;
+      if (this.selectedTipoPaquete === 'sesiones' || this.selectedTipoPaquete === 'tiempo') {
+        if (this.selectedEspecialidadPaquete && this.selectedSubtipoPaquete) buscar = true;
+      } else if (this.selectedTipoPaquete === 'sucamec') {
+        if (this.selectedSubtipoPaquete) buscar = true;
+      }
+      if (buscar) {
+        var paqueteEncontrado = this.precios.find(function (p) {
+          return p.paquete_tipo === _this3.selectedTipoPaquete && (p.paquete_especialidad === _this3.selectedEspecialidadPaquete || p.paquete_tipo === 'sucamec') && p.paquete_subtipo === _this3.selectedSubtipoPaquete;
+        });
+        if (paqueteEncontrado) {
+          this.membresia.tipo = paqueteEncontrado.id;
+          this.calcularFechas();
+        } else {
+          this.membresia.tipo = null;
+          this.fechas = [];
+        }
+      } else {
+        this.membresia.tipo = null;
+        this.fechas = [];
+      }
+    },
+    obtenerPrecioSubtipo: function obtenerPrecioSubtipo(subtipo) {
+      var _this4 = this;
+      var paquete = null;
+      if (this.selectedTipoPaquete === 'sucamec') {
+        paquete = this.precios.find(function (p) {
+          return p.paquete_tipo === 'sucamec' && p.paquete_subtipo === subtipo;
+        });
+      } else if (this.selectedEspecialidadPaquete) {
+        paquete = this.precios.find(function (p) {
+          return p.paquete_tipo === _this4.selectedTipoPaquete && p.paquete_especialidad === _this4.selectedEspecialidadPaquete && p.paquete_subtipo === subtipo;
+        });
+      }
+      return paquete ? parseFloat(paquete.nuevos).toFixed(2) : null;
     },
     balancearMontos: function balancearMontos(editedIndex) {
       var descuento = 0; //this.membresia.descuento ?? 0;
@@ -1512,57 +1575,70 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     guardar: function guardar() {
-      var _this3 = this;
+      var _this5 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var mem, datos, servidor, respuesta;
+        var nombreMembresiaSeleccionada, pkg, datos, servidor, respuesta;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              if (_this3.pacienteElegido.id) {
+              if (_this5.pacienteElegido.id) {
                 _context3.next = 3;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> Seleccione un paciente', 'danger', 10);
               return _context3.abrupt("return", false);
             case 3:
-              if (!(_this3.membresia.cuotas <= 0)) {
+              if (_this5.membresia.tipo) {
                 _context3.next = 6;
+                break;
+              }
+              alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> Seleccione un paquete válido', 'danger', 10);
+              return _context3.abrupt("return", false);
+            case 6:
+              if (!(_this5.membresia.cuotas <= 0)) {
+                _context3.next = 9;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> El número de cuotas mínimo debe ser 1', 'danger', 10);
               return _context3.abrupt("return", false);
-            case 6:
-              if (_this3.membresia.fin) {
-                _context3.next = 9;
+            case 9:
+              if (_this5.membresia.fin) {
+                _context3.next = 12;
                 break;
               }
-              alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> Ingrese el último día de la memebresía', 'danger', 10);
+              alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> Ingrese el último día del paquete', 'danger', 10);
               return _context3.abrupt("return", false);
-            case 9:
-              if (!(_this3.membresia.descuento > 0 && _this3.comentarios == '')) {
-                _context3.next = 14;
+            case 12:
+              if (!(_this5.membresia.descuento > 0 && _this5.comentarios == '')) {
+                _context3.next = 17;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> Debe agregar un motivo por el descuento', 'danger', 10);
               return _context3.abrupt("return", false);
-            case 14:
-              _this3.comentarios = _this3.membresia.descuento > 0 ? 'Descuento por: S/ ' + _this3.membresia.descuento + ' ' + _this3.comentarios : _this3.comentarios;
-            case 15:
-              mem = document.getElementById("sltMembresia");
+            case 17:
+              _this5.comentarios = _this5.membresia.descuento > 0 ? 'Descuento por: S/ ' + _this5.membresia.descuento + ' ' + _this5.comentarios : _this5.comentarios;
+            case 18:
+              _this5.guardando = true;
+              nombreMembresiaSeleccionada = '';
+              pkg = _this5.precios.find(function (p) {
+                return p.id == _this5.membresia.tipo;
+              });
+              if (pkg) nombreMembresiaSeleccionada = pkg.descripcion;
               datos = new FormData();
-              datos.append('idPaciente', _this3.pacienteElegido.id);
-              datos.append('customer', _this3.pacienteElegido.name + ' ' + _this3.pacienteElegido.nombres);
-              datos.append('motivo', _this3.pacienteElegido.id);
-              datos.append('membresia', JSON.stringify(_this3.membresia));
-              datos.append('user_id', _this3.idUsuario);
-              datos.append('nombreMembresia', mem.options[mem.selectedIndex].text);
-              datos.append('fechas', JSON.stringify(_this3.fechas));
-              datos.append('fechas_membresias', JSON.stringify(_this3.sesionesAcumuladas));
-              datos.append('comentarios', _this3.comentarios);
-              datos.append('meses', _this3.cantMeses);
+              datos.append('idPaciente', _this5.pacienteElegido.id);
+              datos.append('customer', _this5.pacienteElegido.name + ' ' + _this5.pacienteElegido.nombres);
+              datos.append('motivo', _this5.pacienteElegido.id);
+              datos.append('membresia', JSON.stringify(_this5.membresia));
+              datos.append('user_id', _this5.idUsuario);
+              datos.append('nombreMembresia', nombreMembresiaSeleccionada);
+              datos.append('fechas', JSON.stringify(_this5.fechas));
+              datos.append('fechas_membresias', JSON.stringify(_this5.sesionesAcumuladas));
+              datos.append('comentarios', _this5.comentarios);
+              datos.append('meses', _this5.cantMeses);
               datos.append('num_sesion', 0);
-              datos.append('descuento', _this3.membresia.descuento);
-              _context3.next = 31;
+              datos.append('descuento', _this5.membresia.descuento);
+              _context3.prev = 35;
+              _context3.next = 38;
               return fetch('/api/guardarMembresia', {
                 method: 'POST',
                 body: datos,
@@ -1570,41 +1646,52 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   'Authorization': 'Bearer ' + localStorage.getItem('token')
                 }
               });
-            case 31:
+            case 38:
               servidor = _context3.sent;
-              _context3.next = 34;
+              _context3.next = 41;
               return servidor.json();
-            case 34:
+            case 41:
               respuesta = _context3.sent;
+              _this5.guardando = false;
               if (respuesta.mensaje) {
-                _this3.pacienteElegido = {};
-                _this3.fechas = [];
-                _this3.$swal({
-                  title: 'Se guardó la membresía',
+                _this5.pacienteElegido = {};
+                _this5.fechas = [];
+                _this5.$swal({
+                  title: 'Se guardó el paquete',
                   showConfirmButton: false,
                   icon: 'success',
                   timer: 1000
                 });
-                alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-regular fa-calendar-check"></i> Membresía guardada', 'success', 10);
-                _this3.$emit('membresiaGuardada');
-              } else alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-regular fa-bomb"></i> Hubo un error guardando', 'danger', 10);
-            case 36:
+                alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-regular fa-calendar-check"></i> Paquete guardado', 'success', 10);
+                _this5.$emit('membresiaGuardada');
+              } else {
+                alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-regular fa-bomb"></i> Hubo un error guardando', 'danger', 10);
+              }
+              _context3.next = 51;
+              break;
+            case 46:
+              _context3.prev = 46;
+              _context3.t0 = _context3["catch"](35);
+              console.error(_context3.t0);
+              _this5.guardando = false;
+              alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-regular fa-bomb"></i> Hubo un error de conexión', 'danger', 10);
+            case 51:
             case "end":
               return _context3.stop();
           }
-        }, _callee3);
+        }, _callee3, null, [[35, 46]]);
       }))();
     },
     listarProfesionales: function listarProfesionales() {
-      var _this4 = this;
+      var _this6 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
               _context4.next = 2;
-              return _this4.axios.get('/api/profesional').then(function (response) {
-                _this4.doctores = response.data;
-                _this4.listarhorario();
+              return _this6.axios.get('/api/profesional').then(function (response) {
+                _this6.doctores = response.data;
+                _this6.listarhorario();
               });
             case 2:
             case "end":
@@ -1614,22 +1701,22 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }))();
     },
     listarhorario: function listarhorario() {
-      var _this5 = this;
+      var _this7 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var id;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
-              id = _this5.doctorSeleccionado;
+              id = _this7.doctorSeleccionado;
               _context5.next = 3;
-              return _this5.axios.get("/api/horario/".concat(id)).then(function (res) {
-                _this5.horarios = res.data.schedulesInvalid;
-                _this5.horariosAll = res.data.schedules;
-                _this5.hoursProfessional = _this5.horarios;
-                _this5.emitSchedule(_this5.nuevaFecha.fecha);
-                _this5.schedulesInvalid = [];
-                _this5.hoursProfessional.forEach(function (el) {
-                  _this5.schedulesInvalid.push(el.schedule_id);
+              return _this7.axios.get("/api/horario/".concat(id)).then(function (res) {
+                _this7.horarios = res.data.schedulesInvalid;
+                _this7.horariosAll = res.data.schedules;
+                _this7.hoursProfessional = _this7.horarios;
+                _this7.emitSchedule(_this7.nuevaFecha.fecha);
+                _this7.schedulesInvalid = [];
+                _this7.hoursProfessional.forEach(function (el) {
+                  _this7.schedulesInvalid.push(el.schedule_id);
                 });
               })["catch"](function (err) {
                 console.error(err);
@@ -1642,7 +1729,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }))();
     },
     emitSchedule: function emitSchedule() {
-      var _this6 = this;
+      var _this8 = this;
       var info = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.nuevaFecha.fecha;
       this.horarios = [];
       var arraySchedulesInvalid = [];
@@ -1652,17 +1739,17 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         }
       });
       this.horariosAll.forEach(function (el) {
-        if (el.day === _this6.dayWeek[new Date(info).getDay()]) {
+        if (el.day === _this8.dayWeek[new Date(info).getDay()]) {
           if (arraySchedulesInvalid.includes(el.id)) {
             // Hay cita
             if (el.appointments.find(function (el) {
               return el.date === info && el.status != 3;
             }) ? true : false) {} else {
-              _this6.horarios.push(el);
+              _this8.horarios.push(el);
             }
           } else {
             // No hay cita
-            _this6.horarios.push(el);
+            _this8.horarios.push(el);
           }
         }
       });
@@ -1682,16 +1769,16 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   computed: {
     descripcionPaqueteElegido: function descripcionPaqueteElegido() {
-      var _this7 = this;
+      var _this9 = this;
       var paquete = this.precios.find(function (x) {
-        return x.id == _this7.membresia.tipo;
+        return x.id == _this9.membresia.tipo;
       });
       return paquete ? paquete.descripcion : '';
     },
     mostrarPrecio: function mostrarPrecio() {
-      var _this8 = this;
+      var _this10 = this;
       var nuevos = this.precios.find(function (x) {
-        return x.id == _this8.membresia.tipo;
+        return x.id == _this10.membresia.tipo;
       });
       return nuevos ? parseFloat(nuevos.nuevos).toFixed(2) : 0;
     },
@@ -1710,16 +1797,16 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       return moment__WEBPACK_IMPORTED_MODULE_0___default()(this.membresia.fin).fromNow();
     },
     cantSesiones: function cantSesiones() {
-      var _this9 = this;
+      var _this11 = this;
       var precio = this.precios.find(function (x) {
-        return x.id == _this9.membresia.tipo;
+        return x.id == _this11.membresia.tipo;
       });
       return precio ? precio.sesiones : '';
     },
     cantMeses: function cantMeses() {
-      var _this10 = this;
+      var _this12 = this;
       var precio = this.precios.find(function (x) {
-        return x.id == _this10.membresia.tipo;
+        return x.id == _this12.membresia.tipo;
       });
       return precio ? precio.meses : 0;
     }
@@ -2821,7 +2908,7 @@ var render = function render() {
         "text-danger": payment.type == 6,
         "text-primary": payment.type != 6
       }
-    }, [_vm._v("S/ "), payment.type == 6 ? _c("span", [_vm._v("-")]) : _vm._e(), _vm._v(" " + _vm._s(_vm.retornarFloat(payment.price)))]), _vm._v(" "), _c("td", [payment.type == 6 ? _c("span", [_vm._v("Salida de dinero")]) : _vm._e(), _vm._v(" "), payment.type == 5 ? _c("span", [_vm._v("Pago de cita")]) : _vm._e(), _vm._v(" "), payment.type == 3 ? _c("span", [_vm._v("Informe")]) : _vm._e(), _vm._v(" "), payment.type == 2 ? _c("span", [_vm._v("Paquete Kurame")]) : _vm._e(), _vm._v(" "), payment.type == 1 ? _c("span", [_vm._v("Paquete Membresía")]) : _vm._e(), _vm._v(" "), payment.type == 0 ? _c("span", [_vm._v("Certificado")]) : _vm._e()]), _vm._v(" "), _c("td", {
+    }, [_vm._v("S/ "), payment.type == 6 ? _c("span", [_vm._v("-")]) : _vm._e(), _vm._v(" " + _vm._s(_vm.retornarFloat(payment.price)))]), _vm._v(" "), _c("td", [payment.type == 6 ? _c("span", [_vm._v("Salida de dinero")]) : _vm._e(), _vm._v(" "), payment.type == 5 ? _c("span", [_vm._v("Pago de cita")]) : _vm._e(), _vm._v(" "), payment.type == 3 ? _c("span", [_vm._v("Informe")]) : _vm._e(), _vm._v(" "), payment.type == 2 ? _c("span", [_vm._v("Paquete Kurame")]) : _vm._e(), _vm._v(" "), payment.type == 1 ? _c("span", [_vm._v("Paquete")]) : _vm._e(), _vm._v(" "), payment.type == 0 ? _c("span", [_vm._v("Certificado")]) : _vm._e()]), _vm._v(" "), _c("td", {
       staticClass: "text-capitalize"
     }, [_c("span", [_vm._v(_vm._s(_vm.queMoneda(payment.moneda)))])]), _vm._v(" "), _c("td", [_vm._v(_vm._s(payment.voucher_issued))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(payment.profesional_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.horaLatam(payment.created_at)))]), _vm._v(" "), _c("td", {
       staticClass: "d-print-none",
@@ -4040,10 +4127,10 @@ render._withStripped = true;
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=template&id=5cb2816c":
-/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=template&id=5cb2816c ***!
-  \***************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=template&id=5cb2816c&scoped=true":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=template&id=5cb2816c&scoped=true ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -4155,67 +4242,249 @@ var render = function render() {
     }
   }, [_vm._v("Cambiar")])])])]), _vm._v(" "), _c("div", {
     staticClass: "mb-4"
-  }, [_vm._m(3), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.membresia.tipo,
-      expression: "membresia.tipo"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "sltMembresia"
+  }, [_vm._m(3), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
+  }, [_c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "card h-100 cursor-pointer transition-all",
+    "class": _vm.selectedTipoPaquete === "sesiones" ? "border-primary card-paquete-selected" : "border-secondary border-opacity-25",
+    staticStyle: {
+      cursor: "pointer"
     },
     on: {
-      change: [function ($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.membresia, "tipo", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }, function ($event) {
-        return _vm.calcularFechas();
-      }]
-    }
-  }, _vm._l(_vm.precios, function (precio) {
-    return _c("option", {
-      domProps: {
-        value: precio.id
+      click: function click($event) {
+        return _vm.seleccionarTipo("sesiones");
       }
-    }, [_vm._v(_vm._s(precio.descripcion))]);
-  }), 0), _vm._v(" "), _vm.membresia.tipo ? _c("div", {
-    staticClass: "row mt-3"
-  }, [_c("div", {
-    staticClass: "col-md-4"
-  }, [_c("div", {
-    staticClass: "card border-primary shadow-sm h-100",
-    staticStyle: {
-      "background-color": "#f0f7ff"
     }
   }, [_c("div", {
-    staticClass: "card-body text-center py-3 d-flex flex-column justify-content-center"
-  }, [_c("div", {
-    staticClass: "text-primary fw-medium mb-1"
-  }, [_vm._v(_vm._s(_vm.descripcionPaqueteElegido))]), _vm._v(" "), _vm.cantSesiones ? _c("div", {
-    staticClass: "small text-muted"
-  }, [_vm._v("S/ " + _vm._s((_vm.mostrarPrecio / _vm.cantSesiones).toFixed(2)) + "/sesión")]) : _vm._e()])])]), _vm._v(" "), _vm.cantSesiones ? _c("div", {
+    staticClass: "card-body text-center py-3"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-cube fs-4 mb-2",
+    "class": _vm.selectedTipoPaquete === "sesiones" ? "text-primary" : "text-muted"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "fw-medium",
+    "class": _vm.selectedTipoPaquete === "sesiones" ? "text-primary" : "text-dark"
+  }, [_vm._v("Por Sesiones")]), _vm._v(" "), _c("div", {
+    staticClass: "small text-muted mt-1",
+    staticStyle: {
+      "font-size": "0.75rem"
+    }
+  }, [_vm._v("4, 6 u 8 sesiones")])])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-4"
   }, [_c("div", {
-    staticClass: "card border-primary shadow-sm h-100",
+    staticClass: "card h-100 cursor-pointer transition-all",
+    "class": _vm.selectedTipoPaquete === "tiempo" ? "border-primary card-paquete-selected" : "border-secondary border-opacity-25",
     staticStyle: {
-      "background-color": "#f0f7ff"
+      cursor: "pointer"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.seleccionarTipo("tiempo");
+      }
     }
   }, [_c("div", {
-    staticClass: "card-body text-center py-3 d-flex flex-column justify-content-center"
+    staticClass: "card-body text-center py-3"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-stopwatch fs-4 mb-2",
+    "class": _vm.selectedTipoPaquete === "tiempo" ? "text-primary" : "text-muted"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "fw-medium",
+    "class": _vm.selectedTipoPaquete === "tiempo" ? "text-primary" : "text-dark"
+  }, [_vm._v("Por Tiempo")]), _vm._v(" "), _c("div", {
+    staticClass: "small text-muted mt-1",
+    staticStyle: {
+      "font-size": "0.75rem"
+    }
+  }, [_vm._v("15 o 30 días")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
   }, [_c("div", {
-    staticClass: "text-primary fw-bold fs-5 mb-0"
-  }, [_vm._v(_vm._s(_vm.cantSesiones))]), _vm._v(" "), _c("div", {
-    staticClass: "small text-muted mt-1"
-  }, [_vm._v("S/ " + _vm._s(_vm.mostrarPrecio) + " en total")])])])]) : _vm._e()]) : _vm._e()]), _vm._v(" "), _c("div", {
+    staticClass: "card h-100 cursor-pointer transition-all",
+    "class": _vm.selectedTipoPaquete === "sucamec" ? "border-primary card-paquete-selected" : "border-secondary border-opacity-25",
+    staticStyle: {
+      cursor: "pointer"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.seleccionarTipo("sucamec");
+      }
+    }
+  }, [_c("div", {
+    staticClass: "card-body text-center py-3"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-shield-halved fs-4 mb-2",
+    "class": _vm.selectedTipoPaquete === "sucamec" ? "text-primary" : "text-muted"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "fw-medium",
+    "class": _vm.selectedTipoPaquete === "sucamec" ? "text-primary" : "text-dark"
+  }, [_vm._v("Sucamec")]), _vm._v(" "), _c("div", {
+    staticClass: "small text-muted mt-1",
+    staticStyle: {
+      "font-size": "0.75rem"
+    }
+  }, [_vm._v("Nuevo o Renovación")])])])])])]), _vm._v(" "), _vm.selectedTipoPaquete === "sesiones" || _vm.selectedTipoPaquete === "tiempo" ? _c("div", {
     staticClass: "mb-4"
-  }, [_vm._m(4), _vm._v(" "), _c("select", {
+  }, [_vm._m(4), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
+  }, [_c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "card h-100 cursor-pointer transition-all",
+    "class": _vm.selectedEspecialidadPaquete === "psicologica" ? "border-primary card-paquete-selected" : "border-secondary border-opacity-25",
+    staticStyle: {
+      cursor: "pointer"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.seleccionarEspecialidad("psicologica");
+      }
+    }
+  }, [_c("div", {
+    staticClass: "card-body text-center py-3"
+  }, [_c("div", {
+    staticClass: "fw-medium",
+    "class": _vm.selectedEspecialidadPaquete === "psicologica" ? "text-primary" : "text-dark"
+  }, [_vm._v("Psicológica")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "card h-100 cursor-pointer transition-all",
+    "class": _vm.selectedEspecialidadPaquete === "psiquiatrica" ? "border-primary card-paquete-selected" : "border-secondary border-opacity-25",
+    staticStyle: {
+      cursor: "pointer"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.seleccionarEspecialidad("psiquiatrica");
+      }
+    }
+  }, [_c("div", {
+    staticClass: "card-body text-center py-3"
+  }, [_c("div", {
+    staticClass: "fw-medium",
+    "class": _vm.selectedEspecialidadPaquete === "psiquiatrica" ? "text-primary" : "text-dark"
+  }, [_vm._v("Psiquiátrica")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "card h-100 cursor-pointer transition-all",
+    "class": _vm.selectedEspecialidadPaquete === "nutricional" ? "border-primary card-paquete-selected" : "border-secondary border-opacity-25",
+    staticStyle: {
+      cursor: "pointer"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.seleccionarEspecialidad("nutricional");
+      }
+    }
+  }, [_c("div", {
+    staticClass: "card-body text-center py-3"
+  }, [_c("div", {
+    staticClass: "fw-medium",
+    "class": _vm.selectedEspecialidadPaquete === "nutricional" ? "text-primary" : "text-dark"
+  }, [_vm._v("Nutricional")])])])])])]) : _vm._e(), _vm._v(" "), _vm.selectedTipoPaquete ? _c("div", {
+    staticClass: "mb-4"
+  }, [_c("label", {
+    staticClass: "form-label text-secondary small fw-medium mb-2"
+  }, [_vm._v("\n\t\t\t\t\t\t" + _vm._s(_vm.selectedTipoPaquete === "sesiones" ? "Número de Sesiones" : _vm.selectedTipoPaquete === "tiempo" ? "Duración" : "Trámite") + "\n\t\t\t\t\t\t"), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]), _vm._v(" "), _vm.selectedTipoPaquete === "sesiones" ? _c("div", {
+    staticClass: "row g-3"
+  }, _vm._l(["4", "6", "8"], function (sesion) {
+    return _c("div", {
+      key: sesion,
+      staticClass: "col-md-4"
+    }, [_c("div", {
+      staticClass: "card h-100 cursor-pointer transition-all",
+      "class": _vm.selectedSubtipoPaquete === sesion ? "border-primary card-paquete-selected" : "border-secondary border-opacity-25",
+      staticStyle: {
+        cursor: "pointer"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.seleccionarSubtipo(sesion);
+        }
+      }
+    }, [_c("div", {
+      staticClass: "card-body text-center py-3"
+    }, [_c("div", {
+      staticClass: "fw-bold fs-5 mb-1",
+      "class": _vm.selectedSubtipoPaquete === sesion ? "text-primary" : "text-dark"
+    }, [_vm._v(_vm._s(sesion))]), _vm._v(" "), _vm.obtenerPrecioSubtipo(sesion) ? _c("div", {
+      staticClass: "small text-muted"
+    }, [_vm._v("S/ " + _vm._s(_vm.obtenerPrecioSubtipo(sesion)))]) : _vm._e()])])]);
+  }), 0) : _vm._e(), _vm._v(" "), _vm.selectedTipoPaquete === "tiempo" ? _c("div", {
+    staticClass: "row g-3"
+  }, _vm._l(["15", "30"], function (dia) {
+    return _c("div", {
+      key: dia,
+      staticClass: "col-md-6"
+    }, [_c("div", {
+      staticClass: "card h-100 cursor-pointer transition-all",
+      "class": _vm.selectedSubtipoPaquete === dia ? "border-primary card-paquete-selected" : "border-secondary border-opacity-25",
+      staticStyle: {
+        cursor: "pointer"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.seleccionarSubtipo(dia);
+        }
+      }
+    }, [_c("div", {
+      staticClass: "card-body text-center py-3"
+    }, [_c("div", {
+      staticClass: "fw-bold fs-5 mb-1",
+      "class": _vm.selectedSubtipoPaquete === dia ? "text-primary" : "text-dark"
+    }, [_vm._v(_vm._s(dia) + " Días")]), _vm._v(" "), _vm.obtenerPrecioSubtipo(dia) ? _c("div", {
+      staticClass: "small text-muted"
+    }, [_vm._v("S/ " + _vm._s(_vm.obtenerPrecioSubtipo(dia)))]) : _vm._e()])])]);
+  }), 0) : _vm._e(), _vm._v(" "), _vm.selectedTipoPaquete === "sucamec" ? _c("div", {
+    staticClass: "row g-3"
+  }, [_c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "card h-100 cursor-pointer transition-all",
+    "class": _vm.selectedSubtipoPaquete === "nuevo" ? "border-primary card-paquete-selected" : "border-secondary border-opacity-25",
+    staticStyle: {
+      cursor: "pointer"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.seleccionarSubtipo("nuevo");
+      }
+    }
+  }, [_c("div", {
+    staticClass: "card-body text-center py-3"
+  }, [_c("div", {
+    staticClass: "fw-bold fs-5 mb-1",
+    "class": _vm.selectedSubtipoPaquete === "nuevo" ? "text-primary" : "text-dark"
+  }, [_vm._v("Nuevo")]), _vm._v(" "), _vm.obtenerPrecioSubtipo("nuevo") ? _c("div", {
+    staticClass: "small text-muted"
+  }, [_vm._v("S/ " + _vm._s(_vm.obtenerPrecioSubtipo("nuevo")))]) : _vm._e()])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_c("div", {
+    staticClass: "card h-100 cursor-pointer transition-all",
+    "class": _vm.selectedSubtipoPaquete === "renovacion" ? "border-primary card-paquete-selected" : "border-secondary border-opacity-25",
+    staticStyle: {
+      cursor: "pointer"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.seleccionarSubtipo("renovacion");
+      }
+    }
+  }, [_c("div", {
+    staticClass: "card-body text-center py-3"
+  }, [_c("div", {
+    staticClass: "fw-bold fs-5 mb-1",
+    "class": _vm.selectedSubtipoPaquete === "renovacion" ? "text-primary" : "text-dark"
+  }, [_vm._v("Renovación")]), _vm._v(" "), _vm.obtenerPrecioSubtipo("renovacion") ? _c("div", {
+    staticClass: "small text-muted"
+  }, [_vm._v("S/ " + _vm._s(_vm.obtenerPrecioSubtipo("renovacion")))]) : _vm._e()])])])]) : _vm._e(), _vm._v(" "), !_vm.membresia.tipo && _vm.selectedSubtipoPaquete && (_vm.selectedTipoPaquete === "sucamec" || _vm.selectedEspecialidadPaquete) ? _c("div", {
+    staticClass: "alert alert-warning mt-3 py-2 small d-flex align-items-center"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-triangle-exclamation me-2"
+  }), _vm._v(" No se encontró un precio configurado para esta combinación en la base de datos.\n\t\t\t\t\t")]) : _vm._e()]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "mb-4"
+  }, [_vm._m(5), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -4257,7 +4526,7 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "card-body p-4"
-  }, [_vm._m(5), _vm._v(" "), _c("div", {
+  }, [_vm._m(6), _vm._v(" "), _c("div", {
     staticClass: "row g-3"
   }, [_c("div", {
     staticClass: "col-md-6"
@@ -4364,7 +4633,7 @@ var render = function render() {
     }
   })]) : _vm._e()]), _vm._v(" "), _vm.fechas.length > 0 ? _c("div", {
     staticClass: "mt-4"
-  }, [_vm._m(6), _vm._v(" "), _c("div", {
+  }, [_vm._m(7), _vm._v(" "), _c("div", {
     staticClass: "row g-3"
   }, _vm._l(_vm.fechas, function (fecha, index) {
     return _c("div", {
@@ -4498,16 +4767,19 @@ var render = function render() {
   }, [_vm._v("Cancelar")]), _vm._v(" "), _c("button", {
     staticClass: "btn btn-primary px-4",
     attrs: {
-      type: "button"
+      type: "button",
+      disabled: _vm.guardando
     },
     on: {
       click: function click($event) {
         return _vm.guardar();
       }
     }
-  }, [_c("i", {
+  }, [_vm.guardando ? _c("i", {
+    staticClass: "fa-solid fa-circle-notch fa-spin me-2"
+  }) : _c("i", {
     staticClass: "fa-solid fa-cube me-2"
-  }), _vm._v(" Crear Paquete\n\t\t\t\t")])])])])]);
+  }), _vm._v("\n\t\t\t\t\tCrear Paquete\n\t\t\t\t")])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -4549,7 +4821,15 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("label", {
-    staticClass: "form-label text-secondary small fw-medium mb-1"
+    staticClass: "form-label text-secondary small fw-medium mb-2"
+  }, [_vm._v("Tipo de Paquete "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label text-secondary small fw-medium mb-2"
   }, [_vm._v("Especialidad del Paquete "), _c("span", {
     staticClass: "text-danger"
   }, [_vm._v("*")])]);
@@ -4760,6 +5040,30 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.impresionComprobante{\r\n\tcursor:p
 
 /***/ }),
 
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=style&index=0&id=5cb2816c&scoped=true&lang=css":
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=style&index=0&id=5cb2816c&scoped=true&lang=css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.card-paquete-selected[data-v-5cb2816c] {\r\n\tbackground-color: #f0f7ff !important;\r\n\tbox-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;\n}\n.cursor-pointer[data-v-5cb2816c] {\r\n\tcursor: pointer;\n}\n.transition-all[data-v-5cb2816c] {\r\n\ttransition: all 0.2s ease-in-out;\n}\r\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/HomePagos.vue?vue&type=style&index=0&id=0725e1b0&scoped=true&lang=css":
 /*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/HomePagos.vue?vue&type=style&index=0&id=0725e1b0&scoped=true&lang=css ***!
@@ -4817,6 +5121,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalFacturacion_vue_vue_type_style_index_0_id_e3a1cbea_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=style&index=0&id=5cb2816c&scoped=true&lang=css":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=style&index=0&id=5cb2816c&scoped=true&lang=css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalMembresias_vue_vue_type_style_index_0_id_5cb2816c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalMembresias.vue?vue&type=style&index=0&id=5cb2816c&scoped=true&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=style&index=0&id=5cb2816c&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalMembresias_vue_vue_type_style_index_0_id_5cb2816c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalMembresias_vue_vue_type_style_index_0_id_5cb2816c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -5030,23 +5364,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ModalMembresias_vue_vue_type_template_id_5cb2816c__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalMembresias.vue?vue&type=template&id=5cb2816c */ "./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=template&id=5cb2816c");
+/* harmony import */ var _ModalMembresias_vue_vue_type_template_id_5cb2816c_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalMembresias.vue?vue&type=template&id=5cb2816c&scoped=true */ "./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=template&id=5cb2816c&scoped=true");
 /* harmony import */ var _ModalMembresias_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModalMembresias.vue?vue&type=script&lang=js */ "./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _ModalMembresias_vue_vue_type_style_index_0_id_5cb2816c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalMembresias.vue?vue&type=style&index=0&id=5cb2816c&scoped=true&lang=css */ "./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=style&index=0&id=5cb2816c&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _ModalMembresias_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _ModalMembresias_vue_vue_type_template_id_5cb2816c__WEBPACK_IMPORTED_MODULE_0__.render,
-  _ModalMembresias_vue_vue_type_template_id_5cb2816c__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _ModalMembresias_vue_vue_type_template_id_5cb2816c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _ModalMembresias_vue_vue_type_template_id_5cb2816c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "5cb2816c",
   null
   
 )
@@ -5294,19 +5630,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=template&id=5cb2816c":
-/*!******************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=template&id=5cb2816c ***!
-  \******************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=template&id=5cb2816c&scoped=true":
+/*!******************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=template&id=5cb2816c&scoped=true ***!
+  \******************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalMembresias_vue_vue_type_template_id_5cb2816c__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalMembresias_vue_vue_type_template_id_5cb2816c__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalMembresias_vue_vue_type_template_id_5cb2816c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalMembresias_vue_vue_type_template_id_5cb2816c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalMembresias_vue_vue_type_template_id_5cb2816c__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalMembresias.vue?vue&type=template&id=5cb2816c */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=template&id=5cb2816c");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalMembresias_vue_vue_type_template_id_5cb2816c_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalMembresias.vue?vue&type=template&id=5cb2816c&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=template&id=5cb2816c&scoped=true");
 
 
 /***/ }),
@@ -5350,6 +5686,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalFacturacion_vue_vue_type_style_index_0_id_e3a1cbea_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalFacturacion.vue?vue&type=style&index=0&id=e3a1cbea&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/ModalFacturacion.vue?vue&type=style&index=0&id=e3a1cbea&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=style&index=0&id=5cb2816c&scoped=true&lang=css":
+/*!********************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=style&index=0&id=5cb2816c&scoped=true&lang=css ***!
+  \********************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalMembresias_vue_vue_type_style_index_0_id_5cb2816c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalMembresias.vue?vue&type=style&index=0&id=5cb2816c&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pagos/ModalMembresias.vue?vue&type=style&index=0&id=5cb2816c&scoped=true&lang=css");
 
 
 /***/ })

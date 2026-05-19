@@ -116,7 +116,7 @@
 
 		<div class="card my-2">
 			<div class="card-body">
-				<p class="text-muted"><strong>Precios de Kurame y Membresías</strong></p>
+				<p class="text-muted"><strong>Precios de Kurame y Paquetes</strong></p>
 				<table class="table table-hover">
 					<thead>
 						<tr>

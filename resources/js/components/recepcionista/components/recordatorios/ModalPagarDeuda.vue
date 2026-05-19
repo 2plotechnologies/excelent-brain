@@ -9,7 +9,7 @@
 				</div>
 				<div class="modal-body">
 					<p>A favor de <strong class="text-capitalize">{{ deuda.name }}</strong></p>
-					<p>Esta por hacer una modificación de la membresía <strong>{{ deuda.motivo }}</strong></p>
+					<p>Esta por hacer una modificación del paquete <strong>{{ deuda.motivo }}</strong></p>
 					<p v-if="deuda.numero_cuota">Cuota <strong>#{{ deuda.numero_cuota }}</strong></p>
 					<p>Monto S/ <strong>{{ parseFloat(deuda.monto).toFixed(2) }}</strong></p>
 					<label for="">Opciones</label>

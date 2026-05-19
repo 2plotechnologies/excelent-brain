@@ -13,7 +13,7 @@
 					<input type="number" class="form-control" v-model="precio.nuevos" >
 					<label for="">Precio para pacientes continuos</label>
 					<input type="number" class="form-control" v-model="precio.continuos" >
-					<label for="">Precio especial para pacientes que tienen membresía activa</label>
+					<label for="">Precio especial para pacientes que tienen paquete activo</label>
 					<input type="number" class="form-control" v-model="precio.especialMembresias" >
 					<div v-if="precio.servicio==0">
 						<label for="">N° Sesiones</label>

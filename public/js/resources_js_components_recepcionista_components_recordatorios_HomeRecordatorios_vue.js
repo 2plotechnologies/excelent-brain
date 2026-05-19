@@ -3697,7 +3697,7 @@ var render = function render() {
     staticClass: "modal-body"
   }, [_c("p", [_vm._v("A favor de "), _c("strong", {
     staticClass: "text-capitalize"
-  }, [_vm._v(_vm._s(_vm.deuda.name))])]), _vm._v(" "), _c("p", [_vm._v("Esta por hacer una modificación de la membresía "), _c("strong", [_vm._v(_vm._s(_vm.deuda.motivo))])]), _vm._v(" "), _vm.deuda.numero_cuota ? _c("p", [_vm._v("Cuota "), _c("strong", [_vm._v("#" + _vm._s(_vm.deuda.numero_cuota))])]) : _vm._e(), _vm._v(" "), _c("p", [_vm._v("Monto S/ "), _c("strong", [_vm._v(_vm._s(parseFloat(_vm.deuda.monto).toFixed(2)))])]), _vm._v(" "), _c("label", {
+  }, [_vm._v(_vm._s(_vm.deuda.name))])]), _vm._v(" "), _c("p", [_vm._v("Esta por hacer una modificación del paquete "), _c("strong", [_vm._v(_vm._s(_vm.deuda.motivo))])]), _vm._v(" "), _vm.deuda.numero_cuota ? _c("p", [_vm._v("Cuota "), _c("strong", [_vm._v("#" + _vm._s(_vm.deuda.numero_cuota))])]) : _vm._e(), _vm._v(" "), _c("p", [_vm._v("Monto S/ "), _c("strong", [_vm._v(_vm._s(parseFloat(_vm.deuda.monto).toFixed(2)))])]), _vm._v(" "), _c("label", {
     attrs: {
       "for": ""
     }
