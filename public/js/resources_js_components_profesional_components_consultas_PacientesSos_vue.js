@@ -53,7 +53,11 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     fetchData: function fetchData() {
       var _this2 = this;
-      this.axios.get('/api/pedirSOS').then(function (res) {
+      this.axios.get('/api/pedirSOS', {
+        params: {
+          idSede: this.$attrs.idSede
+        }
+      }).then(function (res) {
         _this2.pacientes = res.data.pacientes;
       });
     },

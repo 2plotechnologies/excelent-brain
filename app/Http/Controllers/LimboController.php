@@ -13,10 +13,15 @@ class LimboController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $limbos = Limbo::with(['appointment.patient', 'appointment.professional', 'appointment.precio', 'appointment.schedule', 'appointment.payment'])
-        ->get();
+        $query = Limbo::with(['appointment.patient', 'appointment.professional', 'appointment.precio', 'appointment.schedule', 'appointment.payment']);
+        
+        if ($request->has('idSede') && $request->idSede) {
+            $query->where('idSede', $request->idSede);
+        }
+
+        $limbos = $query->get();
         return $limbos;
     }
 

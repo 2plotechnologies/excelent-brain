@@ -47,6 +47,11 @@ class PaqueteController extends Controller
                 'u.nombre as registrado_por'
             );
 
+        // Filtrar por sede
+        if ($request->has('idSede') && $request->idSede) {
+            $query->where('membresias.idSede', $request->idSede);
+        }
+
         // Filters matching frontend logic
         if ($estado != 0) {
             $query->where('membresias.estado', $estado);
@@ -303,7 +308,8 @@ class PaqueteController extends Controller
                 'formato_nuevo' => $request->input('formato_nuevo', 1),
                 'byDoctor' => 0,
                 'num_sesion' => $request->input('num_sesion'),
-                'idMembresia' => $request->input('idMembresia')
+                'idMembresia' => $request->input('idMembresia'),
+                'idSede' => $request->input('idSede', 1)
             ]);
 
             // Crear el pago ficticio para la cita

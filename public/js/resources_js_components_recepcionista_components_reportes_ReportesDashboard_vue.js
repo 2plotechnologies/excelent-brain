@@ -200,7 +200,8 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
       };
       this.axios.get(urlMap[endpoint], {
         params: {
-          date: date
+          date: date,
+          idSede: this.$attrs.idSede
         }
       }).then(function (res) {
         _this.data[endpoint] = res.data;

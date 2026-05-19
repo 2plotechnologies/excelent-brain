@@ -2361,12 +2361,12 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         }).then(function (res) {
           console.log(res.data);
           _this2.closeModal();
-          if (parseInt(res.data) > 0) {
+          if (res.data.status === 'success') {
             _this2.$swal('Datos de paciente guardados con éxito');
           } else {
             _this2.$swal({
               icon: 'error',
-              text: 'El dni ya está registrado: ' + res.data
+              text: res.data.message || 'El dni ya está registrado'
             });
           }
         })["catch"](function (error) {

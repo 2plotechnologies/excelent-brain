@@ -17,6 +17,7 @@ class Discharge extends Model
         'type', // 1: Psicológica, 2: Psiquiátrica
         'comments',
         'status', // 1: Activo, 2: Inactivo, 3: Reingreso
+        'idSede',
     ];
 
     public function patient()

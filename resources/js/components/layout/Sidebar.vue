@@ -93,6 +93,13 @@
 									<span>Altas de Pacientes</span>
 							</router-link>
 						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
+							<router-link to="/administrador/sedes" class="nav-link">
+									<i class="fas fa-building"></i>
+									<span>Gestión de Sedes</span>
+							</router-link>
+						</li>
 				</div>
 
 				<!-- Rol del profesional -->
@@ -218,6 +225,13 @@
 								<router-link  to="/interno/pacientes" class="nav-link">
 										<i class="fas fa-user-nurse"></i>
 										<span>Triaje</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link to="/interno/pacientes-sos" class="nav-link">
+										<i class="fa-solid fa-skull-crossbones"></i>
+										<span>Pacientes S.O.S.</span>
 								</router-link>
 						</li>
 

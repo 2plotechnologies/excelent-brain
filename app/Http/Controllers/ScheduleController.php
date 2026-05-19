@@ -92,9 +92,10 @@ class ScheduleController extends Controller
 
 			
 		}
-    public function horarioCuadernoOcupado($fecha, $dia){
-			       
-        $appointment = Appointment::whereDate('appointments.date', '=', $fecha)
+    public function horarioCuadernoOcupado($fecha, $dia, Request $request){
+			$idSede = $request->query('idSede', null);
+
+        $appointmentQuery = Appointment::whereDate('appointments.date', '=', $fecha)
         ->where('appointments.status', '<>', 6) //limbo
         ->where('appointments.status', '<>', 4)
         ->where('appointments.status', '<>', 3)
@@ -102,8 +103,13 @@ class ScheduleController extends Controller
         ->with(['patient', 'patient.ultimoSemaforo'])
         ->with('payment')
         ->with('professional')
-        ->with('membresia')
-        ->get();
+        ->with('membresia');
+
+        if ($idSede) {
+            $appointmentQuery->where('appointments.idSede', $idSede);
+        }
+
+        $appointment = $appointmentQuery->get();
         //return $appointment; die();
         
         foreach ($appointment as $cita) {
@@ -138,11 +144,16 @@ class ScheduleController extends Controller
         }
 
 
-       $solos = Schedule::selectRaw('MIN(id) as id, professional_id, day, check_time, departure_date')
+       $solosQuery = Schedule::selectRaw('MIN(id) as id, professional_id, day, check_time, departure_date')
         ->where('day', '=', $dia)
         ->whereNotNull('check_time')
-        ->whereNotNull('departure_date')
-        ->groupBy('professional_id', 'day', 'check_time', 'departure_date')
+        ->whereNotNull('departure_date');
+
+        if ($idSede) {
+            $solosQuery->where('idSede', $idSede);
+        }
+
+        $solos = $solosQuery->groupBy('professional_id', 'day', 'check_time', 'departure_date')
         ->orderBy('professional_id', 'asc')
         ->orderBy('check_time', 'asc')
         ->get();
@@ -235,7 +246,8 @@ class ScheduleController extends Controller
                     'check_time' => $check_time,
                     'departure_date' => $departure_date,
                     'day' => $dia,
-                    'professional_id' => $professional_id
+                    'professional_id' => $professional_id,
+                    'idSede' => $request->get('idSede', 1)
                 ]);
 
                 $res = 'Exito';

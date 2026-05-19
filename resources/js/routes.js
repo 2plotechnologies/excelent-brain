@@ -21,6 +21,7 @@ const NotasCredito = () => import('./components/administrador/views/NotasCredito
 const editarPacientesAdmin = () => import('./components/administrador/views/EditarPacientesAdmin.vue')
 const RecepcionistaReportesGerenciales = () => import('./components/administrador/views/reportes/ReportesGerenciales');
 const HomeHorasTrabajadas = () => import('./components/administrador/views/HomeHorasTrabajadas.vue');
+const HomeSedes = () => import('./components/administrador/views/HomeSedes.vue');
 
 const HomeAdministradorRouterReportes = () => import('./components/administrador/views/reportes/HomeRouterReportes.vue');
 const HomeAdministradorReportes = () => import('./components/administrador/views/reportes/HomeReportes.vue');
@@ -243,6 +244,11 @@ export const routes = [
         path: 'altas',
         name: 'altasProfesional',
         component: HomeAltas
+      },
+      {
+        path: 'pacientes-sos',
+        name: 'pacientesSosInterno',
+        component: PacientesSos
       }
     ]
   },
@@ -483,6 +489,11 @@ export const routes = [
             component: ChartMensual
           },
         ]
+      },
+      {
+        path: '/administrador/sedes',
+        name: 'sedesAdmin',
+        component: HomeSedes
       },
 
     ]

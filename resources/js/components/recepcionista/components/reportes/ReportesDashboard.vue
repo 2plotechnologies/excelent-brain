@@ -459,7 +459,7 @@ export default {
         'ingresos': '/api/reportes/ingresos'
       };
 
-      this.axios.get(urlMap[endpoint], { params: { date: date } })
+      this.axios.get(urlMap[endpoint], { params: { date: date, idSede: this.$attrs.idSede } })
         .then(res => {
           this.data[endpoint] = res.data;
           if (callback) callback(res.data);

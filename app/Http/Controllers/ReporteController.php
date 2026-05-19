@@ -29,7 +29,7 @@ class ReporteController extends Controller
             ")
             //Mes enviado desde front. No envia start y end, solo el mes...
             ->whereBetween('ep.date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
-            ->where('ep.idSede', 1)
+            ->where('ep.idSede', $request->idSede ?? 1)
             ->where('ep.activo', 1)
             ->whereNotIn('ep.type', [6,16])
             ->where('ep.price', '>', 0)
@@ -67,7 +67,7 @@ class ReporteController extends Controller
                 END as servicio
             ")
             ->whereBetween('ep.date', [Carbon::parse($request->date)->startOfMonth(), Carbon::parse($request->date)->endOfMonth()])
-            ->where('ep.idSede', 1)
+            ->where('ep.idSede', $request->idSede ?? 1)
             ->where('ep.activo', 1)
             ->where('ep.price', '>', 0);
 

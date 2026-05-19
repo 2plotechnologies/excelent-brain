@@ -282,7 +282,7 @@
 				this.cargando = true;
 				let dia = this.dayWeek(moment(this.fecha).format('d')-1)
 				
-				await this.axios.get(`/api/horarioCuadernoOcupado/${this.fecha}/${dia}`)
+				await this.axios.get(`/api/horarioCuadernoOcupado/${this.fecha}/${dia}`, { params: { idSede: this.idSede } })
 				.then(res => { 
 					moment.locale('es')
 					alertify.notify('<i class="fa-regular fa-calendar-check"></i> Datos del ' + moment(this.fecha).format('DD [de] MMMM') , 'success', 5);

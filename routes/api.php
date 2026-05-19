@@ -34,6 +34,7 @@ use App\Http\Controllers\SeguimientoCRMController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\QuestionnaireController;
 use App\Http\Controllers\HorasTrabajadasController;
+use App\Http\Controllers\SedeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -196,6 +197,15 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('insertarDeudasSeguimiento', [ExtrasController::class, 'insertarDeudasSeguimiento']);
             Route::get('pedirHistorialDeudas/{idPaciente}', [ExtrasController::class, 'pedirHistorialDeudas']);
         });
+    });
+
+    // ── SEDES ─────────────────────────────────────────────────────────────────
+    Route::get('sedes', [SedeController::class, 'index']); // Disponible para todos los autenticados
+    Route::middleware('role:administrador')->group(function () {
+        Route::post('sedes', [SedeController::class, 'store']);
+        Route::put('sedes/{id}', [SedeController::class, 'update']);
+        Route::delete('sedes/{id}', [SedeController::class, 'destroy']);
+        Route::post('sedes/{id}/reactivar', [SedeController::class, 'reactivar']);
     });
 
     // ── USERS (admin only) ────────────────────────────────────────────────────

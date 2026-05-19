@@ -236,7 +236,8 @@ class AppointmentController extends Controller
 				'active_slot' => 1,
 				'hora_inicio' => $hora_inicio,
 				'hora_fin' => $hora_fin,
-				'duracion' => $duracion
+				'duracion' => $duracion,
+				'idSede' => $request->get('idSede', 1)
 			]);
 
 			$payment = Payment::create([
@@ -303,7 +304,8 @@ class AppointmentController extends Controller
 				'active_slot' => 1,
 				'hora_inicio' => $hora_inicio,
 				'hora_fin' => $hora_fin,
-				'duracion' => $duracion
+				'duracion' => $duracion,
+				'idSede' => $request->get('idSede', 1)
 			]);
 
 			$payment = Payment::create([
@@ -478,7 +480,8 @@ class AppointmentController extends Controller
 							'active_slot' => 1,
 							'hora_inicio' => $hora_inicio_bloq,
 							'hora_fin' => $hora_fin_bloq,
-							'duracion' => 15
+							'duracion' => 15,
+							'idSede' => $request->get('idSede', 1)
 						]);
 					}
 				}
@@ -904,7 +907,8 @@ Medical_evolution::create([
 			'active_slot' => 1,
 			'hora_inicio' => $hora_inicio,
 			'hora_fin' => $hora_fin,
-			'duracion' => $duracion
+			'duracion' => $duracion,
+			'idSede' => $cita->idSede ?? 1
 		]);
 		$cita->update([
 			'status' => 4,

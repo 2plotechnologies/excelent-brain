@@ -193,7 +193,7 @@ export default {
 	},
 	methods: {
 		fetchData() {
-			this.axios.get('/api/pedirSOS')
+			this.axios.get('/api/pedirSOS', { params: { idSede: this.$attrs.idSede } })
 				.then(res => {
 					this.pacientes = res.data.pacientes;
 				});

@@ -524,7 +524,21 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-clipboard-check"
-  }), _vm._v(" "), _c("span", [_vm._v("Altas de Pacientes")])])], 1)]) : _vm._e(), _vm._v(" "), _vm.rolUser === "profesional" ? _c("div", [_c("li", {
+  }), _vm._v(" "), _c("span", [_vm._v("Altas de Pacientes")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "nav-item nav__list",
+    on: {
+      click: function click($event) {
+        return _vm.activeSidebar();
+      }
+    }
+  }, [_c("router-link", {
+    staticClass: "nav-link",
+    attrs: {
+      to: "/administrador/sedes"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-building"
+  }), _vm._v(" "), _c("span", [_vm._v("Gestión de Sedes")])])], 1)]) : _vm._e(), _vm._v(" "), _vm.rolUser === "profesional" ? _c("div", [_c("li", {
     staticClass: "nav-item nav__list active",
     on: {
       click: function click($event) {
@@ -705,7 +719,21 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-user-nurse"
-  }), _vm._v(" "), _c("span", [_vm._v("Triaje")])])], 1)]) : _vm._e(), _vm._v(" "), _vm.rolUser === "recepcionista" ? _c("div", [_c("li", {
+  }), _vm._v(" "), _c("span", [_vm._v("Triaje")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "nav-item nav__list",
+    on: {
+      click: function click($event) {
+        return _vm.activeSidebar();
+      }
+    }
+  }, [_c("router-link", {
+    staticClass: "nav-link",
+    attrs: {
+      to: "/interno/pacientes-sos"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-skull-crossbones"
+  }), _vm._v(" "), _c("span", [_vm._v("Pacientes S.O.S.")])])], 1)]) : _vm._e(), _vm._v(" "), _vm.rolUser === "recepcionista" ? _c("div", [_c("li", {
     staticClass: "nav-item nav__list active",
     on: {
       click: function click($event) {

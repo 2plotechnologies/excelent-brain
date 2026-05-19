@@ -617,15 +617,20 @@ class PatientController extends Controller
 			'professional_id' => $request->idProfesional,
 			'type' => $request->type,
 			'comments' => $request->comments,
-			'status' => 1
+			'status' => 1,
+			'idSede' => $request->idSede ?? 1
 		]);
 		return response()->json([
 			'msg'=> 'Dado de alta exitósamente'
 		]);
 	}
 
-	public function listDischarges() {
-		$discharges = \App\Models\Discharge::with('patient', 'professional')->orderBy('created_at', 'desc')->get();
+	public function listDischarges(Request $request) {
+		$query = \App\Models\Discharge::with('patient', 'professional')->orderBy('created_at', 'desc');
+		if ($request->has('idSede') && $request->idSede) {
+			$query->where('idSede', $request->idSede);
+		}
+		$discharges = $query->get();
 		return response()->json($discharges);
 	}
 
@@ -900,7 +905,8 @@ class PatientController extends Controller
 			DB::table('sos')->insert([
 				'idPaciente' => $request->get('id'),
 				'idProfesional' => $request->get('idProfesional'),
-				'comentarios' => $request->get('comentarios')
+				'comentarios' => $request->get('comentarios'),
+				'idSede' => $request->get('idSede', 1)
 			]);
 
 			return response()->json(['mensaje' => 'Paciente activado']); 
@@ -918,13 +924,18 @@ class PatientController extends Controller
 			return response()->json(['mensaje' => 'Paciente activado']); 
 		}
 
-		public function pedirSOS(){
-			$pacientes = DB::table('sos')
+		public function pedirSOS(Request $request){
+			$query = DB::table('sos')
 			->join('professionals', 'sos.idProfesional', '=', 'professionals.id')
 			->join('patients', 'sos.idPaciente', '=', 'patients.id')
 			->select('sos.*', 'professionals.name as nombreProfesional', 'patients.*', 'sos.id as idSos')
-			->where('sos.activo','=', 1)
-			->orderByDesc('idSos')->get();
+			->where('sos.activo','=', 1);
+
+			if ($request->has('idSede') && $request->idSede) {
+				$query->where('sos.idSede', $request->idSede);
+			}
+
+			$pacientes = $query->orderByDesc('idSos')->get();
 
 			foreach ($pacientes as $paciente) {
 				$relaciones = Relative::where('patient_id', $paciente->idPaciente)->get();

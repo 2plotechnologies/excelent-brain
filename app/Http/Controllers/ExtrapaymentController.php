@@ -140,8 +140,9 @@ class ExtrapaymentController extends Controller
 				$fecha = Carbon::now();
 				$hoy = $fecha->format('d/m/Y h:i A');
 
-				// Definir nombres de sede
-				$nombreSede = ($idSede == 1) ? "El Tambo" : (($idSede == 2) ? "San Carlos" : ""); 
+				// Definir nombres de sede dinámicamente
+				$sede = \App\Models\Sede::find($idSede);
+				$nombreSede = $sede ? $sede->nombre : "Sede $idSede"; 
 
 
 				// Filtrar ingresos por sede

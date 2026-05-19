@@ -311,10 +311,10 @@ import alertify from 'alertifyjs'
 					this.axios.post(`/api/patient/new`, {paciente: this.paciente})
 					.then(res => { console.log(res.data);
 						this.closeModal()
-						if(parseInt(res.data)>0){
+						if(res.data.status === 'success'){
 							this.$swal('Datos de paciente guardados con éxito')
 						}else{
-							this.$swal({icon: 'error', text: 'El dni ya está registrado: '+ res.data})
+							this.$swal({icon: 'error', text: res.data.message || 'El dni ya está registrado'})
 						}
 					})
 					.catch(error => {
