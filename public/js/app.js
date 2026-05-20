@@ -6967,6 +6967,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_0__);
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'ModalIntercambio',
   props: ['posibles', 'primero'],
@@ -6978,6 +6981,7 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     intercambiar: function intercambiar() {
       var _this = this;
+      if (this.idCambio === -1) return;
       var elegido = this.posibles[this.idCambio];
       this.axios.post('/api/intercambiar', {
         idElegido: elegido.id,
@@ -6987,6 +6991,17 @@ __webpack_require__.r(__webpack_exports__);
       }).then(function (response) {
         _this.$emit('actualizar');
       });
+    },
+    horaLatam1: function horaLatam1(horita) {
+      return moment__WEBPACK_IMPORTED_MODULE_0___default()(horita, 'HH:mm:ss').format('hh:mm');
+    },
+    horaLatam2: function horaLatam2(horita) {
+      return moment__WEBPACK_IMPORTED_MODULE_0___default()(horita, 'HH:mm:ss').format('hh:mm a');
+    }
+  },
+  watch: {
+    posibles: function posibles() {
+      this.idCambio = -1;
     }
   }
 });
@@ -7477,10 +7492,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               }
               return _context2.abrupt("return");
             case 2:
-              diaManual = moment__WEBPACK_IMPORTED_MODULE_2___default()(_this5.fechaManual).format('d');
-              diaSemana = _this5.dayWeek(diaManual - 1);
+              diaManual = parseInt(moment__WEBPACK_IMPORTED_MODULE_2___default()(_this5.fechaManual).format('d')) - 1;
+              if (diaManual === -1) diaManual = 6;
+              diaSemana = _this5.dayWeek(diaManual);
               _this5.cargandoHorarios = true;
-              _context2.next = 7;
+              _context2.next = 8;
               return _this5.axios.get("/api/horarioCuadernoOcupado/".concat(_this5.fechaManual, "/").concat(diaSemana)).then(function (res) {
                 var solos = res.data.solos.filter(function (h) {
                   return h.professional_id == _this5.cita.professional_id;
@@ -7502,7 +7518,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               })["finally"](function () {
                 return _this5.cargandoHorarios = false;
               });
-            case 7:
+            case 8:
             case "end":
               return _context2.stop();
           }
@@ -8839,8 +8855,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     return {
       data: null,
       professionals: {},
-      horarios: {},
-      horariosAll: {},
+      horarios: [],
+      horariosAll: [],
       hoursProfessional: [],
       schedulesInvalid: [],
       caso: 'reprogramar',
@@ -9001,13 +9017,19 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
+              if (!(!_this6.data || !_this6.data.professional_id)) {
+                _context5.next = 2;
+                break;
+              }
+              return _context5.abrupt("return");
+            case 2:
               id = _this6.data.professional_id;
-              _context5.next = 3;
+              _context5.next = 5;
               return _this6.axios.get("/api/horario/".concat(id)).then(function (res) {
                 _this6.horarios = res.data.schedulesInvalid;
                 _this6.horariosAll = res.data.schedules;
                 _this6.hoursProfessional = _this6.horarios;
-                _this6.emitSchedule(document.querySelector(".emit-fecha").value);
+                _this6.emitSchedule(_this6.data.date);
                 _this6.schedulesInvalid = [];
                 _this6.hoursProfessional.forEach(function (el) {
                   _this6.schedulesInvalid.push(el.schedule_id);
@@ -9015,7 +9037,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               })["catch"](function (err) {
                 console.error(err);
               });
-            case 3:
+            case 5:
             case "end":
               return _context5.stop();
           }
@@ -9024,7 +9046,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     emitSchedule: function emitSchedule() {
       var _this7 = this;
-      var info = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : document.querySelector(".emit-fecha").value;
+      var info = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.data ? this.data.date : '';
       this.horarios = [];
       var arraySchedulesInvalid = [];
       this.hoursProfessional.forEach(function (el) {
@@ -9032,8 +9054,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           arraySchedulesInvalid.push(el.schedule_id);
         }
       });
+      var dayIndex = parseInt(moment__WEBPACK_IMPORTED_MODULE_2___default()(info).format('d')) - 1;
+      if (dayIndex === -1) dayIndex = 6;
+      var targetDay = this.dayWeek(dayIndex);
       this.horariosAll.forEach(function (el) {
-        if (el.day === _this7.dayWeek(new Date(info).getDay())) {
+        if (el.active !== 0 && el.day && targetDay && el.day.toLowerCase() === targetDay.toLowerCase()) {
+          if (el.date && el.date !== info) {
+            return;
+          }
           if (arraySchedulesInvalid.includes(el.id)) {
             // Hay cita
             //console.log("Hya citas")
@@ -9360,6 +9388,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     fechaEmit: function fechaEmit(id, diaSeleccionado) {
       var _this6 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var dayIndex, targetDay;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
@@ -9371,8 +9400,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 _this6.horasMalas = res.data.invalidos;
               });
             case 3:
+              dayIndex = parseInt(moment__WEBPACK_IMPORTED_MODULE_9___default()(diaSeleccionado).format('d')) - 1;
+              if (dayIndex === -1) dayIndex = 6;
+              targetDay = _this6.diaDeLaSemana(dayIndex);
               _this6.horasSolas.forEach(function (fecha) {
-                if (fecha.day == _this6.diaDeLaSemana(new Date(diaSeleccionado).getDay())) {
+                if (fecha.active !== 0 && fecha.day && targetDay && fecha.day.toLowerCase() == targetDay.toLowerCase()) {
                   //Digamos Martes
                   _this6.horarios.push(fecha);
                 }
@@ -9382,20 +9414,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   return el.id == mal.schedule_id;
                 });
                 console.log(indice);
-                _this6.horarios.splice(indice, 1);
+                if (indice > -1) {
+                  _this6.horarios.splice(indice, 1);
+                }
               });
-
-              /* this.horariosAll.forEach(el => {
-                //console.log('dia', el.day)
-              //Si es el dia elegido, en ese rango busca si tiene una cita [appointment], si tiene no agrega nada, si no tiene agrega a horarios (horas libres)
-                if (el.day === this.diaDeLaSemana(new Date(diaSeleccionado).getDay())) { //compara el día de hoy con la lista Ejm: martes con indice(2) en la lista de horarios
-              if (el.appointments.find( el => {el.date === diaSeleccionado && el.status != 3; console.log(el)} ) ? true : false) { // Hay cita
-              } else { //hora libre
-              this.horarios.push(el)
-              }
-                      }
-              }) */
-            case 5:
+            case 8:
             case "end":
               return _context5.stop();
           }
@@ -9719,7 +9742,7 @@ __webpack_require__.r(__webpack_exports__);
     queEsta: function queEsta(indexProf, hora) {
       var _this2 = this;
       var queEs = this.profesionales[indexProf].schedules.find(function (x) {
-        return x.day == _this2.hoyLetras && x.check_time == hora + ':00:00' || x.check_time == hora + ':15:00' || x.check_time == hora + ':30:00' || x.check_time == hora + ':45:00';
+        return x.active !== 0 && x.day && _this2.hoyLetras && x.day.toLowerCase() == _this2.hoyLetras.toLowerCase() && (x.check_time == hora + ':00:00' || x.check_time == hora + ':15:00' || x.check_time == hora + ':30:00' || x.check_time == hora + ':45:00');
       });
       if (queEs) return 'libre';else return 'inactivo';
     }
@@ -12894,10 +12917,10 @@ render._withStripped = true;
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=template&id=7d086086":
-/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=template&id=7d086086 ***!
-  \****************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=template&id=7d086086&scoped=true":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=template&id=7d086086&scoped=true ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -12907,7 +12930,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
 /* harmony export */ });
 var render = function render() {
-  var _vm$primero$patient$n;
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
@@ -12921,19 +12943,56 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "modal-dialog modal-dialog-centered"
   }, [_c("div", {
-    staticClass: "modal-content"
+    staticClass: "modal-content p-2 shadow",
+    staticStyle: {
+      "border-radius": "16px",
+      border: "none"
+    }
   }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
-  }, [_vm._v("\n\t\t\t\tElija de los siguientes pacientes uno para realizar el intercambio de horarios.\n\t\t\t\t"), _c("select", {
+    staticClass: "modal-body border-0 pt-3"
+  }, [_c("div", {
+    staticClass: "p-3 mb-3 rounded-3",
+    staticStyle: {
+      "background-color": "#f8fafc",
+      border: "1px solid #f1f5f9"
+    }
+  }, [_c("div", {
+    staticClass: "small text-muted mb-1",
+    staticStyle: {
+      "font-size": "12px",
+      "font-weight": "500",
+      "text-transform": "uppercase",
+      "letter-spacing": "0.5px"
+    }
+  }, [_vm._v("Cita de Origen:")]), _vm._v(" "), _c("h6", {
+    staticClass: "mb-1 fw-bold text-capitalize",
+    staticStyle: {
+      color: "#334155",
+      "font-size": "15px"
+    }
+  }, [_vm._v("\n\t\t\t\t\t\t" + _vm._s(_vm.primero.patient ? _vm.primero.patient.name + " " + _vm.primero.patient.nombres : "Paciente") + "\n\t\t\t\t\t")]), _vm._v(" "), _c("div", {
+    staticStyle: {
+      color: "#64748b",
+      "font-size": "13px"
+    }
+  }, [_c("i", {
+    staticClass: "fa-regular fa-calendar me-1"
+  }), _vm._v(" " + _vm._s(_vm.primero.date || "...") + " · \n\t\t\t\t\t\t"), _c("i", {
+    staticClass: "fa-regular fa-clock me-1"
+  }), _vm._v(" " + _vm._s(_vm.primero.schedule ? _vm.horaLatam1(_vm.primero.schedule.check_time) : "...") + " - " + _vm._s(_vm.primero.schedule ? _vm.horaLatam1(_vm.primero.schedule.departure_date) : "...") + " · \n\t\t\t\t\t\t"), _c("i", {
+    staticClass: "fa-solid fa-user-md me-1"
+  }), _vm._v(" " + _vm._s(_vm.primero.professional ? _vm.primero.professional.name || _vm.primero.professional.nombre : "Profesional") + "\n\t\t\t\t\t")])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3"
+  }, [_vm._m(1), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.idCambio,
       expression: "idCambio"
     }],
-    staticClass: "form-select text-capitalize",
+    staticClass: "form-select custom-input text-capitalize shadow-none",
     attrs: {
-      id: ""
+      id: "sltIntercambio"
     },
     on: {
       change: function change($event) {
@@ -12946,23 +13005,67 @@ var render = function render() {
         _vm.idCambio = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
       }
     }
-  }, _vm._l(_vm.posibles, function (posible, index) {
+  }, [_c("option", {
+    attrs: {
+      value: "-1",
+      disabled: "",
+      selected: ""
+    }
+  }, [_vm._v("Seleccionar paciente...")]), _vm._v(" "), _vm._l(_vm.posibles, function (posible, index) {
     return _c("option", {
+      key: index,
       staticClass: "text-capitalize",
       domProps: {
         value: index
       }
-    }, [_vm._v(_vm._s(posible.patient.name.toLowerCase()))]);
-  }), 0), _vm._v(" "), _c("p", {
-    staticClass: "mt-3 mb-0"
-  }, [_vm._v("Se intercambiará por: "), _c("strong", {
-    staticClass: "text-capitalize"
-  }, [_vm._v(_vm._s((_vm$primero$patient$n = _vm.primero.patient.name) === null || _vm$primero$patient$n === void 0 ? void 0 : _vm$primero$patient$n.toLowerCase()))])])]), _vm._v(" "), _c("div", {
-    staticClass: "modal-footer"
+    }, [_vm._v("\n\t\t\t\t\t\t\t" + _vm._s(posible.patient ? posible.patient.name.toLowerCase() + " " + (posible.patient.nombres || "").toLowerCase() : "Paciente") + " \n\t\t\t\t\t\t\t(" + _vm._s(posible.schedule ? _vm.horaLatam1(posible.schedule.check_time) : "") + ")\n\t\t\t\t\t\t")]);
+  })], 2)]), _vm._v(" "), _vm.posibles.length === 0 ? _c("div", {
+    staticClass: "alert alert-warning py-2 px-3 small border-0 rounded-3 mb-3 d-flex align-items-center"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-triangle-exclamation me-2 fs-6"
+  }), _vm._v(" "), _c("span", [_vm._v("No hay otras citas programadas con este profesional en este día para realizar un intercambio.")])]) : _vm._e(), _vm._v(" "), _vm.idCambio !== -1 && _vm.posibles[_vm.idCambio] ? _c("div", {
+    staticClass: "p-3 mb-4 rounded-3",
+    staticStyle: {
+      "background-color": "#eff6ff",
+      border: "1px solid #dbeafe"
+    }
+  }, [_c("div", {
+    staticClass: "small text-primary fw-bold mb-1",
+    staticStyle: {
+      "font-size": "12px",
+      "text-transform": "uppercase",
+      "letter-spacing": "0.5px"
+    }
+  }, [_vm._v("Cita de Destino (Intercambio):")]), _vm._v(" "), _c("h6", {
+    staticClass: "mb-1 fw-bold text-capitalize",
+    staticStyle: {
+      color: "#1e3a8a",
+      "font-size": "15px"
+    }
+  }, [_vm._v("\n\t\t\t\t\t\t" + _vm._s(_vm.posibles[_vm.idCambio].patient ? _vm.posibles[_vm.idCambio].patient.name + " " + _vm.posibles[_vm.idCambio].patient.nombres : "Paciente") + "\n\t\t\t\t\t")]), _vm._v(" "), _c("div", {
+    staticStyle: {
+      color: "#1e40af",
+      "font-size": "13px"
+    }
+  }, [_c("i", {
+    staticClass: "fa-regular fa-calendar me-1"
+  }), _vm._v(" " + _vm._s(_vm.posibles[_vm.idCambio].date || "...") + " · \n\t\t\t\t\t\t"), _c("i", {
+    staticClass: "fa-regular fa-clock me-1"
+  }), _vm._v(" " + _vm._s(_vm.posibles[_vm.idCambio].schedule ? _vm.horaLatam1(_vm.posibles[_vm.idCambio].schedule.check_time) : "...") + " - " + _vm._s(_vm.posibles[_vm.idCambio].schedule ? _vm.horaLatam1(_vm.posibles[_vm.idCambio].schedule.departure_date) : "...") + " · \n\t\t\t\t\t\t"), _c("i", {
+    staticClass: "fa-solid fa-user-md me-1"
+  }), _vm._v(" " + _vm._s(_vm.posibles[_vm.idCambio].professional ? _vm.posibles[_vm.idCambio].professional.name || _vm.posibles[_vm.idCambio].professional.nombre : "Profesional") + "\n\t\t\t\t\t")])]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-end gap-2 mt-4"
   }, [_c("button", {
-    staticClass: "btn btn-primary",
+    staticClass: "btn custom-btn-cancel",
     attrs: {
       type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Cancelar")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary custom-btn-submit d-flex align-items-center",
+    attrs: {
+      type: "button",
+      disabled: _vm.idCambio === -1,
       "data-bs-dismiss": "modal"
     },
     on: {
@@ -12971,20 +13074,27 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-retweet"
-  }), _vm._v(" Cambiar")])])])])]);
+    staticClass: "fas fa-retweet me-2"
+  }), _vm._v(" Confirmar Intercambio\n\t\t\t\t\t")])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header"
-  }, [_c("h1", {
-    staticClass: "modal-title fs-5",
+    staticClass: "modal-header border-0 pb-0"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center"
+  }, [_c("i", {
+    staticClass: "fas fa-retweet text-primary fs-5 me-2"
+  }), _vm._v(" "), _c("h5", {
+    staticClass: "modal-title fw-bold",
+    staticStyle: {
+      color: "#1e293b"
+    },
     attrs: {
       id: "exampleModalLabel"
     }
-  }, [_vm._v("Intercambiar")]), _vm._v(" "), _c("button", {
+  }, [_vm._v("Intercambiar Horario")])]), _vm._v(" "), _c("button", {
     staticClass: "btn-close",
     attrs: {
       type: "button",
@@ -12992,6 +13102,19 @@ var staticRenderFns = [function () {
       "aria-label": "Close"
     }
   })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_vm._v("Seleccione paciente para el intercambio "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
 }];
 render._withStripped = true;
 
@@ -21452,6 +21575,30 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.ajs-message{border-radius: 5px!important;}\n.ajs-success { background-color: rgb(33, 201, 89)!important;\n}\n.ajs-danger { background-color: rgb(232, 27, 0)!important; color:white!important;\n}\r\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=style&index=0&id=7d086086&scoped=true&lang=css":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=style&index=0&id=7d086086&scoped=true&lang=css ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.custom-input[data-v-7d086086] {\n\tborder-radius: 8px;\n\tborder: 1px solid #cbd5e1;\n\tpadding: 0.6rem 1rem;\n\tfont-size: 14px;\n}\n.custom-input[data-v-7d086086]:focus {\n\tborder-color: #3b82f6;\n\tbox-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);\n\toutline: none;\n}\n.custom-btn-cancel[data-v-7d086086] {\n\tborder-radius: 8px;\n\tborder: 1px solid #cbd5e1;\n\tbackground-color: #ffffff;\n\tcolor: #475569;\n\tpadding: 0.5rem 1.5rem;\n\tfont-weight: 500;\n\tfont-size: 14px;\n}\n.custom-btn-cancel[data-v-7d086086]:hover {\n\tbackground-color: #f1f5f9;\n}\n.custom-btn-submit[data-v-7d086086] {\n\tborder-radius: 8px;\n\tpadding: 0.5rem 1.5rem;\n\tfont-weight: 500;\n\tbackground-color: #79a6fa; \n\tborder: none;\n\tfont-size: 14px;\n\tcolor: #fff;\n}\n.custom-btn-submit[data-v-7d086086]:hover:not(:disabled) {\n\tbackground-color: #5c91f9;\n}\n.custom-btn-submit[data-v-7d086086]:disabled {\n\tbackground-color: #cbd5e1;\n\tcursor: not-allowed;\n\tcolor: #94a3b8;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -61197,6 +61344,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=style&index=0&id=7d086086&scoped=true&lang=css":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=style&index=0&id=7d086086&scoped=true&lang=css ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalIntercambio_vue_vue_type_style_index_0_id_7d086086_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalIntercambio.vue?vue&type=style&index=0&id=7d086086&scoped=true&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=style&index=0&id=7d086086&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalIntercambio_vue_vue_type_style_index_0_id_7d086086_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalIntercambio_vue_vue_type_style_index_0_id_7d086086_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalNuevaCita.vue?vue&type=style&index=0&id=33da45b8&lang=css":
 /*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalNuevaCita.vue?vue&type=style&index=0&id=33da45b8&lang=css ***!
@@ -62314,23 +62491,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ModalIntercambio_vue_vue_type_template_id_7d086086__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalIntercambio.vue?vue&type=template&id=7d086086 */ "./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=template&id=7d086086");
+/* harmony import */ var _ModalIntercambio_vue_vue_type_template_id_7d086086_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalIntercambio.vue?vue&type=template&id=7d086086&scoped=true */ "./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=template&id=7d086086&scoped=true");
 /* harmony import */ var _ModalIntercambio_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModalIntercambio.vue?vue&type=script&lang=js */ "./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _ModalIntercambio_vue_vue_type_style_index_0_id_7d086086_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalIntercambio.vue?vue&type=style&index=0&id=7d086086&scoped=true&lang=css */ "./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=style&index=0&id=7d086086&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _ModalIntercambio_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _ModalIntercambio_vue_vue_type_template_id_7d086086__WEBPACK_IMPORTED_MODULE_0__.render,
-  _ModalIntercambio_vue_vue_type_template_id_7d086086__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _ModalIntercambio_vue_vue_type_template_id_7d086086_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _ModalIntercambio_vue_vue_type_template_id_7d086086_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "7d086086",
   null
   
 )
@@ -63249,19 +63428,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=template&id=7d086086":
-/*!*******************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=template&id=7d086086 ***!
-  \*******************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=template&id=7d086086&scoped=true":
+/*!*******************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=template&id=7d086086&scoped=true ***!
+  \*******************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalIntercambio_vue_vue_type_template_id_7d086086__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalIntercambio_vue_vue_type_template_id_7d086086__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalIntercambio_vue_vue_type_template_id_7d086086_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalIntercambio_vue_vue_type_template_id_7d086086_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalIntercambio_vue_vue_type_template_id_7d086086__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalIntercambio.vue?vue&type=template&id=7d086086 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=template&id=7d086086");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalIntercambio_vue_vue_type_template_id_7d086086_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalIntercambio.vue?vue&type=template&id=7d086086&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=template&id=7d086086&scoped=true");
 
 
 /***/ }),
@@ -63505,6 +63684,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalCita_vue_vue_type_style_index_0_id_d6f9c10a_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalCita.vue?vue&type=style&index=0&id=d6f9c10a&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalCita.vue?vue&type=style&index=0&id=d6f9c10a&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=style&index=0&id=7d086086&scoped=true&lang=css":
+/*!*********************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=style&index=0&id=7d086086&scoped=true&lang=css ***!
+  \*********************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalIntercambio_vue_vue_type_style_index_0_id_7d086086_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalIntercambio.vue?vue&type=style&index=0&id=7d086086&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/citas/ModalIntercambio.vue?vue&type=style&index=0&id=7d086086&scoped=true&lang=css");
 
 
 /***/ }),

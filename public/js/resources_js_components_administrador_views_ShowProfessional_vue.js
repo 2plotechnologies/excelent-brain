@@ -89,6 +89,112 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=script&lang=js":
+/*!**********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=script&lang=js ***!
+  \**********************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  props: {
+    profId: {
+      required: true
+    }
+  },
+  data: function data() {
+    return {
+      horarios: [],
+      schedule: {
+        date: '',
+        check_time: '',
+        departure_date: '',
+        professional_id: this.profId
+      }
+    };
+  },
+  mounted: function mounted() {
+    this.getSchedules();
+  },
+  methods: {
+    getSchedules: function getSchedules() {
+      var _this = this;
+      this.axios.get("/api/professional/".concat(this.profId, "/schedules/all")).then(function (res) {
+        _this.horarios = res.data;
+      })["catch"](function (err) {
+        return console.error(err);
+      });
+    },
+    insertSchedule: function insertSchedule() {
+      var _this2 = this;
+      this.schedule.professional_id = this.profId;
+      this.axios.post('/api/schedule', this.schedule).then(function (result) {
+        if (result.data.mensaje === 'Exito') {
+          _this2.$swal('Horario insertado');
+          _this2.getSchedules();
+          _this2.schedule.date = '';
+          _this2.schedule.check_time = '';
+          _this2.schedule.departure_date = '';
+        } else {
+          _this2.$swal({
+            icon: 'error',
+            title: 'El horario insertado se cruzaba con otro'
+          });
+        }
+      })["catch"](function (err) {
+        return console.error(err);
+      });
+    },
+    toggleActive: function toggleActive(id) {
+      var _this3 = this;
+      this.axios.put("/api/schedule/".concat(id, "/toggle")).then(function (res) {
+        if (res.data.mensaje === 'success') {
+          _this3.getSchedules();
+        }
+      })["catch"](function (err) {
+        return console.error(err);
+      });
+    },
+    deleteSchedule: function deleteSchedule(id) {
+      var _this4 = this;
+      this.$swal({
+        title: '¿Quieres eliminar este horario?',
+        showDenyButton: true,
+        confirmButtonText: 'Sí',
+        denyButtonText: 'No'
+      }).then(function (result) {
+        if (result.isConfirmed) {
+          _this4.axios["delete"]('/api/schedule/' + id).then(function (res) {
+            _this4.$swal('Horario eliminado con éxito');
+            _this4.getSchedules();
+          });
+        }
+      });
+    },
+    horaHumana: function horaHumana(hora) {
+      if (!hora) return '...';
+      var minutos = parseInt(hora.substring(3, 5));
+      var hr = parseInt(hora.substring(0, 2));
+      if (hr > 12) {
+        return "".concat(hr - 12, ":").concat(minutos.toString().padStart(2, '0'), " PM");
+      } else {
+        if (hr === 12 && minutos >= 0) {
+          return "".concat(hr, ":").concat(minutos.toString().padStart(2, '0'), " PM");
+        }
+        if (hr === 0) {
+          return "12:".concat(minutos.toString().padStart(2, '0'), " AM");
+        }
+        return "".concat(hr, ":").concat(minutos.toString().padStart(2, '0'), " AM");
+      }
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/ShowProfessional.vue?vue&type=script&lang=js":
 /*!******************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/ShowProfessional.vue?vue&type=script&lang=js ***!
@@ -100,8 +206,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _EvolucionesModal_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./EvolucionesModal.vue */ "./resources/js/components/administrador/views/EvolucionesModal.vue");
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _GestionHorariosAdmin_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./GestionHorariosAdmin.vue */ "./resources/js/components/administrador/views/GestionHorariosAdmin.vue");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_2__);
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
@@ -111,10 +218,12 @@ function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.
 function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'HomeProfesionales',
   components: {
-    EvolucionModal: _EvolucionesModal_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+    EvolucionModal: _EvolucionesModal_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+    GestionHorariosAdmin: _GestionHorariosAdmin_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   data: function data() {
     return {
@@ -186,10 +295,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.show = 2;
     }
   }), "setMonths", function setMonths() {
-    this.months.push(moment__WEBPACK_IMPORTED_MODULE_1___default()(this.today).format('YYYY-MM'));
-    while (moment__WEBPACK_IMPORTED_MODULE_1___default()(this.today).format('YYYY-MM') != '2022-01') {
-      this.months.push(moment__WEBPACK_IMPORTED_MODULE_1___default()(this.today).add(-1, 'months').format('YYYY-MM'));
-      this.today = moment__WEBPACK_IMPORTED_MODULE_1___default()(this.today).add(-1, 'months');
+    this.months.push(moment__WEBPACK_IMPORTED_MODULE_2___default()(this.today).format('YYYY-MM'));
+    while (moment__WEBPACK_IMPORTED_MODULE_2___default()(this.today).format('YYYY-MM') != '2022-01') {
+      this.months.push(moment__WEBPACK_IMPORTED_MODULE_2___default()(this.today).add(-1, 'months').format('YYYY-MM'));
+      this.today = moment__WEBPACK_IMPORTED_MODULE_2___default()(this.today).add(-1, 'months');
     }
   }), "getProfesionales", function getProfesionales() {
     var _this = this;
@@ -307,7 +416,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     });
   }), "fechaLatam", function fechaLatam(fecha) {
-    return moment__WEBPACK_IMPORTED_MODULE_1___default()(fecha).format('DD/MM/YYYY');
+    return moment__WEBPACK_IMPORTED_MODULE_2___default()(fecha).format('DD/MM/YYYY');
   }), "capitalizar", function capitalizar(texto) {
     var primeraLetra = texto.charAt(0);
     var primeraLetraMayuscula = primeraLetra.toUpperCase();
@@ -318,14 +427,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   filters: {
     dateParse: function dateParse(val) {
-      return moment__WEBPACK_IMPORTED_MODULE_1___default()(val).format('DD/MM/YYYY');
+      return moment__WEBPACK_IMPORTED_MODULE_2___default()(val).format('DD/MM/YYYY');
     },
     monthParse: function monthParse(val) {
-      return moment__WEBPACK_IMPORTED_MODULE_1___default()(val + '-01').format('YYYY-MM');
+      return moment__WEBPACK_IMPORTED_MODULE_2___default()(val + '-01').format('YYYY-MM');
     },
     optionParseMonth: function optionParseMonth(val) {
-      moment__WEBPACK_IMPORTED_MODULE_1___default().locale('es');
-      var texto = moment__WEBPACK_IMPORTED_MODULE_1___default()(val).format('MMMM YYYY');
+      moment__WEBPACK_IMPORTED_MODULE_2___default().locale('es');
+      var texto = moment__WEBPACK_IMPORTED_MODULE_2___default()(val).format('MMMM YYYY');
       var primeraLetra = texto.charAt(0);
       var primeraLetraMayuscula = primeraLetra.toUpperCase();
       return primeraLetraMayuscula + texto.slice(1);
@@ -333,7 +442,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     timeParse: function timeParse(time) {
       var datetime = new Date('1970-01-01T' + time + 'Z');
       datetime.setHours(datetime.getHours() + 5);
-      return moment__WEBPACK_IMPORTED_MODULE_1___default()(datetime).format('LT');
+      return moment__WEBPACK_IMPORTED_MODULE_2___default()(datetime).format('LT');
     }
   }
 });
@@ -442,6 +551,181 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fas fa-times"
   })])]);
+}];
+render._withStripped = true;
+
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=template&id=5b84c893&scoped=true":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=template&id=5b84c893&scoped=true ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render),
+/* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mt-4"
+  }, [_c("div", {
+    staticClass: "card shadow mb-4"
+  }, [_vm._m(0), _vm._v(" "), _c("div", {
+    staticClass: "card-body"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "card rounded border border-primary p-4"
+  }, [_c("h5", {
+    staticClass: "text-success font-weight-bold"
+  }, [_vm._v("Agregar Horario")]), _vm._v(" "), _c("form", {
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.insertSchedule.apply(null, arguments);
+      }
+    }
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("Fecha Específica")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.schedule.date,
+      expression: "schedule.date"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "date",
+      required: ""
+    },
+    domProps: {
+      value: _vm.schedule.date
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.schedule, "date", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("Hora de Inicio")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.schedule.check_time,
+      expression: "schedule.check_time"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "time",
+      required: ""
+    },
+    domProps: {
+      value: _vm.schedule.check_time
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.schedule, "check_time", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("Hora de Salida")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.schedule.departure_date,
+      expression: "schedule.departure_date"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "time",
+      required: ""
+    },
+    domProps: {
+      value: _vm.schedule.departure_date
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.schedule, "departure_date", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _vm._m(1)])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-8"
+  }, [_c("div", {
+    staticClass: "card rounded border border-primary p-4"
+  }, [_c("h5", {
+    staticClass: "text-success font-weight-bold"
+  }, [_vm._v("Horarios Registrados")]), _vm._v(" "), _c("div", {
+    staticClass: "table-responsive mt-3"
+  }, [_c("table", {
+    staticClass: "table table-bordered"
+  }, [_vm._m(2), _vm._v(" "), _c("tbody", [_vm._l(_vm.horarios, function (horario) {
+    return _c("tr", {
+      key: horario.id
+    }, [_c("td", [horario.date ? _c("span", [_vm._v(_vm._s(horario.date))]) : _c("span", [_vm._v(_vm._s(horario.day) + " (Recurrente)")])]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.horaHumana(horario.check_time)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.horaHumana(horario.departure_date)))]), _vm._v(" "), _c("td", [horario.active ? _c("span", {
+      staticClass: "badge badge-success bg-success"
+    }, [_vm._v("Activo")]) : _c("span", {
+      staticClass: "badge badge-danger bg-danger"
+    }, [_vm._v("Inactivo")])]), _vm._v(" "), _c("td", [_c("button", {
+      staticClass: "btn btn-sm",
+      "class": horario.active ? "btn-danger" : "btn-success",
+      on: {
+        click: function click($event) {
+          return _vm.toggleActive(horario.id);
+        }
+      }
+    }, [_vm._v("\n                        " + _vm._s(horario.active ? "Desactivar" : "Activar") + "\n                      ")]), _vm._v(" "), _c("button", {
+      staticClass: "btn btn-sm btn-outline-danger ml-2",
+      on: {
+        click: function click($event) {
+          return _vm.deleteSchedule(horario.id);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-trash"
+    })])])]);
+  }), _vm._v(" "), _vm.horarios.length === 0 ? _c("tr", [_c("td", {
+    staticClass: "text-center",
+    attrs: {
+      colspan: "5"
+    }
+  }, [_vm._v("No hay horarios registrados.")])]) : _vm._e()], 2)])])])])])])])]);
+};
+var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "card-header bg-dark py-3 d-flex flex-row align-items-center justify-content-between"
+  }, [_c("h6", {
+    staticClass: "m-0 font-weight-bold text-white"
+  }, [_vm._v("Gestión de Horarios")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "form-group"
+  }, [_c("button", {
+    staticClass: "btn btn-success",
+    attrs: {
+      type: "submit"
+    }
+  }, [_vm._v("Registrar horario")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Día / Fecha")]), _vm._v(" "), _c("th", [_vm._v("Hora Inicio")]), _vm._v(" "), _c("th", [_vm._v("Hora Fin")]), _vm._v(" "), _c("th", [_vm._v("Estado")]), _vm._v(" "), _c("th", [_vm._v("Acciones")])])]);
 }];
 render._withStripped = true;
 
@@ -727,7 +1011,11 @@ var render = function render() {
     }, [_vm._v("No confirmado")]), _vm._v(" "), _c("p", {
       staticClass: "text-danger"
     }, [_vm._v("Evolución no generada o eliminada")])]], 2)]);
-  }), 0)]), _vm._v(" "), _vm.appointments.length == 0 ? _c("p", [_vm._v("No hay registros")]) : _vm._e()]), _vm._v(" "), _vm.evolutions ? _c("evolucion-modal", {
+  }), 0)]), _vm._v(" "), _vm.appointments.length == 0 ? _c("p", [_vm._v("No hay registros")]) : _vm._e()]), _vm._v(" "), _vm.profesional && _vm.profesional.id ? _c("gestion-horarios-admin", {
+    attrs: {
+      profId: _vm.profesional.id
+    }
+  }) : _vm._e(), _vm._v(" "), _vm.evolutions ? _c("evolucion-modal", {
     attrs: {
       dataEvolution: _vm.evolutions
     }
@@ -797,6 +1085,29 @@ render._withStripped = true;
 
 /***/ }),
 
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=style&index=0&id=5b84c893&scoped=true&lang=css":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=style&index=0&id=5b84c893&scoped=true&lang=css ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.badge[data-v-5b84c893] {\n  font-size: 0.9em;\n}\n.ml-2[data-v-5b84c893] {\n  margin-left: 0.5rem;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/ShowProfessional.vue?vue&type=style&index=0&id=63431a42&scoped=true&lang=css":
 /*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/ShowProfessional.vue?vue&type=style&index=0&id=63431a42&scoped=true&lang=css ***!
@@ -817,6 +1128,35 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\nimg[data-v-63431a42]{\n  -o-object-f
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=style&index=0&id=5b84c893&scoped=true&lang=css":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=style&index=0&id=5b84c893&scoped=true&lang=css ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_GestionHorariosAdmin_vue_vue_type_style_index_0_id_5b84c893_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./GestionHorariosAdmin.vue?vue&type=style&index=0&id=5b84c893&scoped=true&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=style&index=0&id=5b84c893&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_GestionHorariosAdmin_vue_vue_type_style_index_0_id_5b84c893_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_GestionHorariosAdmin_vue_vue_type_style_index_0_id_5b84c893_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -887,6 +1227,46 @@ component.options.__file = "resources/js/components/administrador/views/Evolucio
 
 /***/ }),
 
+/***/ "./resources/js/components/administrador/views/GestionHorariosAdmin.vue":
+/*!******************************************************************************!*\
+  !*** ./resources/js/components/administrador/views/GestionHorariosAdmin.vue ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _GestionHorariosAdmin_vue_vue_type_template_id_5b84c893_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GestionHorariosAdmin.vue?vue&type=template&id=5b84c893&scoped=true */ "./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=template&id=5b84c893&scoped=true");
+/* harmony import */ var _GestionHorariosAdmin_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./GestionHorariosAdmin.vue?vue&type=script&lang=js */ "./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=script&lang=js");
+/* harmony import */ var _GestionHorariosAdmin_vue_vue_type_style_index_0_id_5b84c893_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./GestionHorariosAdmin.vue?vue&type=style&index=0&id=5b84c893&scoped=true&lang=css */ "./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=style&index=0&id=5b84c893&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+;
+
+
+/* normalize component */
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _GestionHorariosAdmin_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _GestionHorariosAdmin_vue_vue_type_template_id_5b84c893_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _GestionHorariosAdmin_vue_vue_type_template_id_5b84c893_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "5b84c893",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/administrador/views/GestionHorariosAdmin.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/js/components/administrador/views/ShowProfessional.vue":
 /*!**************************************************************************!*\
   !*** ./resources/js/components/administrador/views/ShowProfessional.vue ***!
@@ -942,6 +1322,21 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=script&lang=js":
+/*!******************************************************************************************************!*\
+  !*** ./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=script&lang=js ***!
+  \******************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GestionHorariosAdmin_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./GestionHorariosAdmin.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GestionHorariosAdmin_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
 /***/ "./resources/js/components/administrador/views/ShowProfessional.vue?vue&type=script&lang=js":
 /*!**************************************************************************************************!*\
   !*** ./resources/js/components/administrador/views/ShowProfessional.vue?vue&type=script&lang=js ***!
@@ -973,6 +1368,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=template&id=5b84c893&scoped=true":
+/*!************************************************************************************************************************!*\
+  !*** ./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=template&id=5b84c893&scoped=true ***!
+  \************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_GestionHorariosAdmin_vue_vue_type_template_id_5b84c893_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_GestionHorariosAdmin_vue_vue_type_template_id_5b84c893_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_GestionHorariosAdmin_vue_vue_type_template_id_5b84c893_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./GestionHorariosAdmin.vue?vue&type=template&id=5b84c893&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=template&id=5b84c893&scoped=true");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/administrador/views/ShowProfessional.vue?vue&type=template&id=63431a42&scoped=true":
 /*!********************************************************************************************************************!*\
   !*** ./resources/js/components/administrador/views/ShowProfessional.vue?vue&type=template&id=63431a42&scoped=true ***!
@@ -985,6 +1396,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ShowProfessional_vue_vue_type_template_id_63431a42_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ShowProfessional_vue_vue_type_template_id_63431a42_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ShowProfessional.vue?vue&type=template&id=63431a42&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/ShowProfessional.vue?vue&type=template&id=63431a42&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=style&index=0&id=5b84c893&scoped=true&lang=css":
+/*!**************************************************************************************************************************************!*\
+  !*** ./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=style&index=0&id=5b84c893&scoped=true&lang=css ***!
+  \**************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_GestionHorariosAdmin_vue_vue_type_style_index_0_id_5b84c893_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/style-loader/dist/cjs.js!../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./GestionHorariosAdmin.vue?vue&type=style&index=0&id=5b84c893&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/administrador/views/GestionHorariosAdmin.vue?vue&type=style&index=0&id=5b84c893&scoped=true&lang=css");
 
 
 /***/ }),

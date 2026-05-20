@@ -421,28 +421,22 @@ export default {
 				this.horasMalas = res.data.invalidos;
 			})
       
+      let dayIndex = parseInt(moment(diaSeleccionado).format('d')) - 1;
+      if (dayIndex === -1) dayIndex = 6;
+      let targetDay = this.diaDeLaSemana(dayIndex);
+
 			this.horasSolas.forEach(fecha=>{
-				if(fecha.day == this.diaDeLaSemana(new Date(diaSeleccionado).getDay()) ){ //Digamos Martes
+				if(fecha.active !== 0 && fecha.day && targetDay && fecha.day.toLowerCase() == targetDay.toLowerCase() ){ //Digamos Martes
 					this.horarios.push(fecha)
 				}
 			})
 			this.horasMalas.forEach(mal=> {
 				let indice =  this.horarios.findIndex( el => el.id == mal.schedule_id )
 				console.log(indice);
-				this.horarios.splice(indice,1)
+				if (indice > -1) {
+					this.horarios.splice(indice,1)
+				}
 			})
-
-      /* this.horariosAll.forEach(el => {
-        //console.log('dia', el.day)
-				//Si es el dia elegido, en ese rango busca si tiene una cita [appointment], si tiene no agrega nada, si no tiene agrega a horarios (horas libres)
-        if (el.day === this.diaDeLaSemana(new Date(diaSeleccionado).getDay())) { //compara el día de hoy con la lista Ejm: martes con indice(2) en la lista de horarios
-					if (el.appointments.find( el => {el.date === diaSeleccionado && el.status != 3; console.log(el)} ) ? true : false) { // Hay cita
-					} else { //hora libre
-						this.horarios.push(el)
-					}
-				
-        }
-      }) */
     },
     async searchHistoria () {
       let search = document.getElementById("searchInputAppointment").value.split('/'),

@@ -254,9 +254,9 @@ class ProfessionalController extends Controller
     public function horasLibres($id, $fecha){
 			$profesional = Professional::find($id);
 
-			$dias = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+			$dias = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
 			$carbonFecha = Carbon::parse(	$fecha);
-			$indice = $carbonFecha->dayOfWeek; // Retorna 0=domingo, 1=lunes...
+			$indice = $carbonFecha->dayOfWeek; // Retorna 0=Domingo, 1=Lunes...
 			$dia = $dias[$indice];
 			
 			//Solución 1: llamando a todos los índices, pero hay error

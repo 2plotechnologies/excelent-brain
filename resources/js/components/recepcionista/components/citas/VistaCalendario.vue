@@ -102,7 +102,7 @@ export default{
 			return moment(temporal, 'HH:mm').format('hh:mm a')
 		},
 		queEsta( indexProf, hora){
-			var queEs = this.profesionales[indexProf].schedules.find(x=> x.day == this.hoyLetras && x.check_time ==hora+':00:00' || x.check_time == hora+':15:00' || x.check_time ==hora+':30:00' || x.check_time ==hora+':45:00' )
+			var queEs = this.profesionales[indexProf].schedules.find(x=> x.active !== 0 && x.day && this.hoyLetras && x.day.toLowerCase() == this.hoyLetras.toLowerCase() && (x.check_time ==hora+':00:00' || x.check_time == hora+':15:00' || x.check_time ==hora+':30:00' || x.check_time ==hora+':45:00') )
 
 			if(queEs) return 'libre' 
 			else return 'inactivo'

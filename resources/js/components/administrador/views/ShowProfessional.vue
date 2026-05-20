@@ -190,6 +190,7 @@
       <p v-if="extra_payments.length==0">No hay registros</p>
     </div> -->
 
+    <gestion-horarios-admin v-if="profesional && profesional.id" :profId="profesional.id"></gestion-horarios-admin>
     <evolucion-modal v-if="evolutions" :dataEvolution="evolutions"></evolucion-modal>
   </main>
 </template>
@@ -197,11 +198,12 @@
 <script>
 
 import EvolucionModal from './EvolucionesModal.vue';
+import GestionHorariosAdmin from './GestionHorariosAdmin.vue';
 import moment, { relativeTimeThreshold } from 'moment'
 export default {
   name: 'HomeProfesionales',
 
-  components: { EvolucionModal },
+  components: { EvolucionModal, GestionHorariosAdmin },
 
   data () {
     return {

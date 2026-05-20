@@ -117,8 +117,8 @@ export default {
     return{
       data: null,
       professionals: {},
-      horarios: {},
-      horariosAll: {},
+      horarios: [],
+      horariosAll: [],
       hoursProfessional: [],
       schedulesInvalid: [],
       caso: 'reprogramar',
@@ -208,6 +208,7 @@ export default {
     },
 
     async listarhorario () {
+      if (!this.data || !this.data.professional_id) return;
       let id = this.data.professional_id
       
       await this.axios.get(`/api/horario/${id}`)
@@ -216,7 +217,7 @@ export default {
         this.horariosAll = res.data.schedules;       
         this.hoursProfessional = this.horarios;
 
-        this.emitSchedule(document.querySelector(".emit-fecha").value);
+        this.emitSchedule(this.data.date);
 
         this.schedulesInvalid = []
         this.hoursProfessional.forEach(el => {
@@ -228,7 +229,7 @@ export default {
       })
     },
 
-    emitSchedule (info = document.querySelector(".emit-fecha").value) {
+    emitSchedule (info = this.data ? this.data.date : '') {
       this.horarios = []
 
       let arraySchedulesInvalid = []
@@ -238,8 +239,15 @@ export default {
         }
       })
 
+      let dayIndex = parseInt(moment(info).format('d')) - 1;
+      if (dayIndex === -1) dayIndex = 6;
+      let targetDay = this.dayWeek(dayIndex);
+
       this.horariosAll.forEach(el => {
-        if (el.day === this.dayWeek(new Date(info).getDay())) {
+        if (el.active !== 0 && el.day && targetDay && el.day.toLowerCase() === targetDay.toLowerCase()) {
+          if (el.date && el.date !== info) {
+            return;
+          }
           if (arraySchedulesInvalid.includes(el.id)) {
             // Hay cita
             //console.log("Hya citas")

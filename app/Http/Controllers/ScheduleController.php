@@ -61,6 +61,11 @@ class ScheduleController extends Controller
 			->get();
         
 			$solos = Schedule::where('professional_id', $id)
+            ->where('active', 1)
+            ->where(function($query) use ($fecha) {
+                $query->whereNull('date')
+                      ->orWhereDate('date', $fecha);
+            })
 			->orderBy('check_time', 'asc')
 			->get();
         
@@ -70,14 +75,19 @@ class ScheduleController extends Controller
 			]);
     }
 		public function horarioLibre($id, $fecha){
-			$dias = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+			$dias = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
 			$carbonFecha = Carbon::parse(	$fecha);
-			$indice = $carbonFecha->dayOfWeek; // Retorna 0=domingo, 1=lunes...
+			$indice = $carbonFecha->dayOfWeek; // Retorna 0=Domingo, 1=Lunes...
 			$dia = $dias[$indice];
 
 			//Lista el día y el id de profesional, luego compara con appointments y saca los que NO estan en appointments
 			$citasLibres = Schedule::where('day', $dia)
 			->where('professional_id', $id)
+            ->where('active', 1)
+            ->where(function($query) use ($fecha) {
+                $query->whereNull('date')
+                      ->orWhereDate('date', $fecha);
+            })
 			->whereNotExists(function ($query) use ($fecha) {
 				$query->select(DB::raw(1)) //lo mismo que select *
 				->from('appointments')
@@ -146,6 +156,11 @@ class ScheduleController extends Controller
 
        $solosQuery = Schedule::selectRaw('MIN(id) as id, professional_id, day, check_time, departure_date')
         ->where('day', '=', $dia)
+        ->where('active', 1)
+        ->where(function($query) use ($fecha) {
+            $query->whereNull('date')
+                  ->orWhereDate('date', $fecha);
+        })
         ->whereNotNull('check_time')
         ->whereNotNull('departure_date');
 
@@ -236,8 +251,16 @@ class ScheduleController extends Controller
         $check_time = $request->get('check_time');
         $departure_date = $request->get('departure_date');
         $professional_id = $request->get('professional_id');
-        $dias = $request->get('daysSelected');
+        $dias = $request->get('daysSelected', []);
+        $date = $request->get('date', null);
 
+        if ($date && empty($dias)) {
+            $carbonFecha = Carbon::parse($date);
+            $diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+            $dias = [$diasSemana[$carbonFecha->dayOfWeek]];
+        }
+
+        $res = 'No Success';
 
         foreach ($dias as $dia)
         {
@@ -246,6 +269,8 @@ class ScheduleController extends Controller
                     'check_time' => $check_time,
                     'departure_date' => $departure_date,
                     'day' => $dia,
+                    'date' => $date,
+                    'active' => 1,
                     'professional_id' => $professional_id,
                     'idSede' => $request->get('idSede', 1)
                 ]);
@@ -283,14 +308,33 @@ class ScheduleController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $scheduleToUpdate = Schedule::find($id);
+        if (!$scheduleToUpdate) {
+            return response()->json(['mensaje' => 'failed', 'error' => 'Not found'], 404);
+        }
+        
         $check_time = $request->get('check_time');
         $departure_date = $request->get('departure_date');
-        $day = $request->get('daySelected');
+        $date = $request->get('date');
+        
+        $dias = $request->get('daysSelected', []);
+        $day = null;
+        if (!empty($dias)) {
+            $day = $dias[0];
+        } elseif ($date) {
+            $carbonFecha = Carbon::parse($date);
+            $diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+            $day = $diasSemana[$carbonFecha->dayOfWeek];
+        } else {
+            $day = $request->get('daySelected') ?? $scheduleToUpdate->day; // Fallback
+        }
 
-        if($this->validateSchedule($check_time, $departure_date, $id, $day)){
+        if($this->validateSchedule($check_time, $departure_date, $scheduleToUpdate->professional_id, $day)){
             Schedule::where('id',$id)->update([
                 'check_time' => $check_time,
-                'departure_date' => $departure_date
+                'departure_date' => $departure_date,
+                'day' => $day,
+                'date' => $date
             ]);
 
             Appointment::where('schedule_id', $id)->update([
@@ -305,9 +349,6 @@ class ScheduleController extends Controller
                 'mensaje' => 'failed'
             ]);
         }
-
-
-
     }
 
     /**
@@ -329,5 +370,22 @@ class ScheduleController extends Controller
         return response()->json([
             'mensaje' => 'Horarios de prof'
         ]);
+    }
+
+    public function getAllSchedules($id)
+    {
+        $schedules = Schedule::where('professional_id', $id)->orderBy('check_time', 'asc')->get();
+        return response()->json($schedules);
+    }
+
+    public function toggleActive($id)
+    {
+        $schedule = Schedule::find($id);
+        if ($schedule) {
+            $schedule->active = !$schedule->active;
+            $schedule->save();
+            return response()->json(['mensaje' => 'success', 'active' => $schedule->active]);
+        }
+        return response()->json(['mensaje' => 'failed'], 404);
     }
 }

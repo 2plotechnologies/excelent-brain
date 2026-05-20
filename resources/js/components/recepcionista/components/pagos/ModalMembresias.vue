@@ -568,8 +568,15 @@ export default {
 				}
 			})
 
+			let dayIndex = parseInt(moment(info).format('d')) - 1;
+			if (dayIndex === -1) dayIndex = 6;
+			let targetDay = this.dayWeek[dayIndex];
+
 			this.horariosAll.forEach(el => {
-				if (el.day === this.dayWeek[new Date(info).getDay()]) {
+				if (el.active !== 0 && el.day && targetDay && el.day.toLowerCase() === targetDay.toLowerCase()) {
+					if (el.date && el.date !== info) {
+						return;
+					}
 					if (arraySchedulesInvalid.includes(el.id)) {
 						// Hay cita
 						if (el.appointments.find(el => el.date === info && el.status != 3) ? true : false) {

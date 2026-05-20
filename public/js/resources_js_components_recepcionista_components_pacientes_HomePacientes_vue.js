@@ -2346,7 +2346,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         console.error(err);
       })["finally"](function (result) {
         _this.switchReciec = 1;
-        document.querySelector(".btnReniec").classList.replace('btn-danger', 'btn-info');
+        try {
+          var btn = document.querySelector(".btnReniec");
+          if (btn) {
+            btn.classList.replace('btn-danger', 'btn-info');
+          }
+        } catch (e) {
+          console.error(e);
+        }
       });
     },
     createDataPatient: function createDataPatient() {
@@ -6224,10 +6231,10 @@ render._withStripped = true;
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=template&id=163c320f":
-/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=template&id=163c320f ***!
-  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=template&id=163c320f&scoped=true":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=template&id=163c320f&scoped=true ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -6253,23 +6260,30 @@ var render = function render() {
       role: "document"
     }
   }, [_c("div", {
-    staticClass: "modal-content"
+    staticClass: "modal-content p-2 shadow",
+    staticStyle: {
+      "border-radius": "16px",
+      border: "none"
+    }
   }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
-  }, [_vm._m(1), _vm._v(" "), _c("form", {
+    staticClass: "modal-body border-0 pt-3"
+  }, [_c("form", {
     attrs: {
       action: ""
+    },
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+      }
     }
   }, [_c("div", {
-    staticClass: "form-group row"
+    staticClass: "section-container"
+  }, [_vm._m(1), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
   }, [_c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Dni")]), _vm._v(" "), _c("div", {
-    staticClass: "input-group mb-3"
+    staticClass: "col-md-6"
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
+    staticClass: "input-group"
   }, [_c("input", {
     directives: [{
       name: "model",
@@ -6277,12 +6291,12 @@ var render = function render() {
       value: _vm.paciente.dni,
       expression: "paciente.dni"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input shadow-none",
     attrs: {
       type: "text",
       name: "dni",
       id: "dni",
-      placeholder: "Dni del paciente"
+      placeholder: "DNI del paciente"
     },
     domProps: {
       value: _vm.paciente.dni
@@ -6298,10 +6312,11 @@ var render = function render() {
       }
     }
   }), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-outline-secondary",
+    staticClass: "btn btn-primary btn-search-reniec btnReniec d-flex align-items-center justify-content-center",
     attrs: {
       type: "button",
-      id: "button-addon2"
+      id: "button-addon2",
+      title: "Buscar en RENIEC"
     },
     on: {
       click: function click($event) {
@@ -6309,21 +6324,17 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-search"
-  })])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Celular")]), _vm._v(" "), _c("input", {
+    staticClass: "fas fa-search me-1"
+  }), _vm._v(" Buscar\n                  ")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_vm._m(3), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.phone,
       expression: "paciente.phone"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input shadow-none",
     attrs: {
       type: "text",
       name: "phone",
@@ -6340,19 +6351,15 @@ var render = function render() {
       }
     }
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Apellidos")]), _vm._v(" "), _c("input", {
+    staticClass: "col-md-6"
+  }, [_vm._m(4), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.name,
       expression: "paciente.name"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input shadow-none",
     attrs: {
       type: "text",
       name: "name",
@@ -6369,19 +6376,15 @@ var render = function render() {
       }
     }
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Nombres")]), _vm._v(" "), _c("input", {
+    staticClass: "col-md-6"
+  }, [_vm._m(5), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.nombres,
       expression: "paciente.nombres"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input shadow-none",
     attrs: {
       type: "text",
       name: "nombres",
@@ -6397,22 +6400,84 @@ var render = function render() {
         _vm.$set(_vm.paciente, "nombres", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
-  }, [_c("div", {
-    staticClass: "col-sm-12"
-  }, [_c("label", {
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_vm._m(6), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.paciente.birth_date,
+      expression: "paciente.birth_date"
+    }],
+    staticClass: "form-control custom-input shadow-none",
     attrs: {
-      "for": "name"
+      type: "date",
+      name: "birth_date",
+      id: "birth_date"
+    },
+    domProps: {
+      value: _vm.paciente.birth_date
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.paciente, "birth_date", $event.target.value);
+      }
     }
-  }, [_vm._v("Dirección")]), _vm._v(" "), _c("input", {
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
+  }, [_vm._m(7), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.paciente.gender,
+      expression: "paciente.gender"
+    }],
+    staticClass: "form-select custom-input text-secondary shadow-none",
+    attrs: {
+      id: "sexo"
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.paciente, "gender", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "2"
+    }
+  }, [_vm._v("Sin definir")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "0"
+    }
+  }, [_vm._v("Femenino")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "1"
+    }
+  }, [_vm._v("Masculino")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "3"
+    }
+  }, [_vm._v("LGTB+")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "section-container"
+  }, [_vm._m(8), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
+  }, [_c("div", {
+    staticClass: "col-md-12"
+  }, [_vm._m(9), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.address.address,
       expression: "paciente.address.address"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input shadow-none",
     attrs: {
       type: "text",
       name: "address",
@@ -6431,8 +6496,11 @@ var render = function render() {
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-sm-6 d-none"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
     }
   }, [_vm._v("Correo electrónico")]), _vm._v(" "), _c("input", {
     directives: [{
@@ -6441,7 +6509,7 @@ var render = function render() {
       value: _vm.paciente.email,
       expression: "paciente.email"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input",
     attrs: {
       type: "email",
       name: "email",
@@ -6457,22 +6525,16 @@ var render = function render() {
         _vm.$set(_vm.paciente, "email", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
-  }, [_c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Departamento")]), _vm._v(" "), _c("select", {
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_vm._m(10), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.address.department,
       expression: "paciente.address.department"
     }],
-    staticClass: "form-select",
+    staticClass: "form-select custom-input text-secondary shadow-none",
     attrs: {
       id: "department"
     },
@@ -6491,24 +6553,21 @@ var render = function render() {
     }
   }, _vm._l(_vm.ubigeo.departamentos, function (departamento) {
     return _c("option", {
+      key: departamento.idDepa,
       domProps: {
         value: departamento.idDepa
       }
     }, [_vm._v(_vm._s(departamento.departamento))]);
   }), 0)]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Provincia")]), _vm._v(" "), _c("select", {
+    staticClass: "col-md-4"
+  }, [_vm._m(11), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.address.province,
       expression: "paciente.address.province"
     }],
-    staticClass: "form-select",
+    staticClass: "form-select custom-input text-secondary shadow-none",
     attrs: {
       id: "provincia"
     },
@@ -6527,24 +6586,21 @@ var render = function render() {
     }
   }, _vm._l(_vm.provincias, function (provincia) {
     return _c("option", {
+      key: provincia.idProv,
       domProps: {
         value: provincia.idProv
       }
     }, [_vm._v(_vm._s(provincia.provincia))]);
   }), 0)]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Distrito")]), _vm._v(" "), _c("select", {
+    staticClass: "col-md-4"
+  }, [_vm._m(12), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.address.district,
       expression: "paciente.address.district"
     }],
-    staticClass: "form-select",
+    staticClass: "form-select custom-input text-secondary shadow-none",
     attrs: {
       id: "distrito"
     },
@@ -6561,31 +6617,26 @@ var render = function render() {
     }
   }, _vm._l(_vm.distritos, function (distrito) {
     return _c("option", {
+      key: distrito.idDist,
       domProps: {
         value: distrito.idDist
       }
     }, [_vm._v(_vm._s(distrito.distrito))]);
-  }), 0)])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
-  }, [_c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Ocupación")]), _vm._v(" "), _c("input", {
+  }), 0)]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_vm._m(13), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.occupation,
       expression: "paciente.occupation"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input shadow-none",
     attrs: {
       type: "text",
       name: "occupation",
       id: "occupation",
-      placeholder: "Ocuación del paciente"
+      placeholder: "Ocupación del paciente"
     },
     domProps: {
       value: _vm.paciente.occupation
@@ -6597,21 +6648,15 @@ var render = function render() {
       }
     }
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("div", {
-    staticClass: "form-group"
-  }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Estado Civil")]), _vm._v(" "), _c("select", {
+    staticClass: "col-md-4"
+  }, [_vm._m(14), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.marital_status,
       expression: "paciente.marital_status"
     }],
-    staticClass: "form-select",
+    staticClass: "form-select custom-input text-secondary shadow-none",
     attrs: {
       name: "marital_status",
       id: "marital_status"
@@ -6647,22 +6692,16 @@ var render = function render() {
     attrs: {
       value: "5"
     }
-  }, [_vm._v("Conviviente")])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
-  }, [_c("div", {
-    staticClass: "form-group"
-  }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Grado de instrucción")]), _vm._v(" "), _c("select", {
+  }, [_vm._v("Conviviente")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_vm._m(15), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.instruction_degree,
       expression: "paciente.instruction_degree"
     }],
-    staticClass: "form-select",
+    staticClass: "form-select custom-input text-secondary shadow-none",
     attrs: {
       name: "instruction_degree",
       id: "instruction_degree"
@@ -6698,100 +6737,24 @@ var render = function render() {
     attrs: {
       value: "5"
     }
-  }, [_vm._v("Tecnico")]), _vm._v(" "), _c("option", {
+  }, [_vm._v("Técnico")]), _vm._v(" "), _c("option", {
     attrs: {
       value: "6"
     }
   }, [_vm._v("Sin instrucción")])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
+    staticClass: "section-container"
+  }, [_vm._m(16), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
   }, [_c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Fecha de nacimiento")]), _vm._v(" "), _c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.paciente.birth_date,
-      expression: "paciente.birth_date"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      type: "date",
-      name: "birth_date",
-      id: "birth_date"
-    },
-    domProps: {
-      value: _vm.paciente.birth_date
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.$set(_vm.paciente, "birth_date", $event.target.value);
-      }
-    }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-6"
-  }, [_c("label", {
-    attrs: {
-      "for": "name"
-    }
-  }, [_vm._v("Género")]), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.paciente.gender,
-      expression: "paciente.gender"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "sexo"
-    },
-    on: {
-      change: function change($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.$set(_vm.paciente, "gender", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }
-    }
-  }, [_c("option", {
-    attrs: {
-      value: "2"
-    }
-  }, [_vm._v("Sin definir")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "0"
-    }
-  }, [_vm._v("Femenino")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "1"
-    }
-  }, [_vm._v("Masculino")]), _vm._v(" "), _c("option", {
-    attrs: {
-      value: "3"
-    }
-  }, [_vm._v("LGTB+")])])])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
-  }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Referencia")]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4 my-1"
-  }, [_c("select", {
+    staticClass: "col-md-4"
+  }, [_vm._m(17), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.recomendation,
       expression: "paciente.recomendation"
     }],
-    staticClass: "form-select text-capitalize",
+    staticClass: "form-select custom-input text-capitalize text-secondary shadow-none",
     attrs: {
       name: "tipo_recomendacion",
       id: "tipo_recomendacion"
@@ -6814,21 +6777,22 @@ var render = function render() {
     }
   }, [_vm._v("Ninguno")]), _vm._v(" "), _vm._l(_vm.recomendaciones, function (reco) {
     return _c("option", {
+      key: reco,
       staticClass: "text-capitalize",
       domProps: {
         value: reco
       }
     }, [_vm._v(_vm._s(reco))]);
   })], 2)]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-8"
-  }, [_c("input", {
+    staticClass: "col-md-8"
+  }, [_vm._m(18), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.recomendacion_comentario,
       expression: "paciente.recomendacion_comentario"
     }],
-    staticClass: "form-control text-capitalize",
+    staticClass: "form-control custom-input text-capitalize shadow-none",
     attrs: {
       type: "text",
       placeholder: "¿Comentario extra sobre la recomendación?"
@@ -6842,27 +6806,33 @@ var render = function render() {
         _vm.$set(_vm.paciente, "recomendacion_comentario", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _vm._m(2), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
+  })])])]), _vm._v(" "), _c("div", {
+    staticClass: "section-container"
+  }, [_vm._m(19), _vm._v(" "), _c("div", {
+    staticClass: "p-3 mb-3 bg-white border rounded-3"
+  }, [_vm._m(20), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
   }, [_c("div", {
-    staticClass: "col-sm-4"
+    staticClass: "col-md-4"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "13px"
     }
-  }, [_vm._v("Nombre del primer contacto")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Nombre Completo")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.contacto,
       expression: "paciente.contacto"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input shadow-none",
     attrs: {
       type: "text",
       name: "contacto",
       id: "contacto",
-      placeholder: "Contacto",
+      placeholder: "Nombre de contacto",
       autocomplete: "off"
     },
     domProps: {
@@ -6875,19 +6845,21 @@ var render = function render() {
       }
     }
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
+    staticClass: "col-md-4"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "13px"
     }
-  }, [_vm._v("Celular emergencia")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Celular Emergencia")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.contacto_celular,
       expression: "paciente.contacto_celular"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input shadow-none",
     attrs: {
       type: "text",
       name: "contacto_celular",
@@ -6905,10 +6877,12 @@ var render = function render() {
       }
     }
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
+    staticClass: "col-md-4"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "13px"
     }
   }, [_vm._v("Parentesco")]), _vm._v(" "), _c("input", {
     directives: [{
@@ -6917,7 +6891,7 @@ var render = function render() {
       value: _vm.paciente.parentezco,
       expression: "paciente.parentezco"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input shadow-none",
     attrs: {
       type: "text",
       name: "parentezco",
@@ -6934,27 +6908,31 @@ var render = function render() {
         _vm.$set(_vm.paciente, "parentezco", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group row"
+  })])])]), _vm._v(" "), _c("div", {
+    staticClass: "p-3 bg-white border rounded-3"
+  }, [_vm._m(21), _vm._v(" "), _c("div", {
+    staticClass: "row g-3"
   }, [_c("div", {
-    staticClass: "col-sm-4"
+    staticClass: "col-md-4"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "13px"
     }
-  }, [_vm._v("Nombre del segundo contacto")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Nombre Completo")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.contacto2,
       expression: "paciente.contacto2"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input shadow-none",
     attrs: {
       type: "text",
-      name: "contacto",
-      id: "contacto",
-      placeholder: "Contacto",
+      name: "contacto2",
+      id: "contacto2",
+      placeholder: "Nombre de contacto",
       autocomplete: "off"
     },
     domProps: {
@@ -6967,23 +6945,25 @@ var render = function render() {
       }
     }
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
+    staticClass: "col-md-4"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "13px"
     }
-  }, [_vm._v("Celular emergencia")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Celular Emergencia")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.paciente.contacto_celular2,
       expression: "paciente.contacto_celular2"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input shadow-none",
     attrs: {
       type: "text",
-      name: "contacto_celular",
-      id: "contacto_celular",
+      name: "contacto_celular2",
+      id: "contacto_celular2",
       placeholder: "Celular",
       autocomplete: "off"
     },
@@ -6997,10 +6977,12 @@ var render = function render() {
       }
     }
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col-sm-4"
+    staticClass: "col-md-4"
   }, [_c("label", {
-    attrs: {
-      "for": "name"
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "13px"
     }
   }, [_vm._v("Parentesco")]), _vm._v(" "), _c("input", {
     directives: [{
@@ -7009,11 +6991,11 @@ var render = function render() {
       value: _vm.paciente.parentezco2,
       expression: "paciente.parentezco2"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control custom-input shadow-none",
     attrs: {
       type: "text",
-      name: "parentezco",
-      id: "parentezco",
+      name: "parentezco2",
+      id: "parentezco2",
       placeholder: "Parentesco",
       autocomplete: "off"
     },
@@ -7026,16 +7008,16 @@ var render = function render() {
         _vm.$set(_vm.paciente, "parentezco2", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("hr")])]), _vm._v(" "), _c("div", {
-    staticClass: "modal-footer"
+  })])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer border-0 pt-0"
   }, [_c("button", {
-    staticClass: "btn btn-danger",
+    staticClass: "btn custom-btn-cancel",
     attrs: {
       type: "button",
       "data-bs-dismiss": "modal"
     }
   }, [_vm._v("Cancelar")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-primary",
+    staticClass: "btn btn-primary custom-btn-submit d-flex align-items-center",
     attrs: {
       type: "button"
     },
@@ -7044,43 +7026,293 @@ var render = function render() {
         return _vm.createDataPatient();
       }
     }
-  }, [_vm._v("Crear")])])])])]);
+  }, [_c("i", {
+    staticClass: "fa-regular fa-circle-check me-2"
+  }), _vm._v(" Crear Paciente\n        ")])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header"
-  }, [_c("h5", {
-    staticClass: "modal-title",
+    staticClass: "modal-header border-0 pb-0"
+  }, [_c("div", {
+    staticClass: "d-flex align-items-center"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-user-plus text-primary fs-5 me-2"
+  }), _vm._v(" "), _c("h5", {
+    staticClass: "modal-title fw-bold",
+    staticStyle: {
+      color: "#1e293b"
+    },
     attrs: {
       id: "exampleModalLabel"
     }
-  }, [_vm._v(" Datos del Nuevo Paciente")]), _vm._v(" "), _c("button", {
-    staticClass: "close",
+  }, [_vm._v("Datos del Nuevo Paciente")])]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close shadow-none",
     attrs: {
       type: "button",
       id: "cerrModalPatient",
       "data-bs-dismiss": "modal",
       "aria-label": "Close"
     }
-  }, [_c("span", {
-    attrs: {
-      "aria-hidden": "true"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "section-title"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-address-card text-primary me-2"
+  }), _vm._v(" Datos Personales y de Identificación\n            ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
     }
-  }, [_vm._v("×")])])]);
+  }, [_c("i", {
+    staticClass: "fa-solid fa-id-card text-muted me-1"
+  }), _vm._v(" DNI "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("p", {
-    staticClass: "mb-0"
-  }, [_c("strong", [_vm._v("Datos Personales")])]);
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-phone text-muted me-1"
+  }), _vm._v(" Celular "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("p", {
-    staticClass: "mb-0"
-  }, [_c("strong", [_vm._v("Datos de Contacto de Emergencia")])]);
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-user text-muted me-1"
+  }), _vm._v(" Apellidos "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-user text-muted me-1"
+  }), _vm._v(" Nombres "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-calendar-days text-muted me-1"
+  }), _vm._v(" Fecha de nacimiento\n                ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-venus-mars text-muted me-1"
+  }), _vm._v(" Género\n                ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "section-title"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-map-location-dot text-primary me-2"
+  }), _vm._v(" Ubicación y Datos Demográficos\n            ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-location-dot text-muted me-1"
+  }), _vm._v(" Dirección\n                ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-map text-muted me-1"
+  }), _vm._v(" Departamento\n                ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-map text-muted me-1"
+  }), _vm._v(" Provincia\n                ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-map text-muted me-1"
+  }), _vm._v(" Distrito\n                ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-briefcase text-muted me-1"
+  }), _vm._v(" Ocupación\n                ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-heart text-muted me-1"
+  }), _vm._v(" Estado Civil\n                ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-graduation-cap text-muted me-1"
+  }), _vm._v(" Grado de instrucción\n                ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "section-title"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-share-nodes text-primary me-2"
+  }), _vm._v(" Origen y Referencia\n            ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_c("i", {
+    staticClass: "fa-solid fa-bullhorn text-muted me-1"
+  }), _vm._v(" Tipo Recomendación\n                ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px",
+      "font-weight": "500"
+    }
+  }, [_c("i", {
+    staticClass: "fa-regular fa-comment-dots text-muted me-1"
+  }), _vm._v(" Comentario de Recomendación\n                ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "section-title"
+  }, [_c("i", {
+    staticClass: "fa-solid fa-phone-flip text-primary me-2"
+  }), _vm._v(" Contactos de Emergencia\n            ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "fw-semibold text-secondary mb-2",
+    staticStyle: {
+      "font-size": "13px"
+    }
+  }, [_c("span", {
+    staticClass: "badge bg-secondary me-1"
+  }, [_vm._v("1")]), _vm._v(" Primer Contacto de Emergencia\n              ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "fw-semibold text-secondary mb-2",
+    staticStyle: {
+      "font-size": "13px"
+    }
+  }, [_c("span", {
+    staticClass: "badge bg-secondary me-1"
+  }, [_vm._v("2")]), _vm._v(" Segundo Contacto de Emergencia\n              ")]);
 }];
 render._withStripped = true;
 
@@ -9769,7 +10001,30 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.ajs-message{border-radius: 5px!important;}\n.ajs-success { background-color: rgb(33, 201, 89)!important;\n}\n.ajs-danger { background-color: rgb(232, 27, 0)!important; color:white!important;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.ajs-message{border-radius: 5px!important;}\n.ajs-success { background-color: rgb(33, 201, 89)!important;\n}\n.ajs-danger { background-color: rgb(232, 27, 0)!important; color:white!important;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=1&id=163c320f&scoped=true&lang=css":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=1&id=163c320f&scoped=true&lang=css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.custom-input[data-v-163c320f] {\n  border-radius: 8px;\n  border: 1px solid #cbd5e1;\n  padding: 0.6rem 1rem;\n  font-size: 14px;\n}\n.custom-input[data-v-163c320f]:focus {\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);\n  outline: none;\n}\n.custom-btn-cancel[data-v-163c320f] {\n  border-radius: 8px;\n  border: 1px solid #cbd5e1;\n  background-color: #ffffff;\n  color: #475569;\n  padding: 0.5rem 1.5rem;\n  font-weight: 500;\n  font-size: 14px;\n}\n.custom-btn-cancel[data-v-163c320f]:hover {\n  background-color: #f1f5f9;\n}\n.custom-btn-submit[data-v-163c320f] {\n  border-radius: 8px;\n  padding: 0.5rem 1.5rem;\n  font-weight: 500;\n  background-color: #79a6fa; \n  border: none;\n  font-size: 14px;\n  color: #fff;\n}\n.custom-btn-submit[data-v-163c320f]:hover {\n  background-color: #5c91f9;\n}\n.btn-search-reniec[data-v-163c320f] {\n  border-radius: 0 8px 8px 0;\n  padding: 0.6rem 1.25rem;\n  background-color: #3b82f6;\n  border: 1px solid #3b82f6;\n  font-size: 14px;\n  color: #fff;\n  font-weight: 500;\n}\n.btn-search-reniec[data-v-163c320f]:hover {\n  background-color: #2563eb;\n  border-color: #2563eb;\n}\n.input-group > .custom-input[data-v-163c320f] {\n  border-top-right-radius: 0;\n  border-bottom-right-radius: 0;\n}\n.section-container[data-v-163c320f] {\n  background-color: #f8fafc;\n  border: 1px solid #f1f5f9;\n  border-radius: 12px;\n  padding: 1.25rem;\n  margin-bottom: 1.5rem;\n}\n.section-title[data-v-163c320f] {\n  font-size: 15px;\n  font-weight: 600;\n  color: #1e293b;\n  margin-bottom: 1rem;\n  display: flex;\n  align-items: center;\n  border-bottom: 1px solid #e2e8f0;\n  padding-bottom: 0.5rem;\n}\n.section-title i[data-v-163c320f] {\n  font-size: 16px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -10062,6 +10317,35 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNewPatient_vue_vue_type_style_index_0_id_163c320f_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=1&id=163c320f&scoped=true&lang=css":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=1&id=163c320f&scoped=true&lang=css ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNewPatient_vue_vue_type_style_index_1_id_163c320f_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalNewPatient.vue?vue&type=style&index=1&id=163c320f&scoped=true&lang=css */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=1&id=163c320f&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNewPatient_vue_vue_type_style_index_1_id_163c320f_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNewPatient_vue_vue_type_style_index_1_id_163c320f_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -10702,25 +10986,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ModalNewPatient_vue_vue_type_template_id_163c320f__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalNewPatient.vue?vue&type=template&id=163c320f */ "./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=template&id=163c320f");
+/* harmony import */ var _ModalNewPatient_vue_vue_type_template_id_163c320f_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModalNewPatient.vue?vue&type=template&id=163c320f&scoped=true */ "./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=template&id=163c320f&scoped=true");
 /* harmony import */ var _ModalNewPatient_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModalNewPatient.vue?vue&type=script&lang=js */ "./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=script&lang=js");
 /* harmony import */ var _ModalNewPatient_vue_vue_type_style_index_0_id_163c320f_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ModalNewPatient.vue?vue&type=style&index=0&id=163c320f&lang=css */ "./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=0&id=163c320f&lang=css");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _ModalNewPatient_vue_vue_type_style_index_1_id_163c320f_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ModalNewPatient.vue?vue&type=style&index=1&id=163c320f&scoped=true&lang=css */ "./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=1&id=163c320f&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
 ;
 
 
+
 /* normalize component */
 
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_4__["default"])(
   _ModalNewPatient_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _ModalNewPatient_vue_vue_type_template_id_163c320f__WEBPACK_IMPORTED_MODULE_0__.render,
-  _ModalNewPatient_vue_vue_type_template_id_163c320f__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _ModalNewPatient_vue_vue_type_template_id_163c320f_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _ModalNewPatient_vue_vue_type_template_id_163c320f_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "163c320f",
   null
   
 )
@@ -11544,18 +11830,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=template&id=163c320f":
-/*!**********************************************************************************************************************!*\
-  !*** ./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=template&id=163c320f ***!
-  \**********************************************************************************************************************/
+/***/ "./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=template&id=163c320f&scoped=true":
+/*!**********************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=template&id=163c320f&scoped=true ***!
+  \**********************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNewPatient_vue_vue_type_template_id_163c320f__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNewPatient_vue_vue_type_template_id_163c320f__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNewPatient_vue_vue_type_template_id_163c320f_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNewPatient_vue_vue_type_template_id_163c320f_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNewPatient_vue_vue_type_template_id_163c320f__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalNewPatient.vue?vue&type=template&id=163c320f */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=template&id=163c320f");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNewPatient_vue_vue_type_template_id_163c320f_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalNewPatient.vue?vue&type=template&id=163c320f&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=template&id=163c320f&scoped=true");
 
 
 /***/ }),
@@ -11772,6 +12058,18 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNewPatient_vue_vue_type_style_index_0_id_163c320f_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalNewPatient.vue?vue&type=style&index=0&id=163c320f&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=0&id=163c320f&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=1&id=163c320f&scoped=true&lang=css":
+/*!************************************************************************************************************************************************!*\
+  !*** ./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=1&id=163c320f&scoped=true&lang=css ***!
+  \************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_ModalNewPatient_vue_vue_type_style_index_1_id_163c320f_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModalNewPatient.vue?vue&type=style&index=1&id=163c320f&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/recepcionista/components/pacientes/ModalNewPatient.vue?vue&type=style&index=1&id=163c320f&scoped=true&lang=css");
 
 
 /***/ }),

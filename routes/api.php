@@ -293,6 +293,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('professional', ProfessionalController::class)->only(['index', 'store', 'update', 'show', 'destroy']);
     Route::resource('schedule', ScheduleController::class)->only(['index', 'store', 'update', 'show', 'destroy']);
     Route::get('horario/{id}', [ScheduleController::class, 'getschedules']);
+    Route::get('professional/{id}/schedules/all', [ScheduleController::class, 'getAllSchedules']);
+    Route::put('schedule/{id}/toggle', [ScheduleController::class, 'toggleActive']);
     Route::get('horarioLibre/{id}/{fecha}', [ScheduleController::class, 'horarioLibre']);
     Route::get('horarioOcupado/{id}/{fecha}', [ScheduleController::class, 'horarioOcupado']);
     Route::get('horarioCuadernoOcupado/{fecha}/{dia}', [ScheduleController::class, 'horarioCuadernoOcupado']);

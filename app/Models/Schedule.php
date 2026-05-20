@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Schedule extends Model
 {
     use HasFactory;
-    protected $fillable=['check_time','departure_date','day','professional_id','idSede'];
+    protected $fillable=['check_time','departure_date','day','professional_id','idSede', 'active', 'date'];
     //Relación inversa de uno a muchos Professional-Schedule
     public function professional() {
         return $this->belongsTo("App\Models\Professional");

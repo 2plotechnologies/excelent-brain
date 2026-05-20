@@ -53,6 +53,10 @@
                                     <label class="form-check-label" for="horarioSabado">Sábado</label>
                                 </div>
                             </div>
+                            <div v-if="title=='Agregar'" class="form-group">
+                                <label>Fecha Específica (Opcional si es recurrente)</label>
+                                <input type="date" class="form-control" v-model="schedule.date">
+                            </div>
                             <div class="form-group">
                                 <label for="">Hora de Inicio</label>
                                 <input class="form-control" type="time" v-model="schedule.check_time" required>
@@ -74,11 +78,18 @@
                         <button @click="showForm" class="btn btn-success">Agregar Horario</button>
                     </div>
                     <div v-for="horario in filtro" :key="horario.id" class="schudles mt-3">
-                        <div v-if="horario.day == day" class="btn btn-success w-100 mt-2 d-flex justify-content-between">
-                            <p>{{ horaHumana(horario ? horario.check_time : '...')}} - {{ horaHumana(horario ? horario.departure_date : '...')}}</p>
+                        <div v-if="horario.day && horario.day.toLowerCase() == day.toLowerCase()" class="btn w-100 mt-2 d-flex justify-content-between align-items-center" :class="horario.active ? 'btn-success' : 'btn-secondary'">
+                            <div class="text-left">
+                                <p class="mb-0">{{ horaHumana(horario ? horario.check_time : '...')}} - {{ horaHumana(horario ? horario.departure_date : '...')}}</p>
+                                <small v-if="horario.date">Fecha: {{ horario.date }}</small>
+                                <small v-else>Recurrente ({{ horario.day }})</small>
+                            </div>
                             <div class="div">
-                                <a @click="editSchedule(horario)" class="btn btn-info btn-circle"><i class="fas fa-pencil-alt"></i></a>
-                                <a @click="deleteSchedule(horario.id)" class="btn btn-danger btn-circle"><i class="fas fa-trash"></i></a>
+                                <a @click="toggleActive(horario.id)" class="btn btn-sm" :class="horario.active ? 'btn-warning' : 'btn-success'" title="Activar/Desactivar">
+                                    <i class="fas" :class="horario.active ? 'fa-ban' : 'fa-check'"></i>
+                                </a>
+                                <a @click="editSchedule(horario)" class="btn btn-info btn-circle btn-sm ml-1"><i class="fas fa-pencil-alt"></i></a>
+                                <a @click="deleteSchedule(horario.id)" class="btn btn-danger btn-circle btn-sm ml-1"><i class="fas fa-trash"></i></a>
                             </div>
                         </div>
                     </div>
@@ -100,6 +111,7 @@ export default {
             schedule:{
                 id:'',
                 daysSelected:[],
+                date: null,
                 check_time: null,
                 departure_date: null,
                 professional_id: ''
@@ -146,16 +158,18 @@ export default {
         },
 
         cleanModal(){
-                this.schedule.daysSelected=[],
-                this.schedule.check_time= null,
+                this.schedule.daysSelected=[]
+                this.schedule.date= null
+                this.schedule.check_time= null
                 this.schedule.departure_date= null
         },
 
         editSchedule(horario){
             this.showForm()
-            this.schedule.check_time= horario.check_time,
-            this.schedule.departure_date= horario.departure_date,
-            this.schedule.daysSelected.push(horario.day)
+            this.schedule.check_time= horario.check_time
+            this.schedule.departure_date= horario.departure_date
+            this.schedule.daysSelected = [horario.day]
+            this.schedule.date = horario.date
             this.title = 'Editar'
             this.schedule.id = horario.id
             console.log(horario)
@@ -183,10 +197,20 @@ export default {
                     .then((res) => {
                        console.log(res.data)
                        this.$swal('Horario eliminado con éxito')
+                       this.$parent.getSchedules(this.prof.id)
                     });
-                    this.$parent.getSchedules(this.prof.id)
                 }
             })
+        },
+
+        toggleActive(id) {
+            this.axios.put(`/api/schedule/${id}/toggle`)
+                .then(res => {
+                    if (res.data.mensaje === 'success') {
+                        this.$parent.getSchedules(this.prof.id)
+                    }
+                })
+                .catch(err => console.error(err));
         },
 
         horaHumana (hora) {

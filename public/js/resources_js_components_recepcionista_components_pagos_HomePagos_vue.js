@@ -1738,8 +1738,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           arraySchedulesInvalid.push(el.schedule_id);
         }
       });
+      var dayIndex = parseInt(moment__WEBPACK_IMPORTED_MODULE_0___default()(info).format('d')) - 1;
+      if (dayIndex === -1) dayIndex = 6;
+      var targetDay = this.dayWeek[dayIndex];
       this.horariosAll.forEach(function (el) {
-        if (el.day === _this8.dayWeek[new Date(info).getDay()]) {
+        if (el.active !== 0 && el.day && targetDay && el.day.toLowerCase() === targetDay.toLowerCase()) {
+          if (el.date && el.date !== info) {
+            return;
+          }
           if (arraySchedulesInvalid.includes(el.id)) {
             // Hay cita
             if (el.appointments.find(function (el) {

@@ -250,6 +250,7 @@ __webpack_require__.r(__webpack_exports__);
       schedule: {
         id: '',
         daysSelected: [],
+        date: null,
         check_time: null,
         departure_date: null,
         professional_id: ''
@@ -291,11 +292,17 @@ __webpack_require__.r(__webpack_exports__);
       })["catch"](function (err) {});
     },
     cleanModal: function cleanModal() {
-      this.schedule.daysSelected = [], this.schedule.check_time = null, this.schedule.departure_date = null;
+      this.schedule.daysSelected = [];
+      this.schedule.date = null;
+      this.schedule.check_time = null;
+      this.schedule.departure_date = null;
     },
     editSchedule: function editSchedule(horario) {
       this.showForm();
-      this.schedule.check_time = horario.check_time, this.schedule.departure_date = horario.departure_date, this.schedule.daysSelected.push(horario.day);
+      this.schedule.check_time = horario.check_time;
+      this.schedule.departure_date = horario.departure_date;
+      this.schedule.daysSelected = [horario.day];
+      this.schedule.date = horario.date;
       this.title = 'Editar';
       this.schedule.id = horario.id;
       console.log(horario);
@@ -321,9 +328,19 @@ __webpack_require__.r(__webpack_exports__);
           _this3.axios["delete"]('/api/schedule/' + key).then(function (res) {
             console.log(res.data);
             _this3.$swal('Horario eliminado con éxito');
+            _this3.$parent.getSchedules(_this3.prof.id);
           });
-          _this3.$parent.getSchedules(_this3.prof.id);
         }
+      });
+    },
+    toggleActive: function toggleActive(id) {
+      var _this4 = this;
+      this.axios.put("/api/schedule/".concat(id, "/toggle")).then(function (res) {
+        if (res.data.mensaje === 'success') {
+          _this4.$parent.getSchedules(_this4.prof.id);
+        }
+      })["catch"](function (err) {
+        return console.error(err);
       });
     },
     horaHumana: function horaHumana(hora) {
@@ -344,9 +361,9 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     filtro: function filtro() {
-      var _this4 = this;
+      var _this5 = this;
       return this.horarios.filter(function (horario) {
-        return horario.day == _this4.day;
+        return horario.day == _this5.day;
       });
     }
   }
@@ -1218,7 +1235,29 @@ var render = function render() {
     attrs: {
       "for": "horarioSabado"
     }
-  }, [_vm._v("Sábado")])])]) : _vm._e(), _vm._v(" "), _c("div", {
+  }, [_vm._v("Sábado")])])]) : _vm._e(), _vm._v(" "), _vm.title == "Agregar" ? _c("div", {
+    staticClass: "form-group"
+  }, [_c("label", [_vm._v("Fecha Específica (Opcional si es recurrente)")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.schedule.date,
+      expression: "schedule.date"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "date"
+    },
+    domProps: {
+      value: _vm.schedule.date
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.schedule, "date", $event.target.value);
+      }
+    }
+  })]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "form-group"
   }, [_c("label", {
     attrs: {
@@ -1300,12 +1339,31 @@ var render = function render() {
     return _c("div", {
       key: horario.id,
       staticClass: "schudles mt-3"
-    }, [horario.day == _vm.day ? _c("div", {
-      staticClass: "btn btn-success w-100 mt-2 d-flex justify-content-between"
-    }, [_c("p", [_vm._v(_vm._s(_vm.horaHumana(horario ? horario.check_time : "...")) + " - " + _vm._s(_vm.horaHumana(horario ? horario.departure_date : "...")))]), _vm._v(" "), _c("div", {
+    }, [horario.day && horario.day.toLowerCase() == _vm.day.toLowerCase() ? _c("div", {
+      staticClass: "btn w-100 mt-2 d-flex justify-content-between align-items-center",
+      "class": horario.active ? "btn-success" : "btn-secondary"
+    }, [_c("div", {
+      staticClass: "text-left"
+    }, [_c("p", {
+      staticClass: "mb-0"
+    }, [_vm._v(_vm._s(_vm.horaHumana(horario ? horario.check_time : "...")) + " - " + _vm._s(_vm.horaHumana(horario ? horario.departure_date : "...")))]), _vm._v(" "), horario.date ? _c("small", [_vm._v("Fecha: " + _vm._s(horario.date))]) : _c("small", [_vm._v("Recurrente (" + _vm._s(horario.day) + ")")])]), _vm._v(" "), _c("div", {
       staticClass: "div"
     }, [_c("a", {
-      staticClass: "btn btn-info btn-circle",
+      staticClass: "btn btn-sm",
+      "class": horario.active ? "btn-warning" : "btn-success",
+      attrs: {
+        title: "Activar/Desactivar"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.toggleActive(horario.id);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas",
+      "class": horario.active ? "fa-ban" : "fa-check"
+    })]), _vm._v(" "), _c("a", {
+      staticClass: "btn btn-info btn-circle btn-sm ml-1",
       on: {
         click: function click($event) {
           return _vm.editSchedule(horario);
@@ -1314,7 +1372,7 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fas fa-pencil-alt"
     })]), _vm._v(" "), _c("a", {
-      staticClass: "btn btn-danger btn-circle",
+      staticClass: "btn btn-danger btn-circle btn-sm ml-1",
       on: {
         click: function click($event) {
           return _vm.deleteSchedule(horario.id);

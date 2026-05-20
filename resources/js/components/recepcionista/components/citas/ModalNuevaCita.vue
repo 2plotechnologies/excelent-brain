@@ -963,8 +963,9 @@ export default {
 		},
 		async buscarHorariosManual() {
 			if (!this.fechaManual || !this.cita.professional_id) return;
-			let diaManual = moment(this.fechaManual).format('d');
-			let diaSemana = this.dayWeek(diaManual - 1);
+			let diaManual = parseInt(moment(this.fechaManual).format('d')) - 1;
+			if (diaManual === -1) diaManual = 6;
+			let diaSemana = this.dayWeek(diaManual);
 			this.cargandoHorarios = true;
 			await this.axios.get(`/api/horarioCuadernoOcupado/${this.fechaManual}/${diaSemana}`)
 				.then(res => {
