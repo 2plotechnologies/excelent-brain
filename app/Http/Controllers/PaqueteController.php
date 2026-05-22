@@ -361,18 +361,24 @@ class PaqueteController extends Controller
                 ->where('status', 2)
                 ->count();
 
-            // Costo por sesión
-            $costo_por_sesion = floatval($membresia->monto) / floatval($precio->sesiones);
-            
-            // Total pagado
-            $total_pagado = Extra_payment::where('idMembresia', $id)
+            // El prorrateo se basa en el precio base de la membresía (monto + descuento)
+            $precio_base = floatval($membresia->monto) + floatval($membresia->descuento);
+            $costo_por_sesion = $precio_base / floatval($precio->sesiones);
+            $monto_proporcional = round($costo_por_sesion * $sesiones_efectivas, 2);
+
+            // Total pagado actualmente
+            $total_pagado = floatval(Extra_payment::where('idMembresia', $id)
                 ->where('activo', 1)
-                ->sum('price');
+                ->sum('price'));
 
-            // Dinero a favor
-            $dinero_a_favor = $total_pagado - ($costo_por_sesion * $sesiones_efectivas);
+            // Calcular diferencia (dinero a favor del paciente si es positivo, saldo deudor si es negativo)
+            $diferencia = round($total_pagado - $monto_proporcional, 2);
 
-            if ($dinero_a_favor > 0) {
+            $user_id = auth()->id() ?: $membresia->user_id;
+
+            if ($diferencia > 0) {
+                // Caso A: El paciente pagó de más -> Generar Nota de Crédito y pago de ajuste negativo
+                $dinero_a_favor = $diferencia;
                 NotaCredito::create([
                     'patient_id' => $membresia->patient_id,
                     'idMembresia_origen' => $id,
@@ -382,13 +388,55 @@ class PaqueteController extends Controller
                     'observaciones' => $request->input('observaciones', 'Prorrateo de paquete'),
                     'fecha_emision' => Carbon::now()->format('Y-m-d')
                 ]);
+
+                // Generar pago de ajuste negativo
+                $patient = Patient::find($membresia->patient_id);
+                $customer_name = $patient ? trim($patient->name . ' ' . $patient->nombres) : '';
+
+                $pagoAjuste = new Extra_payment;
+                $pagoAjuste->customer = $customer_name;
+                $pagoAjuste->price = -$dinero_a_favor;
+                $pagoAjuste->moneda = 1;
+                $pagoAjuste->voucher = '';
+                $pagoAjuste->appointment_id = 0;
+                $pagoAjuste->patient_id = $membresia->patient_id;
+                $pagoAjuste->type = 7; // pago de membresía
+                $pagoAjuste->observation = 'Ajuste Prorrateo - Devolución';
+                $pagoAjuste->continuo = 3;
+                $pagoAjuste->idMembresia = $id;
+                $pagoAjuste->user_id = $user_id;
+                $pagoAjuste->numero_cuota = 0;
+                $pagoAjuste->idSede = $membresia->idSede ?: (DB::table('users')->where('id', $user_id)->value('IdSede') ?: 1);
+                $pagoAjuste->save();
+            } elseif ($diferencia < 0) {
+                // Caso B: El paciente pagó de menos -> Generar cuota de saldo deudor pendiente
+                $saldo_deudor = abs($diferencia);
+                DB::table('deudas')->insert([
+                    'patient_id' => $membresia->patient_id,
+                    'motivo' => 'Saldo Deudor Prorrateo - ' . ($precio->descripcion ?: 'Paquete'),
+                    'user_id' => $user_id,
+                    'fecha' => Carbon::now()->format('Y-m-d'),
+                    'monto' => $saldo_deudor,
+                    'idMembresia' => $id,
+                    'idPago' => $membresia->tipo,
+                    'numero_cuota' => 1,
+                    'estado' => 1, // pendiente
+                    'activo' => 1
+                ]);
             }
 
+            // Actualizar el monto de la membresía al valor proporcional consumido y setear descuento a 0
+            $membresia->monto = $monto_proporcional;
+            $membresia->descuento = 0;
             $membresia->estado = 4; // Prorrateado
             $membresia->save();
 
             DB::commit();
-            return response()->json(['message' => 'Paquete prorrateado correctamente', 'dinero_a_favor' => $dinero_a_favor]);
+            return response()->json([
+                'message' => 'Paquete prorrateado correctamente',
+                'dinero_a_favor' => $diferencia > 0 ? $diferencia : 0,
+                'saldo_deudor' => $diferencia < 0 ? abs($diferencia) : 0
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);

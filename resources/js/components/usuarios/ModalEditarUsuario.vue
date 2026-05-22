@@ -26,6 +26,11 @@
 						<option value="1">Sí</option>
 					</select>
 				</div>
+				<label for="">Sede</label>
+				<select class="form-select" v-model="usuario.idSede">
+					<option value="1">General (Sede 1)</option>
+					<option v-for="sede in sedes" :key="sede.id" :value="sede.id">{{ sede.nombre }}</option>
+				</select>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal" @click="guardar()">Actualizar campos</button>
@@ -38,7 +43,7 @@
 import alertify from 'alertifyjs'
 export default{
 	name: 'ModalEditarUsuario',
-	props:['usuario'],
+	props:['usuario', 'sedes'],
 	data(){ return { clave: '' }},
 	methods:{
 		guardar(){

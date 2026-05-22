@@ -570,10 +570,41 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       var modal = new bootstrap.Modal(document.getElementById('modalProrratear'));
       modal.show();
     },
+    calcularDetalleProrrateo: function calcularDetalleProrrateo() {
+      if (!this.paqueteSeleccionado) return {
+        precioBase: 0,
+        costoPorSesion: 0,
+        valorConsumido: 0,
+        diferencia: 0,
+        tipo: 'ninguno'
+      };
+      var monto = parseFloat(this.paqueteSeleccionado.monto) || 0;
+      var descuento = parseFloat(this.paqueteSeleccionado.descuento) || 0;
+      var precioBase = monto + descuento;
+      var totalSesiones = Math.max(parseInt(this.paqueteSeleccionado.total_sesiones) || 1, 1);
+      var sesionesUsadas = parseInt(this.paqueteSeleccionado.sesiones_usadas) || 0;
+      var pagado = parseFloat(this.paqueteSeleccionado.pagado) || 0;
+      var costoPorSesion = precioBase / totalSesiones;
+      var valorConsumido = costoPorSesion * sesionesUsadas;
+      var diferencia = pagado - valorConsumido;
+      var tipo = 'ninguno';
+      if (diferencia > 0.005) {
+        tipo = 'devolver';
+      } else if (diferencia < -0.005) {
+        tipo = 'deudor';
+      }
+      return {
+        precioBase: precioBase,
+        costoPorSesion: costoPorSesion,
+        valorConsumido: valorConsumido,
+        diferencia: Math.abs(diferencia),
+        tipo: tipo
+      };
+    },
     confirmarProrrateo: function confirmarProrrateo() {
       var _this10 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-        var res, modal, _error$response;
+        var res, modal, msg, _error$response;
         return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) switch (_context7.prev = _context7.next) {
             case 0:
@@ -587,29 +618,37 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               res = _context7.sent;
               modal = bootstrap.Modal.getInstance(document.getElementById('modalProrratear'));
               if (modal) modal.hide();
+              msg = '';
+              if (res.data.dinero_a_favor > 0) {
+                msg = "Se gener\xF3 una nota de cr\xE9dito por S/ ".concat(parseFloat(res.data.dinero_a_favor).toFixed(2));
+              } else if (res.data.saldo_deudor > 0) {
+                msg = "Se gener\xF3 una cuota de saldo deudor pendiente por S/ ".concat(parseFloat(res.data.saldo_deudor).toFixed(2));
+              } else {
+                msg = 'No hubo saldo a favor ni saldo deudor. El paquete quedó balanceado.';
+              }
               _this10.$swal({
                 icon: 'success',
                 title: 'Paquete prorrateado',
-                text: "Se gener\xF3 una nota de cr\xE9dito por S/ ".concat(parseFloat(res.data.dinero_a_favor).toFixed(2))
+                text: msg
               });
-              _context7.next = 10;
+              _context7.next = 12;
               return _this10.cargarPaquetes(_this10.pagination.current_page);
-            case 10:
-              _context7.next = 15;
-              break;
             case 12:
-              _context7.prev = 12;
+              _context7.next = 17;
+              break;
+            case 14:
+              _context7.prev = 14;
               _context7.t0 = _context7["catch"](1);
               _this10.$swal('Error', ((_error$response = _context7.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.error) || 'No se pudo prorratear', 'error');
-            case 15:
-              _context7.prev = 15;
+            case 17:
+              _context7.prev = 17;
               _this10.procesandoEstado = false;
-              return _context7.finish(15);
-            case 18:
+              return _context7.finish(17);
+            case 20:
             case "end":
               return _context7.stop();
           }
-        }, _callee7, null, [[1, 12, 15, 18]]);
+        }, _callee7, null, [[1, 14, 17, 20]]);
       }))();
     },
     cambiarEstado: function cambiarEstado(paquete, accion) {
@@ -1097,22 +1136,36 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     calcularFechas: function calcularFechas() {
       this.fechas = [];
       if (!this.membresia.tipo) return;
-      var precioBase = this.mostrarPrecio;
-      var precioParcial = Math.ceil(precioBase / this.membresia.cuotas * 10) / 10;
-      var hoy = moment__WEBPACK_IMPORTED_MODULE_0___default()();
+      var precioBase = parseFloat(this.mostrarPrecio) || 0;
+      var descuento = parseFloat(this.membresia.descuento) || 0;
+      var precioTotal = parseFloat(Math.max(0, precioBase - descuento).toFixed(2));
       this.membresia.precio = precioBase;
-      for (var i = 0; i < this.membresia.cuotas; i++) {
+      var numCuotas = parseInt(this.membresia.cuotas) || 1;
+      var hoy = moment__WEBPACK_IMPORTED_MODULE_0___default()();
+      for (var i = 0; i < numCuotas; i++) {
         this.fechas.push({
           dia: hoy.format('YYYY-MM-DD'),
-          monto: parseFloat(precioParcial).toFixed(2),
-          total: precioBase,
+          monto: '0.00',
+          total: precioTotal,
           pago: false
         });
-        // Original code modified the readonly attr of inputs via DOM. We handle it via Vue bindings now.
         hoy = moment__WEBPACK_IMPORTED_MODULE_0___default()(hoy).add(1, 'month');
       }
       this.membresia.fin = this.membresia.tipo == 47 ? moment__WEBPACK_IMPORTED_MODULE_0___default()().add(1, 'year').format('YYYY-MM-DD') : moment__WEBPACK_IMPORTED_MODULE_0___default()().format('YYYY-MM-DD');
-      this.balancearMontos(0);
+
+      // Balancear inicialmente
+      if (numCuotas === 1) {
+        this.fechas[0].monto = precioTotal.toFixed(2);
+      } else {
+        var baseCuota = parseFloat((precioTotal / numCuotas).toFixed(2));
+        var suma = 0;
+        for (var _i = 0; _i < numCuotas - 1; _i++) {
+          this.fechas[_i].monto = baseCuota.toFixed(2);
+          suma += baseCuota;
+        }
+        var ultimaCuota = parseFloat((precioTotal - suma).toFixed(2));
+        this.fechas[numCuotas - 1].monto = ultimaCuota.toFixed(2);
+      }
     },
     seleccionarTipo: function seleccionarTipo(tipo) {
       if (this.selectedTipoPaquete !== tipo) {
@@ -1173,29 +1226,30 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       return paquete ? parseFloat(paquete.nuevos).toFixed(2) : null;
     },
     balancearMontos: function balancearMontos(editedIndex) {
-      var descuento = 0; //this.membresia.descuento ?? 0;
-      if (parseInt(this.membresia.cuotas) > 1) {
-        if (editedIndex === 0) {
-          // Si se editó la primera cuota, balanceamos desde la segunda
-          var cantidadFechasABalancear = this.fechas.length - 1;
-          var montoRestante = (parseFloat(this.fechas[0].total) - parseFloat(this.fechas[0].monto) - descuento) / cantidadFechasABalancear;
-          this.fechas.forEach(function (fecha, index) {
-            if (index > 0) {
-              // Balanceamos desde la segunda cuota
-              fecha.monto = montoRestante.toFixed(2);
-            }
-          });
-        } else if (editedIndex <= this.fechas.length - 2) {
-          // Si se editó la segunda cuota, respetamos la primera y balanceamos desde la tercera
-          var _cantidadFechasABalancear = this.fechas.length - editedIndex + 1;
-          var sumaAnteriores = this.fechas.filter(function (_, index) {
-            return index <= editedIndex;
-          }).reduce(function (acc, item) {
-            return acc + parseFloat(item.monto);
-          }, 0);
-          var _montoRestante = (parseFloat(this.fechas[0].total) - sumaAnteriores - descuento) / _cantidadFechasABalancear;
-          for (var i = editedIndex + 1; i < this.fechas.length; i++) this.fechas[i].monto = _montoRestante.toFixed(2);
+      var precioBase = parseFloat(this.mostrarPrecio) || 0;
+      var descuento = parseFloat(this.membresia.descuento) || 0;
+      var precioTotal = parseFloat(Math.max(0, precioBase - descuento).toFixed(2));
+      var numCuotas = this.fechas.length;
+      if (numCuotas <= 1) return;
+
+      // Sumar las cuotas hasta la editada inclusive
+      var sumaAnteriores = 0;
+      for (var i = 0; i <= editedIndex; i++) {
+        sumaAnteriores += parseFloat(this.fechas[i].monto) || 0;
+      }
+      var cantidadFechasABalancear = numCuotas - (editedIndex + 1);
+      if (cantidadFechasABalancear > 0) {
+        var montoRestanteTotal = precioTotal - sumaAnteriores;
+        var baseRestante = parseFloat((montoRestanteTotal / cantidadFechasABalancear).toFixed(2));
+        var suma = sumaAnteriores;
+        for (var _i2 = editedIndex + 1; _i2 < numCuotas - 1; _i2++) {
+          this.fechas[_i2].monto = baseRestante.toFixed(2);
+          suma += baseRestante;
         }
+
+        // El restante se asigna a la última cuota para evitar pérdida de centavos
+        var ultimaMonto = parseFloat((precioTotal - suma).toFixed(2));
+        this.fechas[numCuotas - 1].monto = ultimaMonto.toFixed(2);
       }
     },
     guardar: function guardar() {
@@ -2776,7 +2830,19 @@ var render = function render() {
     staticClass: "text-muted small"
   }, [_vm._v("Monto Total del Paquete")]), _vm._v(" "), _c("span", {
     staticClass: "fw-bold"
-  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.paqueteSeleccionado.monto).toFixed(2)))])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.paqueteSeleccionado.monto).toFixed(2)))])]), _vm._v(" "), parseFloat(_vm.paqueteSeleccionado.descuento || 0) > 0 ? _c("div", {
+    staticClass: "d-flex justify-content-between mb-2"
+  }, [_c("span", {
+    staticClass: "text-muted small"
+  }, [_vm._v("Descuento")]), _vm._v(" "), _c("span", {
+    staticClass: "fw-bold text-success"
+  }, [_vm._v("- S/ " + _vm._s(parseFloat(_vm.paqueteSeleccionado.descuento).toFixed(2)))])]) : _vm._e(), _vm._v(" "), parseFloat(_vm.paqueteSeleccionado.descuento || 0) > 0 ? _c("div", {
+    staticClass: "d-flex justify-content-between mb-2"
+  }, [_c("span", {
+    staticClass: "text-muted small"
+  }, [_vm._v("Precio Base de Referencia")]), _vm._v(" "), _c("span", {
+    staticClass: "fw-bold"
+  }, [_vm._v("S/ " + _vm._s(_vm.calcularDetalleProrrateo().precioBase.toFixed(2)))])]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "d-flex justify-content-between mb-2"
   }, [_c("span", {
     staticClass: "text-muted small"
@@ -2788,13 +2854,19 @@ var render = function render() {
     staticClass: "text-muted small"
   }, [_vm._v("Costo por Sesión")]), _vm._v(" "), _c("span", {
     staticClass: "fw-bold"
-  }, [_vm._v("S/ " + _vm._s((parseFloat(_vm.paqueteSeleccionado.monto) / Math.max(_vm.paqueteSeleccionado.total_sesiones, 1)).toFixed(2)))])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("S/ " + _vm._s(_vm.calcularDetalleProrrateo().costoPorSesion.toFixed(2)))])]), _vm._v(" "), _c("div", {
     staticClass: "d-flex justify-content-between mb-2"
   }, [_c("span", {
     staticClass: "text-muted small"
   }, [_vm._v("Sesiones Usadas")]), _vm._v(" "), _c("span", {
     staticClass: "fw-bold text-danger"
-  }, [_vm._v(_vm._s(_vm.paqueteSeleccionado.sesiones_usadas))])]), _vm._v(" "), _c("hr", {
+  }, [_vm._v(_vm._s(_vm.paqueteSeleccionado.sesiones_usadas))])]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-between mb-2"
+  }, [_c("span", {
+    staticClass: "text-muted small"
+  }, [_vm._v("Valor Proporcional Consumido")]), _vm._v(" "), _c("span", {
+    staticClass: "fw-bold text-dark"
+  }, [_vm._v("S/ " + _vm._s(_vm.calcularDetalleProrrateo().valorConsumido.toFixed(2)))])]), _vm._v(" "), _c("hr", {
     staticClass: "border-secondary opacity-25"
   }), _vm._v(" "), _c("div", {
     staticClass: "d-flex justify-content-between mb-2"
@@ -2802,13 +2874,25 @@ var render = function render() {
     staticClass: "text-muted small"
   }, [_vm._v("Total Pagado")]), _vm._v(" "), _c("span", {
     staticClass: "fw-bold text-success"
-  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.paqueteSeleccionado.pagado || 0).toFixed(2)))])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.paqueteSeleccionado.pagado || 0).toFixed(2)))])]), _vm._v(" "), _vm.calcularDetalleProrrateo().tipo === "devolver" ? _c("div", {
     staticClass: "d-flex justify-content-between"
   }, [_c("span", {
     staticClass: "fw-bold"
-  }, [_vm._v("Saldo a Devolver")]), _vm._v(" "), _c("span", {
-    staticClass: "fw-bold fs-5 text-primary"
-  }, [_vm._v("\n                S/ " + _vm._s(Math.max(0, parseFloat(_vm.paqueteSeleccionado.pagado || 0) - parseFloat(_vm.paqueteSeleccionado.monto) / Math.max(_vm.paqueteSeleccionado.total_sesiones, 1) * _vm.paqueteSeleccionado.sesiones_usadas).toFixed(2)) + "\n              ")])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Saldo a Devolver (Nota de Crédito)")]), _vm._v(" "), _c("span", {
+    staticClass: "fw-bold fs-5 text-success"
+  }, [_vm._v("\n                S/ " + _vm._s(_vm.calcularDetalleProrrateo().diferencia.toFixed(2)) + "\n              ")])]) : _vm.calcularDetalleProrrateo().tipo === "deudor" ? _c("div", {
+    staticClass: "d-flex justify-content-between"
+  }, [_c("span", {
+    staticClass: "fw-bold"
+  }, [_vm._v("Saldo Deudor (A cobrar)")]), _vm._v(" "), _c("span", {
+    staticClass: "fw-bold fs-5 text-danger"
+  }, [_vm._v("\n                S/ " + _vm._s(_vm.calcularDetalleProrrateo().diferencia.toFixed(2)) + "\n              ")])]) : _c("div", {
+    staticClass: "d-flex justify-content-between"
+  }, [_c("span", {
+    staticClass: "fw-bold"
+  }, [_vm._v("Saldo Balanceado")]), _vm._v(" "), _c("span", {
+    staticClass: "fw-bold fs-5 text-secondary"
+  }, [_vm._v("\n                S/ 0.00\n              ")])])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
   }, [_c("label", {
     staticClass: "form-label small fw-bold text-muted"

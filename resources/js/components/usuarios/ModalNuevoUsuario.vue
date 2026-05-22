@@ -26,6 +26,11 @@
 						<option value="1">Sí</option>
 					</select>
 				</div>
+				<label for="">Sede</label>
+				<select class="form-select" v-model="usuario.idSede">
+					<option value="1">General (Sede 1)</option>
+					<option v-for="sede in sedes" :key="sede.id" :value="sede.id">{{ sede.nombre }}</option>
+				</select>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal" @click="guardar()">Actualizar campos</button>
@@ -38,14 +43,14 @@
 import alertify from 'alertifyjs'
 export default{
 	name: 'ModalNuevoUsuario',
-	
-	data(){ return { usuario:{rol:'recepcionista', privilegios:0} }},
+	props: ['sedes'],
+	data(){ return { usuario:{rol:'recepcionista', privilegios:0, idSede:1} }},
 	methods:{
 		guardar(){
 			this.axios.post('/api/nuevoUsuarioBasico', {usuario:this.usuario})
 			.then(res=> {
 				console.log(res.data)
-				this.usuario={rol:'recepcionista', privilegios:0};
+				this.usuario={rol:'recepcionista', privilegios:0, idSede:1};
 				alertify.notify('<i class="fa-regular fa-calendar-check"></i> ' + res.data.mensaje, 'success', 5);
 				this.$parent.cargarUsuarios();
 			})

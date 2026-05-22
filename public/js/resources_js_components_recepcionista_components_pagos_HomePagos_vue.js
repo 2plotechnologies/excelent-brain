@@ -1473,22 +1473,36 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     calcularFechas: function calcularFechas() {
       this.fechas = [];
       if (!this.membresia.tipo) return;
-      var precioBase = this.mostrarPrecio;
-      var precioParcial = Math.ceil(precioBase / this.membresia.cuotas * 10) / 10;
-      var hoy = moment__WEBPACK_IMPORTED_MODULE_0___default()();
+      var precioBase = parseFloat(this.mostrarPrecio) || 0;
+      var descuento = parseFloat(this.membresia.descuento) || 0;
+      var precioTotal = parseFloat(Math.max(0, precioBase - descuento).toFixed(2));
       this.membresia.precio = precioBase;
-      for (var i = 0; i < this.membresia.cuotas; i++) {
+      var numCuotas = parseInt(this.membresia.cuotas) || 1;
+      var hoy = moment__WEBPACK_IMPORTED_MODULE_0___default()();
+      for (var i = 0; i < numCuotas; i++) {
         this.fechas.push({
           dia: hoy.format('YYYY-MM-DD'),
-          monto: parseFloat(precioParcial).toFixed(2),
-          total: precioBase,
+          monto: '0.00',
+          total: precioTotal,
           pago: false
         });
-        // Original code modified the readonly attr of inputs via DOM. We handle it via Vue bindings now.
         hoy = moment__WEBPACK_IMPORTED_MODULE_0___default()(hoy).add(1, 'month');
       }
       this.membresia.fin = this.membresia.tipo == 47 ? moment__WEBPACK_IMPORTED_MODULE_0___default()().add(1, 'year').format('YYYY-MM-DD') : moment__WEBPACK_IMPORTED_MODULE_0___default()().format('YYYY-MM-DD');
-      this.balancearMontos(0);
+
+      // Balancear inicialmente
+      if (numCuotas === 1) {
+        this.fechas[0].monto = precioTotal.toFixed(2);
+      } else {
+        var baseCuota = parseFloat((precioTotal / numCuotas).toFixed(2));
+        var suma = 0;
+        for (var _i = 0; _i < numCuotas - 1; _i++) {
+          this.fechas[_i].monto = baseCuota.toFixed(2);
+          suma += baseCuota;
+        }
+        var ultimaCuota = parseFloat((precioTotal - suma).toFixed(2));
+        this.fechas[numCuotas - 1].monto = ultimaCuota.toFixed(2);
+      }
     },
     seleccionarTipo: function seleccionarTipo(tipo) {
       if (this.selectedTipoPaquete !== tipo) {
@@ -1549,29 +1563,30 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       return paquete ? parseFloat(paquete.nuevos).toFixed(2) : null;
     },
     balancearMontos: function balancearMontos(editedIndex) {
-      var descuento = 0; //this.membresia.descuento ?? 0;
-      if (parseInt(this.membresia.cuotas) > 1) {
-        if (editedIndex === 0) {
-          // Si se editó la primera cuota, balanceamos desde la segunda
-          var cantidadFechasABalancear = this.fechas.length - 1;
-          var montoRestante = (parseFloat(this.fechas[0].total) - parseFloat(this.fechas[0].monto) - descuento) / cantidadFechasABalancear;
-          this.fechas.forEach(function (fecha, index) {
-            if (index > 0) {
-              // Balanceamos desde la segunda cuota
-              fecha.monto = montoRestante.toFixed(2);
-            }
-          });
-        } else if (editedIndex <= this.fechas.length - 2) {
-          // Si se editó la segunda cuota, respetamos la primera y balanceamos desde la tercera
-          var _cantidadFechasABalancear = this.fechas.length - editedIndex + 1;
-          var sumaAnteriores = this.fechas.filter(function (_, index) {
-            return index <= editedIndex;
-          }).reduce(function (acc, item) {
-            return acc + parseFloat(item.monto);
-          }, 0);
-          var _montoRestante = (parseFloat(this.fechas[0].total) - sumaAnteriores - descuento) / _cantidadFechasABalancear;
-          for (var i = editedIndex + 1; i < this.fechas.length; i++) this.fechas[i].monto = _montoRestante.toFixed(2);
+      var precioBase = parseFloat(this.mostrarPrecio) || 0;
+      var descuento = parseFloat(this.membresia.descuento) || 0;
+      var precioTotal = parseFloat(Math.max(0, precioBase - descuento).toFixed(2));
+      var numCuotas = this.fechas.length;
+      if (numCuotas <= 1) return;
+
+      // Sumar las cuotas hasta la editada inclusive
+      var sumaAnteriores = 0;
+      for (var i = 0; i <= editedIndex; i++) {
+        sumaAnteriores += parseFloat(this.fechas[i].monto) || 0;
+      }
+      var cantidadFechasABalancear = numCuotas - (editedIndex + 1);
+      if (cantidadFechasABalancear > 0) {
+        var montoRestanteTotal = precioTotal - sumaAnteriores;
+        var baseRestante = parseFloat((montoRestanteTotal / cantidadFechasABalancear).toFixed(2));
+        var suma = sumaAnteriores;
+        for (var _i2 = editedIndex + 1; _i2 < numCuotas - 1; _i2++) {
+          this.fechas[_i2].monto = baseRestante.toFixed(2);
+          suma += baseRestante;
         }
+
+        // El restante se asigna a la última cuota para evitar pérdida de centavos
+        var ultimaMonto = parseFloat((precioTotal - suma).toFixed(2));
+        this.fechas[numCuotas - 1].monto = ultimaMonto.toFixed(2);
       }
     },
     guardar: function guardar() {

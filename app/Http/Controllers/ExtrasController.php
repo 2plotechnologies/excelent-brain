@@ -613,11 +613,17 @@ class ExtrasController extends Controller
 	}
 
 	public function anularMembresia(Request $request){
-		$membresia = Membresia::where('id', $request->input('id'));
+		$id = $request->input('id');
+		$membresia = Membresia::where('id', $id);
 		$membresia->update([
 			'activo' => 0,
 			'estado' => 3	
 		]);
+
+		// Desactivar deudas pendientes de la membresía anulada para evitar que queden huérfanas
+		DB::table('deudas')
+			->where('idMembresia', $id)
+			->update(['activo' => 0]);
 		
 		return response()->json([ 'mensaje' => 'Eliminado exitoso' ]);
 	}
@@ -945,6 +951,21 @@ class ExtrasController extends Controller
 		$idPaciente = $request->input('idPaciente') ?: ($deuda ? $deuda->patient_id : null);
 		$observacion = $request->input('observacion') ?: $request->input('observación');
 
+		// Validar que el pago no supere el saldo pendiente de la membresía/paquete
+		if ($idMembresia && $request->input('estado') == '2') {
+			$membresiaObj = Membresia::find($idMembresia);
+			if ($membresiaObj) {
+				$total_pagado = floatval(Extra_payment::where('idMembresia', $idMembresia)->where('activo', 1)->sum('price'));
+				$saldo_pendiente = floatval($membresiaObj->monto) - $total_pagado;
+				$monto_pago = floatval($request->input('precio'));
+				if ($monto_pago > $saldo_pendiente + 0.005) {
+					return response()->json([
+						'error' => 'El pago de S/ ' . number_format($monto_pago, 2) . ' supera el saldo pendiente del paquete (S/ ' . number_format($saldo_pendiente, 2) . ').'
+					], 422);
+				}
+			}
+		}
+
 		// Validar pago secuencial: solo se puede pagar la cuota pendiente más antigua
 		if ($deuda && $idMembresia && $deuda->numero_cuota) {
 			$cuotaMasAntigua = DB::table('deudas')
@@ -1005,6 +1026,7 @@ class ExtrasController extends Controller
 			'email'=>$request->input('usuario.email'),
 			'rol'=>$request->input('usuario.rol'),
 			'privilegios'=>$request->input('usuario.privilegios'),
+			'idSede'=>$request->input('usuario.idSede', 1),
 			'password'=> Hash::make($request->input('usuario.clave')),
 		]);
 		return response()->json(['mensaje'=>'Creado con éxito', 'id' => $idUsuario]);
@@ -1018,7 +1040,8 @@ class ExtrasController extends Controller
 			'nombre'=>$request->input('usuario.nombre'),
 			'email'=>$request->input('usuario.email'),
 			'rol'=>$request->input('usuario.rol'),
-			'privilegios'=>$request->input('usuario.privilegios')
+			'privilegios'=>$request->input('usuario.privilegios'),
+			'idSede'=>$request->input('usuario.idSede', 1)
 		]);
 		if($clave){
 			DB::table('users')->where('id', $request->input('usuario.id'))

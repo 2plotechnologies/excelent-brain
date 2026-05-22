@@ -352,22 +352,38 @@ export default {
 		calcularFechas() {
 			this.fechas = [];
 			if (!this.membresia.tipo) return;
-			const precioBase = this.mostrarPrecio ;
-			const precioParcial = Math.ceil((precioBase / this.membresia.cuotas)*10)/10
-			var hoy = moment()
+			const precioBase = parseFloat(this.mostrarPrecio) || 0;
+			const descuento = parseFloat(this.membresia.descuento) || 0;
+			const precioTotal = parseFloat(Math.max(0, precioBase - descuento).toFixed(2));
 			this.membresia.precio = precioBase;
-			for (let i = 0; i < this.membresia.cuotas; i++) {
+			
+			const numCuotas = parseInt(this.membresia.cuotas) || 1;
+			var hoy = moment();
+			
+			for (let i = 0; i < numCuotas; i++) {
 				this.fechas.push({
 					dia: hoy.format('YYYY-MM-DD'),
-					monto: parseFloat(precioParcial).toFixed(2),
-					total: precioBase,
+					monto: '0.00',
+					total: precioTotal,
 					pago: false
-				})
-				// Original code modified the readonly attr of inputs via DOM. We handle it via Vue bindings now.
-				hoy = moment(hoy).add(1, 'month')
+				});
+				hoy = moment(hoy).add(1, 'month');
 			}
-			this.membresia.fin = this.membresia.tipo==47 ?  moment().add(1,'year').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD')
-			this.balancearMontos(0);
+			this.membresia.fin = this.membresia.tipo==47 ?  moment().add(1,'year').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+			
+			// Balancear inicialmente
+			if (numCuotas === 1) {
+				this.fechas[0].monto = precioTotal.toFixed(2);
+			} else {
+				const baseCuota = parseFloat((precioTotal / numCuotas).toFixed(2));
+				let suma = 0;
+				for (let i = 0; i < numCuotas - 1; i++) {
+					this.fechas[i].monto = baseCuota.toFixed(2);
+					suma += baseCuota;
+				}
+				const ultimaCuota = parseFloat((precioTotal - suma).toFixed(2));
+				this.fechas[numCuotas - 1].monto = ultimaCuota.toFixed(2);
+			}
 		},
 		seleccionarTipo(tipo) {
 			if (this.selectedTipoPaquete !== tipo) {
@@ -430,30 +446,33 @@ export default {
 			return paquete ? parseFloat(paquete.nuevos).toFixed(2) : null;
 		},
 		balancearMontos(editedIndex) {
-			const descuento = 0//this.membresia.descuento ?? 0;
-			if (parseInt(this.membresia.cuotas) >1) {
-				if (editedIndex === 0) {
-					// Si se editó la primera cuota, balanceamos desde la segunda
-					let cantidadFechasABalancear = this.fechas.length - 1;
-					let montoRestante = (parseFloat(this.fechas[0].total) - parseFloat(this.fechas[0].monto) - descuento) / cantidadFechasABalancear;
-					
-					this.fechas.forEach((fecha, index) => {
-							if (index > 0) { // Balanceamos desde la segunda cuota
-									fecha.monto = montoRestante.toFixed(2);
-							}
-					});
-				} else if(editedIndex<= this.fechas.length-2) {
-					// Si se editó la segunda cuota, respetamos la primera y balanceamos desde la tercera
-					let cantidadFechasABalancear = this.fechas.length - editedIndex+1;
-					let sumaAnteriores = this.fechas.filter( (_,index) => index<= editedIndex )
-					.reduce( (acc, item) => acc + parseFloat(item.monto), 0 )
-
-					let montoRestante = (parseFloat(this.fechas[0].total) - sumaAnteriores - descuento) / cantidadFechasABalancear;
-
-					for(let i=editedIndex+1; i<this.fechas.length; i++)
-						this.fechas[i].monto = montoRestante.toFixed(2)
-						
+			const precioBase = parseFloat(this.mostrarPrecio) || 0;
+			const descuento = parseFloat(this.membresia.descuento) || 0;
+			const precioTotal = parseFloat(Math.max(0, precioBase - descuento).toFixed(2));
+			const numCuotas = this.fechas.length;
+			
+			if (numCuotas <= 1) return;
+			
+			// Sumar las cuotas hasta la editada inclusive
+			let sumaAnteriores = 0;
+			for (let i = 0; i <= editedIndex; i++) {
+				sumaAnteriores += parseFloat(this.fechas[i].monto) || 0;
+			}
+			
+			let cantidadFechasABalancear = numCuotas - (editedIndex + 1);
+			if (cantidadFechasABalancear > 0) {
+				let montoRestanteTotal = precioTotal - sumaAnteriores;
+				let baseRestante = parseFloat((montoRestanteTotal / cantidadFechasABalancear).toFixed(2));
+				let suma = sumaAnteriores;
+				
+				for (let i = editedIndex + 1; i < numCuotas - 1; i++) {
+					this.fechas[i].monto = baseRestante.toFixed(2);
+					suma += baseRestante;
 				}
+				
+				// El restante se asigna a la última cuota para evitar pérdida de centavos
+				let ultimaMonto = parseFloat((precioTotal - suma).toFixed(2));
+				this.fechas[numCuotas - 1].monto = ultimaMonto.toFixed(2);
 			}
 		},
 		async guardar() {

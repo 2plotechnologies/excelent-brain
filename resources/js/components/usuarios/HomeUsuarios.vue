@@ -13,6 +13,7 @@
 							<th>Nombre</th>
 							<th>Nick / Correo</th>
 							<th>Nivel</th>
+							<th>Sede</th>
 							<th>Privilegios</th>
 							<th>@</th>
 						</tr>
@@ -23,6 +24,7 @@
 							<td class="text-capitalize">{{ usuario.nombre }}</td>
 							<td>{{ usuario.email }}</td>
 							<td class="text-capitalize">{{ usuario.rol }}</td>
+							<td>{{ getSedeName(usuario.idSede) }}</td>
 							<td>{{ usuario.privilegios==0? 'No': 'SI' }}</td>
 							<td>
 								<button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario" @click="queUsuario=usuario" ><i class="fa-solid fa-pen-to-square"></i> Editar</button>
@@ -33,8 +35,8 @@
 				</table>
 			</div>
 		</div>
-		<ModalEditarUsuario :usuario="queUsuario"></ModalEditarUsuario>
-		<ModalNuevoUsuario></ModalNuevoUsuario>
+		<ModalEditarUsuario :usuario="queUsuario" :sedes="sedes"></ModalEditarUsuario>
+		<ModalNuevoUsuario :sedes="sedes"></ModalNuevoUsuario>
 	</main>
 </template>
 <script>
@@ -44,9 +46,17 @@ export default{
 	name:'HomeUsuarios',
 	components:{ModalEditarUsuario, ModalNuevoUsuario},
 	data(){ return {
-		usuarios:[], queUsuario:[]
+		usuarios:[], queUsuario:[], sedes:[]
 	}},
 	methods:{
+		getSedeName(id) {
+			const sede = this.sedes.find(s => s.id == id);
+			return sede ? sede.nombre : 'General';
+		},
+		cargarSedes() {
+			this.axios.get('/api/sedes')
+			.then(res => this.sedes = res.data)
+		},
 		cargarUsuarios(){
 			this.axios.get('/api/cargarUsuarios')
 			.then(res => this.usuarios = res.data)
@@ -59,6 +69,7 @@ export default{
 		}
 	},
 	mounted(){
+		this.cargarSedes()
 		this.cargarUsuarios()
 	}
 

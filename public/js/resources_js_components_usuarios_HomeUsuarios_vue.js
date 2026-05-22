@@ -24,29 +24,43 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       usuarios: [],
-      queUsuario: []
+      queUsuario: [],
+      sedes: []
     };
   },
   methods: {
-    cargarUsuarios: function cargarUsuarios() {
+    getSedeName: function getSedeName(id) {
+      var sede = this.sedes.find(function (s) {
+        return s.id == id;
+      });
+      return sede ? sede.nombre : 'General';
+    },
+    cargarSedes: function cargarSedes() {
       var _this = this;
+      this.axios.get('/api/sedes').then(function (res) {
+        return _this.sedes = res.data;
+      });
+    },
+    cargarUsuarios: function cargarUsuarios() {
+      var _this2 = this;
       this.axios.get('/api/cargarUsuarios').then(function (res) {
-        return _this.usuarios = res.data;
+        return _this2.usuarios = res.data;
       });
     },
     cargarEliminar: function cargarEliminar(index) {
-      var _this2 = this;
+      var _this3 = this;
       if (confirm("\xBFEst\xE1 seguro que desea elminar a ".concat(this.usuarios[index].email, "?"))) {
         this.axios.post('/api/eliminarUsuario', {
           id: this.usuarios[index].id
         }).then(function (res) {
           console.log(res.data);
-          _this2.cargarUsuarios();
+          _this3.cargarUsuarios();
         });
       }
     }
   },
   mounted: function mounted() {
+    this.cargarSedes();
     this.cargarUsuarios();
   }
 });
@@ -68,7 +82,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'ModalEditarUsuario',
-  props: ['usuario'],
+  props: ['usuario', 'sedes'],
   data: function data() {
     return {
       clave: ''
@@ -106,11 +120,13 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'ModalNuevoUsuario',
+  props: ['sedes'],
   data: function data() {
     return {
       usuario: {
         rol: 'recepcionista',
-        privilegios: 0
+        privilegios: 0,
+        idSede: 1
       }
     };
   },
@@ -123,7 +139,8 @@ __webpack_require__.r(__webpack_exports__);
         console.log(res.data);
         _this.usuario = {
           rol: 'recepcionista',
-          privilegios: 0
+          privilegios: 0,
+          idSede: 1
         };
         alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('<i class="fa-regular fa-calendar-check"></i> ' + res.data.mensaje, 'success', 5);
         _this.$parent.cargarUsuarios();
@@ -159,7 +176,7 @@ var render = function render() {
       staticClass: "text-capitalize"
     }, [_vm._v(_vm._s(usuario.nombre))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(usuario.email))]), _vm._v(" "), _c("td", {
       staticClass: "text-capitalize"
-    }, [_vm._v(_vm._s(usuario.rol))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(usuario.privilegios == 0 ? "No" : "SI"))]), _vm._v(" "), _c("td", [_c("button", {
+    }, [_vm._v(_vm._s(usuario.rol))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.getSedeName(usuario.idSede)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(usuario.privilegios == 0 ? "No" : "SI"))]), _vm._v(" "), _c("td", [_c("button", {
       staticClass: "btn btn-outline-primary btn-sm",
       attrs: {
         "data-bs-toggle": "modal",
@@ -184,9 +201,14 @@ var render = function render() {
     }), _vm._v(" Eliminar")])])]);
   }), 0)])])]), _vm._v(" "), _c("ModalEditarUsuario", {
     attrs: {
-      usuario: _vm.queUsuario
+      usuario: _vm.queUsuario,
+      sedes: _vm.sedes
     }
-  }), _vm._v(" "), _c("ModalNuevoUsuario")], 1);
+  }), _vm._v(" "), _c("ModalNuevoUsuario", {
+    attrs: {
+      sedes: _vm.sedes
+    }
+  })], 1);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -205,7 +227,7 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("N°")]), _vm._v(" "), _c("th", [_vm._v("Nombre")]), _vm._v(" "), _c("th", [_vm._v("Nick / Correo")]), _vm._v(" "), _c("th", [_vm._v("Nivel")]), _vm._v(" "), _c("th", [_vm._v("Privilegios")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("N°")]), _vm._v(" "), _c("th", [_vm._v("Nombre")]), _vm._v(" "), _c("th", [_vm._v("Nick / Correo")]), _vm._v(" "), _c("th", [_vm._v("Nivel")]), _vm._v(" "), _c("th", [_vm._v("Sede")]), _vm._v(" "), _c("th", [_vm._v("Privilegios")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
 }];
 render._withStripped = true;
 
@@ -379,7 +401,41 @@ var render = function render() {
     attrs: {
       value: "1"
     }
-  }, [_vm._v("Sí")])])]) : _vm._e()]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Sí")])])]) : _vm._e(), _vm._v(" "), _c("label", {
+    attrs: {
+      "for": ""
+    }
+  }, [_vm._v("Sede")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.usuario.idSede,
+      expression: "usuario.idSede"
+    }],
+    staticClass: "form-select",
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.usuario, "idSede", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "1"
+    }
+  }, [_vm._v("General (Sede 1)")]), _vm._v(" "), _vm._l(_vm.sedes, function (sede) {
+    return _c("option", {
+      key: sede.id,
+      domProps: {
+        value: sede.id
+      }
+    }, [_vm._v(_vm._s(sede.nombre))]);
+  })], 2)]), _vm._v(" "), _c("div", {
     staticClass: "modal-footer"
   }, [_c("button", {
     staticClass: "btn btn-outline-primary",
@@ -585,7 +641,41 @@ var render = function render() {
     attrs: {
       value: "1"
     }
-  }, [_vm._v("Sí")])])]) : _vm._e()]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Sí")])])]) : _vm._e(), _vm._v(" "), _c("label", {
+    attrs: {
+      "for": ""
+    }
+  }, [_vm._v("Sede")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.usuario.idSede,
+      expression: "usuario.idSede"
+    }],
+    staticClass: "form-select",
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.usuario, "idSede", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "1"
+    }
+  }, [_vm._v("General (Sede 1)")]), _vm._v(" "), _vm._l(_vm.sedes, function (sede) {
+    return _c("option", {
+      key: sede.id,
+      domProps: {
+        value: sede.id
+      }
+    }, [_vm._v(_vm._s(sede.nombre))]);
+  })], 2)]), _vm._v(" "), _c("div", {
     staticClass: "modal-footer"
   }, [_c("button", {
     staticClass: "btn btn-outline-primary",

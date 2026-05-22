@@ -653,27 +653,51 @@
                 <span class="text-muted small">Monto Total del Paquete</span>
                 <span class="fw-bold">S/ {{ parseFloat(paqueteSeleccionado.monto).toFixed(2) }}</span>
               </div>
+              <div class="d-flex justify-content-between mb-2" v-if="parseFloat(paqueteSeleccionado.descuento || 0) > 0">
+                <span class="text-muted small">Descuento</span>
+                <span class="fw-bold text-success">- S/ {{ parseFloat(paqueteSeleccionado.descuento).toFixed(2) }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2" v-if="parseFloat(paqueteSeleccionado.descuento || 0) > 0">
+                <span class="text-muted small">Precio Base de Referencia</span>
+                <span class="fw-bold">S/ {{ calcularDetalleProrrateo().precioBase.toFixed(2) }}</span>
+              </div>
               <div class="d-flex justify-content-between mb-2">
                 <span class="text-muted small">Sesiones Totales</span>
                 <span class="fw-bold">{{ paqueteSeleccionado.total_sesiones }}</span>
               </div>
               <div class="d-flex justify-content-between mb-2">
                 <span class="text-muted small">Costo por Sesión</span>
-                <span class="fw-bold">S/ {{ (parseFloat(paqueteSeleccionado.monto) / Math.max(paqueteSeleccionado.total_sesiones, 1)).toFixed(2) }}</span>
+                <span class="fw-bold">S/ {{ calcularDetalleProrrateo().costoPorSesion.toFixed(2) }}</span>
               </div>
               <div class="d-flex justify-content-between mb-2">
                 <span class="text-muted small">Sesiones Usadas</span>
                 <span class="fw-bold text-danger">{{ paqueteSeleccionado.sesiones_usadas }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted small">Valor Proporcional Consumido</span>
+                <span class="fw-bold text-dark">S/ {{ calcularDetalleProrrateo().valorConsumido.toFixed(2) }}</span>
               </div>
               <hr class="border-secondary opacity-25">
               <div class="d-flex justify-content-between mb-2">
                 <span class="text-muted small">Total Pagado</span>
                 <span class="fw-bold text-success">S/ {{ parseFloat(paqueteSeleccionado.pagado || 0).toFixed(2) }}</span>
               </div>
-              <div class="d-flex justify-content-between">
-                <span class="fw-bold">Saldo a Devolver</span>
-                <span class="fw-bold fs-5 text-primary">
-                  S/ {{ Math.max(0, parseFloat(paqueteSeleccionado.pagado || 0) - (parseFloat(paqueteSeleccionado.monto) / Math.max(paqueteSeleccionado.total_sesiones, 1) * paqueteSeleccionado.sesiones_usadas)).toFixed(2) }}
+              <div class="d-flex justify-content-between" v-if="calcularDetalleProrrateo().tipo === 'devolver'">
+                <span class="fw-bold">Saldo a Devolver (Nota de Crédito)</span>
+                <span class="fw-bold fs-5 text-success">
+                  S/ {{ calcularDetalleProrrateo().diferencia.toFixed(2) }}
+                </span>
+              </div>
+              <div class="d-flex justify-content-between" v-else-if="calcularDetalleProrrateo().tipo === 'deudor'">
+                <span class="fw-bold">Saldo Deudor (A cobrar)</span>
+                <span class="fw-bold fs-5 text-danger">
+                  S/ {{ calcularDetalleProrrateo().diferencia.toFixed(2) }}
+                </span>
+              </div>
+              <div class="d-flex justify-content-between" v-else>
+                <span class="fw-bold">Saldo Balanceado</span>
+                <span class="fw-bold fs-5 text-secondary">
+                  S/ 0.00
                 </span>
               </div>
             </div>
@@ -1077,6 +1101,40 @@ export default {
       const modal = new bootstrap.Modal(document.getElementById('modalProrratear'));
       modal.show();
     },
+    calcularDetalleProrrateo() {
+      if (!this.paqueteSeleccionado) return {
+        precioBase: 0,
+        costoPorSesion: 0,
+        valorConsumido: 0,
+        diferencia: 0,
+        tipo: 'ninguno'
+      };
+      const monto = parseFloat(this.paqueteSeleccionado.monto) || 0;
+      const descuento = parseFloat(this.paqueteSeleccionado.descuento) || 0;
+      const precioBase = monto + descuento;
+      const totalSesiones = Math.max(parseInt(this.paqueteSeleccionado.total_sesiones) || 1, 1);
+      const sesionesUsadas = parseInt(this.paqueteSeleccionado.sesiones_usadas) || 0;
+      const pagado = parseFloat(this.paqueteSeleccionado.pagado) || 0;
+      
+      const costoPorSesion = precioBase / totalSesiones;
+      const valorConsumido = costoPorSesion * sesionesUsadas;
+      const diferencia = pagado - valorConsumido;
+      
+      let tipo = 'ninguno';
+      if (diferencia > 0.005) {
+        tipo = 'devolver';
+      } else if (diferencia < -0.005) {
+        tipo = 'deudor';
+      }
+      
+      return {
+        precioBase: precioBase,
+        costoPorSesion: costoPorSesion,
+        valorConsumido: valorConsumido,
+        diferencia: Math.abs(diferencia),
+        tipo: tipo
+      };
+    },
     async confirmarProrrateo() {
       this.procesandoEstado = true;
       try {
@@ -1086,10 +1144,19 @@ export default {
         const modal = bootstrap.Modal.getInstance(document.getElementById('modalProrratear'));
         if (modal) modal.hide();
         
+        let msg = '';
+        if (res.data.dinero_a_favor > 0) {
+          msg = `Se generó una nota de crédito por S/ ${parseFloat(res.data.dinero_a_favor).toFixed(2)}`;
+        } else if (res.data.saldo_deudor > 0) {
+          msg = `Se generó una cuota de saldo deudor pendiente por S/ ${parseFloat(res.data.saldo_deudor).toFixed(2)}`;
+        } else {
+          msg = 'No hubo saldo a favor ni saldo deudor. El paquete quedó balanceado.';
+        }
+        
         this.$swal({
           icon: 'success',
           title: 'Paquete prorrateado',
-          text: `Se generó una nota de crédito por S/ ${parseFloat(res.data.dinero_a_favor).toFixed(2)}`,
+          text: msg,
         });
         await this.cargarPaquetes(this.pagination.current_page);
       } catch (error) {

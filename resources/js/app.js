@@ -49,7 +49,15 @@ axios.get = function (url, config) {
     return originalGet.call(this, url, config);
 };
 // --- FIN FIX 429 TOO MANY REQUESTS ---
-
+// Limpiar caché al cerrar sesión
+axios.interceptors.request.use(config => {
+    if (config.url === '/api/logout' || config.url?.endsWith('/api/logout')) {
+        userCache = null;
+        userCacheTime = null;
+        userPromise = null;
+    }
+    return config;
+});
 // importamos y configuramos el router
 import VueRouter from 'vue-router'
 import { routes } from './routes'

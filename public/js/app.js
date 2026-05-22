@@ -19243,7 +19243,16 @@ var userCacheTime = null;
   return originalGet.call(this, url, config);
 };
 // --- FIN FIX 429 TOO MANY REQUESTS ---
-
+// Limpiar caché al cerrar sesión
+axios__WEBPACK_IMPORTED_MODULE_3___default().interceptors.request.use(function (config) {
+  var _config$url;
+  if (config.url === '/api/logout' || (_config$url = config.url) !== null && _config$url !== void 0 && _config$url.endsWith('/api/logout')) {
+    userCache = null;
+    userCacheTime = null;
+    userPromise = null;
+  }
+  return config;
+});
 // importamos y configuramos el router
 
 
