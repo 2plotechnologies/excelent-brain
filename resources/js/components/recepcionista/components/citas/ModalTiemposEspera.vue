@@ -115,6 +115,9 @@ export default{
 				case 'atención': 
 					this.cita.attention = moment().format('HH:mm:ss'); 
 					payload.attention = this.cita.attention;
+					if (!this.cita.hora_fin && this.cita.precio && this.cita.precio.duracion) {
+						this.departureTime = moment(this.cita.attention, 'HH:mm:ss').add(this.cita.precio.duracion, 'minutes').format('HH:mm');
+					}
 					break;
 				case 'fin':
 					payload.departure = this.departureTime;
@@ -149,6 +152,21 @@ export default{
 					let horaCita = moment(this.cita.date + ' ' + this.cita.schedule.check_time)
 					return horaCita.fromNow();
 			},
+	},
+	watch: {
+		cita: {
+			handler(newCita) {
+				if (newCita && newCita.attention && !newCita.hora_fin && newCita.precio && newCita.precio.duracion) {
+					this.departureTime = moment(newCita.attention, 'HH:mm:ss').add(newCita.precio.duracion, 'minutes').format('HH:mm');
+				} else if (newCita && newCita.hora_fin) {
+					this.departureTime = moment(newCita.hora_fin, 'HH:mm:ss').format('HH:mm');
+				} else {
+					this.departureTime = null;
+				}
+			},
+			immediate: true,
+			deep: true
+		}
 	}
 }
 </script>

@@ -53,14 +53,14 @@
             </div>
 
             <!-- ATENCION CARD -->
-            <div class="status-card h-100" @click="$emit('tiemposEspera', cita)" data-bs-toggle="modal" data-bs-target="#modalTiemposEspera">
+            <div class="status-card h-100">
               <div class="status-card-header">
                 <i class="fas fa-stethoscope text-info"></i> <span>ATENCIÓN</span>
               </div>
               <div class="status-options mt-2">
-                <div class="status-option" :class="{ active: isAtencion('espera') }">En espera</div>
-                <div class="status-option" :class="{ active: isAtencion('atencion') }">En atención</div>
-                <div class="status-option" :class="{ active: isAtencion('atendido') }">Atendido</div>
+                <div class="status-option" :class="{ active: isAtencion('espera') }" @click.stop="registrarTiempo('llegada')">En espera</div>
+                <div class="status-option" :class="{ active: isAtencion('atencion') }" @click.stop="registrarTiempo('atención')">En atención</div>
+                <div class="status-option" :class="{ active: isAtencion('atendido') }" @click.stop="registrarTiempo('fin')">Atendido</div>
               </div>
             </div>
           </div>
@@ -72,15 +72,20 @@
               <div class="time-item px-2">
                 <div class="time-label">Hora de llegada</div>
                 <div class="time-value" v-if="cita.entrance">{{ horaLatam2(cita.entrance) }}</div>
-                <button v-else @click="$emit('tiemposEspera', cita)" data-bs-toggle="modal" data-bs-target="#modalTiemposEspera" class="btn btn-registrar btn-sm">Registrar</button>
+                <button v-else @click.stop="registrarTiempo('llegada')" class="btn btn-registrar btn-sm">Registrar</button>
               </div>
               <div class="time-item px-2 border-left">
                 <div class="time-label">Hora de atención</div>
-                <div class="time-value">{{ cita.attention ? horaLatam2(cita.attention) : '—' }}</div>
+                <div class="time-value" v-if="cita.attention">{{ horaLatam2(cita.attention) }}</div>
+                <button v-else @click.stop="registrarTiempo('atención')" class="btn btn-registrar btn-sm" :disabled="!cita.entrance">Registrar</button>
               </div>
               <div class="time-item px-2 border-left">
                 <div class="time-label">Hora de fin</div>
-                <div class="time-value">{{ cita.hora_fin ? horaLatam2(cita.hora_fin) : '—' }}</div>
+                <div class="time-value" v-if="cita.hora_fin">{{ horaLatam2(cita.hora_fin) }}</div>
+                <div v-else class="d-flex flex-column align-items-center">
+                   <input type="time" v-model="departureTimeLocal" class="form-control form-control-sm mb-1 text-center font-weight-bold p-0" style="font-size: 0.75rem; height: 24px; width: 80px;" :disabled="!cita.attention" />
+                   <button @click.stop="registrarTiempo('fin')" class="btn btn-registrar btn-sm" :disabled="!departureTimeLocal || !cita.attention">Finalizar</button>
+                </div>
               </div>
               <div class="time-item px-2 border-left">
                 <div class="time-label">Tiempo espera</div>
@@ -200,7 +205,72 @@ export default {
     indiceElegido: Number,
     precios: Array
   },
+  data() {
+    return {
+      departureTimeLocal: null
+    };
+  },
+  watch: {
+    cita: {
+      handler(newCita) {
+        if (newCita && newCita.attention && !newCita.hora_fin && newCita.precio && newCita.precio.duracion) {
+          this.departureTimeLocal = moment(newCita.attention, 'HH:mm:ss').add(newCita.precio.duracion, 'minutes').format('HH:mm');
+        } else if (newCita && newCita.hora_fin) {
+          this.departureTimeLocal = moment(newCita.hora_fin, 'HH:mm:ss').format('HH:mm');
+        } else {
+          this.departureTimeLocal = null;
+        }
+      },
+      immediate: true,
+      deep: true
+    }
+  },
   methods: {
+    async registrarTiempo(tipo) {
+      if (!this.cita) return;
+      let payload = {
+        idCita: this.cita.id,
+        entrance: this.cita.entrance,
+        attention: this.cita.attention
+      };
+
+      switch (tipo) {
+        case 'llegada': 
+          if(this.cita.entrance) return;
+          this.cita.entrance = moment().format('HH:mm:ss'); 
+          payload.entrance = this.cita.entrance;
+          break;
+        case 'atención': 
+          if(this.cita.attention) return;
+          this.cita.attention = moment().format('HH:mm:ss'); 
+          payload.attention = this.cita.attention;
+          if (!this.cita.hora_fin && this.cita.precio && this.cita.precio.duracion) {
+            this.departureTimeLocal = moment(this.cita.attention, 'HH:mm:ss').add(this.cita.precio.duracion, 'minutes').format('HH:mm');
+          }
+          break;
+        case 'fin':
+          if(this.cita.hora_fin) return;
+          payload.departure = this.departureTimeLocal;
+          break;
+        default: break;
+      }
+      
+      try {
+        let response = await this.axios.post('/api/registrarHora', payload);
+        if(response.data?.mensaje == 'Ok'){
+            if (tipo === 'fin') {
+                this.cita.hora_fin = this.departureTimeLocal;
+                this.cita.status = 5; // Atendido
+            }
+            this.$emit('actualizar', 'sksks');
+            if (window.alertify) {
+              window.alertify.notify('<i class="fa-regular fa-calendar-check"></i> Datos actualizados', 'success', 5);
+            }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
     getServiceLabel(servicio){
       if(!this.precios || !servicio || !servicio.type) return 'Servicio';
       let pr = this.precios.find(x=> x.id == servicio.type);

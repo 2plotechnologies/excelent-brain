@@ -1234,7 +1234,8 @@ class ExtrasController extends Controller
 			'especialMembresias' => $request->get('especialMembresias'),
 			'descripcion' => $request->get('descripcion'),
 			'sesiones' => $request->get('sesiones'),
-			'servicio' => $request->get('servicio')
+			'servicio' => $request->get('servicio'),
+			'duracion' => $request->get('duracion')
 		]);
 		return response()->json(['mensaje' => 'Actualizado ']);
 	}

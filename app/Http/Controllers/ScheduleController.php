@@ -113,7 +113,8 @@ class ScheduleController extends Controller
         ->with(['patient', 'patient.ultimoSemaforo'])
         ->with('payment')
         ->with('professional')
-        ->with('membresia');
+        ->with('membresia')
+        ->with('precio');
 
         if ($idSede) {
             $appointmentQuery->where('appointments.idSede', $idSede);

@@ -353,8 +353,9 @@
 					cita._computed_start = start;
 
 					let end = cita.hora_fin;
-					if (!end && cita.duracion && start !== '00:00:00') {
-						end = moment(start, 'HH:mm:ss').add(cita.duracion, 'minutes').format('HH:mm:ss');
+					let duracion = (cita.precio && cita.precio.duracion) ? cita.precio.duracion : null;
+					if (!end && duracion && start !== '00:00:00') {
+						end = moment(start, 'HH:mm:ss').add(duracion, 'minutes').format('HH:mm:ss');
 					}
 					if (!end && start !== '00:00:00') {
 						// Calculate planned duration in minutes

@@ -154,7 +154,7 @@ var render = function render() {
   }, [_vm._m(1), _vm._v(" "), _c("table", {
     staticClass: "table table-hover"
   }, [_vm._m(2), _vm._v(" "), _c("tbody", _vm._l(_vm.precios, function (precio, index) {
-    return precio.idClasificacion == 1 && precio.servicio == 1 ? _c("tr", [_c("td", [_vm._v(_vm._s(precio.descripcion))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.nuevos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.continuos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.especialMembresias).toFixed(2)))]), _vm._v(" "), _c("td", [_c("button", {
+    return precio.idClasificacion == 1 && precio.servicio == 1 ? _c("tr", [_c("td", [_vm._v(_vm._s(precio.descripcion))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.nuevos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.continuos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.especialMembresias).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(precio.duracion ? precio.duracion + " min" : "-"))]), _vm._v(" "), _c("td", [_c("button", {
       staticClass: "btn btn-sm btn-outline-primary",
       on: {
         click: function click($event) {
@@ -171,7 +171,7 @@ var render = function render() {
   }, [_vm._m(3), _vm._v(" "), _c("table", {
     staticClass: "table table-hover"
   }, [_vm._m(4), _vm._v(" "), _c("tbody", _vm._l(_vm.precios, function (precio, index) {
-    return precio.idClasificacion == 2 && precio.servicio == 1 ? _c("tr", [_c("td", [_vm._v(_vm._s(precio.descripcion))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.nuevos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.continuos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.especialMembresias).toFixed(2)))]), _vm._v(" "), _c("td", [_c("button", {
+    return precio.idClasificacion == 2 && precio.servicio == 1 ? _c("tr", [_c("td", [_vm._v(_vm._s(precio.descripcion))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.nuevos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.continuos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.especialMembresias).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(precio.duracion ? precio.duracion + " min" : "-"))]), _vm._v(" "), _c("td", [_c("button", {
       staticClass: "btn btn-sm btn-outline-primary",
       on: {
         click: function click($event) {
@@ -188,7 +188,7 @@ var render = function render() {
   }, [_vm._m(5), _vm._v(" "), _c("table", {
     staticClass: "table table-hover"
   }, [_vm._m(6), _vm._v(" "), _c("tbody", _vm._l(_vm.precios, function (precio, index) {
-    return precio.idClasificacion == 3 && precio.servicio == 1 ? _c("tr", [_c("td", [_vm._v(_vm._s(precio.descripcion))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.nuevos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.continuos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.especialMembresias).toFixed(2)))]), _vm._v(" "), _c("td", [_c("button", {
+    return precio.idClasificacion == 3 && precio.servicio == 1 ? _c("tr", [_c("td", [_vm._v(_vm._s(precio.descripcion))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.nuevos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.continuos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.especialMembresias).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(precio.duracion ? precio.duracion + " min" : "-"))]), _vm._v(" "), _c("td", [_c("button", {
       staticClass: "btn btn-sm btn-outline-primary",
       on: {
         click: function click($event) {
@@ -205,7 +205,7 @@ var render = function render() {
   }, [_vm._m(7), _vm._v(" "), _c("table", {
     staticClass: "table table-hover"
   }, [_vm._m(8), _vm._v(" "), _c("tbody", _vm._l(_vm.precios, function (precio, index) {
-    return precio.idClasificacion == 6 && precio.servicio == 1 ? _c("tr", [_c("td", [_vm._v(_vm._s(precio.descripcion))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.nuevos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.continuos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.especialMembresias).toFixed(2)))]), _vm._v(" "), _c("td", [_c("button", {
+    return precio.idClasificacion == 6 && precio.servicio == 1 ? _c("tr", [_c("td", [_vm._v(_vm._s(precio.descripcion))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.nuevos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.continuos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.especialMembresias).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(precio.duracion ? precio.duracion + " min" : "-"))]), _vm._v(" "), _c("td", [_c("button", {
       staticClass: "btn btn-sm btn-outline-primary",
       on: {
         click: function click($event) {
@@ -259,7 +259,7 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("Servicio")]), _vm._v(" "), _c("th", [_vm._v("Precio nuevos")]), _vm._v(" "), _c("th", [_vm._v("Precio continuos")]), _vm._v(" "), _c("th", [_vm._v("Precio Club Exc.")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Servicio")]), _vm._v(" "), _c("th", [_vm._v("Precio nuevos")]), _vm._v(" "), _c("th", [_vm._v("Precio continuos")]), _vm._v(" "), _c("th", [_vm._v("Precio Club Exc.")]), _vm._v(" "), _c("th", [_vm._v("Duración")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -269,7 +269,7 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("Servicio")]), _vm._v(" "), _c("th", [_vm._v("Precio nuevos")]), _vm._v(" "), _c("th", [_vm._v("Precio continuos")]), _vm._v(" "), _c("th", [_vm._v("Precio Club Exc.")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Servicio")]), _vm._v(" "), _c("th", [_vm._v("Precio nuevos")]), _vm._v(" "), _c("th", [_vm._v("Precio continuos")]), _vm._v(" "), _c("th", [_vm._v("Precio Club Exc.")]), _vm._v(" "), _c("th", [_vm._v("Duración")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -279,7 +279,7 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("Servicio")]), _vm._v(" "), _c("th", [_vm._v("Precio nuevos")]), _vm._v(" "), _c("th", [_vm._v("Precio continuos")]), _vm._v(" "), _c("th", [_vm._v("Precio Club Exc.")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Servicio")]), _vm._v(" "), _c("th", [_vm._v("Precio nuevos")]), _vm._v(" "), _c("th", [_vm._v("Precio continuos")]), _vm._v(" "), _c("th", [_vm._v("Precio Club Exc.")]), _vm._v(" "), _c("th", [_vm._v("Duración")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -289,7 +289,7 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("Servicio")]), _vm._v(" "), _c("th", [_vm._v("Precio nuevos")]), _vm._v(" "), _c("th", [_vm._v("Precio continuos")]), _vm._v(" "), _c("th", [_vm._v("Precio Club Exc.")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Servicio")]), _vm._v(" "), _c("th", [_vm._v("Precio nuevos")]), _vm._v(" "), _c("th", [_vm._v("Precio continuos")]), _vm._v(" "), _c("th", [_vm._v("Precio Club Exc.")]), _vm._v(" "), _c("th", [_vm._v("Duración")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -452,6 +452,30 @@ var render = function render() {
       input: function input($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.precio, "sesiones", $event.target.value);
+      }
+    }
+  })]) : _vm._e(), _vm._v(" "), _vm.precio.servicio != 0 ? _c("div", [_c("label", {
+    attrs: {
+      "for": ""
+    }
+  }, [_vm._v("Duración aproximada (minutos)")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.precio.duracion,
+      expression: "precio.duracion"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "number"
+    },
+    domProps: {
+      value: _vm.precio.duracion
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.precio, "duracion", $event.target.value);
       }
     }
   })]) : _vm._e()]), _vm._v(" "), _c("div", {

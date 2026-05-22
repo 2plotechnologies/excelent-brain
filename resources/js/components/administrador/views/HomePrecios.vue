@@ -12,6 +12,7 @@
 							<th>Precio nuevos</th>
 							<th>Precio continuos</th>
 							<th>Precio Club Exc.</th>
+							<th>Duración</th>
 							<th>@</th>
 						</tr>
 					</thead>
@@ -21,6 +22,7 @@
 							<td>S/ {{ parseFloat(precio.nuevos).toFixed(2) }}</td>
 							<td>S/ {{ parseFloat(precio.continuos).toFixed(2) }}</td>
 							<td>S/ {{ parseFloat(precio.especialMembresias).toFixed(2) }}</td>
+							<td>{{ precio.duracion ? precio.duracion + ' min' : '-' }}</td>
 							<td>
 								<button class="btn btn-sm btn-outline-primary" @click="editarPrecio(index, precio.idClasificacion)"><i class="far fa-edit"></i></button>
 							</td>
@@ -40,6 +42,7 @@
 							<th>Precio nuevos</th>
 							<th>Precio continuos</th>
 							<th>Precio Club Exc.</th>
+							<th>Duración</th>
 							<th>@</th>
 						</tr>
 					</thead>
@@ -49,6 +52,7 @@
 							<td>S/ {{ parseFloat(precio.nuevos).toFixed(2) }}</td>
 							<td>S/ {{ parseFloat(precio.continuos).toFixed(2) }}</td>
 							<td>S/ {{ parseFloat(precio.especialMembresias).toFixed(2) }}</td>
+							<td>{{ precio.duracion ? precio.duracion + ' min' : '-' }}</td>
 							<td>
 								<button class="btn btn-sm btn-outline-primary" @click="editarPrecio(index, precio.idClasificacion)"><i class="far fa-edit"></i></button>
 							</td>
@@ -68,6 +72,7 @@
 							<th>Precio nuevos</th>
 							<th>Precio continuos</th>
 							<th>Precio Club Exc.</th>
+							<th>Duración</th>
 							<th>@</th>
 						</tr>
 					</thead>
@@ -77,6 +82,7 @@
 							<td>S/ {{ parseFloat(precio.nuevos).toFixed(2) }}</td>
 							<td>S/ {{ parseFloat(precio.continuos).toFixed(2) }}</td>
 							<td>S/ {{ parseFloat(precio.especialMembresias).toFixed(2) }}</td>
+							<td>{{ precio.duracion ? precio.duracion + ' min' : '-' }}</td>
 							<td>
 								<button class="btn btn-sm btn-outline-primary" @click="editarPrecio(index, precio.idClasificacion)"><i class="far fa-edit"></i></button>
 							</td>
@@ -96,6 +102,7 @@
 							<th>Precio nuevos</th>
 							<th>Precio continuos</th>
 							<th>Precio Club Exc.</th>
+							<th>Duración</th>
 							<th>@</th>
 						</tr>
 					</thead>
@@ -105,6 +112,7 @@
 							<td>S/ {{ parseFloat(precio.nuevos).toFixed(2) }}</td>
 							<td>S/ {{ parseFloat(precio.continuos).toFixed(2) }}</td>
 							<td>S/ {{ parseFloat(precio.especialMembresias).toFixed(2) }}</td>
+							<td>{{ precio.duracion ? precio.duracion + ' min' : '-' }}</td>
 							<td>
 								<button class="btn btn-sm btn-outline-primary" @click="editarPrecio(index, precio.idClasificacion)"><i class="far fa-edit"></i></button>
 							</td>

@@ -19,6 +19,10 @@
 						<label for="">N° Sesiones</label>
 						<input type="number" class="form-control" v-model="precio.sesiones" >
 					</div>
+					<div v-if="precio.servicio!=0">
+						<label for="">Duración aproximada (minutos)</label>
+						<input type="number" class="form-control" v-model="precio.duracion" >
+					</div>
 				</div>
 				<div class="modal-footer border-0">
 					<button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal" @click="actualizar()"><i class="fas fa-retweet"></i> Actualizar precios</button>
