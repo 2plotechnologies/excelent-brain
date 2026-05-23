@@ -45,7 +45,7 @@ axios.get = function (url, config) {
         return userPromise;
     }
 
-    // Dejar pasar normalmente todas las demás peticiones GET
+    // Dejar pasar normalmente todas las demás peticiones GET.
     return originalGet.call(this, url, config);
 };
 // --- FIN FIX 429 TOO MANY REQUESTS ---
@@ -58,7 +58,7 @@ axios.interceptors.request.use(config => {
     }
     return config;
 });
-// importamos y configuramos el router
+// importamos y configuramos el router.
 import VueRouter from 'vue-router'
 import { routes } from './routes'
 import Vue from 'vue'

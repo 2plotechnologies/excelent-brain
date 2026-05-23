@@ -169,6 +169,9 @@
               <a :href="getWhatsappLink(cita)" target="_blank" class="btn btn-action btn-outline-success">
                 <i class="fab fa-whatsapp mr-2"></i> WhatsApp
               </a>
+              <button v-if="canSendSatisfaction(cita)" @click="sendSatisfaction(cita)" class="btn btn-action btn-outline-primary" type="button">
+                <i class="far fa-smile mr-2"></i> Satisfaccion
+              </button>
               <a :href="'tel:' + (cita.patient.phone || '').replace(/\s/g, '')" class="btn btn-action btn-outline-dark">
                 <i class="fas fa-phone-alt mr-2"></i> Llamar
               </a>
@@ -305,6 +308,7 @@ export default {
       if(status == 2) return 'status-badge-success';
       if(status == 3) return 'status-badge-danger';
       if(status == 4) return 'status-badge-info';
+      if(status == 5) return 'status-badge-success';
       return 'status-badge-light';
     },
     statusLabel(status) {
@@ -312,6 +316,7 @@ export default {
       if(status == 2) return 'Confirmada';
       if(status == 3) return 'Anulada';
       if(status == 4) return 'Reprogramada';
+      if(status == 5) return 'Atendida';
       return 'Estado';
     },
     fechaLatam(fecha){
@@ -329,6 +334,22 @@ export default {
          return `https://wa.me/51${phone}?text=Buen día ${c.patient.name} ${c.patient.nombres}, le recordamos que tiene reservada una cita online el día de hoy a las ${this.horaLatam2(c.schedule ? c.schedule.check_time : '')}, le dejo el enlace de la cita ${c.link}`;
       } else {
          return `https://wa.me/51${phone}?text=Buen día ${c.patient.name} ${c.patient.nombres}, le recordamos que tiene reservada una cita: %0AFecha ${this.fechaLatam(c.date)} %0AHora: ${this.horaLatam2(c.schedule ? c.schedule.check_time : '')} %0AProfesional: ${c.professional ? c.professional.name : ''} %0AEn el Centro Psicológico y Psiquiátrico EXCELENTEMENTE. Al culminar su sesión, no se olvide de reservar su próxima cita.`;
+      }
+    },
+    canSendSatisfaction(c) {
+      return c && c.status == 5 && c.hora_fin && c.patient && c.patient.phone;
+    },
+    async sendSatisfaction(c) {
+      try {
+        const res = await this.axios.post(`/api/appointment/${c.id}/satisfaction-link`);
+        const phone = (c.patient.phone || '').toString().replaceAll(' ', '');
+        const text = `Buen dia ${c.patient.name} ${c.patient.nombres}, esperamos se encuentre bien. Le enviamos la encuesta de satisfaccion de su cita en el Centro Psicologico y Psiquiatrico EXCELENTEMENTE. ${res.data.url}`;
+        window.open(`https://wa.me/51${phone}?text=${encodeURIComponent(text)}`, '_blank');
+      } catch (error) {
+        console.error(error);
+        if (this.$swal) {
+          this.$swal('No se pudo generar el enlace de satisfaccion');
+        }
       }
     }
   }

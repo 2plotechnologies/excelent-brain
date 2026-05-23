@@ -234,11 +234,21 @@
 											<a 
 											:href="`whatsapp://send?phone=51${qCita.patient ? qCita.patient.phone : ''}&text=Buen día ${qCita.patient ? qCita.patient.name +' '+qCita.patient.nombres : ''}, esperamos se encuentre bien, le enviamos la encuesta de satisfacción de su cita en el Centro Psicológico y Psiquiátrico EXCELENTEMENTE, con ello nos ayudara a seguir mejorando en nuestra atención, gracias por su tiempo. 😊 https://forms.gle/VbnwkK85sXyoiVN5A`"
 											target="_blank" 
+											v-if="false"
 											title="Enviar mensaje" 
 											class="btn btn-primary btn-circle btn-sm"
 											>
 											<i class="fa fa-align-justify"></i>
 											</a>
+											<button
+											v-if="qCita.status == 5 && qCita.hora_fin && qCita.patient && qCita.patient.phone"
+											@click="enviarSatisfaccion(qCita)"
+											title="Enviar satisfaccion"
+											class="btn btn-primary btn-circle btn-sm"
+											type="button"
+											>
+											<i class="far fa-smile"></i>
+											</button>
 											<button data-bs-toggle="modal" @click="buscarRecetas(qCita.patient.id)" data-bs-target="#recetasModalRepetido" class="btn btn-info btn-circle btn-sm" title="Ver recetas">
 											<i class="fas fa-file"></i></button>
 									</div>
@@ -486,6 +496,17 @@ export default {
         })
       }
     },
+		async enviarSatisfaccion(cita){
+			try {
+				const res = await this.axios.post(`/api/appointment/${cita.id}/satisfaction-link`);
+				const phone = (cita.patient.phone || '').toString().replaceAll(' ', '');
+				const text = `Buen dia ${cita.patient.name} ${cita.patient.nombres}, esperamos se encuentre bien. Le enviamos la encuesta de satisfaccion de su cita en el Centro Psicologico y Psiquiatrico EXCELENTEMENTE. ${res.data.url}`;
+				window.open(`https://wa.me/51${phone}?text=${encodeURIComponent(text)}`, '_blank');
+			} catch (error) {
+				console.error(error);
+				this.$swal('No se pudo generar el enlace de satisfaccion');
+			}
+		},
 
     async searchByDate(e){
 

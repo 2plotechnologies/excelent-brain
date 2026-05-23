@@ -6389,6 +6389,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       if (status == 2) return 'status-badge-success';
       if (status == 3) return 'status-badge-danger';
       if (status == 4) return 'status-badge-info';
+      if (status == 5) return 'status-badge-success';
       return 'status-badge-light';
     },
     statusLabel: function statusLabel(status) {
@@ -6396,6 +6397,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       if (status == 2) return 'Confirmada';
       if (status == 3) return 'Anulada';
       if (status == 4) return 'Reprogramada';
+      if (status == 5) return 'Atendida';
       return 'Estado';
     },
     fechaLatam: function fechaLatam(fecha) {
@@ -6414,6 +6416,40 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       } else {
         return "https://wa.me/51".concat(phone, "?text=Buen d\xEDa ").concat(c.patient.name, " ").concat(c.patient.nombres, ", le recordamos que tiene reservada una cita: %0AFecha ").concat(this.fechaLatam(c.date), " %0AHora: ").concat(this.horaLatam2(c.schedule ? c.schedule.check_time : ''), " %0AProfesional: ").concat(c.professional ? c.professional.name : '', " %0AEn el Centro Psicol\xF3gico y Psiqui\xE1trico EXCELENTEMENTE. Al culminar su sesi\xF3n, no se olvide de reservar su pr\xF3xima cita.");
       }
+    },
+    canSendSatisfaction: function canSendSatisfaction(c) {
+      return c && c.status == 5 && c.hora_fin && c.patient && c.patient.phone;
+    },
+    sendSatisfaction: function sendSatisfaction(c) {
+      var _this2 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var res, phone, text;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              _context2.prev = 0;
+              _context2.next = 3;
+              return _this2.axios.post("/api/appointment/".concat(c.id, "/satisfaction-link"));
+            case 3:
+              res = _context2.sent;
+              phone = (c.patient.phone || '').toString().replaceAll(' ', '');
+              text = "Buen dia ".concat(c.patient.name, " ").concat(c.patient.nombres, ", esperamos se encuentre bien. Le enviamos la encuesta de satisfaccion de su cita en el Centro Psicologico y Psiquiatrico EXCELENTEMENTE. ").concat(res.data.url);
+              window.open("https://wa.me/51".concat(phone, "?text=").concat(encodeURIComponent(text)), '_blank');
+              _context2.next = 13;
+              break;
+            case 9:
+              _context2.prev = 9;
+              _context2.t0 = _context2["catch"](0);
+              console.error(_context2.t0);
+              if (_this2.$swal) {
+                _this2.$swal('No se pudo generar el enlace de satisfaccion');
+              }
+            case 13:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, null, [[0, 9]]);
+      }))();
     }
   }
 });
@@ -9612,27 +9648,56 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         });
       }
     },
-    searchByDate: function searchByDate(e) {
+    enviarSatisfaccion: function enviarSatisfaccion(cita) {
       var _this9 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+        var res, phone, text;
         return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              _this9.$swal({
-                title: 'Actualizando citas con fecha: ' + _this9.fechaSinImportancia
-              });
+              _context7.prev = 0;
               _context7.next = 3;
-              return _this9.axios.get("/api/searchByDateAppointment/".concat(_this9.fechaSinImportancia)).then(function (res) {
-                _this9.citas = res.data;
-                _this9.$swal.close();
+              return _this9.axios.post("/api/appointment/".concat(cita.id, "/satisfaction-link"));
+            case 3:
+              res = _context7.sent;
+              phone = (cita.patient.phone || '').toString().replaceAll(' ', '');
+              text = "Buen dia ".concat(cita.patient.name, " ").concat(cita.patient.nombres, ", esperamos se encuentre bien. Le enviamos la encuesta de satisfaccion de su cita en el Centro Psicologico y Psiquiatrico EXCELENTEMENTE. ").concat(res.data.url);
+              window.open("https://wa.me/51".concat(phone, "?text=").concat(encodeURIComponent(text)), '_blank');
+              _context7.next = 13;
+              break;
+            case 9:
+              _context7.prev = 9;
+              _context7.t0 = _context7["catch"](0);
+              console.error(_context7.t0);
+              _this9.$swal('No se pudo generar el enlace de satisfaccion');
+            case 13:
+            case "end":
+              return _context7.stop();
+          }
+        }, _callee7, null, [[0, 9]]);
+      }))();
+    },
+    searchByDate: function searchByDate(e) {
+      var _this10 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+          while (1) switch (_context8.prev = _context8.next) {
+            case 0:
+              _this10.$swal({
+                title: 'Actualizando citas con fecha: ' + _this10.fechaSinImportancia
+              });
+              _context8.next = 3;
+              return _this10.axios.get("/api/searchByDateAppointment/".concat(_this10.fechaSinImportancia)).then(function (res) {
+                _this10.citas = res.data;
+                _this10.$swal.close();
               })["catch"](function (err) {
                 console.error(err);
               });
             case 3:
             case "end":
-              return _context7.stop();
+              return _context8.stop();
           }
-        }, _callee7);
+        }, _callee8);
       }))();
     },
     lowerCase: function lowerCase(text) {
@@ -9726,20 +9791,20 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       if (faltas) return faltas.reason;else return '';
     },
     listarPrecios: function listarPrecios() {
-      var _this10 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
-          while (1) switch (_context8.prev = _context8.next) {
+      var _this11 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
+        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+          while (1) switch (_context9.prev = _context9.next) {
             case 0:
-              _context8.next = 2;
-              return _this10.axios.get('/api/listarPreciosTodos').then(function (response) {
-                return _this10.precios = response.data;
+              _context9.next = 2;
+              return _this11.axios.get('/api/listarPreciosTodos').then(function (response) {
+                return _this11.precios = response.data;
               });
             case 2:
             case "end":
-              return _context8.stop();
+              return _context9.stop();
           }
-        }, _callee8);
+        }, _callee9);
       }))();
     }
   },
@@ -9749,11 +9814,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     //  this.listarhorario();
   },
   mounted: function mounted() {
-    var _this11 = this;
+    var _this12 = this;
     this.axios.get('/api/user').then(function (res) {
-      _this11.idUsuario = parseInt(res.data.user.id);
-      _this11.tienePrivilegios = res.data.user.privilegios;
-      _this11.listarPrecios();
+      _this12.idUsuario = parseInt(res.data.user.id);
+      _this12.tienePrivilegios = res.data.user.privilegios;
+      _this12.listarPrecios();
     });
   },
   updated: function updated() {
@@ -11559,7 +11624,19 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fab fa-whatsapp mr-2"
-  }), _vm._v(" WhatsApp\n            ")]), _vm._v(" "), _c("a", {
+  }), _vm._v(" WhatsApp\n            ")]), _vm._v(" "), _vm.canSendSatisfaction(_vm.cita) ? _c("button", {
+    staticClass: "btn btn-action btn-outline-primary",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.sendSatisfaction(_vm.cita);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "far fa-smile mr-2"
+  }), _vm._v(" Satisfaccion\n            ")]) : _vm._e(), _vm._v(" "), _c("a", {
     staticClass: "btn btn-action btn-outline-dark",
     attrs: {
       href: "tel:" + (_vm.cita.patient.phone || "").replace(/\s/g, "")
@@ -18469,16 +18546,20 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fab fa-whatsapp"
-    })]) : _vm._e(), _vm._v(" "), _c("a", {
+    })]) : _vm._e(), _vm._v(" "),  false ? 0 : _vm._e(), _vm._v(" "), qCita.status == 5 && qCita.hora_fin && qCita.patient && qCita.patient.phone ? _c("button", {
       staticClass: "btn btn-primary btn-circle btn-sm",
       attrs: {
-        href: "whatsapp://send?phone=51".concat(qCita.patient ? qCita.patient.phone : "", "&text=Buen d\xEDa ").concat(qCita.patient ? qCita.patient.name + " " + qCita.patient.nombres : "", ", esperamos se encuentre bien, le enviamos la encuesta de satisfacci\xF3n de su cita en el Centro Psicol\xF3gico y Psiqui\xE1trico EXCELENTEMENTE, con ello nos ayudara a seguir mejorando en nuestra atenci\xF3n, gracias por su tiempo. \uD83D\uDE0A https://forms.gle/VbnwkK85sXyoiVN5A"),
-        target: "_blank",
-        title: "Enviar mensaje"
+        title: "Enviar satisfaccion",
+        type: "button"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.enviarSatisfaccion(qCita);
+        }
       }
     }, [_c("i", {
-      staticClass: "fa fa-align-justify"
-    })]), _vm._v(" "), _c("button", {
+      staticClass: "far fa-smile"
+    })]) : _vm._e(), _vm._v(" "), _c("button", {
       staticClass: "btn btn-info btn-circle btn-sm",
       attrs: {
         "data-bs-toggle": "modal",
@@ -19422,7 +19503,7 @@ var userCacheTime = null;
     return userPromise;
   }
 
-  // Dejar pasar normalmente todas las demás peticiones GET
+  // Dejar pasar normalmente todas las demás peticiones GET.
   return originalGet.call(this, url, config);
 };
 // --- FIN FIX 429 TOO MANY REQUESTS ---
@@ -19436,7 +19517,7 @@ axios__WEBPACK_IMPORTED_MODULE_3___default().interceptors.request.use(function (
   }
   return config;
 });
-// importamos y configuramos el router
+// importamos y configuramos el router.
 
 
 
@@ -19620,6 +19701,9 @@ var Login = function Login() {
 var AutoTriaje = function AutoTriaje() {
   return __webpack_require__.e(/*! import() */ "resources_js_components_acceso_publico_AutoTriaje_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./components/acceso_publico/AutoTriaje.vue */ "./resources/js/components/acceso_publico/AutoTriaje.vue"));
 };
+var SatisfaccionCita = function SatisfaccionCita() {
+  return __webpack_require__.e(/*! import() */ "resources_js_components_acceso_publico_SatisfaccionCita_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./components/acceso_publico/SatisfaccionCita.vue */ "./resources/js/components/acceso_publico/SatisfaccionCita.vue"));
+};
 
 // 2. Homepage
 var HomePage = function HomePage() {
@@ -19658,6 +19742,9 @@ var HomeHorasTrabajadas = function HomeHorasTrabajadas() {
 };
 var HomeSedes = function HomeSedes() {
   return __webpack_require__.e(/*! import() */ "resources_js_components_administrador_views_HomeSedes_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./components/administrador/views/HomeSedes.vue */ "./resources/js/components/administrador/views/HomeSedes.vue"));
+};
+var HomeSatisfaccionClientes = function HomeSatisfaccionClientes() {
+  return __webpack_require__.e(/*! import() */ "resources_js_components_administrador_views_HomeSatisfaccionClientes_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./components/administrador/views/HomeSatisfaccionClientes.vue */ "./resources/js/components/administrador/views/HomeSatisfaccionClientes.vue"));
 };
 var HomeAdministradorRouterReportes = function HomeAdministradorRouterReportes() {
   return __webpack_require__.e(/*! import() */ "resources_js_components_administrador_views_reportes_HomeRouterReportes_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./components/administrador/views/reportes/HomeRouterReportes.vue */ "./resources/js/components/administrador/views/reportes/HomeRouterReportes.vue"));
@@ -19869,6 +19956,13 @@ var routes = [{
   path: '/cuestionario/:token',
   name: 'cuestionario',
   component: AutoTriaje,
+  meta: {
+    guest: true
+  }
+}, {
+  path: '/satisfaccion/:token',
+  name: 'satisfaccionCita',
+  component: SatisfaccionCita,
   meta: {
     guest: true
   }
@@ -20135,6 +20229,10 @@ var routes = [{
     path: '/administrador/horas-trabajadas',
     name: 'horasTrabajadas',
     component: HomeHorasTrabajadas
+  }, {
+    path: '/administrador/satisfaccion-clientes',
+    name: 'satisfaccionClientes',
+    component: HomeSatisfaccionClientes
   }, {
     path: '/administrador/admistracion-profesionales',
     name: 'profesionalRecepcionista',
@@ -94501,7 +94599,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"axios","version":"0.21.4","de
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames not based on template
-/******/ 			if ({"resources_js_components_login_Login_vue":1,"resources_js_components_acceso_publico_AutoTriaje_vue":1,"resources_js_components_HomePage_vue":1,"resources_js_components_administrador_Main_vue":1,"resources_js_components_administrador_views_HomeAdministrador_vue":1,"resources_js_components_administrador_views_ShowProfessional_vue":1,"resources_js_components_administrador_views_HomePrecios_vue":1,"resources_js_components_administrador_views_HomePaquetes_vue":1,"resources_js_components_administrador_views_NotasCredito_vue":1,"resources_js_components_administrador_views_EditarPacientesAdmin_vue":1,"resources_js_components_administrador_views_reportes_ReportesGerenciales_vue":1,"resources_js_components_administrador_views_HomeHorasTrabajadas_vue":1,"resources_js_components_administrador_views_HomeSedes_vue":1,"resources_js_components_administrador_views_reportes_HomeRouterReportes_vue":1,"resources_js_components_administrador_views_reportes_HomeReportes_vue":1,"resources_js_components_administrador_views_reportes_ReporteMedicamentos_vue":1,"resources_js_components_administrador_views_reportes_ReportePacientes_vue":1,"resources_js_components_administrador_views_reportes_ReporteMensual_vue":1,"resources_js_components_administrador_views_reportes_ChartMensual_vue":1,"resources_js_components_profesional_views_Home_vue":1,"resources_js_components_profesional_components_consultas_HomeConsultas_vue":1,"resources_js_components_profesional_components_consultas_EvolucionesPage_vue":1,"resources_js_components_profesional_components_historia_HomeStories_vue":1,"resources_js_components_profesional_components_recursos_HomeRecursos_vue":1,"resources_js_components_profesional_components_recetas_HomeRecetas_vue":1,"resources_js_components_profesional_components_examenes_HomeExamen_vue":1,"resources_js_components_profesional_components_home_cartera_vue":1,"resources_js_components_profesional_components_consultas_PacientesSos_vue":1,"resources_js_components_profesional_components_examenes_Scr_vue":1,"resources_js_components_profesional_components_examenes_Burns_vue":1,"resources_js_components_profesional_components_examenes_ZungDep_vue":1,"resources_js_components_profesional_components_examenes_ZungAns_vue":1,"resources_js_components_profesional_components_examenes_Millon_vue":1,"resources_js_components_profesional_components_examenes_PHQ-9_vue":1,"resources_js_components_profesional_components_examenes_GAD-7_vue":1,"resources_js_components_profesional_components_examenes_BDI-2_vue":1,"resources_js_components_profesional_components_examenes_MCMI-II_vue":1,"resources_js_components_profesional_components_examenes_baron_vue":1,"resources_js_components_profesional_components_examenes_Eysenck-A_vue":1,"resources_js_components_profesional_components_examenes_Eysenck-B_vue":1,"resources_js_components_profesional_components_examenes_SRQ_vue":1,"resources_js_components_profesional_components_examenes_PHQ-15_vue":1,"resources_js_components_profesional_components_examenes_MDQ_vue":1,"resources_js_components_profesional_components_recetas_PrintReceta_vue":1,"resources_js_components_profesional_components_recetas_KairosTable_vue":1,"resources_js_components_profesional_components_kurame_HomeKurame_vue":1,"resources_js_components_profesional_components_dashboard_HomeDashboardProfesional_vue":1,"resources_js_components_interno_Home_vue":1,"resources_js_components_interno_HomePacientes_vue":1,"resources_js_components_recepcionista_components_dashboard_HomeDashboard_vue":1,"resources_js_components_recepcionista_Main_vue":1,"resources_js_components_recepcionista_components_Home_vue":1,"resources_js_components_recepcionista_components_profesionales_HomeProfesional_vue":1,"resources_js_components_recepcionista_components_pacientes_HomePacientes_vue":1,"resources_js_components_recepcionista_components_reportes_HomeReportes_vue":1,"resources_js_components_recepcionista_components_reportes_ReportesAvanzados_vue":1,"resources_js_components_recepcionista_components_reportes_ReportesDashboard_vue":1,"resources_js_components_recepcionista_components_pagos_HomePagos_vue":1,"resources_js_components_recepcionista_components_continuantes_HomeCont_vue":1,"resources_js_components_recepcionista_components_adicionales_HomeAdicionales_vue":1,"resources_js_components_recepcionista_components_adicionales_HomeCartera_vue":1,"resources_js_components_recepcionista_components_recordatorios_HomeRecordatorios_vue":1,"resources_js_components_recepcionista_components_citas_HomeLimbo_vue":1,"resources_js_components_shared_HomeAltas_vue":1,"resources_js_components_recepcionista_components_pacientes_HomeSeguimiento_vue":1,"resources_js_components_usuarios_HomeUsuarios_vue":1,"resources_js_components_profesional_components_consultas_Voice_vue":1,"resources_js_components_layout_NotFound_vue":1,"resources_js_components_PatientTest_vue":1}[chunkId]) return "js/" + chunkId + ".js";
+/******/ 			if ({"resources_js_components_login_Login_vue":1,"resources_js_components_acceso_publico_AutoTriaje_vue":1,"resources_js_components_acceso_publico_SatisfaccionCita_vue":1,"resources_js_components_HomePage_vue":1,"resources_js_components_administrador_Main_vue":1,"resources_js_components_administrador_views_HomeAdministrador_vue":1,"resources_js_components_administrador_views_ShowProfessional_vue":1,"resources_js_components_administrador_views_HomePrecios_vue":1,"resources_js_components_administrador_views_HomePaquetes_vue":1,"resources_js_components_administrador_views_NotasCredito_vue":1,"resources_js_components_administrador_views_EditarPacientesAdmin_vue":1,"resources_js_components_administrador_views_reportes_ReportesGerenciales_vue":1,"resources_js_components_administrador_views_HomeHorasTrabajadas_vue":1,"resources_js_components_administrador_views_HomeSedes_vue":1,"resources_js_components_administrador_views_HomeSatisfaccionClientes_vue":1,"resources_js_components_administrador_views_reportes_HomeRouterReportes_vue":1,"resources_js_components_administrador_views_reportes_HomeReportes_vue":1,"resources_js_components_administrador_views_reportes_ReporteMedicamentos_vue":1,"resources_js_components_administrador_views_reportes_ReportePacientes_vue":1,"resources_js_components_administrador_views_reportes_ReporteMensual_vue":1,"resources_js_components_administrador_views_reportes_ChartMensual_vue":1,"resources_js_components_profesional_views_Home_vue":1,"resources_js_components_profesional_components_consultas_HomeConsultas_vue":1,"resources_js_components_profesional_components_consultas_EvolucionesPage_vue":1,"resources_js_components_profesional_components_historia_HomeStories_vue":1,"resources_js_components_profesional_components_recursos_HomeRecursos_vue":1,"resources_js_components_profesional_components_recetas_HomeRecetas_vue":1,"resources_js_components_profesional_components_examenes_HomeExamen_vue":1,"resources_js_components_profesional_components_home_cartera_vue":1,"resources_js_components_profesional_components_consultas_PacientesSos_vue":1,"resources_js_components_profesional_components_examenes_Scr_vue":1,"resources_js_components_profesional_components_examenes_Burns_vue":1,"resources_js_components_profesional_components_examenes_ZungDep_vue":1,"resources_js_components_profesional_components_examenes_ZungAns_vue":1,"resources_js_components_profesional_components_examenes_Millon_vue":1,"resources_js_components_profesional_components_examenes_PHQ-9_vue":1,"resources_js_components_profesional_components_examenes_GAD-7_vue":1,"resources_js_components_profesional_components_examenes_BDI-2_vue":1,"resources_js_components_profesional_components_examenes_MCMI-II_vue":1,"resources_js_components_profesional_components_examenes_baron_vue":1,"resources_js_components_profesional_components_examenes_Eysenck-A_vue":1,"resources_js_components_profesional_components_examenes_Eysenck-B_vue":1,"resources_js_components_profesional_components_examenes_SRQ_vue":1,"resources_js_components_profesional_components_examenes_PHQ-15_vue":1,"resources_js_components_profesional_components_examenes_MDQ_vue":1,"resources_js_components_profesional_components_recetas_PrintReceta_vue":1,"resources_js_components_profesional_components_recetas_KairosTable_vue":1,"resources_js_components_profesional_components_kurame_HomeKurame_vue":1,"resources_js_components_profesional_components_dashboard_HomeDashboardProfesional_vue":1,"resources_js_components_interno_Home_vue":1,"resources_js_components_interno_HomePacientes_vue":1,"resources_js_components_recepcionista_components_dashboard_HomeDashboard_vue":1,"resources_js_components_recepcionista_Main_vue":1,"resources_js_components_recepcionista_components_Home_vue":1,"resources_js_components_recepcionista_components_profesionales_HomeProfesional_vue":1,"resources_js_components_recepcionista_components_pacientes_HomePacientes_vue":1,"resources_js_components_recepcionista_components_reportes_HomeReportes_vue":1,"resources_js_components_recepcionista_components_reportes_ReportesAvanzados_vue":1,"resources_js_components_recepcionista_components_reportes_ReportesDashboard_vue":1,"resources_js_components_recepcionista_components_pagos_HomePagos_vue":1,"resources_js_components_recepcionista_components_continuantes_HomeCont_vue":1,"resources_js_components_recepcionista_components_adicionales_HomeAdicionales_vue":1,"resources_js_components_recepcionista_components_adicionales_HomeCartera_vue":1,"resources_js_components_recepcionista_components_recordatorios_HomeRecordatorios_vue":1,"resources_js_components_recepcionista_components_citas_HomeLimbo_vue":1,"resources_js_components_shared_HomeAltas_vue":1,"resources_js_components_recepcionista_components_pacientes_HomeSeguimiento_vue":1,"resources_js_components_usuarios_HomeUsuarios_vue":1,"resources_js_components_profesional_components_consultas_Voice_vue":1,"resources_js_components_layout_NotFound_vue":1,"resources_js_components_PatientTest_vue":1}[chunkId]) return "js/" + chunkId + ".js";
 /******/ 			// return url for filenames based on template
 /******/ 			return undefined;
 /******/ 		};

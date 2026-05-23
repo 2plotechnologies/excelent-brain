@@ -5,6 +5,7 @@ use App\Http\Controllers\AdittionalController;
 use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\AppointmentSatisfactionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BurnController;
 use App\Http\Controllers\CieController;
@@ -52,6 +53,8 @@ Route::get('preciosMembresias', [ExtrasController::class, 'preciosMembresias']);
 //Rutas publicas para cuestionarios.
 Route::get('/cuestionario/{token}', [QuestionnaireController::class, 'show']);
 Route::post('/cuestionario/{token}', [QuestionnaireController::class, 'store']);
+Route::get('/satisfaccion/{token}', [AppointmentSatisfactionController::class, 'showPublic']);
+Route::post('/satisfaccion/{token}', [AppointmentSatisfactionController::class, 'storePublic']);
 
 // ─── AUTHENTICATED ────────────────────────────────────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {
@@ -140,6 +143,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group([], function () {
         Route::resource('appointment', AppointmentController::class)->only(['index', 'store', 'update', 'show', 'destroy']);
         Route::post('registrarHora', [AppointmentController::class, 'registrarHora']);
+        Route::post('appointment/{id}/satisfaction-link', [AppointmentSatisfactionController::class, 'createLink']);
         Route::post('eliminarCita/{id}', [AppointmentController::class, 'eliminarCita']);
         Route::put('pagarCita/{id}', [AppointmentController::class, 'pagarCita']);
         Route::get('appointmentKurame/{id}', [AppointmentController::class, 'showKurame']);
@@ -234,6 +238,7 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // Horas Trabajadas y Bloqueos
         Route::get('reporte-horas-trabajadas', [HorasTrabajadasController::class, 'getReporte']);
+        Route::get('satisfaccion-clientes', [AppointmentSatisfactionController::class, 'report']);
         Route::post('bloquear-horarios', [HorasTrabajadasController::class, 'bloquearHorario']);
         Route::delete('desbloquear-horario/{id}', [HorasTrabajadasController::class, 'desbloquearHorario']);
     });

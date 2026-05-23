@@ -1,6 +1,7 @@
 // 1. Login
 const Login = () => import('./components/login/Login.vue')
 const AutoTriaje = () => import('./components/acceso_publico/AutoTriaje.vue')
+const SatisfaccionCita = () => import('./components/acceso_publico/SatisfaccionCita.vue')
 
 
 // 2. Homepage
@@ -22,6 +23,7 @@ const editarPacientesAdmin = () => import('./components/administrador/views/Edit
 const RecepcionistaReportesGerenciales = () => import('./components/administrador/views/reportes/ReportesGerenciales');
 const HomeHorasTrabajadas = () => import('./components/administrador/views/HomeHorasTrabajadas.vue');
 const HomeSedes = () => import('./components/administrador/views/HomeSedes.vue');
+const HomeSatisfaccionClientes = () => import('./components/administrador/views/HomeSatisfaccionClientes.vue');
 
 const HomeAdministradorRouterReportes = () => import('./components/administrador/views/reportes/HomeRouterReportes.vue');
 const HomeAdministradorReportes = () => import('./components/administrador/views/reportes/HomeReportes.vue');
@@ -126,6 +128,12 @@ export const routes = [
     path: '/cuestionario/:token',
     name: 'cuestionario',
     component: AutoTriaje,
+    meta: { guest: true }
+  },
+  {
+    path: '/satisfaccion/:token',
+    name: 'satisfaccionCita',
+    component: SatisfaccionCita,
     meta: { guest: true }
   },
   {
@@ -441,6 +449,11 @@ export const routes = [
         path: '/administrador/horas-trabajadas',
         name: 'horasTrabajadas',
         component: HomeHorasTrabajadas
+      },
+      {
+        path: '/administrador/satisfaccion-clientes',
+        name: 'satisfaccionClientes',
+        component: HomeSatisfaccionClientes
       },
 
       {

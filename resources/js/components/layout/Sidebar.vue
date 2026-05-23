@@ -67,6 +67,12 @@
 									<span>Horas Trabajadas</span>
 							</router-link>
 						</li>
+						<li class="nav-item nav__list" @click="activeSidebar()">
+							<router-link  to="/administrador/satisfaccion-clientes" class="nav-link">
+								<i class="fas fa-smile"></i>
+									<span>Satisfaccion de clientes</span>
+							</router-link>
+						</li>
 						<!-- Nav Item - Dashboard -->
 						<li class="nav-item nav__list" @click="activeSidebar()">
 								<router-link to="/administrador/reportes/total" class="nav-link">
