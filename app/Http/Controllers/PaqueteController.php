@@ -113,7 +113,12 @@ class PaqueteController extends Controller
             $pagos = Extra_payment::where('idMembresia', $membresia->id)->where('activo', 1)->get();
             $membresia->pagado = $pagos->sum('price');
 
-            $deudas = DB::table('deudas')->where('idMembresia', $membresia->id)->where('activo', 1)->get();
+            $deudas = DB::table('deudas')
+                ->where('idMembresia', $membresia->id)
+                ->where('activo', 1)
+                ->orderBy('numero_cuota', 'asc')
+                ->orderBy('fecha', 'asc')
+                ->get();
             
             $cuotas_vencidas = 0;
             $deuda_total = 0;
@@ -238,7 +243,12 @@ class PaqueteController extends Controller
         $pagos = Extra_payment::where('idMembresia', $membresia->id)->where('activo', 1)->get();
         $membresia->pagado = $pagos->sum('price');
 
-        $deudas = DB::table('deudas')->where('idMembresia', $membresia->id)->where('activo', 1)->get();
+        $deudas = DB::table('deudas')
+            ->where('idMembresia', $membresia->id)
+            ->where('activo', 1)
+            ->orderBy('numero_cuota', 'asc')
+            ->orderBy('fecha', 'asc')
+            ->get();
         
         $cuotas_vencidas = 0;
         $deuda_total = 0;
@@ -522,6 +532,21 @@ class PaqueteController extends Controller
                         'fecha' => $nuevaFecha,
                         'observaciones' => trim($nuevaObs)
                     ]);
+                
+                if ($deuda->fecha != $nuevaFecha) {
+                    $todasDeudas = DB::table('deudas')
+                        ->where('idMembresia', $deuda->idMembresia)
+                        ->where('activo', 1)
+                        ->orderBy('fecha', 'asc')
+                        ->orderBy('id', 'asc')
+                        ->get();
+                    
+                    $num = 1;
+                    foreach($todasDeudas as $d) {
+                        DB::table('deudas')->where('id', $d->id)->update(['numero_cuota' => $num]);
+                        $num++;
+                    }
+                }
             }
 
             DB::commit();
@@ -576,8 +601,24 @@ class PaqueteController extends Controller
                 'estado' => $deuda->estado,
                 'activo' => 1,
                 'idMembresia' => $deuda->idMembresia,
+                'idPago' => property_exists($deuda, 'idPago') ? $deuda->idPago : null,
+                'numero_cuota' => $deuda->numero_cuota,
                 'observaciones' => "[$fechaHoraActual] Cuota fraccionada de la deuda original por $nombreUsuario."
             ]);
+
+            // Reordenar numero_cuota para este paquete
+            $todasDeudas = DB::table('deudas')
+                ->where('idMembresia', $deuda->idMembresia)
+                ->where('activo', 1)
+                ->orderBy('fecha', 'asc')
+                ->orderBy('id', 'asc')
+                ->get();
+            
+            $num = 1;
+            foreach($todasDeudas as $d) {
+                DB::table('deudas')->where('id', $d->id)->update(['numero_cuota' => $num]);
+                $num++;
+            }
 
             DB::commit();
             return response()->json(['message' => 'Cuota fraccionada correctamente']);

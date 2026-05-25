@@ -410,6 +410,7 @@
                     <td>
                       <div v-if="editandoDeudaId !== cuota.id">
                         <div class="fw-bold d-flex align-items-center gap-2">
+                          <span class="badge bg-secondary me-1" v-if="cuota.numero_cuota">#{{ cuota.numero_cuota }}</span>
                           {{ formatFecha(cuota.fecha) }}
                           <button v-if="cuota.estado == 1" class="btn btn-sm btn-link text-muted p-0 ms-1" @click="iniciarEdicionDeuda(cuota)"><i class="fas fa-pencil-alt"></i></button>
                         </div>
@@ -449,7 +450,7 @@
                         <button class="btn btn-sm btn-light shadow-sm" @click="cancelarEdicionDeuda()"><i class="fas fa-times"></i></button>
                       </div>
                       <div v-else class="d-flex gap-1 justify-content-center">
-                        <button v-if="cuota.estado == 1" class="btn btn-sm btn-primary shadow-sm text-nowrap" @click="procesarPago(cuota)" :disabled="procesandoPago">
+                        <button v-if="cuota.estado == 1" class="btn btn-sm btn-primary shadow-sm text-nowrap" @click="procesarPago(cuota)" :disabled="procesandoPago || !cuota.canPay" :title="!cuota.canPay ? 'Debe pagar las cuotas anteriores primero' : ''">
                           <i class="fas fa-hand-holding-usd me-1" v-if="!procesandoPago"></i> 
                           <i class="fas fa-spinner fa-spin me-1" v-else></i> Pagar 
                         </button>
@@ -888,11 +889,7 @@ export default {
 
             // Reasignar o inicializar métodos de pago
             if (this.paqueteSeleccionado.deudas) {
-              this.paqueteSeleccionado.deudas.forEach(d => {
-                if (d.estado == 1) {
-                  this.$set(d, 'metodo_pago_id', metodosPrevios[d.id] || 1);
-                }
-              });
+              this.actualizarPermisosPago(metodosPrevios);
             }
           }
         }
@@ -1233,6 +1230,7 @@ export default {
         
         cuota.estado = 2;
         cuota.metodo_pago_nombre = this.monedas.find(m => m.id == (cuota.metodo_pago_id || 1))?.tipo;
+        this.actualizarPermisosPago();
         this.cargarPaquetes(this.pagination.current_page);
         
       } catch (error) {
@@ -1245,16 +1243,30 @@ export default {
     abrirModalPago(paquete) {
       this.paqueteSeleccionado = paquete;
       
-      // Inicializar métodos de pago para cada cuota pendiente
+      // Inicializar métodos de pago para cada cuota pendiente y establecer canPay
       if (this.paqueteSeleccionado.deudas) {
-        this.paqueteSeleccionado.deudas.forEach(cuota => {
-          if (cuota.estado == 1 && !cuota.metodo_pago_id) {
-            this.$set(cuota, 'metodo_pago_id', 1); // Por defecto Efectivo (ID 1 suele ser efectivo)
-          }
-        });
+        this.actualizarPermisosPago();
       }
       
       this.mostrarModalPago = true;
+    },
+    actualizarPermisosPago(metodosPrevios = {}) {
+      let firstPendingFound = false;
+      this.paqueteSeleccionado.deudas.forEach(cuota => {
+        if (cuota.estado == 1) { // Pendiente
+          if (!cuota.metodo_pago_id) {
+            this.$set(cuota, 'metodo_pago_id', metodosPrevios[cuota.id] || 1); // Por defecto Efectivo
+          }
+          if (!firstPendingFound) {
+            firstPendingFound = true;
+            this.$set(cuota, 'canPay', true);
+          } else {
+            this.$set(cuota, 'canPay', false);
+          }
+        } else {
+          this.$set(cuota, 'canPay', false);
+        }
+      });
     },
     abrirModalReporte(paquete, editar = false) {
       this.paqueteSeleccionado = paquete;
