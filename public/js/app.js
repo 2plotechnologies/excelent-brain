@@ -6284,7 +6284,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 attention: _this.cita.attention
               };
               _context.t0 = tipo;
-              _context.next = _context.t0 === 'llegada' ? 6 : _context.t0 === 'atención' ? 11 : _context.t0 === 'fin' ? 17 : 21;
+              _context.next = _context.t0 === 'llegada' ? 6 : _context.t0 === 'atención' ? 11 : _context.t0 === 'fin' ? 17 : 22;
               break;
             case 6:
               if (!_this.cita.entrance) {
@@ -6295,7 +6295,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 8:
               _this.cita.entrance = moment__WEBPACK_IMPORTED_MODULE_0___default()().format('HH:mm:ss');
               payload.entrance = _this.cita.entrance;
-              return _context.abrupt("break", 22);
+              return _context.abrupt("break", 23);
             case 11:
               if (!_this.cita.attention) {
                 _context.next = 13;
@@ -6308,7 +6308,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               if (!_this.cita.hora_fin && _this.cita.precio && _this.cita.precio.duracion) {
                 _this.departureTimeLocal = moment__WEBPACK_IMPORTED_MODULE_0___default()(_this.cita.attention, 'HH:mm:ss').add(_this.cita.precio.duracion, 'minutes').format('HH:mm');
               }
-              return _context.abrupt("break", 22);
+              return _context.abrupt("break", 23);
             case 17:
               if (!_this.cita.hora_fin) {
                 _context.next = 19;
@@ -6316,37 +6316,40 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               }
               return _context.abrupt("return");
             case 19:
+              if (!_this.departureTimeLocal) {
+                _this.departureTimeLocal = moment__WEBPACK_IMPORTED_MODULE_0___default()().format('HH:mm');
+              }
               payload.departure = _this.departureTimeLocal;
-              return _context.abrupt("break", 22);
-            case 21:
-              return _context.abrupt("break", 22);
+              return _context.abrupt("break", 23);
             case 22:
-              _context.prev = 22;
-              _context.next = 25;
+              return _context.abrupt("break", 23);
+            case 23:
+              _context.prev = 23;
+              _context.next = 26;
               return _this.axios.post('/api/registrarHora', payload);
-            case 25:
+            case 26:
               response = _context.sent;
               if (((_response$data = response.data) === null || _response$data === void 0 ? void 0 : _response$data.mensaje) == 'Ok') {
                 if (tipo === 'fin') {
-                  _this.cita.hora_fin = _this.departureTimeLocal;
-                  _this.cita.status = 5; // Atendido
+                  _this.$set(_this.cita, 'hora_fin', _this.departureTimeLocal);
+                  _this.$set(_this.cita, 'status', 5); // Atendido
                 }
                 _this.$emit('actualizar', 'sksks');
                 if (window.alertify) {
                   window.alertify.notify('<i class="fa-regular fa-calendar-check"></i> Datos actualizados', 'success', 5);
                 }
               }
-              _context.next = 32;
+              _context.next = 33;
               break;
-            case 29:
-              _context.prev = 29;
-              _context.t1 = _context["catch"](22);
+            case 30:
+              _context.prev = 30;
+              _context.t1 = _context["catch"](23);
               console.error(_context.t1);
-            case 32:
+            case 33:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[22, 29]]);
+        }, _callee, null, [[23, 30]]);
       }))();
     },
     getServiceLabel: function getServiceLabel(servicio) {
@@ -11372,7 +11375,7 @@ var render = function render() {
   }, [_vm._v("No Confirmado")]), _vm._v(" "), _c("div", {
     staticClass: "status-option active-success",
     "class": {
-      active: _vm.cita.status == 2
+      active: _vm.cita.status == 2 || _vm.cita.status == 5
     }
   }, [_vm._v("Confirmado")])])]), _vm._v(" "), _c("div", {
     staticClass: "status-card h-100"

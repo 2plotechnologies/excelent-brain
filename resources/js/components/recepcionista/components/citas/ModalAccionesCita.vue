@@ -2,7 +2,7 @@
   <div class="modal fade" id="modalAccionesCita" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-md modal-dialog-centered" role="document">
       <div class="modal-content border-0 shadow-lg" v-if="cita && cita.patient" style="border-radius: 20px; overflow: hidden;">
-        <!-- Header -->
+        <!-- Header. -->
         <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between">
           <div class="d-flex align-items-center">
             <div class="icon-header-container mr-3">
@@ -26,10 +26,10 @@
         </div>
 
         <div class="modal-body px-4 pt-4">
-          
-          <!-- Status Cards Group -->
+
+          <!-- Status Cards Group. -->
           <div class="status-cards-grid mb-4">
-            <!-- PAGO CARD -->
+            <!-- PAGO CARD. -->
             <div class="status-card h-100" @click="$emit('openModal', cita, '#pagoModal', indiceElegido)" data-bs-toggle="modal" data-bs-target="#pagoModal">
               <div class="status-card-header">
                 <i class="fas fa-sack-dollar text-warning"></i> <span>PAGO</span>
@@ -48,7 +48,7 @@
               </div>
               <div class="status-options mt-2">
                 <div class="status-option" :class="{ active: cita.status == 1 }">No Confirmado</div>
-                <div class="status-option active-success" :class="{ active: cita.status == 2 }">Confirmado</div>
+                <div class="status-option active-success" :class="{ active: cita.status == 2 || cita.status == 5 }">Confirmado</div>
               </div>
             </div>
 
@@ -153,7 +153,7 @@
             <button v-if="cita.status != 3" @click="$emit('openModal', cita, '#reprogModal', indiceElegido)" data-bs-target="#reprogModal" data-bs-toggle="modal" class="btn btn-action btn-outline-primary">
               <i class="fas fa-sync-alt mr-2"></i> Reprogramar
             </button>
-            
+
             <button @click="$emit('eliminar', cita.id)" class="btn btn-action btn-outline-danger" data-bs-dismiss="modal">
               <i class="fas fa-times-circle mr-2"></i> Cancelar
             </button>
@@ -164,7 +164,7 @@
 
             <button @click="$emit('openModal', cita, '#modalEstado', indiceElegido)" data-bs-toggle="modal" data-bs-target="#modalEstado" class="btn btn-action btn-outline-secondary">
               <i class="fas fa-user-slash mr-2"></i> No Asistió
-            </button> 
+            </button>
 
               <a :href="getWhatsappLink(cita)" target="_blank" class="btn btn-action btn-outline-success">
                 <i class="fab fa-whatsapp mr-2"></i> WhatsApp
@@ -238,14 +238,14 @@ export default {
       };
 
       switch (tipo) {
-        case 'llegada': 
+        case 'llegada':
           if(this.cita.entrance) return;
-          this.cita.entrance = moment().format('HH:mm:ss'); 
+          this.cita.entrance = moment().format('HH:mm:ss');
           payload.entrance = this.cita.entrance;
           break;
-        case 'atención': 
+        case 'atención':
           if(this.cita.attention) return;
-          this.cita.attention = moment().format('HH:mm:ss'); 
+          this.cita.attention = moment().format('HH:mm:ss');
           payload.attention = this.cita.attention;
           if (!this.cita.hora_fin && this.cita.precio && this.cita.precio.duracion) {
             this.departureTimeLocal = moment(this.cita.attention, 'HH:mm:ss').add(this.cita.precio.duracion, 'minutes').format('HH:mm');
@@ -253,17 +253,20 @@ export default {
           break;
         case 'fin':
           if(this.cita.hora_fin) return;
+          if(!this.departureTimeLocal) {
+             this.departureTimeLocal = moment().format('HH:mm');
+          }
           payload.departure = this.departureTimeLocal;
           break;
         default: break;
       }
-      
+
       try {
         let response = await this.axios.post('/api/registrarHora', payload);
         if(response.data?.mensaje == 'Ok'){
             if (tipo === 'fin') {
-                this.cita.hora_fin = this.departureTimeLocal;
-                this.cita.status = 5; // Atendido
+                this.$set(this.cita, 'hora_fin', this.departureTimeLocal);
+                this.$set(this.cita, 'status', 5); // Atendido
             }
             this.$emit('actualizar', 'sksks');
             if (window.alertify) {
@@ -323,7 +326,7 @@ export default {
       if(fecha) return moment(fecha).format('DD/MM/YYYY');
       return '—';
     },
-    horaLatam2(horita){ 
+    horaLatam2(horita){
       if(horita) return moment(horita, 'HH:mm:ss').format('HH:mm');
       return '—';
     },
@@ -411,7 +414,7 @@ export default {
   border: 1px solid #ffe8cc;
 }
 
-/* Status Cards */
+/* Status Cards. */
 .status-cards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -458,7 +461,7 @@ export default {
 .status-option.active-warning.active { background: #fff9db; border-color: #ffe066; color: #f08c00; }
 .status-option.active-success.active { background: #ebfbee; border-color: #8ce99a; color: #2b8a3e; }
 
-/* Sections */
+/* Sections. */
 .section-label {
   font-size: 0.7rem;
   font-weight: 800;
@@ -488,7 +491,7 @@ export default {
 }
 .btn-registrar:hover { background: #f8f9fa; border-color: #ced4da; }
 
-/* Patient Card */
+/* Patient Card. */
 .patient-avatar {
   background: #e7f5ff;
   width: 44px;
@@ -531,7 +534,7 @@ export default {
 .detail-label { font-size: 0.65rem; color: #adb5bd; font-weight: 800; margin-bottom: 0; }
 .detail-value { font-size: 0.85rem; font-weight: 700; color: #495057; }
 
-/* Action Buttons */
+/* Action Buttons. */
 .btn-action {
   border-radius: 12px;
   padding: 10px 16px;
