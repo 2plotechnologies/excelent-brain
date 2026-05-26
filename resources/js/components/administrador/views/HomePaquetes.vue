@@ -1394,7 +1394,7 @@ export default {
       }
     },
     async abrirModalFraccionar(cuota) {
-      const { value: formValues } = await this.$swal({
+      this.$swal({
         title: 'Fraccionar Cuota',
         html:
           `<p class="text-muted">Cuota actual: <strong>S/ ${parseFloat(cuota.monto).toFixed(2)}</strong></p>` +
@@ -1406,35 +1406,35 @@ export default {
         showCancelButton: true,
         confirmButtonText: 'Fraccionar',
         cancelButtonText: 'Cancelar',
-        preConfirm: () => {
+        showLoaderOnConfirm: true,
+        preConfirm: async () => {
           const monto = document.getElementById('swal-input1').value;
           const fecha = document.getElementById('swal-input2').value;
           if (!monto || !fecha || parseFloat(monto) <= 0 || parseFloat(monto) >= cuota.monto) {
             this.$swal.showValidationMessage('Ingresa un monto válido y una fecha');
             return false;
           }
-          return { monto: parseFloat(monto), fecha: fecha };
+          try {
+            const datos = {
+              idDeuda: cuota.id,
+              monto_fraccion: parseFloat(monto),
+              nueva_fecha: fecha,
+              user_id: this.idUsuario
+            };
+            const response = await this.axios.post('/api/fraccionarDeuda', datos);
+            return response.data;
+          } catch (error) {
+            this.$swal.showValidationMessage(error.response?.data?.error || 'No se pudo fraccionar la cuota');
+            return false;
+          }
+        },
+        allowOutsideClick: () => !this.$swal.isLoading()
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.$swal('Éxito', result.value.message, 'success');
+          this.cargarPaquetes(this.pagination.current_page);
         }
       });
-
-      if (formValues) {
-        try {
-          this.procesandoFraccion = true;
-          const datos = {
-            idDeuda: cuota.id,
-            monto_fraccion: formValues.monto,
-            nueva_fecha: formValues.fecha,
-            user_id: this.idUsuario
-          };
-          const response = await this.axios.post('/api/fraccionarDeuda', datos);
-          this.$swal('Éxito', response.data.message, 'success');
-          this.cargarPaquetes(this.pagination.current_page);
-        } catch (error) {
-          this.$swal('Error', error.response?.data?.error || 'No se pudo fraccionar la cuota', 'error');
-        } finally {
-          this.procesandoFraccion = false;
-        }
-      }
     }
   },
   watch: {

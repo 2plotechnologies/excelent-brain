@@ -203,6 +203,7 @@
 		
 		<modalVerRecetas v-if="cita && cita.id" :prescriptions="recetas" idModal="recetasModalCuaderno"></modalVerRecetas>
 		<modalTiemposEspera v-if="cita && cita.id" :cita="cita" @actualizar="actualizarListadoCitas" idModal="modalTiemposEsperaCuaderno"></modalTiemposEspera>
+    <ModalMoverVacio v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="actualizarListadoCitas"></ModalMoverVacio>
 
 	</div>
 </template>
@@ -220,6 +221,7 @@
 	import modalVerRecetas from './ModalVerRecetas.vue'
 	import modalTiemposEspera from './ModalTiemposEspera.vue'
 	import ModalAccionesCita from './ModalAccionesCita.vue'
+	import ModalMoverVacio from './ModalMoverVacio.vue'
 		
 	import alertify from 'alertifyjs'
 	
@@ -254,7 +256,7 @@
 			tooltipStyle: { top: '0px', left: '0px', position: 'fixed', zIndex: 1055, pointerEvents: 'none', minWidth: '150px', maxWidth: '250px' },
 		}},
 		props:[ 'nombreUser', 'idSede'],
-		components: { PagoModal, ModalEstadoCita, ModalNuevaCita, ModalPatient, InfoModal, ReprogModal, ModalSearchPatient, ModalIntercambio, modalVerRecetas, modalTiemposEspera, ModalAccionesCita },
+		components: { PagoModal, ModalEstadoCita, ModalNuevaCita, ModalPatient, InfoModal, ReprogModal, ModalSearchPatient, ModalIntercambio, modalVerRecetas, modalTiemposEspera, ModalAccionesCita, ModalMoverVacio },
 		computed: {
 			profesionesUnicas() {
 				const profesiones = this.doctores.map(d => d.profession).filter(p => p != null && p.trim() != '');
@@ -639,41 +641,6 @@
 			},
 			abrirTiemposEspera(cita) {
 				this.citaTemp = cita;
-			},
-			mandarVacioAutomatico(cita) {
-				let doc = this.doctores.find(d => d.id == cita.professional_id);
-				if(!doc || !doc.horarios) return;
-				
-				// Encontrar el primer horario libre
-				let proximo = doc.horarios.find(h => h.libre == 1);
-				
-				if(!proximo) {
-					this.$swal.fire('No hay espacios', 'No se encontraron horarios vacíos para este profesional hoy.', 'warning');
-					return;
-				}
-
-				this.$swal.fire({
-					title: 'Mover a sitio vacío',
-					text: `¿Desea mover esta cita al horario de las ${this.formatHora(proximo.check_time)}?`,
-					icon: 'question',
-					showCancelButton: true,
-					confirmButtonText: 'Sí, mover',
-					cancelButtonText: 'Cancelar',
-					confirmButtonColor: '#3085d6',
-				}).then((result) => {
-					if (result.isConfirmed) {
-						let payload = { ...cita, schedule_id: proximo.id, user_id: this.idUsuario };
-						this.axios.put(`/api/mandarVacio/${cita.id}`, payload)
-						.then(res => {
-							this.$swal.fire('Éxito', 'La cita ha sido movida al espacio vacío.', 'success');
-							this.obtenerHorarios();
-						})
-						.catch(err => {
-							console.error(err);
-							this.$swal.fire('Error', 'No se pudo mover la cita.', 'error');
-						});
-					}
-				});
 			}
 		},
 		mounted(){

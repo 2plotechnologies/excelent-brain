@@ -160,19 +160,19 @@
           <!-- ACTION BUTTONS -->
           <div class="d-flex flex-wrap gap-2 justify-content-left pb-4">
             <!-- Main Actions -->
-            <button v-if="cita.status != 3" @click="$emit('openModal', cita, targetReprog, indiceElegido)" :data-bs-target="targetReprog" data-bs-toggle="modal" class="btn btn-action btn-outline-primary">
+            <button v-if="cita.status != 3 && !isAtendidaConHoraFin(cita)" @click="$emit('openModal', cita, targetReprog, indiceElegido)" :data-bs-target="targetReprog" data-bs-toggle="modal" class="btn btn-action btn-outline-primary">
               <i class="fas fa-sync-alt mr-2"></i> Reprogramar
             </button>
 
-            <button @click="$emit('eliminar', cita.id)" class="btn btn-action btn-outline-danger" data-bs-dismiss="modal">
+            <button v-if="!isAtendidaConHoraFin(cita)" @click="$emit('eliminar', cita.id)" class="btn btn-action btn-outline-danger" data-bs-dismiss="modal">
               <i class="fas fa-times-circle mr-2"></i> Cancelar
             </button>
 
-            <button v-if="cita.status != 3" @click="$emit('openModal', cita, targetEstado, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetEstado" class="btn btn-action btn-outline-secondary">
+            <button v-if="cita.status != 3 && !isAtendidaConHoraFin(cita)" @click="$emit('openModal', cita, targetEstado, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetEstado" class="btn btn-action btn-outline-secondary">
               <i class="fas fa-ban mr-2"></i> Anular
             </button>
 
-            <button @click="$emit('openModal', cita, targetEstado, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetEstado" class="btn btn-action btn-outline-secondary">
+            <button v-if="!isAtendidaConHoraFin(cita)" @click="$emit('openModal', cita, targetEstado, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetEstado" class="btn btn-action btn-outline-secondary">
               <i class="fas fa-user-slash mr-2"></i> No Asistió
             </button>
 
@@ -188,16 +188,16 @@
 
             <!-- More Extras Icons row -->
             <div class="w-100 d-flex justify-content-left gap-4 mt-3">
-              <button @click="$emit('intercambiar', cita)" :data-bs-target="targetIntercambio" data-bs-toggle="modal" class="btn btn-link text-muted p-0 small" title="Intercambiar">
+              <button v-if="!isAtendidaConHoraFin(cita)" @click="$emit('intercambiar', cita)" :data-bs-target="targetIntercambio" data-bs-toggle="modal" class="btn btn-link text-muted p-0 small" title="Intercambiar">
                 <i class="fas fa-retweet"></i> Intercambiar
               </button>
-              <button @click="$emit('moverVacio', cita)" class="btn btn-link text-muted p-0 small" title="Mover a sitio Vacio">
+              <button v-if="!isAtendidaConHoraFin(cita)" @click="$emit('openModal', cita, '#modalMoverVacio', indiceElegido)" data-bs-target="#modalMoverVacio" data-bs-toggle="modal" class="btn btn-link text-muted p-0 small" title="Mover a sitio Vacio">
                 <i class="fas fa-share-square"></i> Mover a Vacio
               </button>
               <button @click="$emit('buscarRecetas', cita.patient.id)" data-bs-toggle="modal" :data-bs-target="targetRecetas" class="btn btn-link text-muted p-0 small" title="Recetas">
                 <i class="fas fa-file-medical"></i> Recetas
               </button>
-              <button @click="$emit('changeMode', cita.id, indiceElegido)" class="btn btn-link text-muted p-0 small" title="Cambiar modo" data-bs-dismiss="modal">
+              <button v-if="!isAtendidaConHoraFin(cita)" @click="$emit('changeMode', cita.id, indiceElegido)" class="btn btn-link text-muted p-0 small" title="Cambiar modo" data-bs-dismiss="modal">
                 <i :class="cita.mode == 1 ? 'far fa-user' : 'fas fa-desktop'"></i> {{ cita.mode == 1 ? 'Modo' : 'Modo' }}
               </button>
             </div>
@@ -362,6 +362,9 @@ export default {
     },
     canSendSatisfaction(c) {
       return c && c.status == 5 && c.hora_fin && c.patient && c.patient.phone;
+    },
+    isAtendidaConHoraFin(c) {
+      return c && c.status == 5 && c.hora_fin;
     },
     async sendSatisfaction(c) {
       try {

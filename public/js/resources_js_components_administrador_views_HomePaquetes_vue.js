@@ -965,68 +965,75 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     abrirModalFraccionar: function abrirModalFraccionar(cuota) {
       var _this16 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee13() {
-        var _yield$_this16$$swal, formValues, datos, response, _error$response3;
-        return _regeneratorRuntime().wrap(function _callee13$(_context13) {
-          while (1) switch (_context13.prev = _context13.next) {
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee14() {
+        return _regeneratorRuntime().wrap(function _callee14$(_context14) {
+          while (1) switch (_context14.prev = _context14.next) {
             case 0:
-              _context13.next = 2;
-              return _this16.$swal({
+              _this16.$swal({
                 title: 'Fraccionar Cuota',
                 html: "<p class=\"text-muted\">Cuota actual: <strong>S/ ".concat(parseFloat(cuota.monto).toFixed(2), "</strong></p>") + "<label class=\"form-label text-start d-block small fw-bold\">Monto a separar:</label>" + '<input id="swal-input1" class="form-control mb-3" type="number" step="0.01" min="0.01" max="' + (cuota.monto - 0.01) + '">' + "<label class=\"form-label text-start d-block small fw-bold\">Fecha de la nueva cuota (fracci\xF3n):</label>" + '<input id="swal-input2" class="form-control" type="date">',
                 focusConfirm: false,
                 showCancelButton: true,
                 confirmButtonText: 'Fraccionar',
                 cancelButtonText: 'Cancelar',
-                preConfirm: function preConfirm() {
-                  var monto = document.getElementById('swal-input1').value;
-                  var fecha = document.getElementById('swal-input2').value;
-                  if (!monto || !fecha || parseFloat(monto) <= 0 || parseFloat(monto) >= cuota.monto) {
-                    _this16.$swal.showValidationMessage('Ingresa un monto válido y una fecha');
-                    return false;
+                showLoaderOnConfirm: true,
+                preConfirm: function () {
+                  var _preConfirm = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee13() {
+                    var monto, fecha, datos, response, _error$response3;
+                    return _regeneratorRuntime().wrap(function _callee13$(_context13) {
+                      while (1) switch (_context13.prev = _context13.next) {
+                        case 0:
+                          monto = document.getElementById('swal-input1').value;
+                          fecha = document.getElementById('swal-input2').value;
+                          if (!(!monto || !fecha || parseFloat(monto) <= 0 || parseFloat(monto) >= cuota.monto)) {
+                            _context13.next = 5;
+                            break;
+                          }
+                          _this16.$swal.showValidationMessage('Ingresa un monto válido y una fecha');
+                          return _context13.abrupt("return", false);
+                        case 5:
+                          _context13.prev = 5;
+                          datos = {
+                            idDeuda: cuota.id,
+                            monto_fraccion: parseFloat(monto),
+                            nueva_fecha: fecha,
+                            user_id: _this16.idUsuario
+                          };
+                          _context13.next = 9;
+                          return _this16.axios.post('/api/fraccionarDeuda', datos);
+                        case 9:
+                          response = _context13.sent;
+                          return _context13.abrupt("return", response.data);
+                        case 13:
+                          _context13.prev = 13;
+                          _context13.t0 = _context13["catch"](5);
+                          _this16.$swal.showValidationMessage(((_error$response3 = _context13.t0.response) === null || _error$response3 === void 0 || (_error$response3 = _error$response3.data) === null || _error$response3 === void 0 ? void 0 : _error$response3.error) || 'No se pudo fraccionar la cuota');
+                          return _context13.abrupt("return", false);
+                        case 17:
+                        case "end":
+                          return _context13.stop();
+                      }
+                    }, _callee13, null, [[5, 13]]);
+                  }));
+                  function preConfirm() {
+                    return _preConfirm.apply(this, arguments);
                   }
-                  return {
-                    monto: parseFloat(monto),
-                    fecha: fecha
-                  };
+                  return preConfirm;
+                }(),
+                allowOutsideClick: function allowOutsideClick() {
+                  return !_this16.$swal.isLoading();
+                }
+              }).then(function (result) {
+                if (result.isConfirmed) {
+                  _this16.$swal('Éxito', result.value.message, 'success');
+                  _this16.cargarPaquetes(_this16.pagination.current_page);
                 }
               });
-            case 2:
-              _yield$_this16$$swal = _context13.sent;
-              formValues = _yield$_this16$$swal.value;
-              if (!formValues) {
-                _context13.next = 21;
-                break;
-              }
-              _context13.prev = 5;
-              _this16.procesandoFraccion = true;
-              datos = {
-                idDeuda: cuota.id,
-                monto_fraccion: formValues.monto,
-                nueva_fecha: formValues.fecha,
-                user_id: _this16.idUsuario
-              };
-              _context13.next = 10;
-              return _this16.axios.post('/api/fraccionarDeuda', datos);
-            case 10:
-              response = _context13.sent;
-              _this16.$swal('Éxito', response.data.message, 'success');
-              _this16.cargarPaquetes(_this16.pagination.current_page);
-              _context13.next = 18;
-              break;
-            case 15:
-              _context13.prev = 15;
-              _context13.t0 = _context13["catch"](5);
-              _this16.$swal('Error', ((_error$response3 = _context13.t0.response) === null || _error$response3 === void 0 || (_error$response3 = _error$response3.data) === null || _error$response3 === void 0 ? void 0 : _error$response3.error) || 'No se pudo fraccionar la cuota', 'error');
-            case 18:
-              _context13.prev = 18;
-              _this16.procesandoFraccion = false;
-              return _context13.finish(18);
-            case 21:
+            case 1:
             case "end":
-              return _context13.stop();
+              return _context14.stop();
           }
-        }, _callee13, null, [[5, 15, 18, 21]]);
+        }, _callee14);
       }))();
     }
   },

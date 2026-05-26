@@ -14,8 +14,8 @@
 						<button data-bs-toggle="modal" data-bs-target="#egresosExtras" class="btn-premium btn-egreso"><i class="fas fa-minus"></i> Egresos</button>
 						<button class="btn-premium btn-print" v-if="consultarFecha()" @click="verTicketCierre()"> <i class="fas fa-print"></i> Ticket</button>
 						<button class="btn-premium btn-refresh" @click="actualizar()"> <i class="fas fa-sync"></i> Actualizar</button>
-						
-						
+
+
 					</div>
 	</div>
 	<div class="row mb-3 mt-3 d-print-none">
@@ -47,8 +47,8 @@
 	</div>
 
 	<div class="d-flex mb-3 gap-2 flex-wrap d-print-none">
-		<button v-for="filtro in filtrosPills" :key="filtro" 
-				class="btn rounded-pill border-0 px-3 py-1" 
+		<button v-for="filtro in filtrosPills" :key="filtro"
+				class="btn rounded-pill border-0 px-3 py-1"
 				style="font-size: 0.85rem; font-weight: 500;"
 				:class="filtroActual === filtro ? 'btn-primary' : 'bg-light text-muted'"
 				@click="filtroActual = filtro">
@@ -110,28 +110,28 @@
 						</td>
 						<td class="text-center">
 							<div class="d-flex justify-content-center gap-1">
-								<!-- Eye Icon (PDF) -->
-								<a v-if="transaction.source === 'payments'" 
-								   target="_blank" :href="`/api/pdfExtraCupon/${transaction.id}`" 
+								<!-- Eye Icon (PDF). -->
+								<a v-if="transaction.source === 'payments'"
+								   target="_blank" :href="`/api/pdfExtraCupon/${transaction.id}?token=${token}`"
 								   class="btn-action" title="Ver PDF">
 									<i class="far fa-eye"></i>
 								</a>
-								<a v-else target="_blank" 
-								   :href="`/api/pdfExtraCupon/${transaction.id}?token=${token}`" 
+								<a v-else target="_blank"
+								   :href="`/api/pdfExtraCupon/${transaction.id}?token=${token}`"
 								   class="btn-action" title="Ver PDF">
 									<i class="far fa-eye"></i>
 								</a>
 
 								<!-- Pencil Icon (Edit) -->
-								<button class="btn-action" title="Editar" 
-										data-bs-toggle="modal" data-bs-target="#modalEditarPago" 
-										@click="editar(transaction.originalIndex)" 
+								<button class="btn-action" title="Editar"
+										data-bs-toggle="modal" data-bs-target="#modalEditarPago"
+										@click="editar(transaction.originalIndex)"
 										v-if="consultarFecha()">
 									<i class="fas fa-pencil-alt"></i>
 								</button>
 
 								<!-- Paperclip Icon (Adjunto) -->
-								<button class="btn-action" data-bs-toggle="offcanvas" data-bs-target="#offAdjunto" 
+								<button class="btn-action" data-bs-toggle="offcanvas" data-bs-target="#offAdjunto"
 										@click="verAdjunto(transaction.id)" title="Adjuntar archivo">
 									<i class="fas fa-paperclip"></i>
 								</button>
@@ -143,23 +143,23 @@
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
 										<li>
-											<button class="dropdown-item" v-if="esAdmin && transaction.source === 'payments'" 
-													@click="pagoSeleccionado = transaction" 
+											<button class="dropdown-item" v-if="esAdmin && transaction.source === 'payments'"
+													@click="pagoSeleccionado = transaction"
 													data-bs-toggle="modal" data-bs-target="#modalDividirPago">
 												<i class="fas fa-divide"></i> Dividir pago
 											</button>
 										</li>
 										<li>
-											<button class="dropdown-item" v-if="transaction.source === 'payments'" 
-													@click="pagoSeleccionado = transaction" 
+											<button class="dropdown-item" v-if="transaction.source === 'payments'"
+													@click="pagoSeleccionado = transaction"
 													data-bs-toggle="modal" data-bs-target="#modalFacturacion">
 												<i class="fas fa-file-invoice"></i> Facturación SUNAT
 											</button>
 										</li>
 										<li><hr class="dropdown-divider" v-if="esAdmin"></li>
 										<li>
-											<button class="dropdown-item text-danger" v-if="esAdmin" 
-													@click="mostrarModalBorrar(transaction.id, transaction.originalIndex)" 
+											<button class="dropdown-item text-danger" v-if="esAdmin"
+													@click="mostrarModalBorrar(transaction.id, transaction.originalIndex)"
 													data-bs-toggle="modal" data-bs-target="#modalMotivoBorrar">
 												<i class="fas fa-trash-alt text-danger"></i> Eliminar
 											</button>
@@ -306,7 +306,7 @@
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<div class="form-group row">                                                    
+					<div class="form-group row">
 						<div class="col-sm-12">
 							<label for="">Método de pago</label>
 							<select class="form-select" id="pay_status" name="pay_status" v-model="caso.moneda">
@@ -331,7 +331,7 @@
 							<label for="">Boleta / Factura</label>
 							<input type="text" class="form-control" v-model="caso.boleta">
 						</div>
-					
+
 						<div class="form-group">
 							<label for="">Observación</label>
 							<textarea class="form-control" name="observation" id="observation" cols="10" rows="2" v-model="caso.observacion"></textarea>
@@ -344,7 +344,7 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<modal-pagos-extras :idUsuario="$attrs.idUser" :idSede="$attrs.idSede" />
 	<modal-egresos-extras :idUsuario="$attrs.idUser" :nombreUser="$attrs.nombreUser" :idSede="$attrs.idSede"/>
 	<OffcanvasAdjuntos :id="idSeleccionado" :foto="foto" :habilitarEliminado="habilitarEliminado" ></OffcanvasAdjuntos>
@@ -561,14 +561,14 @@ export default{
 				return item;
 			});
 
-			if (this.filtroActual === 'Ingresos') return result; 
+			if (this.filtroActual === 'Ingresos') return result;
 			if (this.filtroActual === 'Egresos') return result.filter(item => item.type == 6);
 			if (this.filtroActual === 'Citas') return result.filter(item => item.type == 5);
 			if (this.filtroActual === 'Adelantos') return result.filter(item => item.type == 8);
 			if (this.filtroActual === 'Cuotas') return result.filter(item => [1, 2, 7, 15].includes(item.type));
 			if (this.filtroActual === 'Ing. Extra') return result.filter(item => item.type == 4);
 			if (this.filtroActual === 'Egr. Extra') return [];
-			
+
 			return result;
 		},
 		filteredSalidas() {
@@ -580,12 +580,12 @@ export default{
 			if (this.filtroActual === 'Egresos') return result;
 			if (this.filtroActual === 'Egr. Extra') return result;
 			if (['Citas', 'Adelantos', 'Cuotas', 'Ing. Extra', 'Ingresos'].includes(this.filtroActual)) return [];
-			
+
 			return result;
 		},
 		unifiedTransactions() {
 			let combined = [];
-			
+
 			// Add income (payments)
 			this.filteredPayments.forEach(p => {
 				combined.push({
@@ -680,13 +680,13 @@ export default{
 							this.sumaTipos.push({suma: parseFloat(item.price ?? 0), moneda: this.queMoneda(item.moneda)})
 					}
 					//console.log(item.type==6);
-					
+
 					if(item.type==6){
 						return suma- parseFloat(item.price??0)
 					}else{
 						return suma+ parseFloat(item.price??0)
 					}
-					
+
 				}, 0)
 			}else{
 				return 0;
@@ -710,13 +710,13 @@ export default{
 							this.sumaSalidas.push({suma: parseFloat(item.price ?? 0), moneda: this.queMoneda(item.moneda)})
 					}
 					//console.log(item.type==6);
-					
+
 					if(item.type==6){
 						return suma- parseFloat(item.price??0)
 					}else{
 						return suma+ parseFloat(item.price??0)
 					}
-					
+
 				}, 0)
 			}else{
 				return 0;

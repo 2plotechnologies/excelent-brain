@@ -606,11 +606,14 @@ class PaqueteController extends Controller
                 'observaciones' => "[$fechaHoraActual] Cuota fraccionada de la deuda original por $nombreUsuario."
             ]);
 
+            $nuevaFraccionId = DB::getPdo()->lastInsertId();
+
             // Reordenar numero_cuota para este paquete
             $todasDeudas = DB::table('deudas')
                 ->where('idMembresia', $deuda->idMembresia)
                 ->where('activo', 1)
                 ->orderBy('fecha', 'asc')
+                ->orderByRaw("CASE WHEN id = ? THEN 0 ELSE 1 END", [$nuevaFraccionId])
                 ->orderBy('id', 'asc')
                 ->get();
             
