@@ -1,5 +1,5 @@
 <template>
-	<div class="modal fade" id="modalIntercambio" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal fade" :id="idModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content p-2 shadow" style="border-radius: 16px; border: none;">
 				<div class="modal-header border-0 pb-0">
@@ -72,7 +72,11 @@ import moment from 'moment'
 
 export default {
 	name: 'ModalIntercambio',
-	props: ['posibles', 'primero'],
+	props: {
+		posibles: Array,
+		primero: Object,
+		idModal: { type: String, default: 'modalIntercambio' }
+	},
 	data() {
 		return {
 			idCambio: -1

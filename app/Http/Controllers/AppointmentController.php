@@ -519,7 +519,7 @@ class AppointmentController extends Controller
 
 		$consults = Appointment::where('professional_id', $professional->id)
 			->whereBetween('date', [$dateWeekBefore, $dateWeekAfter])
-			->with('patient', 'professional', 'schedule', 'payment', 'precio','membresia')
+			->with('patient', 'professional', 'schedule', 'payment', 'precio','membresia.precio')
 			->with('patient.initial_psychiatric_history')
 			->with('patient.initial_psychological_history')
 			->orderBy(function ($query) {
@@ -584,7 +584,7 @@ class AppointmentController extends Controller
 		$appointments =Appointment::
 		join('patients as p', 'p.id', '=', 'appointments.patient_id')
 		->select('appointments.*', 'appointments.id as idCita') // Agregar la columna raw aquí
-		->with('professional','patient', 'payment', 'schedule','patient.address','patient.relative', 'precio', 'schedule', 'membresia')
+		->with('professional','patient', 'payment', 'schedule','patient.address','patient.relative', 'precio', 'schedule', 'membresia.precio')
 		->where(DB::raw("CONCAT(p.name, ' ', p.nombres)"), 'like', '%'. $nombre . '%')
 		->orWhere(DB::raw("CONCAT(p.nombres, ' ', p.name)"), 'like', $nombre . '%')
 		->orWhere('p.dni', $dni)
@@ -613,7 +613,7 @@ class AppointmentController extends Controller
 
 	public function searchByDateAppointment($date){
 		$appointments = Appointment::where('date', $date)
-			->with('professional','patient', 'payment', 'schedule','patient.address','patient.relative', 'patient.semaforo','precio', 'membresia')
+			->with('professional','patient', 'payment', 'schedule','patient.address','patient.relative', 'patient.semaforo','precio', 'membresia.precio')
 			/* ->orderBy('professional_id')
 			->orderBy('check_time', 'desc') */
 			->get()

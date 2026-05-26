@@ -1,5 +1,5 @@
 <template>
-	<div class="modal fade" id="modalTiemposEspera" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal fade" :id="idModal" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
         <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between">
@@ -94,7 +94,10 @@ import alertify from 'alertifyjs';
 import moment from 'moment'
 export default{
 	name: 'modalTiemposEspera',
-	props:['cita'],
+	props:{
+		cita: Object,
+		idModal: { type: String, default: 'modalTiemposEspera' }
+	},
 	
 	data(){ return{
 		entrance: null, attention: null, departureTime: null

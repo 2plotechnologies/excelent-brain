@@ -6242,7 +6242,35 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   props: {
     cita: Object,
     indiceElegido: Number,
-    precios: Array
+    precios: Array,
+    idModal: {
+      type: String,
+      "default": 'modalAccionesCita'
+    },
+    targetPago: {
+      type: String,
+      "default": '#pagoModal'
+    },
+    targetEstado: {
+      type: String,
+      "default": '#modalEstado'
+    },
+    targetInfo: {
+      type: String,
+      "default": '#infoModal'
+    },
+    targetReprog: {
+      type: String,
+      "default": '#reprogModal'
+    },
+    targetIntercambio: {
+      type: String,
+      "default": '#modalIntercambio'
+    },
+    targetRecetas: {
+      type: String,
+      "default": '#recetasModal'
+    }
   },
   data: function data() {
     return {
@@ -6284,7 +6312,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 attention: _this.cita.attention
               };
               _context.t0 = tipo;
-              _context.next = _context.t0 === 'llegada' ? 6 : _context.t0 === 'atención' ? 11 : _context.t0 === 'fin' ? 17 : 22;
+              _context.next = _context.t0 === 'llegada' ? 6 : _context.t0 === 'atención' ? 11 : _context.t0 === 'fin' ? 17 : 25;
               break;
             case 6:
               if (!_this.cita.entrance) {
@@ -6295,7 +6323,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 8:
               _this.cita.entrance = moment__WEBPACK_IMPORTED_MODULE_0___default()().format('HH:mm:ss');
               payload.entrance = _this.cita.entrance;
-              return _context.abrupt("break", 23);
+              return _context.abrupt("break", 26);
             case 11:
               if (!_this.cita.attention) {
                 _context.next = 13;
@@ -6308,26 +6336,33 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               if (!_this.cita.hora_fin && _this.cita.precio && _this.cita.precio.duracion) {
                 _this.departureTimeLocal = moment__WEBPACK_IMPORTED_MODULE_0___default()(_this.cita.attention, 'HH:mm:ss').add(_this.cita.precio.duracion, 'minutes').format('HH:mm');
               }
-              return _context.abrupt("break", 23);
+              return _context.abrupt("break", 26);
             case 17:
+              if (!(!_this.cita.entrance || !_this.cita.attention)) {
+                _context.next = 20;
+                break;
+              }
+              if (window.alertify) window.alertify.error('Debe registrar la hora de llegada y atención primero.');
+              return _context.abrupt("return");
+            case 20:
               if (!_this.cita.hora_fin) {
-                _context.next = 19;
+                _context.next = 22;
                 break;
               }
               return _context.abrupt("return");
-            case 19:
+            case 22:
               if (!_this.departureTimeLocal) {
                 _this.departureTimeLocal = moment__WEBPACK_IMPORTED_MODULE_0___default()().format('HH:mm');
               }
               payload.departure = _this.departureTimeLocal;
-              return _context.abrupt("break", 23);
-            case 22:
-              return _context.abrupt("break", 23);
-            case 23:
-              _context.prev = 23;
-              _context.next = 26;
-              return _this.axios.post('/api/registrarHora', payload);
+              return _context.abrupt("break", 26);
+            case 25:
+              return _context.abrupt("break", 26);
             case 26:
+              _context.prev = 26;
+              _context.next = 29;
+              return _this.axios.post('/api/registrarHora', payload);
+            case 29:
               response = _context.sent;
               if (((_response$data = response.data) === null || _response$data === void 0 ? void 0 : _response$data.mensaje) == 'Ok') {
                 if (tipo === 'fin') {
@@ -6339,17 +6374,17 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   window.alertify.notify('<i class="fa-regular fa-calendar-check"></i> Datos actualizados', 'success', 5);
                 }
               }
-              _context.next = 33;
+              _context.next = 36;
               break;
-            case 30:
-              _context.prev = 30;
-              _context.t1 = _context["catch"](23);
-              console.error(_context.t1);
             case 33:
+              _context.prev = 33;
+              _context.t1 = _context["catch"](26);
+              console.error(_context.t1);
+            case 36:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[23, 30]]);
+        }, _callee, null, [[26, 33]]);
       }))();
     },
     getServiceLabel: function getServiceLabel(servicio) {
@@ -6980,12 +7015,13 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   methods: {
     update: function update() {
-      if (document.querySelector(".status-appointment").value == 3 && this.motivo == '') {
+      var statusDropdown = this.$el.querySelector(".status-appointment");
+      if (statusDropdown && statusDropdown.value == 3 && this.motivo == '') {
         alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('<i class="fa-solid fa-skull-crossbones"></i> Debe ingresar un motivo para anular la cita', 'danger', 10);
       } else {
         if (this.isProcessing) return;
         this.isProcessing = true;
-        if (document.querySelector(".status-appointment").value == 3) {
+        if (statusDropdown && statusDropdown.value == 3) {
           this.data.schedule_id = null;
           this.updateStatuAppointment();
         } else {
@@ -7031,12 +7067,21 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }))();
     },
     closeModal: function closeModal() {
-      document.getElementById('cerrModalEstado').click();
+      var closeBtn = this.$el.querySelector('.btn-close-custom');
+      if (closeBtn) {
+        closeBtn.click();
+      } else {
+        document.getElementById('cerrModalEstado').click();
+      }
     }
   },
   props: {
     dataCit: Object,
-    idUsuario: Number
+    idUsuario: Number,
+    idModal: {
+      type: String,
+      "default": 'modalEstado'
+    }
   },
   computed: {
     updateStatu: function updateStatu() {
@@ -7078,7 +7123,11 @@ __webpack_require__.r(__webpack_exports__);
   },
   props: {
     dataCit: Object,
-    precios: Array
+    precios: Array,
+    idModal: {
+      type: String,
+      "default": 'infoModal'
+    }
   },
   computed: {
     getData: function getData() {
@@ -7119,7 +7168,14 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'ModalIntercambio',
-  props: ['posibles', 'primero'],
+  props: {
+    posibles: Array,
+    primero: Object,
+    idModal: {
+      type: String,
+      "default": 'modalIntercambio'
+    }
+  },
   data: function data() {
     return {
       idCambio: -1
@@ -8647,7 +8703,13 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'modalTiemposEspera',
-  props: ['cita'],
+  props: {
+    cita: Object,
+    idModal: {
+      type: String,
+      "default": 'modalTiemposEspera'
+    }
+  },
   data: function data() {
     return {
       entrance: null,
@@ -8759,7 +8821,13 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'modalVerRecetas',
-  props: ['prescriptions'],
+  props: {
+    prescriptions: Array,
+    idModal: {
+      type: String,
+      "default": 'recetasModal'
+    }
+  },
   data: function data() {
     return {};
   },
@@ -8849,7 +8917,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   props: {
     cita: Object,
     idUsuario: null,
-    idSede: null
+    idSede: null,
+    idModal: {
+      type: String,
+      "default": 'pagoModal'
+    }
   },
   mounted: function mounted() {
     var _this = this;
@@ -8878,7 +8950,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 idSede: _this2.idSede
               }).then(function (res) {
                 //console.log(res.data)
-                _this2.dataCita.payment.pay_status = _this2.caso.pago;
+                _this2.$set(_this2.dataCita.payment, 'pay_status', _this2.caso.pago);
                 _this2.closeModal();
                 //this.$swal('Pago actualizado con éxito')
                 if (_this2.caso.pago == 2) {
@@ -8903,9 +8975,9 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 }
                 if (_this2.caso.pago == '3' || _this2.caso.pago == 3) {
                   _this2.caso.pago = 1;
-                  _this2.dataCita.payment.pay_status = _this2.caso.pago;
-                  _this2.dataCita.payment.adelanto = parseFloat(_this2.dataCita.payment.adelanto || 0) + parseFloat(_this2.caso.monto_adelanto);
-                  _this2.dataCita.payment.price = parseFloat(_this2.dataCita.payment.price) - parseFloat(_this2.caso.monto_adelanto);
+                  _this2.$set(_this2.dataCita.payment, 'pay_status', _this2.caso.pago);
+                  _this2.$set(_this2.dataCita.payment, 'adelanto', parseFloat(_this2.dataCita.payment.adelanto || 0) + parseFloat(_this2.caso.monto_adelanto));
+                  _this2.$set(_this2.dataCita.payment, 'price', parseFloat(_this2.dataCita.payment.price) - parseFloat(_this2.caso.monto_adelanto));
                   _this2.$emit('actualizarAdelanto', _this2.caso.monto_adelanto, _this2.dataCita.id);
                 }
                 _this2.$emit('actualizar');
@@ -8930,7 +9002,12 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       window.open("/api/pdfCupon/".concat(this.dataCita.id, "?token=").concat(localStorage.getItem('token')), '_blank');
     },
     closeModal: function closeModal() {
-      document.getElementById('cerrModal').click();
+      var closeBtn = this.$el.querySelector('.btn-close-custom');
+      if (closeBtn) {
+        closeBtn.click();
+      } else {
+        document.getElementById('cerrModal').click();
+      }
     },
     pagoModal: function pagoModal(data) {
       console.log('pago modal');
@@ -9031,7 +9108,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   props: {
     dataCit: Object,
-    idUsuario: null
+    idUsuario: null,
+    idModal: {
+      type: String,
+      "default": 'reprogModal'
+    }
   },
   methods: {
     getProfessional: function getProfessional() {
@@ -9143,19 +9224,21 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     mandarVacio: function mandarVacio() {
       var _this5 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var selectHorario;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
-              if (!(document.getElementById('sltProfesionalHorarioID').value == '')) {
-                _context4.next = 4;
+              selectHorario = _this5.$el.querySelector('#sltProfesionalHorarioID');
+              if (!(!selectHorario || selectHorario.value == '')) {
+                _context4.next = 5;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('El horario no puede estar vacío', 'danger', 10);
-              _context4.next = 7;
+              _context4.next = 8;
               break;
-            case 4:
+            case 5:
               _this5.data.user_id = _this5.idUsuario;
-              _context4.next = 7;
+              _context4.next = 8;
               return _this5.axios.put("/api/mandarVacio/".concat(_this5.dataCit.id), _this5.data).then(function (res) {
                 console.log(res.data);
                 _this5.closeModal();
@@ -9168,7 +9251,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               })["catch"](function (err) {
                 console.error(err);
               });
-            case 7:
+            case 8:
             case "end":
               return _context4.stop();
           }
@@ -9246,7 +9329,12 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       });
     },
     closeModal: function closeModal() {
-      document.getElementById('cerrModal').click();
+      var closeBtn = this.$el.querySelector('[data-bs-dismiss="modal"]');
+      if (closeBtn) {
+        closeBtn.click();
+      } else {
+        document.getElementById('cerrModal').click();
+      }
     },
     dayWeek: function dayWeek(day) {
       switch (day) {
@@ -10164,6 +10252,9 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
                 // Cruzar con horas malas
                 var ocupado = false;
                 _this3.doctores.forEach(function (profesional) {
+                  _this3.$set(profesional, 'horariosOcupados', _this3.horasMalas.filter(function (horaMala) {
+                    return parseInt(horaMala.professional_id) == parseInt(profesional.id);
+                  }));
                   profesional.horarios.forEach(function (horario) {
                     ocupado = _this3.horasMalas.findIndex(function (hora) {
                       return hora.schedule_id == horario.id;
@@ -10371,6 +10462,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         if (cita.status == 2) estado = 'Confirmado';
         if (cita.status == 3) estado = 'Anulado';
         if (cita.status == 4) estado = 'Reprogramado';
+        if (cita.status == 5) estado = 'Atendida';
         this.tooltipData = {
           paciente: cita.patient.name.split(' ')[0] + ' ' + cita.patient.nombres.split(' ')[0],
           hora: horaRango,
@@ -11289,7 +11381,7 @@ var render = function render() {
   return _c("div", {
     staticClass: "modal fade",
     attrs: {
-      id: "modalAccionesCita",
+      id: _vm.idModal,
       tabindex: "-1",
       role: "dialog",
       "aria-hidden": "true"
@@ -11312,7 +11404,7 @@ var render = function render() {
   }, [_vm._m(0), _vm._v(" "), _c("div", [_c("h5", {
     staticClass: "modal-title font-weight-bold text-dark mb-1"
   }, [_vm._v("Detalle de Cita")]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex gap-2 mt-1 flex-wrap"
+    staticClass: "d-flex gap-2 mt-1 flex-wrap align-items-center"
   }, [_c("span", {
     staticClass: "badge-status",
     "class": _vm.statusClass(_vm.cita.status)
@@ -11322,7 +11414,11 @@ var render = function render() {
     staticClass: "badge-service"
   }, [_c("i", {
     staticClass: "fas fa-stethoscope mr-1"
-  }), _vm._v(" " + _vm._s(_vm.getServiceLabel(_vm.cita)) + "\n              ")]) : _vm._e()])])]), _vm._v(" "), _vm._m(1)]), _vm._v(" "), _c("div", {
+  }), _vm._v(" " + _vm._s(_vm.getServiceLabel(_vm.cita)) + "\n              ")]) : _vm._e(), _vm._v(" "), parseInt(_vm.cita.idMembresia) > 0 ? _c("span", {
+    staticClass: "badge-package"
+  }, [_c("i", {
+    staticClass: "fas fa-box-open mr-1"
+  }), _vm._v(" " + _vm._s(_vm.cita.membresia && _vm.cita.membresia.precio ? _vm.cita.membresia.precio.descripcion : "PAQUETE") + "\n              ")]) : _vm._e()])])]), _vm._v(" "), _vm._m(1)]), _vm._v(" "), _c("div", {
     staticClass: "modal-body px-4 pt-4"
   }, [_c("div", {
     staticClass: "status-cards-grid mb-4"
@@ -11330,11 +11426,11 @@ var render = function render() {
     staticClass: "status-card h-100",
     attrs: {
       "data-bs-toggle": "modal",
-      "data-bs-target": "#pagoModal"
+      "data-bs-target": _vm.targetPago
     },
     on: {
       click: function click($event) {
-        return _vm.$emit("openModal", _vm.cita, "#pagoModal", _vm.indiceElegido);
+        return _vm.$emit("openModal", _vm.cita, _vm.targetPago, _vm.indiceElegido);
       }
     }
   }, [_vm._m(2), _vm._v(" "), _c("div", {
@@ -11358,11 +11454,11 @@ var render = function render() {
     staticClass: "status-card h-100",
     attrs: {
       "data-bs-toggle": "modal",
-      "data-bs-target": "#modalEstado"
+      "data-bs-target": _vm.targetEstado
     },
     on: {
       click: function click($event) {
-        return _vm.$emit("openModal", _vm.cita, "#modalEstado", _vm.indiceElegido);
+        return _vm.$emit("openModal", _vm.cita, _vm.targetEstado, _vm.indiceElegido);
       }
     }
   }, [_vm._m(3), _vm._v(" "), _c("div", {
@@ -11518,11 +11614,11 @@ var render = function render() {
     staticClass: "btn btn-link text-dark text-decoration-none small p-0 ms-2",
     attrs: {
       "data-bs-toggle": "modal",
-      "data-bs-target": "#infoModal"
+      "data-bs-target": _vm.targetInfo
     },
     on: {
       click: function click($event) {
-        return _vm.$emit("openModal", _vm.cita, "#infoModal", _vm.indiceElegido);
+        return _vm.$emit("openModal", _vm.cita, _vm.targetInfo, _vm.indiceElegido);
       }
     }
   }, [_c("i", {
@@ -11553,7 +11649,7 @@ var render = function render() {
     staticClass: "detail-label text-uppercase"
   }, [_vm._v("Profesional")]), _vm._v(" "), _c("div", {
     staticClass: "detail-value text-truncate"
-  }, [_vm._v(_vm._s(_vm.cita.professional ? _vm.cita.professional.name : "N/A"))])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v(_vm._s(_vm.cita.professional && _vm.cita.professional.name ? _vm.cita.professional.name.split(" ").slice(0, 2).join(" ") : "N/A"))])])]), _vm._v(" "), _c("div", {
     staticClass: "detail-item"
   }, [_vm._m(10), _vm._v(" "), _c("div", {
     staticClass: "detail-content overflow-hidden"
@@ -11561,7 +11657,18 @@ var render = function render() {
     staticClass: "detail-label text-uppercase"
   }, [_vm._v("Modalidad")]), _vm._v(" "), _c("div", {
     staticClass: "detail-value"
-  }, [_vm._v(_vm._s(_vm.cita.mode == 1 ? "Presencial" : "Virtual"))])])])]), _vm._v(" "), _c("hr", {
+  }, [_vm._v(_vm._s(_vm.cita.mode == 1 ? "Presencial" : "Virtual"))])])]), _vm._v(" "), parseInt(_vm.cita.idMembresia) > 0 ? _c("div", {
+    staticClass: "detail-item",
+    staticStyle: {
+      "grid-column": "span 2"
+    }
+  }, [_vm._m(11), _vm._v(" "), _c("div", {
+    staticClass: "detail-content overflow-hidden"
+  }, [_c("div", {
+    staticClass: "detail-label text-uppercase"
+  }, [_vm._v("Paquete")]), _vm._v(" "), _c("div", {
+    staticClass: "detail-value text-truncate"
+  }, [_vm._v(_vm._s(_vm.cita.membresia && _vm.cita.membresia.precio ? _vm.cita.membresia.precio.descripcion : "Asociado a Paquete"))])])]) : _vm._e()]), _vm._v(" "), _c("hr", {
     staticClass: "my-4",
     staticStyle: {
       opacity: "0.1"
@@ -11571,12 +11678,12 @@ var render = function render() {
   }, [_vm.cita.status != 3 ? _c("button", {
     staticClass: "btn btn-action btn-outline-primary",
     attrs: {
-      "data-bs-target": "#reprogModal",
+      "data-bs-target": _vm.targetReprog,
       "data-bs-toggle": "modal"
     },
     on: {
       click: function click($event) {
-        return _vm.$emit("openModal", _vm.cita, "#reprogModal", _vm.indiceElegido);
+        return _vm.$emit("openModal", _vm.cita, _vm.targetReprog, _vm.indiceElegido);
       }
     }
   }, [_c("i", {
@@ -11597,11 +11704,11 @@ var render = function render() {
     staticClass: "btn btn-action btn-outline-secondary",
     attrs: {
       "data-bs-toggle": "modal",
-      "data-bs-target": "#modalEstado"
+      "data-bs-target": _vm.targetEstado
     },
     on: {
       click: function click($event) {
-        return _vm.$emit("openModal", _vm.cita, "#modalEstado", _vm.indiceElegido);
+        return _vm.$emit("openModal", _vm.cita, _vm.targetEstado, _vm.indiceElegido);
       }
     }
   }, [_c("i", {
@@ -11610,11 +11717,11 @@ var render = function render() {
     staticClass: "btn btn-action btn-outline-secondary",
     attrs: {
       "data-bs-toggle": "modal",
-      "data-bs-target": "#modalEstado"
+      "data-bs-target": _vm.targetEstado
     },
     on: {
       click: function click($event) {
-        return _vm.$emit("openModal", _vm.cita, "#modalEstado", _vm.indiceElegido);
+        return _vm.$emit("openModal", _vm.cita, _vm.targetEstado, _vm.indiceElegido);
       }
     }
   }, [_c("i", {
@@ -11651,7 +11758,7 @@ var render = function render() {
   }, [_c("button", {
     staticClass: "btn btn-link text-muted p-0 small",
     attrs: {
-      "data-bs-target": "#modalIntercambio",
+      "data-bs-target": _vm.targetIntercambio,
       "data-bs-toggle": "modal",
       title: "Intercambiar"
     },
@@ -11678,7 +11785,7 @@ var render = function render() {
     staticClass: "btn btn-link text-muted p-0 small",
     attrs: {
       "data-bs-toggle": "modal",
-      "data-bs-target": "#recetasModal",
+      "data-bs-target": _vm.targetRecetas,
       title: "Recetas"
     },
     on: {
@@ -11795,6 +11902,14 @@ var staticRenderFns = [function () {
     staticClass: "detail-icon"
   }, [_c("i", {
     staticClass: "fas fa-video text-secondary"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "detail-icon"
+  }, [_c("i", {
+    staticClass: "fas fa-box-open text-warning"
   })]);
 }];
 render._withStripped = true;
@@ -12931,7 +13046,7 @@ var render = function render() {
   return _c("div", {
     staticClass: "modal fade",
     attrs: {
-      id: "modalEstado",
+      id: _vm.idModal,
       tabindex: "-1",
       role: "dialog",
       "aria-hidden": "true"
@@ -13099,7 +13214,7 @@ var render = function render() {
   return _c("div", {
     staticClass: "modal fade",
     attrs: {
-      id: "infoModal",
+      id: _vm.idModal,
       tabindex: "-1",
       role: "dialog",
       "aria-labelledby": "exampleModalLabel",
@@ -13198,7 +13313,7 @@ var render = function render() {
   return _c("div", {
     staticClass: "modal fade",
     attrs: {
-      id: "modalIntercambio",
+      id: _vm.idModal,
       tabindex: "-1",
       "aria-labelledby": "exampleModalLabel",
       "aria-hidden": "true"
@@ -17046,7 +17161,7 @@ var render = function render() {
   return _c("div", {
     staticClass: "modal fade",
     attrs: {
-      id: "modalTiemposEspera",
+      id: _vm.idModal,
       tabindex: "-1",
       role: "dialog",
       "aria-hidden": "true"
@@ -17268,7 +17383,7 @@ var render = function render() {
   return _c("div", {
     staticClass: "modal fade",
     attrs: {
-      id: "recetasModal",
+      id: _vm.idModal,
       tabindex: "-1",
       "aria-labelledby": "modalEvolution",
       "aria-hidden": "true"
@@ -17425,10 +17540,10 @@ var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    ref: "pagoModal",
+    ref: _vm.idModal,
     staticClass: "modal fade",
     attrs: {
-      id: "pagoModal",
+      id: _vm.idModal,
       tabindex: "-1",
       role: "dialog",
       "aria-hidden": "true"
@@ -17800,7 +17915,7 @@ var render = function render() {
   return _c("div", {
     staticClass: "modal fade",
     attrs: {
-      id: "reprogModal",
+      id: _vm.idModal,
       tabindex: "-1",
       role: "dialog",
       "aria-labelledby": "exampleModalLabel",
@@ -19174,7 +19289,7 @@ var render = function render() {
         }],
         attrs: {
           "data-bs-toggle": _vm.isBlocked(horaOcup) ? null : "modal",
-          "data-bs-target": _vm.isBlocked(horaOcup) ? null : "#modalAccionesCita"
+          "data-bs-target": _vm.isBlocked(horaOcup) ? null : "#modalAccionesCitaCuaderno"
         },
         on: {
           click: function click($event) {
@@ -19282,7 +19397,7 @@ var render = function render() {
         }
       })]), _vm._v(" "), _c("i", {
         staticClass: "fas fa-dollar-sign",
-        "class": horaOcup.payment && horaOcup.payment.pay_status == 1 ? "text-danger" : "text-success",
+        "class": horaOcup.payment && horaOcup.payment.pay_status == 2 ? "text-success" : "text-danger",
         staticStyle: {
           "font-size": "0.75rem"
         }
@@ -19337,7 +19452,14 @@ var render = function render() {
     attrs: {
       cita: _vm.cita,
       indiceElegido: _vm.indexElegido,
-      precios: _vm.precios
+      precios: _vm.precios,
+      idModal: "modalAccionesCitaCuaderno",
+      targetPago: "#pagoModalCuaderno",
+      targetEstado: "#modalEstadoCuaderno",
+      targetInfo: "#infoModalCuaderno",
+      targetReprog: "#reprogModalCuaderno",
+      targetIntercambio: "#modalIntercambioCuaderno",
+      targetRecetas: "#recetasModalCuaderno"
     },
     on: {
       changeMode: _vm.changeMode,
@@ -19351,7 +19473,8 @@ var render = function render() {
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("modal-estado", {
     attrs: {
       dataCit: _vm.cita,
-      idUsuario: _vm.idUsuario
+      idUsuario: _vm.idUsuario,
+      idModal: "modalEstadoCuaderno"
     },
     on: {
       actualizar: _vm.actualizarListadoCitas
@@ -19360,7 +19483,8 @@ var render = function render() {
     attrs: {
       cita: _vm.cita,
       idUsuario: _vm.idUsuario,
-      idSede: _vm.idSede
+      idSede: _vm.idSede,
+      idModal: "pagoModalCuaderno"
     },
     on: {
       actualizarAdelanto: _vm.actualizarAdelanto,
@@ -19373,7 +19497,8 @@ var render = function render() {
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("reprog-modal", {
     attrs: {
       dataCit: _vm.cita,
-      idUsuario: _vm.idUsuario
+      idUsuario: _vm.idUsuario,
+      idModal: "reprogModalCuaderno"
     },
     on: {
       ocultarCita: _vm.actualizarListadoCitas
@@ -19381,23 +19506,27 @@ var render = function render() {
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("info-modal", {
     attrs: {
       dataCit: _vm.cita,
-      precios: _vm.precios
+      precios: _vm.precios,
+      idModal: "infoModalCuaderno"
     }
   }) : _vm._e(), _vm._v(" "), _c("modal-search-patient"), _vm._v(" "), _c("ModalIntercambio", {
     attrs: {
       posibles: _vm.posibles,
-      primero: _vm.primero
+      primero: _vm.primero,
+      idModal: "modalIntercambioCuaderno"
     },
     on: {
       actualizar: _vm.actualizarListadoCitas
     }
   }), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("modalVerRecetas", {
     attrs: {
-      prescriptions: _vm.recetas
+      prescriptions: _vm.recetas,
+      idModal: "recetasModalCuaderno"
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("modalTiemposEspera", {
     attrs: {
-      cita: _vm.cita
+      cita: _vm.cita,
+      idModal: "modalTiemposEsperaCuaderno"
     },
     on: {
       actualizar: _vm.actualizarListadoCitas
@@ -21843,7 +21972,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\r\n/* Main Layout */\n.modal-content[data-v-4fc44170] {\r\n  background: #ffffff;\n}\r\n\r\n/* Header */\n.icon-header-container[data-v-4fc44170] {\r\n  background: #f0f7ff;\r\n  width: 44px;\r\n  height: 44px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  border-radius: 12px;\n}\n.btn-close-custom[data-v-4fc44170] {\r\n  background: #f8f9fa;\r\n  border: none;\r\n  width: 32px;\r\n  height: 32px;\r\n  border-radius: 50%;\r\n  color: #adb5bd;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  transition: all 0.2s;\r\n  cursor: pointer;\n}\n.btn-close-custom[data-v-4fc44170]:hover { background: #e9ecef; color: #495057;\n}\r\n\r\n/* Badges */\n.badge-status[data-v-4fc44170] {\r\n  padding: 4px 12px;\r\n  border-radius: 50px;\r\n  font-size: 0.7rem;\r\n  font-weight: 700;\r\n  text-transform: uppercase;\n}\n.status-badge-success[data-v-4fc44170] { background: #e7fcf3; color: #0ca678; border: 1px solid #c3fae8;\n}\n.status-badge-secondary[data-v-4fc44170] { background: #f1f3f5; color: #495057; border: 1px solid #e9ecef;\n}\n.status-badge-danger[data-v-4fc44170] { background: #fff5f5; color: #e03131; border: 1px solid #ffe3e3;\n}\n.status-badge-info[data-v-4fc44170] { background: #e7f5ff; color: #1971c2; border: 1px solid #d0ebff;\n}\n.badge-service[data-v-4fc44170] {\r\n  padding: 4px 12px;\r\n  border-radius: 50px;\r\n  font-size: 0.7rem;\r\n  font-weight: 700;\r\n  text-transform: uppercase;\r\n  background: #fff4e6;\r\n  color: #fd7e14;\r\n  border: 1px solid #ffe8cc;\n}\r\n\r\n/* Status Cards */\n.status-cards-grid[data-v-4fc44170] {\r\n  display: grid;\r\n  grid-template-columns: repeat(3, 1fr);\r\n  gap: 12px;\n}\n.status-card[data-v-4fc44170] {\r\n  background: #f8f9fc;\r\n  border-radius: 14px;\r\n  padding: 12px;\r\n  border: 1px solid #f1f3f9;\r\n  cursor: pointer;\r\n  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);\n}\n.status-card[data-v-4fc44170]:hover { border-color: #dbe4ff; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.03);\n}\n.status-card-header[data-v-4fc44170] {\r\n  font-size: 0.65rem;\r\n  font-weight: 800;\r\n  color: #adb5bd;\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 6px;\r\n  letter-spacing: 1px;\n}\n.status-options[data-v-4fc44170] {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 3px;\n}\n.status-option[data-v-4fc44170] {\r\n  padding: 6px 10px;\r\n  border-radius: 8px;\r\n  font-size: 0.75rem;\r\n  color: #868e96;\r\n  border: 1px solid transparent;\n}\n.status-option.active[data-v-4fc44170] {\r\n  background: #ffffff;\r\n  border-color: #e9ecef;\r\n  font-weight: 700;\r\n  color: #495057;\r\n  box-shadow: 0 2px 4px rgba(0,0,0,0.02);\n}\n.status-option.active-warning.active[data-v-4fc44170] { background: #fff9db; border-color: #ffe066; color: #f08c00;\n}\n.status-option.active-success.active[data-v-4fc44170] { background: #ebfbee; border-color: #8ce99a; color: #2b8a3e;\n}\r\n\r\n/* Sections */\n.section-label[data-v-4fc44170] {\r\n  font-size: 0.7rem;\r\n  font-weight: 800;\r\n  color: #adb5bd;\r\n  letter-spacing: 1px;\r\n  text-transform: uppercase;\n}\n.time-control-container[data-v-4fc44170], .patient-card[data-v-4fc44170] {\r\n  background: #f8f9fc;\r\n  border-radius: 16px;\r\n  border: 1px solid #f1f3f9;\n}\n.time-item[data-v-4fc44170] { text-align: center; flex: 1;\n}\n.time-label[data-v-4fc44170] { font-size: 0.65rem; color: #adb5bd; margin-bottom: 2px;\n}\n.time-value[data-v-4fc44170] { font-size: 0.9rem; font-weight: 800; color: #495057;\n}\n.btn-registrar[data-v-4fc44170] {\r\n  background: #ffffff;\r\n  border: 1px solid #dee2e6;\r\n  border-radius: 10px;\r\n  padding: 4px 12px;\r\n  font-weight: 700;\r\n  font-size: 0.75rem;\r\n  color: #495057;\r\n  transition: all 0.2s;\n}\n.btn-registrar[data-v-4fc44170]:hover { background: #f8f9fa; border-color: #ced4da;\n}\r\n\r\n/* Patient Card */\n.patient-avatar[data-v-4fc44170] {\r\n  background: #e7f5ff;\r\n  width: 44px;\r\n  height: 44px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  border-radius: 50%;\r\n  flex-shrink: 0;\n}\n.patient-name[data-v-4fc44170] { font-size: 0.95rem; color: #212529; line-height: 1.2;\n}\n.patient-dni[data-v-4fc44170] { font-size: 0.75rem;\n}\r\n\r\n/* Details Grid */\n.details-grid[data-v-4fc44170] {\r\n  display: grid;\r\n  grid-template-columns: 1fr 1fr;\r\n  gap: 12px;\n}\n.detail-item[data-v-4fc44170] {\r\n  display: flex;\r\n  align-items: center;\r\n  background: #f8f9fc;\r\n  padding: 12px;\r\n  border-radius: 14px;\r\n  border: 1px solid #f1f3f9;\n}\n.detail-icon[data-v-4fc44170] {\r\n  width: 36px;\r\n  height: 36px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  background: #fff;\r\n  border-radius: 10px;\r\n  margin-right: 12px;\r\n  font-size: 1rem;\r\n  box-shadow: 0 2px 4px rgba(0,0,0,0.02);\n}\n.detail-label[data-v-4fc44170] { font-size: 0.65rem; color: #adb5bd; font-weight: 800; margin-bottom: 0;\n}\n.detail-value[data-v-4fc44170] { font-size: 0.85rem; font-weight: 700; color: #495057;\n}\r\n\r\n/* Action Buttons */\n.btn-action[data-v-4fc44170] {\r\n  border-radius: 12px;\r\n  padding: 10px 16px;\r\n  font-weight: 700;\r\n  font-size: 0.8rem;\r\n  transition: all 0.2s;\r\n  min-width: 130px;\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: center;\n}\n.btn-action[data-v-4fc44170]:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.05);\n}\n.border-left[data-v-4fc44170] { border-left: 1px solid #e9ecef!important;\n}\n.border-right[data-v-4fc44170] { border-right: 1px solid #e9ecef!important;\n}\n.gap-2[data-v-4fc44170] { gap: 0.5rem;\n}\n.gap-3[data-v-4fc44170] { gap: 0.75rem;\n}\n.gap-4[data-v-4fc44170] { gap: 1.5rem;\n}\n.mr-2[data-v-4fc44170] { margin-right: 0.5rem;\n}\n.mr-3[data-v-4fc44170] { margin-right: 0.75rem;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n/* Main Layout */\n.modal-content[data-v-4fc44170] {\n  background: #ffffff;\n}\n\n/* Header */\n.icon-header-container[data-v-4fc44170] {\n  background: #f0f7ff;\n  width: 44px;\n  height: 44px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 12px;\n}\n.btn-close-custom[data-v-4fc44170] {\n  background: #f8f9fa;\n  border: none;\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  color: #adb5bd;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  transition: all 0.2s;\n  cursor: pointer;\n}\n.btn-close-custom[data-v-4fc44170]:hover { background: #e9ecef; color: #495057;\n}\n\n/* Badges */\n.badge-status[data-v-4fc44170] {\n  padding: 4px 12px;\n  border-radius: 50px;\n  font-size: 0.7rem;\n  font-weight: 700;\n  text-transform: uppercase;\n}\n.status-badge-success[data-v-4fc44170] { background: #e7fcf3; color: #0ca678; border: 1px solid #c3fae8;\n}\n.status-badge-secondary[data-v-4fc44170] { background: #f1f3f5; color: #495057; border: 1px solid #e9ecef;\n}\n.status-badge-danger[data-v-4fc44170] { background: #fff5f5; color: #e03131; border: 1px solid #ffe3e3;\n}\n.status-badge-info[data-v-4fc44170] { background: #e7f5ff; color: #1971c2; border: 1px solid #d0ebff;\n}\n.badge-service[data-v-4fc44170] {\n  padding: 4px 12px;\n  border-radius: 50px;\n  font-size: 0.7rem;\n  font-weight: 700;\n  text-transform: uppercase;\n  background: #fff4e6;\n  color: #fd7e14;\n  border: 1px solid #ffe8cc;\n}\n.badge-package[data-v-4fc44170] {\n  padding: 4px 12px;\n  border-radius: 50px;\n  font-size: 0.7rem;\n  font-weight: 700;\n  text-transform: uppercase;\n  background: #fff1db;\n  color: #f97316;\n  border: 1px solid #ffedd5;\n  display: inline-flex;\n  align-items: center;\n}\n\n/* Status Cards. */\n.status-cards-grid[data-v-4fc44170] {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 12px;\n}\n.status-card[data-v-4fc44170] {\n  background: #f8f9fc;\n  border-radius: 14px;\n  padding: 12px;\n  border: 1px solid #f1f3f9;\n  cursor: pointer;\n  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);\n}\n.status-card[data-v-4fc44170]:hover { border-color: #dbe4ff; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.03);\n}\n.status-card-header[data-v-4fc44170] {\n  font-size: 0.65rem;\n  font-weight: 800;\n  color: #adb5bd;\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  letter-spacing: 1px;\n}\n.status-options[data-v-4fc44170] {\n  display: flex;\n  flex-direction: column;\n  gap: 3px;\n}\n.status-option[data-v-4fc44170] {\n  padding: 6px 10px;\n  border-radius: 8px;\n  font-size: 0.75rem;\n  color: #868e96;\n  border: 1px solid transparent;\n}\n.status-option.active[data-v-4fc44170] {\n  background: #ffffff;\n  border-color: #e9ecef;\n  font-weight: 700;\n  color: #495057;\n  box-shadow: 0 2px 4px rgba(0,0,0,0.02);\n}\n.status-option.active-warning.active[data-v-4fc44170] { background: #fff9db; border-color: #ffe066; color: #f08c00;\n}\n.status-option.active-success.active[data-v-4fc44170] { background: #ebfbee; border-color: #8ce99a; color: #2b8a3e;\n}\n\n/* Sections. */\n.section-label[data-v-4fc44170] {\n  font-size: 0.7rem;\n  font-weight: 800;\n  color: #adb5bd;\n  letter-spacing: 1px;\n  text-transform: uppercase;\n}\n.time-control-container[data-v-4fc44170], .patient-card[data-v-4fc44170] {\n  background: #f8f9fc;\n  border-radius: 16px;\n  border: 1px solid #f1f3f9;\n}\n.time-item[data-v-4fc44170] { text-align: center; flex: 1;\n}\n.time-label[data-v-4fc44170] { font-size: 0.65rem; color: #adb5bd; margin-bottom: 2px;\n}\n.time-value[data-v-4fc44170] { font-size: 0.9rem; font-weight: 800; color: #495057;\n}\n.btn-registrar[data-v-4fc44170] {\n  background: #ffffff;\n  border: 1px solid #dee2e6;\n  border-radius: 10px;\n  padding: 4px 12px;\n  font-weight: 700;\n  font-size: 0.75rem;\n  color: #495057;\n  transition: all 0.2s;\n}\n.btn-registrar[data-v-4fc44170]:hover { background: #f8f9fa; border-color: #ced4da;\n}\n\n/* Patient Card. */\n.patient-avatar[data-v-4fc44170] {\n  background: #e7f5ff;\n  width: 44px;\n  height: 44px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 50%;\n  flex-shrink: 0;\n}\n.patient-name[data-v-4fc44170] { font-size: 0.95rem; color: #212529; line-height: 1.2;\n}\n.patient-dni[data-v-4fc44170] { font-size: 0.75rem;\n}\n\n/* Details Grid */\n.details-grid[data-v-4fc44170] {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 12px;\n}\n.detail-item[data-v-4fc44170] {\n  display: flex;\n  align-items: center;\n  background: #f8f9fc;\n  padding: 12px;\n  border-radius: 14px;\n  border: 1px solid #f1f3f9;\n}\n.detail-icon[data-v-4fc44170] {\n  width: 36px;\n  height: 36px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: #fff;\n  border-radius: 10px;\n  margin-right: 12px;\n  font-size: 1rem;\n  box-shadow: 0 2px 4px rgba(0,0,0,0.02);\n}\n.detail-label[data-v-4fc44170] { font-size: 0.65rem; color: #adb5bd; font-weight: 800; margin-bottom: 0;\n}\n.detail-value[data-v-4fc44170] { font-size: 0.85rem; font-weight: 700; color: #495057;\n}\n\n/* Action Buttons. */\n.btn-action[data-v-4fc44170] {\n  border-radius: 12px;\n  padding: 10px 16px;\n  font-weight: 700;\n  font-size: 0.8rem;\n  transition: all 0.2s;\n  min-width: 130px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.btn-action[data-v-4fc44170]:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.05);\n}\n.border-left[data-v-4fc44170] { border-left: 1px solid #e9ecef!important;\n}\n.border-right[data-v-4fc44170] { border-right: 1px solid #e9ecef!important;\n}\n.gap-2[data-v-4fc44170] { gap: 0.5rem;\n}\n.gap-3[data-v-4fc44170] { gap: 0.75rem;\n}\n.gap-4[data-v-4fc44170] { gap: 1.5rem;\n}\n.mr-2[data-v-4fc44170] { margin-right: 0.5rem;\n}\n.mr-3[data-v-4fc44170] { margin-right: 0.75rem;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

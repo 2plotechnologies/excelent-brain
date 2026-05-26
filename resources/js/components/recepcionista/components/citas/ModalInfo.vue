@@ -1,5 +1,5 @@
 <template>
-  <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade" :id="idModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -89,7 +89,7 @@
     },
     
     props: {
-      dataCit: Object, precios: Array
+      dataCit: Object, precios: Array, idModal: { type: String, default: 'infoModal' }
     },
 
     computed : {

@@ -1,5 +1,5 @@
 <template>
-	<div class="modal fade" id="pagoModal" ref="pagoModal" tabindex="-1" role="dialog" aria-hidden="true" >
+	<div class="modal fade" :id="idModal" :ref="idModal" tabindex="-1" role="dialog" aria-hidden="true" >
 		<div class="modal-dialog modal-dialog-centered" role="document" >
 			<div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
 				<div class="modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between">
@@ -137,7 +137,7 @@ import moment from 'moment'
 			}
 		},
 		props:{
-			cita: Object, idUsuario:null, idSede:null
+			cita: Object, idUsuario:null, idSede:null, idModal: { type: String, default: 'pagoModal' }
 		},
 		mounted() {
 			this.axios.get("/api/listarMonedas")
@@ -150,7 +150,7 @@ import moment from 'moment'
 				await this.axios.put(`/api/pagarCita/${this.dataCita.id}`, {dataCita: this.dataCita, caso: this.caso, idSede:this.idSede})
 				.then(res => {
 					//console.log(res.data)
-					this.dataCita.payment.pay_status = this.caso.pago;
+					this.$set(this.dataCita.payment, 'pay_status', this.caso.pago);
 					this.closeModal()
 					//this.$swal('Pago actualizado con éxito')
 					if( this.caso.pago ==2){
@@ -178,9 +178,9 @@ import moment from 'moment'
 					}
 					if(this.caso.pago == '3' || this.caso.pago==3){
 						this.caso.pago = 1
-						this.dataCita.payment.pay_status = this.caso.pago
-						this.dataCita.payment.adelanto = parseFloat(this.dataCita.payment.adelanto || 0) + parseFloat(this.caso.monto_adelanto);
-						this.dataCita.payment.price = parseFloat(this.dataCita.payment.price) - parseFloat(this.caso.monto_adelanto);
+						this.$set(this.dataCita.payment, 'pay_status', this.caso.pago);
+						this.$set(this.dataCita.payment, 'adelanto', parseFloat(this.dataCita.payment.adelanto || 0) + parseFloat(this.caso.monto_adelanto));
+						this.$set(this.dataCita.payment, 'price', parseFloat(this.dataCita.payment.price) - parseFloat(this.caso.monto_adelanto));
 						this.$emit('actualizarAdelanto', this.caso.monto_adelanto, this.dataCita.id)
 					}
 					this.$emit('actualizar')
@@ -201,7 +201,12 @@ import moment from 'moment'
 				window.open(`/api/pdfCupon/${this.dataCita.id}?token=${localStorage.getItem('token')}`, '_blank');
 			},
 			closeModal() {
-				document.getElementById('cerrModal').click();
+				const closeBtn = this.$el.querySelector('.btn-close-custom');
+				if (closeBtn) {
+					closeBtn.click();
+				} else {
+					document.getElementById('cerrModal').click();
+				}
 			},
 			pagoModal(data){
 				console.log('pago modal');

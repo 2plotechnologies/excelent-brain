@@ -562,6 +562,18 @@
             </div>
 
             <div class="row g-3">
+              <!-- Tipo de Cita -->
+              <div class="col-12">
+                <label class="form-label small fw-bold text-muted text-uppercase">Tipo de Cita <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0"><i class="fas fa-stethoscope text-muted"></i></span>
+                  <select class="form-select border-start-0" v-model="nuevaSesion.tipo">
+                    <option value="" disabled>{{ precios.length ? 'Seleccione un tipo de cita' : 'Cargando tipos de cita...' }}</option>
+                    <option v-for="precio in preciosFiltrados" :key="precio.id" :value="precio.id">{{ precio.descripcion }}</option>
+                  </select>
+                </div>
+              </div>
+
               <!-- Profesional -->
               <div class="col-12">
                 <label class="form-label small fw-bold text-muted text-uppercase">Profesional <span class="text-danger">*</span></label>
@@ -625,7 +637,7 @@
               type="button" 
               class="btn btn-primary rounded-pill px-4 shadow" 
               @click="guardarCitaPaquete"
-              :disabled="!nuevaSesion.idHorario || guardandoCita"
+              :disabled="!nuevaSesion.tipo || !nuevaSesion.idHorario || guardandoCita"
             >
               <i v-if="guardandoCita" class="fas fa-spinner fa-spin me-2"></i>
               <i v-else class="fas fa-save me-2"></i>
@@ -766,6 +778,7 @@ export default {
         proximos_pasos: ''
       },
       // Agendamiento de sesiones
+      precios: [],
       doctores: [],
       horariosDisponibles: [],
       loadingHorarios: false,
@@ -781,7 +794,8 @@ export default {
         idProfesional: '',
         fecha: new Date().toISOString().split('T')[0],
         idHorario: '',
-        modalidad: '1'
+        modalidad: '1',
+        tipo: ''
       }
     };
   },
@@ -832,18 +846,44 @@ export default {
         return acc;
       }, { totalDeudores: 0, totalDeuda: 0, totalCobrado: 0 });
     },
+    especialidadResuelta() {
+      if (!this.paqueteSeleccionado) return 2; // Por defecto Psicológica
+      const esp = (this.paqueteSeleccionado.paquete_especialidad || '').toLowerCase();
+      const nombre = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
+      if (esp === 'psiquiatrica' || esp === 'psiquíatrica' || nombre.includes('psiquiatr')) {
+        return 1;
+      } else if (esp === 'psicologica' || esp === 'psicológica' || nombre.includes('psicolog')) {
+        return 2;
+      } else if (esp === 'nutricional' || nombre.includes('nutricion') || nombre.includes('nutrición')) {
+        return 6;
+      }
+      return this.paqueteSeleccionado.idClasificacion == 5 ? 2 : this.paqueteSeleccionado.idClasificacion;
+    },
     doctoresFiltrados() {
       if (!this.paqueteSeleccionado || !this.doctores.length) return [];
+      const clasificacion = this.especialidadResuelta;
       // Usar == para evitar problemas de tipo (string vs int)
-      const filtrados = this.doctores.filter(doc => doc.idProfesion == this.paqueteSeleccionado.idClasificacion);
+      const filtrados = this.doctores.filter(doc => doc.idProfesion == clasificacion);
       // Si por alguna razón el filtro no devuelve nada, mostramos todos para no bloquear al usuario
       return filtrados.length > 0 ? filtrados : this.doctores;
+    },
+    preciosFiltrados() {
+      if (!this.paqueteSeleccionado || !this.precios || !this.precios.length) return [];
+      const clasificacion = this.especialidadResuelta;
+      return this.precios.filter(precio => 
+        precio.idClasificacion == clasificacion && 
+        precio.servicio == '1' && 
+        precio.id != 48 && 
+        precio.id != 49 && 
+        precio.activo == '1'
+      );
     }
   },
   mounted() {
     this.obtenerUsuarioYPaquetes();
     this.cargarMonedas();
     this.cargarProfesionales();
+    this.listarPrecios();
   },
   methods: {
     async obtenerUsuarioYPaquetes() {
@@ -922,13 +962,22 @@ export default {
         console.error("Error cargando profesionales:", error);
       }
     },
+    async listarPrecios() {
+      try {
+        const response = await this.axios.get('/api/listarPreciosTodos');
+        this.precios = response.data;
+      } catch (error) {
+        console.error("Error cargando precios:", error);
+      }
+    },
     abrirAgendarCita(paquete) {
       this.paqueteSeleccionado = paquete;
       this.nuevaSesion = {
         idProfesional: '',
         fecha: new Date().toISOString().split('T')[0],
         idHorario: '',
-        modalidad: '1'
+        modalidad: '1',
+        tipo: ''
       };
       this.horariosDisponibles = [];
       const modal = new bootstrap.Modal(document.getElementById('modalAgendarSesion'));
@@ -969,7 +1018,7 @@ export default {
       }
     },
     async guardarCitaPaquete() {
-      if (!this.nuevaSesion.idHorario) return;
+      if (!this.nuevaSesion.tipo || !this.nuevaSesion.idHorario) return;
 
       this.guardandoCita = true;
       try {
@@ -978,7 +1027,7 @@ export default {
           date: this.nuevaSesion.fecha,
           schedule_id: this.nuevaSesion.idHorario,
           clasification: this.paqueteSeleccionado.idClasificacion,
-          type: this.paqueteSeleccionado.tipo,
+          type: this.nuevaSesion.tipo,
           patient_condition: 2, // Continuante
           mode: this.nuevaSesion.modalidad,
           status: 1, // Pendiente

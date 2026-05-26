@@ -1,6 +1,6 @@
 <template>
 	<!-- Modal de recetas -->
-	<div class="modal fade" id="recetasModal" tabindex="-1" aria-labelledby="modalEvolution" aria-hidden="true">
+	<div class="modal fade" :id="idModal" tabindex="-1" aria-labelledby="modalEvolution" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered">
 				<div class="modal-content">
 					<div class="modal-header border-0">
@@ -41,7 +41,10 @@
 import moment from 'moment'
 export default{
 	name: 'modalVerRecetas',
-	props:['prescriptions'],
+	props:{
+		prescriptions: Array,
+		idModal: { type: String, default: 'recetasModal' }
+	},
 	
 	data(){ return{
 

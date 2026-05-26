@@ -115,7 +115,7 @@
 								@mouseleave="ocultarTooltip"
 								@mousemove="moverTooltip($event)"
 								:data-bs-toggle="isBlocked(horaOcup) ? null : 'modal'" 
-								:data-bs-target="isBlocked(horaOcup) ? null : '#modalAccionesCita'">
+								:data-bs-target="isBlocked(horaOcup) ? null : '#modalAccionesCitaCuaderno'">
 							
 							<!-- Blocked Slot View -->
 							<div v-if="isBlocked(horaOcup)" class="booked-content h-100 position-relative overflow-hidden d-flex flex-column bg-light" style="background: repeating-linear-gradient(45deg, #f8f9fc, #f8f9fc 10px, #eaecf4 10px, #eaecf4 20px) !important;">
@@ -146,7 +146,7 @@
 										<svg v-else-if="horaOcup.attention || horaOcup.status == 2" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-info me-1"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg>
 										<svg v-else xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-warning me-1"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
 										
-										<i class="fas fa-dollar-sign" style="font-size: 0.75rem;" :class="horaOcup.payment && horaOcup.payment.pay_status == 1 ? 'text-danger':'text-success'"></i>
+										<i class="fas fa-dollar-sign" style="font-size: 0.75rem;" :class="horaOcup.payment && horaOcup.payment.pay_status == 2 ? 'text-success':'text-danger'"></i>
 									</div>
 								</div>
 								
@@ -177,6 +177,13 @@
 		
 		<!-- Nuevo modal de acciones centralizado -->
 		<ModalAccionesCita v-if="cita && cita.id" :cita="cita" :indiceElegido="indexElegido" :precios="precios"
+			idModal="modalAccionesCitaCuaderno"
+			targetPago="#pagoModalCuaderno"
+			targetEstado="#modalEstadoCuaderno"
+			targetInfo="#infoModalCuaderno"
+			targetReprog="#reprogModalCuaderno"
+			targetIntercambio="#modalIntercambioCuaderno"
+			targetRecetas="#recetasModalCuaderno"
 			@changeMode="changeMode"
 			@openModal="distribuirAperturaModal"
 			@intercambiar="intercambiarHorario"
@@ -186,16 +193,16 @@
 			@tiemposEspera="abrirTiemposEspera"
 		/>
 
-    <modal-estado v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @actualizar="actualizarListadoCitas"></modal-estado>
-    <pago-modal v-if="cita && cita.id" :cita="cita" :idUsuario="idUsuario" :idSede="idSede" @actualizarAdelanto="actualizarAdelanto" @actualizar="actualizarListadoCitas"></pago-modal>
+    <modal-estado v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @actualizar="actualizarListadoCitas" idModal="modalEstadoCuaderno"></modal-estado>
+    <pago-modal v-if="cita && cita.id" :cita="cita" :idUsuario="idUsuario" :idSede="idSede" @actualizarAdelanto="actualizarAdelanto" @actualizar="actualizarListadoCitas" idModal="pagoModalCuaderno"></pago-modal>
 		<modal-patient v-if="cita && cita.id" :dataCit="cita"></modal-patient>
-    <reprog-modal v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="actualizarListadoCitas"></reprog-modal>
-		<info-modal v-if="cita && cita.id" :dataCit="cita" :precios="precios"></info-modal>
+    <reprog-modal v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="actualizarListadoCitas" idModal="reprogModalCuaderno"></reprog-modal>
+		<info-modal v-if="cita && cita.id" :dataCit="cita" :precios="precios" idModal="infoModalCuaderno"></info-modal>
 		<modal-search-patient></modal-search-patient>
-		<ModalIntercambio :posibles="posibles" :primero="primero" @actualizar="actualizarListadoCitas"></ModalIntercambio>
+		<ModalIntercambio :posibles="posibles" :primero="primero" @actualizar="actualizarListadoCitas" idModal="modalIntercambioCuaderno"></ModalIntercambio>
 		
-		<modalVerRecetas v-if="cita && cita.id" :prescriptions="recetas"></modalVerRecetas>
-		<modalTiemposEspera v-if="cita && cita.id" :cita="cita" @actualizar="actualizarListadoCitas"></modalTiemposEspera>
+		<modalVerRecetas v-if="cita && cita.id" :prescriptions="recetas" idModal="recetasModalCuaderno"></modalVerRecetas>
+		<modalTiemposEspera v-if="cita && cita.id" :cita="cita" @actualizar="actualizarListadoCitas" idModal="modalTiemposEsperaCuaderno"></modalTiemposEspera>
 
 	</div>
 </template>
@@ -299,6 +306,7 @@
 					// Cruzar con horas malas
 					let ocupado = false;
 					this.doctores.forEach(profesional=>{
+						this.$set(profesional, 'horariosOcupados', this.horasMalas.filter( horaMala => parseInt(horaMala.professional_id) == parseInt(profesional.id) ));
 						profesional.horarios.forEach(horario=>{
 							ocupado = this.horasMalas.findIndex(hora => hora.schedule_id == horario.id)
 							if(ocupado>-1){
@@ -489,6 +497,7 @@
 					if(cita.status == 2) estado = 'Confirmado';
 					if(cita.status == 3) estado = 'Anulado';
 					if(cita.status == 4) estado = 'Reprogramado';
+					if(cita.status == 5) estado = 'Atendida';
 
 					this.tooltipData = {
 						paciente: cita.patient.name.split(' ')[0] + ' ' + cita.patient.nombres.split(' ')[0],

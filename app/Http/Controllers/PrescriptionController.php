@@ -245,10 +245,12 @@ class PrescriptionController extends Controller
 	}
 }
 
-function object_sorter($clave,$orden=null) {
-	return function ($a, $b) use ($clave,$orden) {
-		  $result=  ($orden=="DESC") ? strnatcmp($b->$clave, $a->$clave) :  strnatcmp($a->$clave, $b->$clave);
-		  return $result;
-	};
+if (!function_exists('App\Http\Controllers\object_sorter')) {
+	function object_sorter($clave,$orden=null) {
+		return function ($a, $b) use ($clave,$orden) {
+			  $result=  ($orden=="DESC") ? strnatcmp($b->$clave, $a->$clave) :  strnatcmp($a->$clave, $b->$clave);
+			  return $result;
+		};
+	}
 }
 

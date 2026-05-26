@@ -1,5 +1,5 @@
 <template>
-  <div class="modal fade" id="reprogModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade" :id="idModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content p-2 shadow" style="border-radius: 16px; border: none;">
         <div class="modal-header border-0 pb-0">
@@ -127,7 +127,7 @@ export default {
     }
   },
   props:{
-    dataCit:Object, idUsuario:null
+    dataCit:Object, idUsuario:null, idModal: { type: String, default: 'reprogModal' }
   },  
 
   methods: {
@@ -190,7 +190,8 @@ export default {
 			}
     },
     async mandarVacio(){
-      if ( document.getElementById('sltProfesionalHorarioID').value=='' ) 
+      const selectHorario = this.$el.querySelector('#sltProfesionalHorarioID');
+      if ( !selectHorario || selectHorario.value=='' ) 
 				alertify.notify('El horario no puede estar vacío', 'danger', 10)
       else{
 				this.data.user_id = this.idUsuario;
@@ -268,7 +269,12 @@ export default {
     },
     
     closeModal() {
-      document.getElementById('cerrModal').click();
+      const closeBtn = this.$el.querySelector('[data-bs-dismiss="modal"]');
+      if (closeBtn) {
+        closeBtn.click();
+      } else {
+        document.getElementById('cerrModal').click();
+      }
     },
 
     dayWeek (day) {

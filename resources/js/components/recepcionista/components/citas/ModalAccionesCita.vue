@@ -1,5 +1,5 @@
 <template>
-  <div class="modal fade" id="modalAccionesCita" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal fade" :id="idModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-md modal-dialog-centered" role="document">
       <div class="modal-content border-0 shadow-lg" v-if="cita && cita.patient" style="border-radius: 20px; overflow: hidden;">
         <!-- Header. -->
@@ -10,12 +10,15 @@
             </div>
             <div>
               <h5 class="modal-title font-weight-bold text-dark mb-1">Detalle de Cita</h5>
-              <div class="d-flex gap-2 mt-1 flex-wrap">
+              <div class="d-flex gap-2 mt-1 flex-wrap align-items-center">
                 <span class="badge-status" :class="statusClass(cita.status)">
                   <i class="fas fa-check-circle mr-1"></i> {{ statusLabel(cita.status) }}
                 </span>
                 <span class="badge-service" v-if="cita.type">
                   <i class="fas fa-stethoscope mr-1"></i> {{ getServiceLabel(cita) }}
+                </span>
+                <span class="badge-package" v-if="parseInt(cita.idMembresia) > 0">
+                  <i class="fas fa-box-open mr-1"></i> {{ (cita.membresia && cita.membresia.precio) ? cita.membresia.precio.descripcion : 'PAQUETE' }}
                 </span>
               </div>
             </div>
@@ -30,7 +33,7 @@
           <!-- Status Cards Group. -->
           <div class="status-cards-grid mb-4">
             <!-- PAGO CARD. -->
-            <div class="status-card h-100" @click="$emit('openModal', cita, '#pagoModal', indiceElegido)" data-bs-toggle="modal" data-bs-target="#pagoModal">
+            <div class="status-card h-100" @click="$emit('openModal', cita, targetPago, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetPago">
               <div class="status-card-header">
                 <i class="fas fa-sack-dollar text-warning"></i> <span>PAGO</span>
               </div>
@@ -42,7 +45,7 @@
             </div>
 
             <!-- CONFIRMACION CARD -->
-            <div class="status-card h-100" @click="$emit('openModal', cita, '#modalEstado', indiceElegido)" data-bs-toggle="modal" data-bs-target="#modalEstado">
+            <div class="status-card h-100" @click="$emit('openModal', cita, targetEstado, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetEstado">
               <div class="status-card-header">
                 <i class="fas fa-check-double text-success"></i> <span>CONFIRMACIÓN</span>
               </div>
@@ -107,7 +110,7 @@
                   <div class="patient-dni text-muted small text-truncate">DNI: {{ cita.patient.dni || '—' }} · {{ cita.patient.phone || '—' }}</div>
                 </div>
               </div>
-              <button @click="$emit('openModal', cita, '#infoModal', indiceElegido)" data-bs-toggle="modal" data-bs-target="#infoModal" class="btn btn-link text-dark text-decoration-none small p-0 ms-2">
+              <button @click="$emit('openModal', cita, targetInfo, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetInfo" class="btn btn-link text-dark text-decoration-none small p-0 ms-2">
                  <i class="fas fa-external-link-alt mr-1"></i> Perfil
               </button>
             </div>
@@ -133,7 +136,7 @@
               <div class="detail-icon"><i class="fas fa-user-md text-warning"></i></div>
               <div class="detail-content overflow-hidden">
                 <div class="detail-label text-uppercase">Profesional</div>
-                <div class="detail-value text-truncate">{{ cita.professional ? cita.professional.name : 'N/A' }}</div>
+                <div class="detail-value text-truncate">{{ cita.professional && cita.professional.name ? cita.professional.name.split(' ').slice(0, 2).join(' ') : 'N/A' }}</div>
               </div>
             </div>
             <div class="detail-item">
@@ -143,6 +146,13 @@
                 <div class="detail-value">{{ cita.mode == 1 ? 'Presencial' : 'Virtual' }}</div>
               </div>
             </div>
+            <div class="detail-item" v-if="parseInt(cita.idMembresia) > 0" style="grid-column: span 2;">
+              <div class="detail-icon"><i class="fas fa-box-open text-warning"></i></div>
+              <div class="detail-content overflow-hidden">
+                <div class="detail-label text-uppercase">Paquete</div>
+                <div class="detail-value text-truncate">{{ (cita.membresia && cita.membresia.precio) ? cita.membresia.precio.descripcion : 'Asociado a Paquete' }}</div>
+              </div>
+            </div>
           </div>
 
           <hr class="my-4" style="opacity: 0.1;">
@@ -150,7 +160,7 @@
           <!-- ACTION BUTTONS -->
           <div class="d-flex flex-wrap gap-2 justify-content-left pb-4">
             <!-- Main Actions -->
-            <button v-if="cita.status != 3" @click="$emit('openModal', cita, '#reprogModal', indiceElegido)" data-bs-target="#reprogModal" data-bs-toggle="modal" class="btn btn-action btn-outline-primary">
+            <button v-if="cita.status != 3" @click="$emit('openModal', cita, targetReprog, indiceElegido)" :data-bs-target="targetReprog" data-bs-toggle="modal" class="btn btn-action btn-outline-primary">
               <i class="fas fa-sync-alt mr-2"></i> Reprogramar
             </button>
 
@@ -158,11 +168,11 @@
               <i class="fas fa-times-circle mr-2"></i> Cancelar
             </button>
 
-            <button v-if="cita.status != 3" @click="$emit('openModal', cita, '#modalEstado', indiceElegido)" data-bs-toggle="modal" data-bs-target="#modalEstado" class="btn btn-action btn-outline-secondary">
+            <button v-if="cita.status != 3" @click="$emit('openModal', cita, targetEstado, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetEstado" class="btn btn-action btn-outline-secondary">
               <i class="fas fa-ban mr-2"></i> Anular
             </button>
 
-            <button @click="$emit('openModal', cita, '#modalEstado', indiceElegido)" data-bs-toggle="modal" data-bs-target="#modalEstado" class="btn btn-action btn-outline-secondary">
+            <button @click="$emit('openModal', cita, targetEstado, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetEstado" class="btn btn-action btn-outline-secondary">
               <i class="fas fa-user-slash mr-2"></i> No Asistió
             </button>
 
@@ -178,13 +188,13 @@
 
             <!-- More Extras Icons row -->
             <div class="w-100 d-flex justify-content-left gap-4 mt-3">
-              <button @click="$emit('intercambiar', cita)" data-bs-target="#modalIntercambio" data-bs-toggle="modal" class="btn btn-link text-muted p-0 small" title="Intercambiar">
+              <button @click="$emit('intercambiar', cita)" :data-bs-target="targetIntercambio" data-bs-toggle="modal" class="btn btn-link text-muted p-0 small" title="Intercambiar">
                 <i class="fas fa-retweet"></i> Intercambiar
               </button>
               <button @click="$emit('moverVacio', cita)" class="btn btn-link text-muted p-0 small" title="Mover a sitio Vacio">
                 <i class="fas fa-share-square"></i> Mover a Vacio
               </button>
-              <button @click="$emit('buscarRecetas', cita.patient.id)" data-bs-toggle="modal" data-bs-target="#recetasModal" class="btn btn-link text-muted p-0 small" title="Recetas">
+              <button @click="$emit('buscarRecetas', cita.patient.id)" data-bs-toggle="modal" :data-bs-target="targetRecetas" class="btn btn-link text-muted p-0 small" title="Recetas">
                 <i class="fas fa-file-medical"></i> Recetas
               </button>
               <button @click="$emit('changeMode', cita.id, indiceElegido)" class="btn btn-link text-muted p-0 small" title="Cambiar modo" data-bs-dismiss="modal">
@@ -206,7 +216,14 @@ export default {
   props: {
     cita: Object,
     indiceElegido: Number,
-    precios: Array
+    precios: Array,
+    idModal: { type: String, default: 'modalAccionesCita' },
+    targetPago: { type: String, default: '#pagoModal' },
+    targetEstado: { type: String, default: '#modalEstado' },
+    targetInfo: { type: String, default: '#infoModal' },
+    targetReprog: { type: String, default: '#reprogModal' },
+    targetIntercambio: { type: String, default: '#modalIntercambio' },
+    targetRecetas: { type: String, default: '#recetasModal' }
   },
   data() {
     return {
@@ -252,6 +269,10 @@ export default {
           }
           break;
         case 'fin':
+          if(!this.cita.entrance || !this.cita.attention) {
+             if(window.alertify) window.alertify.error('Debe registrar la hora de llegada y atención primero.');
+             return;
+          }
           if(this.cita.hora_fin) return;
           if(!this.departureTimeLocal) {
              this.departureTimeLocal = moment().format('HH:mm');
@@ -412,6 +433,18 @@ export default {
   background: #fff4e6;
   color: #fd7e14;
   border: 1px solid #ffe8cc;
+}
+.badge-package {
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #fff1db;
+  color: #f97316;
+  border: 1px solid #ffedd5;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Status Cards. */

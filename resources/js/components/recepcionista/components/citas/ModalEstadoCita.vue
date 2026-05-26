@@ -1,5 +1,5 @@
 <template>
-  <div class="modal fade" id="modalEstado" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal fade" :id="idModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
       <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
         <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex align-items-start justify-content-between">
@@ -66,13 +66,14 @@ import alertify from 'alertifyjs';
 
     methods:{
       update(){
-				if(document.querySelector(".status-appointment").value == 3 && this.motivo==''){
+				const statusDropdown = this.$el.querySelector(".status-appointment");
+				if(statusDropdown && statusDropdown.value == 3 && this.motivo==''){
 					alertify.notify('<i class="fa-solid fa-skull-crossbones"></i> Debe ingresar un motivo para anular la cita' , 'danger', 10);
 				}else{
           if (this.isProcessing) return;
           this.isProcessing = true;
           
-					if (document.querySelector(".status-appointment").value == 3) {
+					if (statusDropdown && statusDropdown.value == 3) {
 						this.data.schedule_id = null;
 						this.updateStatuAppointment()
 					} else {
@@ -108,12 +109,17 @@ import alertify from 'alertifyjs';
 
 
       closeModal() {
-        document.getElementById('cerrModalEstado').click();
+        const closeBtn = this.$el.querySelector('.btn-close-custom');
+        if (closeBtn) {
+          closeBtn.click();
+        } else {
+          document.getElementById('cerrModalEstado').click();
+        }
       },
     },
   
     props:{
-      dataCit: Object, idUsuario:Number
+      dataCit: Object, idUsuario:Number, idModal: { type: String, default: 'modalEstado' }
     },  
 
     computed: {
