@@ -6407,26 +6407,13 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               }
               return _context2.abrupt("return");
             case 2:
-              if (!(estado === 'atendido')) {
-                _context2.next = 6;
-                break;
-              }
-              if (!(!_this2.cita.entrance || !_this2.cita.attention)) {
-                _context2.next = 6;
-                break;
-              }
-              if (window.alertify) {
-                window.alertify.error('Debe registrar la hora de llegada y atención primero antes de marcar como atendida.');
-              }
-              return _context2.abrupt("return");
-            case 6:
               _this2.cargandoEstado = true;
-              _context2.prev = 7;
-              _context2.next = 10;
+              _context2.prev = 3;
+              _context2.next = 6;
               return _this2.axios.post("/api/updateAttentionStatus/".concat(_this2.cita.id), {
                 attention_status: estado
               });
-            case 10:
+            case 6:
               response = _context2.sent;
               if (((_response$data2 = response.data) === null || _response$data2 === void 0 ? void 0 : _response$data2.mensaje) == 'Ok') {
                 _this2.$set(_this2.cita, 'attention_status', estado);
@@ -6442,21 +6429,21 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   window.alertify.notify('<i class="fa-regular fa-calendar-check"></i> Estado de atención actualizado', 'success', 5);
                 }
               }
-              _context2.next = 17;
+              _context2.next = 13;
               break;
-            case 14:
-              _context2.prev = 14;
-              _context2.t0 = _context2["catch"](7);
+            case 10:
+              _context2.prev = 10;
+              _context2.t0 = _context2["catch"](3);
               console.error(_context2.t0);
-            case 17:
-              _context2.prev = 17;
+            case 13:
+              _context2.prev = 13;
               _this2.cargandoEstado = false;
-              return _context2.finish(17);
-            case 20:
+              return _context2.finish(13);
+            case 16:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[7, 14, 17, 20]]);
+        }, _callee2, null, [[3, 10, 13, 16]]);
       }))();
     },
     getServiceLabel: function getServiceLabel(servicio) {

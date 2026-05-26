@@ -60,7 +60,7 @@
               <div class="status-card-header">
                 <i class="fas fa-stethoscope text-info"></i> <span>ATENCIÓN</span>
               </div>
-              
+
               <!-- Loader Placeholder -->
               <div v-if="cargandoEstado" key="loader" class="d-flex flex-column align-items-center justify-content-center mt-3" style="min-height: 80px;">
                 <div class="spinner-border spinner-border-sm text-info mb-2" role="status">
@@ -310,14 +310,6 @@ export default {
     },
     async cambiarEstadoAtencion(estado) {
       if (!this.cita || this.cargandoEstado) return;
-      if (estado === 'atendido') {
-        if (!this.cita.entrance || !this.cita.attention) {
-          if (window.alertify) {
-            window.alertify.error('Debe registrar la hora de llegada y atención primero antes de marcar como atendida.');
-          }
-          return;
-        }
-      }
       this.cargandoEstado = true;
       try {
         let response = await this.axios.post(`/api/updateAttentionStatus/${this.cita.id}`, { attention_status: estado });

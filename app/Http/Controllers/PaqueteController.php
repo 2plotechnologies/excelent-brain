@@ -60,7 +60,7 @@ class PaqueteController extends Controller
             // El front filtra si es 1 (Psicológica/Consulta) o 0 (Ext.)
             // Podrías ajustar este campo según qué guardas en la BD (ej. p.servicio, p.idClasificacion)
             // Asumiré p.servicio según lo que usaste en la vista
-            $query->where('p.servicio', $tipo); 
+            $query->where('p.servicio', $tipo);
         }
         if (!empty($busqueda)) {
             $query->where(function($q) use ($busqueda) {
@@ -106,7 +106,7 @@ class PaqueteController extends Controller
                 ->with('professional')
                 ->orderBy('date', 'desc')
                 ->get();
-            
+
             $membresia->historial_citas = $citas;
             $membresia->sesiones_usadas = $citas->where('status', '<>', 3)->count();
 
@@ -119,7 +119,7 @@ class PaqueteController extends Controller
                 ->orderBy('numero_cuota', 'asc')
                 ->orderBy('fecha', 'asc')
                 ->get();
-            
+
             $cuotas_vencidas = 0;
             $deuda_total = 0;
             foreach($deudas as $d) {
@@ -132,13 +132,13 @@ class PaqueteController extends Controller
             }
             $membresia->debe = $deuda_total;
             $membresia->cuotas_vencidas = $cuotas_vencidas;
-            $membresia->total_cuotas = $membresia->total_cuotas_reales; 
+            $membresia->total_cuotas = $membresia->total_cuotas_reales;
             $membresia->deudas = clone $deudas;
-            
+
             // La primera cita está al final de la colección (ya que está ordenada por fecha desc)
             $firstAppt = $citas->last();
             $membresia->professional = $firstAppt && $firstAppt->professional ? $firstAppt->professional->name : '';
-            
+
             // Evaluación dinámica de estados:
             if ($membresia->estado == 1) { // Inactivo/Pendiente
                 if ($membresia->pagado > 0 || $citas->count() > 0) {
@@ -236,7 +236,7 @@ class PaqueteController extends Controller
             ->with('professional')
             ->orderBy('date', 'desc')
             ->get();
-        
+
         $membresia->historial_citas = $citas;
         $membresia->sesiones_usadas = $citas->where('status', '<>', 3)->count();
 
@@ -249,7 +249,7 @@ class PaqueteController extends Controller
             ->orderBy('numero_cuota', 'asc')
             ->orderBy('fecha', 'asc')
             ->get();
-        
+
         $cuotas_vencidas = 0;
         $deuda_total = 0;
 
@@ -263,16 +263,16 @@ class PaqueteController extends Controller
                 }
             }
         }
-        
+
         $membresia->debe = $deuda_total;
         $membresia->cuotas_vencidas = $cuotas_vencidas;
-        $membresia->total_cuotas = $membresia->cuotas; 
+        $membresia->total_cuotas = $membresia->cuotas;
         $membresia->deudas = clone $deudas;
-        
+
         // La primera cita está al final de la colección (ya que está ordenada por fecha desc)
         $firstAppt = $citas->last();
         $membresia->professional = $firstAppt && $firstAppt->professional ? $firstAppt->professional->name : '';
-        
+
         switch($membresia->estado) {
             case 1: $membresia->status_name = 'Pendiente'; break;
             case 2: $membresia->status_name = 'Activo'; break;
@@ -307,7 +307,7 @@ class PaqueteController extends Controller
         try {
             $cita = Appointment::create([
                 'date' => $request->input('date'),
-                'patient_condition' => $request->input('patient_condition', 2), 
+                'patient_condition' => $request->input('patient_condition', 2),
                 'type' => $request->input('type'),
                 'mode' => $request->input('mode', 1),
                 'status' => $request->input('status', 1),
@@ -350,7 +350,7 @@ class PaqueteController extends Controller
         try {
             $membresia = Membresia::findOrFail($id);
             $precio = DB::table('precios')->where('id', $membresia->tipo)->first();
-            
+
             if (!$precio || $precio->sesiones <= 0) {
                 return response()->json(['error' => 'No se puede prorratear porque no se definió el número de sesiones.'], 400);
             }
@@ -371,7 +371,7 @@ class PaqueteController extends Controller
                 ->where('status', 2)
                 ->count();
 
-            // El prorrateo se basa en el precio base de la membresía (monto + descuento)
+            // El prorrateo se basa en el precio base de la membresía (monto + descuento).
             $precio_base = floatval($membresia->monto) + floatval($membresia->descuento);
             $costo_por_sesion = $precio_base / floatval($precio->sesiones);
             $monto_proporcional = round($costo_por_sesion * $sesiones_efectivas, 2);
@@ -381,13 +381,13 @@ class PaqueteController extends Controller
                 ->where('activo', 1)
                 ->sum('price'));
 
-            // Calcular diferencia (dinero a favor del paciente si es positivo, saldo deudor si es negativo)
+            // Calcular diferencia (dinero a favor del paciente si es positivo, saldo deudor si es negativo).
             $diferencia = round($total_pagado - $monto_proporcional, 2);
 
             $user_id = auth()->id() ?: $membresia->user_id;
 
             if ($diferencia > 0) {
-                // Caso A: El paciente pagó de más -> Generar Nota de Crédito y pago de ajuste negativo
+                // Caso A: El paciente pagó de más -> Generar Nota de Crédito y pago de ajuste negativo.
                 $dinero_a_favor = $diferencia;
                 NotaCredito::create([
                     'patient_id' => $membresia->patient_id,
@@ -458,7 +458,7 @@ class PaqueteController extends Controller
         DB::beginTransaction();
         try {
             $membresia = Membresia::findOrFail($id);
-            
+
             // Cancelar citas pendientes
             Appointment::where('idMembresia', $id)
                 ->whereIn('status', [1, 4])
@@ -509,7 +509,7 @@ class PaqueteController extends Controller
 
             $user = DB::table('users')->where('id', $usuarioId)->first();
             $nombreUsuario = $user ? $user->nombre : 'Sistema';
-            
+
             $cambios = [];
             if ($deuda->motivo != $nuevoMotivo) {
                 $cambios[] = "Motivo cambiado de '{$deuda->motivo}' a '{$nuevoMotivo}'";
@@ -524,7 +524,7 @@ class PaqueteController extends Controller
                 $textoCambios = implode(", ", $cambios);
                 $notaAdicional = "\n[$fechaHoraActual] Modificado por $nombreUsuario: $textoCambios";
                 $nuevaObs = $deuda->observaciones . $notaAdicional;
-                
+
                 DB::table('deudas')
                     ->where('id', $idDeuda)
                     ->update([
@@ -532,7 +532,7 @@ class PaqueteController extends Controller
                         'fecha' => $nuevaFecha,
                         'observaciones' => trim($nuevaObs)
                     ]);
-                
+
                 if ($deuda->fecha != $nuevaFecha) {
                     $todasDeudas = DB::table('deudas')
                         ->where('idMembresia', $deuda->idMembresia)
@@ -540,7 +540,7 @@ class PaqueteController extends Controller
                         ->orderBy('fecha', 'asc')
                         ->orderBy('id', 'asc')
                         ->get();
-                    
+
                     $num = 1;
                     foreach($todasDeudas as $d) {
                         DB::table('deudas')->where('id', $d->id)->update(['numero_cuota' => $num]);
@@ -581,7 +581,7 @@ class PaqueteController extends Controller
             $nuevoMontoOriginal = $deuda->monto - $montoSeparar;
 
             $fechaHoraActual = \Carbon\Carbon::now()->format('Y-m-d H:i:s');
-            
+
             // Actualizar deuda original
             $notaOriginal = "\n[$fechaHoraActual] Fraccionado por $nombreUsuario: Se separó S/ {$montoSeparar} para el {$nuevaFecha}.";
             DB::table('deudas')
@@ -616,7 +616,7 @@ class PaqueteController extends Controller
                 ->orderByRaw("CASE WHEN id = ? THEN 0 ELSE 1 END", [$nuevaFraccionId])
                 ->orderBy('id', 'asc')
                 ->get();
-            
+
             $num = 1;
             foreach($todasDeudas as $d) {
                 DB::table('deudas')->where('id', $d->id)->update(['numero_cuota' => $num]);
