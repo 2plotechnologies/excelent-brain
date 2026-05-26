@@ -56,14 +56,24 @@
             </div>
 
             <!-- ATENCION CARD -->
-            <div class="status-card h-100">
+            <div class="status-card h-100 position-relative" style="min-height: 120px;">
               <div class="status-card-header">
                 <i class="fas fa-stethoscope text-info"></i> <span>ATENCIÓN</span>
               </div>
-              <div class="status-options mt-2">
-                <div class="status-option" :class="{ active: isAtencion('espera') }" @click.stop="registrarTiempo('llegada')">En espera</div>
-                <div class="status-option" :class="{ active: isAtencion('atencion') }" @click.stop="registrarTiempo('atención')">En atención</div>
-                <div class="status-option" :class="{ active: isAtencion('atendido') }" @click.stop="registrarTiempo('fin')">Atendido</div>
+              
+              <!-- Loader Placeholder -->
+              <div v-if="cargandoEstado" key="loader" class="d-flex flex-column align-items-center justify-content-center mt-3" style="min-height: 80px;">
+                <div class="spinner-border spinner-border-sm text-info mb-2" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <span class="text-muted small">Actualizando...</span>
+              </div>
+
+              <!-- Options -->
+              <div v-else key="options" class="status-options mt-2">
+                <div class="status-option" :class="{ active: isAtencion('espera') }" @click.stop="cambiarEstadoAtencion('espera')">En espera</div>
+                <div class="status-option" :class="{ active: isAtencion('atencion') }" @click.stop="cambiarEstadoAtencion('atencion')">En atención</div>
+                <div class="status-option" :class="{ active: isAtencion('atendido') }" @click.stop="cambiarEstadoAtencion('atendido')">Atendido</div>
               </div>
             </div>
           </div>
@@ -160,19 +170,19 @@
           <!-- ACTION BUTTONS -->
           <div class="d-flex flex-wrap gap-2 justify-content-left pb-4">
             <!-- Main Actions -->
-            <button v-if="cita.status != 3 && !isAtendidaConHoraFin(cita)" @click="$emit('openModal', cita, targetReprog, indiceElegido)" :data-bs-target="targetReprog" data-bs-toggle="modal" class="btn btn-action btn-outline-primary">
+            <button v-if="cita.status != 3" @click="$emit('openModal', cita, targetReprog, indiceElegido)" :data-bs-target="targetReprog" data-bs-toggle="modal" class="btn btn-action btn-outline-primary">
               <i class="fas fa-sync-alt mr-2"></i> Reprogramar
             </button>
 
-            <button v-if="!isAtendidaConHoraFin(cita)" @click="$emit('eliminar', cita.id)" class="btn btn-action btn-outline-danger" data-bs-dismiss="modal">
+            <button @click="$emit('eliminar', cita.id)" class="btn btn-action btn-outline-danger" data-bs-dismiss="modal">
               <i class="fas fa-times-circle mr-2"></i> Cancelar
             </button>
 
-            <button v-if="cita.status != 3 && !isAtendidaConHoraFin(cita)" @click="$emit('openModal', cita, targetEstado, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetEstado" class="btn btn-action btn-outline-secondary">
+            <button v-if="cita.status != 3" @click="$emit('openModal', cita, targetEstado, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetEstado" class="btn btn-action btn-outline-secondary">
               <i class="fas fa-ban mr-2"></i> Anular
             </button>
 
-            <button v-if="!isAtendidaConHoraFin(cita)" @click="$emit('openModal', cita, targetEstado, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetEstado" class="btn btn-action btn-outline-secondary">
+            <button @click="$emit('openModal', cita, targetEstado, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetEstado" class="btn btn-action btn-outline-secondary">
               <i class="fas fa-user-slash mr-2"></i> No Asistió
             </button>
 
@@ -188,16 +198,16 @@
 
             <!-- More Extras Icons row -->
             <div class="w-100 d-flex justify-content-left gap-4 mt-3">
-              <button v-if="!isAtendidaConHoraFin(cita)" @click="$emit('intercambiar', cita)" :data-bs-target="targetIntercambio" data-bs-toggle="modal" class="btn btn-link text-muted p-0 small" title="Intercambiar">
+              <button @click="$emit('intercambiar', cita)" :data-bs-target="targetIntercambio" data-bs-toggle="modal" class="btn btn-link text-muted p-0 small" title="Intercambiar">
                 <i class="fas fa-retweet"></i> Intercambiar
               </button>
-              <button v-if="!isAtendidaConHoraFin(cita)" @click="$emit('openModal', cita, '#modalMoverVacio', indiceElegido)" data-bs-target="#modalMoverVacio" data-bs-toggle="modal" class="btn btn-link text-muted p-0 small" title="Mover a sitio Vacio">
+              <button @click="$emit('openModal', cita, '#modalMoverVacio', indiceElegido)" data-bs-target="#modalMoverVacio" data-bs-toggle="modal" class="btn btn-link text-muted p-0 small" title="Mover a sitio Vacio">
                 <i class="fas fa-share-square"></i> Mover a Vacio
               </button>
               <button @click="$emit('buscarRecetas', cita.patient.id)" data-bs-toggle="modal" :data-bs-target="targetRecetas" class="btn btn-link text-muted p-0 small" title="Recetas">
                 <i class="fas fa-file-medical"></i> Recetas
               </button>
-              <button v-if="!isAtendidaConHoraFin(cita)" @click="$emit('changeMode', cita.id, indiceElegido)" class="btn btn-link text-muted p-0 small" title="Cambiar modo" data-bs-dismiss="modal">
+              <button @click="$emit('changeMode', cita.id, indiceElegido)" class="btn btn-link text-muted p-0 small" title="Cambiar modo" data-bs-dismiss="modal">
                 <i :class="cita.mode == 1 ? 'far fa-user' : 'fas fa-desktop'"></i> {{ cita.mode == 1 ? 'Modo' : 'Modo' }}
               </button>
             </div>
@@ -227,7 +237,8 @@ export default {
   },
   data() {
     return {
-      departureTimeLocal: null
+      departureTimeLocal: null,
+      cargandoEstado: false
     };
   },
   watch: {
@@ -287,7 +298,6 @@ export default {
         if(response.data?.mensaje == 'Ok'){
             if (tipo === 'fin') {
                 this.$set(this.cita, 'hora_fin', this.departureTimeLocal);
-                this.$set(this.cita, 'status', 5); // Atendido
             }
             this.$emit('actualizar', 'sksks');
             if (window.alertify) {
@@ -296,6 +306,39 @@ export default {
         }
       } catch (error) {
         console.error(error);
+      }
+    },
+    async cambiarEstadoAtencion(estado) {
+      if (!this.cita || this.cargandoEstado) return;
+      if (estado === 'atendido') {
+        if (!this.cita.entrance || !this.cita.attention) {
+          if (window.alertify) {
+            window.alertify.error('Debe registrar la hora de llegada y atención primero antes de marcar como atendida.');
+          }
+          return;
+        }
+      }
+      this.cargandoEstado = true;
+      try {
+        let response = await this.axios.post(`/api/updateAttentionStatus/${this.cita.id}`, { attention_status: estado });
+        if (response.data?.mensaje == 'Ok') {
+          this.$set(this.cita, 'attention_status', estado);
+          if (estado === 'atendido') {
+            this.$set(this.cita, 'status', 5);
+          } else {
+            if (this.cita.status == 1 || this.cita.status == 5) {
+              this.$set(this.cita, 'status', 2); // Confirmado
+            }
+          }
+          this.$emit('actualizar');
+          if (window.alertify) {
+            window.alertify.notify('<i class="fa-regular fa-calendar-check"></i> Estado de atención actualizado', 'success', 5);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.cargandoEstado = false;
       }
     },
     getServiceLabel(servicio){
@@ -314,9 +357,13 @@ export default {
     },
     isAtencion(tipo) {
       if (!this.cita) return false;
-      const { entrance, attention, status } = this.cita;
-      if (tipo === 'espera') return entrance && !attention;
-      if (tipo === 'atencion') return attention && status != 5;
+      const { status, attention_status } = this.cita;
+      if (attention_status) {
+        return attention_status === tipo;
+      }
+      // Fallback a lógica basada en status para datos antiguos (sin depender de tiempos)
+      if (tipo === 'espera') return status == 1;
+      if (tipo === 'atencion') return status == 2;
       if (tipo === 'atendido') return status == 5;
       return false;
     },
@@ -362,9 +409,6 @@ export default {
     },
     canSendSatisfaction(c) {
       return c && c.status == 5 && c.hora_fin && c.patient && c.patient.phone;
-    },
-    isAtendidaConHoraFin(c) {
-      return c && c.status == 5 && c.hora_fin;
     },
     async sendSatisfaction(c) {
       try {

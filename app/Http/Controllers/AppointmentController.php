@@ -1501,11 +1501,30 @@ public function getPatientsPerMonth($date,$id){
 			if ($hora_inicio) {
 				$updateData['duracion'] = \Carbon\Carbon::parse($request->input('departure'))->diffInMinutes(\Carbon\Carbon::parse($hora_inicio));
 			}
-			$updateData['status'] = 5; // Atendido
 		}
 
 		$cita->update($updateData);
 
+		return response()->json(['mensaje' => 'Ok']);
+	}
+
+	public function updateAttentionStatus(Request $request, $id) {
+		$appointment = Appointment::find($id);
+		$status = $request->input('attention_status');
+		
+		$updateData = [
+			'attention_status' => $status
+		];
+		
+		if ($status == 'atendido') {
+			$updateData['status'] = 5;
+		} else if ($status == 'espera' || $status == 'atencion') {
+			if ($appointment->status == 1 || $appointment->status == 5) {
+				$updateData['status'] = 2; // Confirmada
+			}
+		}
+		
+		$appointment->update($updateData);
 		return response()->json(['mensaje' => 'Ok']);
 	}
 }

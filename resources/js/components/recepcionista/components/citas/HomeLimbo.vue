@@ -97,7 +97,7 @@
 
 						<!-- Actions -->
 						<div class="item-actions">
-							<button class="action-btn" title="Ver detalle" @click="prepararAcciones(cita, index)" data-bs-toggle="modal" data-bs-target="#modalAcciones">
+							<button class="action-btn" title="Ver detalle" @click="prepararAcciones(cita, index)">
 								<i class="fa-regular fa-eye"></i>
 								<span>Ver</span>
 							</button>
@@ -117,7 +117,7 @@
 		</div>
 
 		<reprog-modal :dataCit="dataCit" :idUsuario="$attrs.idUser"></reprog-modal>
-		<modal-acciones-cita v-if="citaElegida.id" :cita="citaElegida" :indiceElegido="indiceElegido" :precios="precios" id="modalAcciones"></modal-acciones-cita>
+		<modal-acciones-cita v-if="citaElegida.id" :key="citaElegida.id" :cita="citaElegida" :indiceElegido="indiceElegido" :precios="precios" id="modalAcciones" @actualizar="fetchLimbos"></modal-acciones-cita>
 	</div>
 </template>
 
@@ -195,6 +195,13 @@ export default {
 		prepararAcciones(cita, index) {
 			this.citaElegida = { ...cita.appointment };
 			this.indiceElegido = index;
+			this.$nextTick(() => {
+				const el = document.getElementById('modalAcciones');
+				if (el && window.bootstrap) {
+					const modalInstance = window.bootstrap.Modal.getOrCreateInstance(el);
+					modalInstance.show();
+				}
+			});
 		},
 		horaLatam(hora) {
 			return moment(hora, 'HH:mm:ss').format('h:mm a');

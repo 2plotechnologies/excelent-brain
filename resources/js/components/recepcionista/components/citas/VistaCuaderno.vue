@@ -113,9 +113,7 @@
 								@click="abrirDetallesCita(horaOcup)"
 								@mouseover="mostrarTooltip($event, horaOcup, doctor)"
 								@mouseleave="ocultarTooltip"
-								@mousemove="moverTooltip($event)"
-								:data-bs-toggle="isBlocked(horaOcup) ? null : 'modal'" 
-								:data-bs-target="isBlocked(horaOcup) ? null : '#modalAccionesCitaCuaderno'">
+								@mousemove="moverTooltip($event)">
 							
 							<!-- Blocked Slot View -->
 							<div v-if="isBlocked(horaOcup)" class="booked-content h-100 position-relative overflow-hidden d-flex flex-column bg-light" style="background: repeating-linear-gradient(45deg, #f8f9fc, #f8f9fc 10px, #eaecf4 10px, #eaecf4 20px) !important;">
@@ -141,10 +139,10 @@
 										{{ horaOcup.patient.name.split(' ')[0] }} {{ horaOcup.patient.nombres.split(' ')[0] }}
 									</div>
 									<div class="d-flex align-items-center">
-										<!-- Iconos de estado de atención (Pendiente, Confirmada, Atendida) -->
-										<svg v-if="horaOcup.status == 5" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-success me-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-										<svg v-else-if="horaOcup.attention || horaOcup.status == 2" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-info me-1"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg>
-										<svg v-else xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-warning me-1"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+										<!-- Iconos de estado de atención (En espera, En atención, Atendido) -->
+										<svg v-if="horaOcup.attention_status === 'atendido' || (!horaOcup.attention_status && horaOcup.status == 5)" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-success me-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+										<svg v-else-if="horaOcup.attention_status === 'atencion' || (!horaOcup.attention_status && horaOcup.status == 2)" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-info me-1"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg>
+										<svg v-else-if="horaOcup.attention_status === 'espera' || (!horaOcup.attention_status && horaOcup.status == 1)" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-warning me-1"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
 										
 										<i class="fas fa-dollar-sign" style="font-size: 0.75rem;" :class="horaOcup.payment && horaOcup.payment.pay_status == 2 ? 'text-success':'text-danger'"></i>
 									</div>
@@ -176,7 +174,7 @@
 		<ModalNuevaCita :doctores="doctores" :profesionalElegido="profesionalElegido" :horaElegida="horaElegida" :idUsuario="idUsuario" :fechaElegida='fecha' @actualizarListadoCitas="actualizarListadoCitas" :idSede="idSede"></ModalNuevaCita>
 		
 		<!-- Nuevo modal de acciones centralizado -->
-		<ModalAccionesCita v-if="cita && cita.id" :cita="cita" :indiceElegido="indexElegido" :precios="precios"
+		<ModalAccionesCita v-if="cita && cita.id" :key="cita.id" :cita="cita" :indiceElegido="indexElegido" :precios="precios"
 			idModal="modalAccionesCitaCuaderno"
 			targetPago="#pagoModalCuaderno"
 			targetEstado="#modalEstadoCuaderno"
@@ -187,23 +185,23 @@
 			@changeMode="changeMode"
 			@openModal="distribuirAperturaModal"
 			@intercambiar="intercambiarHorario"
-			@moverVacio="mandarVacioAutomatico"
 			@eliminar="validarYEliminar"
 			@buscarRecetas="buscarRecetas"
 			@tiemposEspera="abrirTiemposEspera"
+			@actualizar="actualizarListadoCitas"
 		/>
 
-    <modal-estado v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @actualizar="actualizarListadoCitas" idModal="modalEstadoCuaderno"></modal-estado>
-    <pago-modal v-if="cita && cita.id" :cita="cita" :idUsuario="idUsuario" :idSede="idSede" @actualizarAdelanto="actualizarAdelanto" @actualizar="actualizarListadoCitas" idModal="pagoModalCuaderno"></pago-modal>
-		<modal-patient v-if="cita && cita.id" :dataCit="cita"></modal-patient>
-    <reprog-modal v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="actualizarListadoCitas" idModal="reprogModalCuaderno"></reprog-modal>
-		<info-modal v-if="cita && cita.id" :dataCit="cita" :precios="precios" idModal="infoModalCuaderno"></info-modal>
+    <modal-estado v-if="cita && cita.id" :key="'estado-'+cita.id" :dataCit="cita" :idUsuario="idUsuario" @actualizar="actualizarListadoCitas" idModal="modalEstadoCuaderno"></modal-estado>
+    <pago-modal v-if="cita && cita.id" :key="'pago-'+cita.id" :cita="cita" :idUsuario="idUsuario" :idSede="idSede" @actualizarAdelanto="actualizarAdelanto" @actualizar="actualizarListadoCitas" idModal="pagoModalCuaderno"></pago-modal>
+		<modal-patient v-if="cita && cita.id" :key="'patient-'+cita.id" :dataCit="cita"></modal-patient>
+    <reprog-modal v-if="cita && cita.id" :key="'reprog-'+cita.id" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="actualizarListadoCitas" idModal="reprogModalCuaderno"></reprog-modal>
+		<info-modal v-if="cita && cita.id" :key="'info-'+cita.id" :dataCit="cita" :precios="precios" idModal="infoModalCuaderno"></info-modal>
 		<modal-search-patient></modal-search-patient>
 		<ModalIntercambio :posibles="posibles" :primero="primero" @actualizar="actualizarListadoCitas" idModal="modalIntercambioCuaderno"></ModalIntercambio>
 		
-		<modalVerRecetas v-if="cita && cita.id" :prescriptions="recetas" idModal="recetasModalCuaderno"></modalVerRecetas>
-		<modalTiemposEspera v-if="cita && cita.id" :cita="cita" @actualizar="actualizarListadoCitas" idModal="modalTiemposEsperaCuaderno"></modalTiemposEspera>
-    <ModalMoverVacio v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="actualizarListadoCitas"></ModalMoverVacio>
+		<modalVerRecetas v-if="cita && cita.id" :key="'recetas-'+cita.id" :prescriptions="recetas" idModal="recetasModalCuaderno"></modalVerRecetas>
+		<modalTiemposEspera v-if="cita && cita.id" :key="'tiempos-'+cita.id" :cita="cita" @actualizar="actualizarListadoCitas" idModal="modalTiemposEsperaCuaderno"></modalTiemposEspera>
+    <ModalMoverVacio v-if="cita && cita.id" :key="'movervacio-'+cita.id" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="actualizarListadoCitas"></ModalMoverVacio>
 
 	</div>
 </template>
@@ -538,6 +536,13 @@
 				}
 				this.cita = citaMalas;
 				this.indexElegido = this.horasMalas.findIndex(x => x.id == citaMalas.id);
+				this.$nextTick(() => {
+					const el = document.getElementById('modalAccionesCitaCuaderno');
+					if (el && window.bootstrap) {
+						const modalInstance = window.bootstrap.Modal.getOrCreateInstance(el);
+						modalInstance.show();
+					}
+				});
 			},
 			bgPorSemaforo(horaOcup) {
 				if(!horaOcup.patient || !horaOcup.patient.ultimoSemaforo) return 'bg-transparent';

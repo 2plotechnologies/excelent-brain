@@ -5985,6 +5985,13 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
       this.indexElegido = this.dashData.citasHoy.findIndex(function (x) {
         return x.id === cita.id;
       });
+      this.$nextTick(function () {
+        var el = document.getElementById('modalAccionesCita');
+        if (el && window.bootstrap) {
+          var modalInstance = window.bootstrap.Modal.getOrCreateInstance(el);
+          modalInstance.show();
+        }
+      });
     },
     changeMode: function changeMode(id, indiceP) {
       var _this5 = this;
@@ -6274,7 +6281,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   data: function data() {
     return {
-      departureTimeLocal: null
+      departureTimeLocal: null,
+      cargandoEstado: false
     };
   },
   watch: {
@@ -6367,7 +6375,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               if (((_response$data = response.data) === null || _response$data === void 0 ? void 0 : _response$data.mensaje) == 'Ok') {
                 if (tipo === 'fin') {
                   _this.$set(_this.cita, 'hora_fin', _this.departureTimeLocal);
-                  _this.$set(_this.cita, 'status', 5); // Atendido
                 }
                 _this.$emit('actualizar', 'sksks');
                 if (window.alertify) {
@@ -6385,6 +6392,71 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               return _context.stop();
           }
         }, _callee, null, [[26, 33]]);
+      }))();
+    },
+    cambiarEstadoAtencion: function cambiarEstadoAtencion(estado) {
+      var _this2 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var _response$data2, response;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              if (!(!_this2.cita || _this2.cargandoEstado)) {
+                _context2.next = 2;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 2:
+              if (!(estado === 'atendido')) {
+                _context2.next = 6;
+                break;
+              }
+              if (!(!_this2.cita.entrance || !_this2.cita.attention)) {
+                _context2.next = 6;
+                break;
+              }
+              if (window.alertify) {
+                window.alertify.error('Debe registrar la hora de llegada y atención primero antes de marcar como atendida.');
+              }
+              return _context2.abrupt("return");
+            case 6:
+              _this2.cargandoEstado = true;
+              _context2.prev = 7;
+              _context2.next = 10;
+              return _this2.axios.post("/api/updateAttentionStatus/".concat(_this2.cita.id), {
+                attention_status: estado
+              });
+            case 10:
+              response = _context2.sent;
+              if (((_response$data2 = response.data) === null || _response$data2 === void 0 ? void 0 : _response$data2.mensaje) == 'Ok') {
+                _this2.$set(_this2.cita, 'attention_status', estado);
+                if (estado === 'atendido') {
+                  _this2.$set(_this2.cita, 'status', 5);
+                } else {
+                  if (_this2.cita.status == 1 || _this2.cita.status == 5) {
+                    _this2.$set(_this2.cita, 'status', 2); // Confirmado
+                  }
+                }
+                _this2.$emit('actualizar');
+                if (window.alertify) {
+                  window.alertify.notify('<i class="fa-regular fa-calendar-check"></i> Estado de atención actualizado', 'success', 5);
+                }
+              }
+              _context2.next = 17;
+              break;
+            case 14:
+              _context2.prev = 14;
+              _context2.t0 = _context2["catch"](7);
+              console.error(_context2.t0);
+            case 17:
+              _context2.prev = 17;
+              _this2.cargandoEstado = false;
+              return _context2.finish(17);
+            case 20:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, null, [[7, 14, 17, 20]]);
       }))();
     },
     getServiceLabel: function getServiceLabel(servicio) {
@@ -6407,11 +6479,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     isAtencion: function isAtencion(tipo) {
       if (!this.cita) return false;
       var _this$cita = this.cita,
-        entrance = _this$cita.entrance,
-        attention = _this$cita.attention,
-        status = _this$cita.status;
-      if (tipo === 'espera') return entrance && !attention;
-      if (tipo === 'atencion') return attention && status != 5;
+        status = _this$cita.status,
+        attention_status = _this$cita.attention_status;
+      if (attention_status) {
+        return attention_status === tipo;
+      }
+      // Fallback a lógica basada en status para datos antiguos (sin depender de tiempos)
+      if (tipo === 'espera') return status == 1;
+      if (tipo === 'atencion') return status == 2;
       if (tipo === 'atendido') return status == 5;
       return false;
     },
@@ -6458,38 +6533,35 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     canSendSatisfaction: function canSendSatisfaction(c) {
       return c && c.status == 5 && c.hora_fin && c.patient && c.patient.phone;
     },
-    isAtendidaConHoraFin: function isAtendidaConHoraFin(c) {
-      return c && c.status == 5 && c.hora_fin;
-    },
     sendSatisfaction: function sendSatisfaction(c) {
-      var _this2 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var res, phone, text;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              _context2.prev = 0;
-              _context2.next = 3;
-              return _this2.axios.post("/api/appointment/".concat(c.id, "/satisfaction-link"));
+              _context3.prev = 0;
+              _context3.next = 3;
+              return _this3.axios.post("/api/appointment/".concat(c.id, "/satisfaction-link"));
             case 3:
-              res = _context2.sent;
+              res = _context3.sent;
               phone = (c.patient.phone || '').toString().replaceAll(' ', '');
               text = "Buen dia ".concat(c.patient.name, " ").concat(c.patient.nombres, ", esperamos se encuentre bien. Le enviamos la encuesta de satisfaccion de su cita en el Centro Psicologico y Psiquiatrico EXCELENTEMENTE. ").concat(res.data.url);
               window.open("https://wa.me/51".concat(phone, "?text=").concat(encodeURIComponent(text)), '_blank');
-              _context2.next = 13;
+              _context3.next = 13;
               break;
             case 9:
-              _context2.prev = 9;
-              _context2.t0 = _context2["catch"](0);
-              console.error(_context2.t0);
-              if (_this2.$swal) {
-                _this2.$swal('No se pudo generar el enlace de satisfaccion');
+              _context3.prev = 9;
+              _context3.t0 = _context3["catch"](0);
+              console.error(_context3.t0);
+              if (_this3.$swal) {
+                _this3.$swal('No se pudo generar el enlace de satisfaccion');
               }
             case 13:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
           }
-        }, _callee2, null, [[0, 9]]);
+        }, _callee3, null, [[0, 9]]);
       }))();
     }
   }
@@ -7499,8 +7571,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         icon: 'fa-hands-helping'
       }, {
         id: 8,
-        label: 'Triaje',
-        desc: 'Triaje por médico o psicólogo',
+        label: 'Tecnológo',
+        desc: 'Triaje por tecnólogo médico',
         icon: 'fa-stethoscope'
       }, {
         id: 4,
@@ -10693,6 +10765,13 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       this.indexElegido = this.horasMalas.findIndex(function (x) {
         return x.id == citaMalas.id;
       });
+      this.$nextTick(function () {
+        var el = document.getElementById('modalAccionesCitaCuaderno');
+        if (el && window.bootstrap) {
+          var modalInstance = window.bootstrap.Modal.getOrCreateInstance(el);
+          modalInstance.show();
+        }
+      });
     },
     bgPorSemaforo: function bgPorSemaforo(horaOcup) {
       if (!horaOcup.patient || !horaOcup.patient.ultimoSemaforo) return 'bg-transparent';
@@ -11280,9 +11359,7 @@ var render = function render() {
     }, [_c("li", [_c("a", {
       staticClass: "dropdown-item py-2",
       attrs: {
-        href: "#",
-        "data-bs-toggle": "modal",
-        "data-bs-target": "#modalAccionesCita"
+        href: "#"
       },
       on: {
         click: function click($event) {
@@ -11337,6 +11414,7 @@ var render = function render() {
   }, [_c("p", {
     staticClass: "mb-0"
   }, [_vm._v("No hay citas programadas para el día de hoy.")])])])])])]), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("ModalAccionesCita", {
+    key: _vm.cita.id,
     attrs: {
       cita: _vm.cita,
       indiceElegido: _vm.indexElegido,
@@ -11348,9 +11426,11 @@ var render = function render() {
       intercambiar: _vm.intercambiarHorario,
       eliminar: _vm.validarYEliminar,
       buscarRecetas: _vm.buscarRecetas,
-      tiemposEspera: _vm.abrirTiemposEspera
+      tiemposEspera: _vm.abrirTiemposEspera,
+      actualizar: _vm.actualizarListadoCitas
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("reprog-modal", {
+    key: "reprog-" + _vm.cita.id,
     ref: "reprogModal",
     attrs: {
       dataCit: _vm.cita,
@@ -11360,6 +11440,7 @@ var render = function render() {
       ocultarCita: _vm.actualizarListadoCitas
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("info-modal", {
+    key: "info-" + _vm.cita.id,
     attrs: {
       dataCit: _vm.cita,
       precios: _vm.precios
@@ -11373,10 +11454,12 @@ var render = function render() {
       actualizar: _vm.actualizarListadoCitas
     }
   }), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("modalVerRecetas", {
+    key: "recetas-" + _vm.cita.id,
     attrs: {
       prescriptions: _vm.recetas
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("modalTiemposEspera", {
+    key: "tiempos-" + _vm.cita.id,
     attrs: {
       cita: _vm.cita
     },
@@ -11384,6 +11467,7 @@ var render = function render() {
       actualizar: _vm.actualizarListadoCitas
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("modal-estado", {
+    key: "estado-" + _vm.cita.id,
     attrs: {
       dataCit: _vm.cita,
       idUsuario: _vm.idUsuario
@@ -11392,6 +11476,7 @@ var render = function render() {
       actualizar: _vm.actualizarListadoCitas
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("pago-modal", {
+    key: "pago-" + _vm.cita.id,
     attrs: {
       cita: _vm.cita,
       idUsuario: _vm.idUsuario,
@@ -11402,6 +11487,7 @@ var render = function render() {
       actualizar: _vm.actualizarListadoCitas
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("modal-patient", {
+    key: "patient-" + _vm.cita.id,
     attrs: {
       dataCit: _vm.cita
     }
@@ -11622,8 +11708,20 @@ var render = function render() {
       active: _vm.cita.status == 2 || _vm.cita.status == 5
     }
   }, [_vm._v("Confirmado")])])]), _vm._v(" "), _c("div", {
-    staticClass: "status-card h-100"
-  }, [_vm._m(4), _vm._v(" "), _c("div", {
+    staticClass: "status-card h-100 position-relative",
+    staticStyle: {
+      "min-height": "120px"
+    }
+  }, [_vm._m(4), _vm._v(" "), _vm.cargandoEstado ? _c("div", {
+    key: "loader",
+    staticClass: "d-flex flex-column align-items-center justify-content-center mt-3",
+    staticStyle: {
+      "min-height": "80px"
+    }
+  }, [_vm._m(5), _vm._v(" "), _c("span", {
+    staticClass: "text-muted small"
+  }, [_vm._v("Actualizando...")])]) : _c("div", {
+    key: "options",
     staticClass: "status-options mt-2"
   }, [_c("div", {
     staticClass: "status-option",
@@ -11633,7 +11731,7 @@ var render = function render() {
     on: {
       click: function click($event) {
         $event.stopPropagation();
-        return _vm.registrarTiempo("llegada");
+        return _vm.cambiarEstadoAtencion("espera");
       }
     }
   }, [_vm._v("En espera")]), _vm._v(" "), _c("div", {
@@ -11644,7 +11742,7 @@ var render = function render() {
     on: {
       click: function click($event) {
         $event.stopPropagation();
-        return _vm.registrarTiempo("atención");
+        return _vm.cambiarEstadoAtencion("atencion");
       }
     }
   }, [_vm._v("En atención")]), _vm._v(" "), _c("div", {
@@ -11655,12 +11753,12 @@ var render = function render() {
     on: {
       click: function click($event) {
         $event.stopPropagation();
-        return _vm.registrarTiempo("fin");
+        return _vm.cambiarEstadoAtencion("atendido");
       }
     }
   }, [_vm._v("Atendido")])])])]), _vm._v(" "), _c("div", {
     staticClass: "info-section mb-4"
-  }, [_vm._m(5), _vm._v(" "), _c("div", {
+  }, [_vm._m(6), _vm._v(" "), _c("div", {
     staticClass: "time-control-container p-3 d-flex align-items-center justify-content-between text-center"
   }, [_c("div", {
     staticClass: "time-item px-2"
@@ -11752,7 +11850,7 @@ var render = function render() {
     staticClass: "patient-card p-3 d-flex align-items-center justify-content-between"
   }, [_c("div", {
     staticClass: "d-flex align-items-center overflow-hidden"
-  }, [_vm._m(6), _vm._v(" "), _c("div", {
+  }, [_vm._m(7), _vm._v(" "), _c("div", {
     staticClass: "overflow-hidden"
   }, [_c("div", {
     staticClass: "patient-name font-weight-bold text-truncate"
@@ -11775,7 +11873,7 @@ var render = function render() {
     staticClass: "details-grid mb-4"
   }, [_c("div", {
     staticClass: "detail-item"
-  }, [_vm._m(7), _vm._v(" "), _c("div", {
+  }, [_vm._m(8), _vm._v(" "), _c("div", {
     staticClass: "detail-content overflow-hidden"
   }, [_c("div", {
     staticClass: "detail-label text-uppercase"
@@ -11783,7 +11881,7 @@ var render = function render() {
     staticClass: "detail-value"
   }, [_vm._v(_vm._s(_vm.fechaLatam(_vm.cita.date)))])])]), _vm._v(" "), _c("div", {
     staticClass: "detail-item"
-  }, [_vm._m(8), _vm._v(" "), _c("div", {
+  }, [_vm._m(9), _vm._v(" "), _c("div", {
     staticClass: "detail-content overflow-hidden"
   }, [_c("div", {
     staticClass: "detail-label text-uppercase"
@@ -11791,7 +11889,7 @@ var render = function render() {
     staticClass: "detail-value text-truncate"
   }, [_vm._v(_vm._s(_vm.horaLatam2(_vm.cita.schedule ? _vm.cita.schedule.check_time : "")) + " - " + _vm._s(_vm.horaLatam2(_vm.cita.schedule ? _vm.cita.schedule.departure_date : "")))])])]), _vm._v(" "), _c("div", {
     staticClass: "detail-item"
-  }, [_vm._m(9), _vm._v(" "), _c("div", {
+  }, [_vm._m(10), _vm._v(" "), _c("div", {
     staticClass: "detail-content overflow-hidden"
   }, [_c("div", {
     staticClass: "detail-label text-uppercase"
@@ -11799,7 +11897,7 @@ var render = function render() {
     staticClass: "detail-value text-truncate"
   }, [_vm._v(_vm._s(_vm.cita.professional && _vm.cita.professional.name ? _vm.cita.professional.name.split(" ").slice(0, 2).join(" ") : "N/A"))])])]), _vm._v(" "), _c("div", {
     staticClass: "detail-item"
-  }, [_vm._m(10), _vm._v(" "), _c("div", {
+  }, [_vm._m(11), _vm._v(" "), _c("div", {
     staticClass: "detail-content overflow-hidden"
   }, [_c("div", {
     staticClass: "detail-label text-uppercase"
@@ -11810,7 +11908,7 @@ var render = function render() {
     staticStyle: {
       "grid-column": "span 2"
     }
-  }, [_vm._m(11), _vm._v(" "), _c("div", {
+  }, [_vm._m(12), _vm._v(" "), _c("div", {
     staticClass: "detail-content overflow-hidden"
   }, [_c("div", {
     staticClass: "detail-label text-uppercase"
@@ -11823,7 +11921,7 @@ var render = function render() {
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "d-flex flex-wrap gap-2 justify-content-left pb-4"
-  }, [_vm.cita.status != 3 && !_vm.isAtendidaConHoraFin(_vm.cita) ? _c("button", {
+  }, [_vm.cita.status != 3 ? _c("button", {
     staticClass: "btn btn-action btn-outline-primary",
     attrs: {
       "data-bs-target": _vm.targetReprog,
@@ -11836,7 +11934,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-sync-alt mr-2"
-  }), _vm._v(" Reprogramar\n          ")]) : _vm._e(), _vm._v(" "), !_vm.isAtendidaConHoraFin(_vm.cita) ? _c("button", {
+  }), _vm._v(" Reprogramar\n          ")]) : _vm._e(), _vm._v(" "), _c("button", {
     staticClass: "btn btn-action btn-outline-danger",
     attrs: {
       "data-bs-dismiss": "modal"
@@ -11848,7 +11946,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-times-circle mr-2"
-  }), _vm._v(" Cancelar\n          ")]) : _vm._e(), _vm._v(" "), _vm.cita.status != 3 && !_vm.isAtendidaConHoraFin(_vm.cita) ? _c("button", {
+  }), _vm._v(" Cancelar\n          ")]), _vm._v(" "), _vm.cita.status != 3 ? _c("button", {
     staticClass: "btn btn-action btn-outline-secondary",
     attrs: {
       "data-bs-toggle": "modal",
@@ -11861,7 +11959,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-ban mr-2"
-  }), _vm._v(" Anular\n          ")]) : _vm._e(), _vm._v(" "), !_vm.isAtendidaConHoraFin(_vm.cita) ? _c("button", {
+  }), _vm._v(" Anular\n          ")]) : _vm._e(), _vm._v(" "), _c("button", {
     staticClass: "btn btn-action btn-outline-secondary",
     attrs: {
       "data-bs-toggle": "modal",
@@ -11874,7 +11972,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-user-slash mr-2"
-  }), _vm._v(" No Asistió\n          ")]) : _vm._e(), _vm._v(" "), _c("a", {
+  }), _vm._v(" No Asistió\n          ")]), _vm._v(" "), _c("a", {
     staticClass: "btn btn-action btn-outline-success",
     attrs: {
       href: _vm.getWhatsappLink(_vm.cita),
@@ -11903,7 +12001,7 @@ var render = function render() {
     staticClass: "fas fa-phone-alt mr-2"
   }), _vm._v(" Llamar\n            ")]), _vm._v(" "), _c("div", {
     staticClass: "w-100 d-flex justify-content-left gap-4 mt-3"
-  }, [!_vm.isAtendidaConHoraFin(_vm.cita) ? _c("button", {
+  }, [_c("button", {
     staticClass: "btn btn-link text-muted p-0 small",
     attrs: {
       "data-bs-target": _vm.targetIntercambio,
@@ -11917,7 +12015,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-retweet"
-  }), _vm._v(" Intercambiar\n            ")]) : _vm._e(), _vm._v(" "), !_vm.isAtendidaConHoraFin(_vm.cita) ? _c("button", {
+  }), _vm._v(" Intercambiar\n            ")]), _vm._v(" "), _c("button", {
     staticClass: "btn btn-link text-muted p-0 small",
     attrs: {
       "data-bs-target": "#modalMoverVacio",
@@ -11931,7 +12029,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-share-square"
-  }), _vm._v(" Mover a Vacio\n            ")]) : _vm._e(), _vm._v(" "), _c("button", {
+  }), _vm._v(" Mover a Vacio\n            ")]), _vm._v(" "), _c("button", {
     staticClass: "btn btn-link text-muted p-0 small",
     attrs: {
       "data-bs-toggle": "modal",
@@ -11945,7 +12043,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-file-medical"
-  }), _vm._v(" Recetas\n            ")]), _vm._v(" "), !_vm.isAtendidaConHoraFin(_vm.cita) ? _c("button", {
+  }), _vm._v(" Recetas\n            ")]), _vm._v(" "), _c("button", {
     staticClass: "btn btn-link text-muted p-0 small",
     attrs: {
       title: "Cambiar modo",
@@ -11958,7 +12056,7 @@ var render = function render() {
     }
   }, [_c("i", {
     "class": _vm.cita.mode == 1 ? "far fa-user" : "fas fa-desktop"
-  }), _vm._v(" " + _vm._s(_vm.cita.mode == 1 ? "Modo" : "Modo") + "\n            ")]) : _vm._e()])])])]) : _vm._e()])]);
+  }), _vm._v(" " + _vm._s(_vm.cita.mode == 1 ? "Modo" : "Modo") + "\n            ")])])])])]) : _vm._e()])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -12005,6 +12103,17 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fas fa-stethoscope text-info"
   }), _vm._v(" "), _c("span", [_vm._v("ATENCIÓN")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "spinner-border spinner-border-sm text-info mb-2",
+    attrs: {
+      role: "status"
+    }
+  }, [_c("span", {
+    staticClass: "visually-hidden"
+  }, [_vm._v("Loading...")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -13906,7 +14015,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-edit me-1"
-  }), _vm._v(" Cambiar\r\n\t\t\t\t\t\t")])]) : _vm._e(), _vm._v(" "), _c("div", {
+  }), _vm._v(" Cambiar\n\t\t\t\t\t\t")])]) : _vm._e(), _vm._v(" "), _c("div", {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -14845,7 +14954,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-arrow-left me-2"
-  }), _vm._v(" Anterior\r\n\t\t\t\t\t\t\t")]) : _vm._e()]), _vm._v(" "), _c("div", {
+  }), _vm._v(" Anterior\n\t\t\t\t\t\t\t")]) : _vm._e()]), _vm._v(" "), _c("div", {
     staticClass: "d-flex"
   }, [_vm.pasoActual === 1 ? _c("button", {
     staticClass: "btn btn-light-danger btn-lg rounded-pill px-4 me-2",
@@ -14853,7 +14962,7 @@ var render = function render() {
       type: "button",
       "data-bs-dismiss": "modal"
     }
-  }, [_vm._v("\r\n\t\t\t\t\t\t\t\tCancelar\r\n\t\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm.pasoActual < 8 ? _c("button", {
+  }, [_vm._v("\n\t\t\t\t\t\t\t\tCancelar\n\t\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm.pasoActual < 8 ? _c("button", {
     key: "btn-siguiente",
     staticClass: "btn btn-primary btn-lg rounded-pill px-5 shadow-sm",
     attrs: {
@@ -14862,7 +14971,7 @@ var render = function render() {
     on: {
       click: _vm.nextStep
     }
-  }, [_vm._v("\r\n\t\t\t\t\t\t\t\tSiguiente "), _c("i", {
+  }, [_vm._v("\n\t\t\t\t\t\t\t\tSiguiente "), _c("i", {
     staticClass: "fas fa-arrow-right ms-2"
   })]) : _vm._e(), _vm._v(" "), _vm.pasoActual === 8 && _vm.cita.vivo == 1 ? _c("button", {
     key: "btn-registrar",
@@ -14875,11 +14984,11 @@ var render = function render() {
     staticClass: "spinner-border spinner-border-sm me-2"
   }) : _c("i", {
     staticClass: "fas fa-save me-2"
-  }), _vm._v(" Registrar Cita\r\n\t\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm.pasoActual === 8 && _vm.cita.vivo != 1 ? _c("div", {
+  }), _vm._v(" Registrar Cita\n\t\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm.pasoActual === 8 && _vm.cita.vivo != 1 ? _c("div", {
     staticClass: "alert alert-danger mb-0 rounded-pill"
   }, [_c("i", {
     staticClass: "fas fa-cross me-2"
-  }), _vm._v(" El paciente figura como fallecido.\r\n\t\t\t\t\t\t\t")]) : _vm._e()])])])])])])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" El paciente figura como fallecido.\n\t\t\t\t\t\t\t")]) : _vm._e()])])])])])])]), _vm._v(" "), _c("div", {
     staticClass: "modal fade",
     staticStyle: {
       "z-index": "1060"
@@ -15629,7 +15738,7 @@ var render = function render() {
     staticClass: "spinner-border spinner-border-sm me-2"
   }) : _c("i", {
     staticClass: "fas fa-check"
-  }), _vm._v(" Confirmar Datos\r\n\t\t\t\t")])])])])])]);
+  }), _vm._v(" Confirmar Datos\n\t\t\t\t")])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -15694,7 +15803,7 @@ var staticRenderFns = [function () {
     }
   }, [_c("i", {
     staticClass: "fas fa-plus-circle me-2"
-  }), _vm._v(" Crear paciente nuevo\r\n\t\t\t\t\t\t\t\t\t\t\t")])]);
+  }), _vm._v(" Crear paciente nuevo\n\t\t\t\t\t\t\t\t\t\t\t")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -15742,7 +15851,7 @@ var staticRenderFns = [function () {
     staticClass: "font-weight-bold mb-4 d-flex align-items-center"
   }, [_c("i", {
     staticClass: "fas fa-wallet text-primary me-2"
-  }), _vm._v("Configuración de Pago\r\n\t\t\t\t\t\t\t\t\t\t\t")]);
+  }), _vm._v("Configuración de Pago\n\t\t\t\t\t\t\t\t\t\t\t")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -15750,7 +15859,7 @@ var staticRenderFns = [function () {
     staticClass: "font-weight-bold mb-4 d-flex align-items-center"
   }, [_c("i", {
     staticClass: "fas fa-sticky-note text-warning me-2"
-  }), _vm._v("Notas Adicionales\r\n\t\t\t\t\t\t\t\t\t\t\t")]);
+  }), _vm._v("Notas Adicionales\n\t\t\t\t\t\t\t\t\t\t\t")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -19618,10 +19727,6 @@ var render = function render() {
         style: [_vm.slotStyle(horaOcup._computed_start, horaOcup._computed_end, horaOcup), {
           borderLeft: _vm.isBlocked(horaOcup) ? "4px solid #dc3545" : "4px solid " + _vm.stringToColor(doctor.name)
         }],
-        attrs: {
-          "data-bs-toggle": _vm.isBlocked(horaOcup) ? null : "modal",
-          "data-bs-target": _vm.isBlocked(horaOcup) ? null : "#modalAccionesCitaCuaderno"
-        },
         on: {
           click: function click($event) {
             return _vm.abrirDetallesCita(horaOcup);
@@ -19665,7 +19770,7 @@ var render = function render() {
         "class": horaOcup.mode == 1 ? "far fa-user" : "fas fa-desktop"
       }), _vm._v(" \n\t\t\t\t\t\t\t\t\t\t" + _vm._s(horaOcup.patient.name.split(" ")[0]) + " " + _vm._s(horaOcup.patient.nombres.split(" ")[0]) + "\n\t\t\t\t\t\t\t\t\t")]), _vm._v(" "), _c("div", {
         staticClass: "d-flex align-items-center"
-      }, [horaOcup.status == 5 ? _c("svg", {
+      }, [horaOcup.attention_status === "atendido" || !horaOcup.attention_status && horaOcup.status == 5 ? _c("svg", {
         staticClass: "text-success me-1",
         attrs: {
           xmlns: "http://www.w3.org/2000/svg",
@@ -19686,7 +19791,7 @@ var render = function render() {
         attrs: {
           points: "22 4 12 14.01 9 11.01"
         }
-      })]) : horaOcup.attention || horaOcup.status == 2 ? _c("svg", {
+      })]) : horaOcup.attention_status === "atencion" || !horaOcup.attention_status && horaOcup.status == 2 ? _c("svg", {
         staticClass: "text-info me-1",
         attrs: {
           xmlns: "http://www.w3.org/2000/svg",
@@ -19703,7 +19808,7 @@ var render = function render() {
         attrs: {
           d: "M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"
         }
-      })]) : _c("svg", {
+      })]) : horaOcup.attention_status === "espera" || !horaOcup.attention_status && horaOcup.status == 1 ? _c("svg", {
         staticClass: "text-warning me-1",
         attrs: {
           xmlns: "http://www.w3.org/2000/svg",
@@ -19726,7 +19831,7 @@ var render = function render() {
         attrs: {
           points: "12 6 12 12 16 14"
         }
-      })]), _vm._v(" "), _c("i", {
+      })]) : _vm._e(), _vm._v(" "), _c("i", {
         staticClass: "fas fa-dollar-sign",
         "class": horaOcup.payment && horaOcup.payment.pay_status == 2 ? "text-success" : "text-danger",
         staticStyle: {
@@ -19780,6 +19885,7 @@ var render = function render() {
       actualizarListadoCitas: _vm.actualizarListadoCitas
     }
   }), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("ModalAccionesCita", {
+    key: _vm.cita.id,
     attrs: {
       cita: _vm.cita,
       indiceElegido: _vm.indexElegido,
@@ -19796,12 +19902,13 @@ var render = function render() {
       changeMode: _vm.changeMode,
       openModal: _vm.distribuirAperturaModal,
       intercambiar: _vm.intercambiarHorario,
-      moverVacio: _vm.mandarVacioAutomatico,
       eliminar: _vm.validarYEliminar,
       buscarRecetas: _vm.buscarRecetas,
-      tiemposEspera: _vm.abrirTiemposEspera
+      tiemposEspera: _vm.abrirTiemposEspera,
+      actualizar: _vm.actualizarListadoCitas
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("modal-estado", {
+    key: "estado-" + _vm.cita.id,
     attrs: {
       dataCit: _vm.cita,
       idUsuario: _vm.idUsuario,
@@ -19811,6 +19918,7 @@ var render = function render() {
       actualizar: _vm.actualizarListadoCitas
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("pago-modal", {
+    key: "pago-" + _vm.cita.id,
     attrs: {
       cita: _vm.cita,
       idUsuario: _vm.idUsuario,
@@ -19822,10 +19930,12 @@ var render = function render() {
       actualizar: _vm.actualizarListadoCitas
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("modal-patient", {
+    key: "patient-" + _vm.cita.id,
     attrs: {
       dataCit: _vm.cita
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("reprog-modal", {
+    key: "reprog-" + _vm.cita.id,
     attrs: {
       dataCit: _vm.cita,
       idUsuario: _vm.idUsuario,
@@ -19835,6 +19945,7 @@ var render = function render() {
       ocultarCita: _vm.actualizarListadoCitas
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("info-modal", {
+    key: "info-" + _vm.cita.id,
     attrs: {
       dataCit: _vm.cita,
       precios: _vm.precios,
@@ -19850,11 +19961,13 @@ var render = function render() {
       actualizar: _vm.actualizarListadoCitas
     }
   }), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("modalVerRecetas", {
+    key: "recetas-" + _vm.cita.id,
     attrs: {
       prescriptions: _vm.recetas,
       idModal: "recetasModalCuaderno"
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("modalTiemposEspera", {
+    key: "tiempos-" + _vm.cita.id,
     attrs: {
       cita: _vm.cita,
       idModal: "modalTiemposEsperaCuaderno"
@@ -19863,6 +19976,7 @@ var render = function render() {
       actualizar: _vm.actualizarListadoCitas
     }
   }) : _vm._e(), _vm._v(" "), _vm.cita && _vm.cita.id ? _c("ModalMoverVacio", {
+    key: "movervacio-" + _vm.cita.id,
     attrs: {
       dataCit: _vm.cita,
       idUsuario: _vm.idUsuario
@@ -22407,7 +22521,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.wizard-stepper {\r\n\tbackground-color: #f8f9fa;\r\n\tmargin: -1rem -1rem 1.5rem -1rem;\r\n\tpadding: 1.5rem 1rem;\n}\n.step-item {\r\n\topacity: 0.5;\r\n\ttransition: all 0.3s ease;\n}\n.step-item.active {\r\n\topacity: 1;\r\n\ttransform: scale(1.05);\n}\n.step-item.completed {\r\n\topacity: 0.8;\n}\n.step-item.completed .step-icon {\r\n\tbackground-color: #28a745 !important;\r\n\tcolor: white;\n}\n.step-item.active .step-icon {\r\n\tbackground-color: #0d6efd !important;\r\n\tcolor: white;\r\n\tbox-shadow: 0 0 15px rgba(13, 110, 253, 0.4);\n}\n.step-icon {\r\n\twidth: 35px;\r\n\theight: 35px;\r\n\tbackground-color: #dee2e6;\r\n\tcolor: #6c757d;\r\n\tfont-size: 0.9rem;\n}\n.step-label {\r\n\tfont-size: 0.85rem;\r\n\tfont-weight: 600;\n}\n.step-connector {\r\n\theight: 2px;\r\n\tbackground-color: #dee2e6;\r\n\tflex-grow: 1;\r\n\tmin-width: 20px;\n}\n.step-item.completed .step-connector {\r\n\tbackground-color: #28a745;\n}\n.bg-primary-light { background-color: #e7f1ff !important;\n}\n.bg-soft-primary { background-color: rgba(13, 110, 253, 0.1);\n}\n.bg-soft-info { background-color: rgba(13, 202, 240, 0.1);\n}\n.bg-soft-warning { background-color: rgba(255, 193, 7, 0.1);\n}\n.bg-soft-success { background-color: rgba(40, 167, 69, 0.1);\n}\n.bg-light-gradient { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);\n}\n.avatar-circle, .avatar-xl {\r\n\twidth: 48px;\r\n\theight: 48px;\r\n\tborder-radius: 50%;\n}\n.avatar-xl {\r\n\twidth: 100px;\r\n\theight: 100px;\n}\n.category-icon {\r\n\twidth: 50px;\r\n\theight: 50px;\r\n\tfont-size: 1.2rem;\n}\n.bg-cat-1 { background-color: rgba(111, 66, 193, 0.1); color: #6f42c1;\n}\n.bg-cat-2 { background-color: rgba(13, 110, 253, 0.1); color: #0d6efd;\n}\n.bg-cat-3 { background-color: rgba(25, 135, 84, 0.1); color: #198754;\n}\n.bg-cat-4 { background-color: rgba(255, 193, 7, 0.1); color: #ffc107;\n}\n.bg-cat-6 { background-color: rgba(220, 53, 69, 0.1); color: #dc3545;\n}\n.bg-cat-7 { background-color: rgba(13, 202, 240, 0.1); color: #0dcaf0;\n}\n.bg-cat-8 { background-color: rgba(108, 117, 125, 0.1); color: #6c757d;\n}\n.selectable-card {\r\n\tcursor: pointer;\r\n\tborder: 2px solid transparent !important;\n}\n.selectable-card:hover {\r\n\ttransform: translateY(-5px);\r\n\tbox-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;\n}\n.selectable-card.active {\r\n\tborder-color: #0d6efd !important;\r\n\tbackground-color: rgba(13, 110, 253, 0.02);\n}\n.custom-switch .form-check-input {\r\n\twidth: 3rem;\r\n\theight: 1.5rem;\n}\n.ticket-container {\r\n\tmax-width: 600px;\r\n\tmargin: 0 auto;\n}\n.border-dashed { border-style: dashed !important;\n}\n.transition-all { transition: all 0.3s ease;\n}\n.ls-1 { letter-spacing: 1px;\n}\n.btn-light-danger {\r\n\tbackground-color: #ffe5e5;\r\n\tcolor: #d9534f;\r\n\tborder: none;\n}\n.btn-light-danger:hover {\r\n\tbackground-color: #ffd1d1;\n}\n.bg-success-light { background-color: rgba(40, 167, 69, 0.1);\n}\n.text-warning-dark { color: #856404;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.wizard-stepper {\n\tbackground-color: #f8f9fa;\n\tmargin: -1rem -1rem 1.5rem -1rem;\n\tpadding: 1.5rem 1rem;\n}\n.step-item {\n\topacity: 0.5;\n\ttransition: all 0.3s ease;\n}\n.step-item.active {\n\topacity: 1;\n\ttransform: scale(1.05);\n}\n.step-item.completed {\n\topacity: 0.8;\n}\n.step-item.completed .step-icon {\n\tbackground-color: #28a745 !important;\n\tcolor: white;\n}\n.step-item.active .step-icon {\n\tbackground-color: #0d6efd !important;\n\tcolor: white;\n\tbox-shadow: 0 0 15px rgba(13, 110, 253, 0.4);\n}\n.step-icon {\n\twidth: 35px;\n\theight: 35px;\n\tbackground-color: #dee2e6;\n\tcolor: #6c757d;\n\tfont-size: 0.9rem;\n}\n.step-label {\n\tfont-size: 0.85rem;\n\tfont-weight: 600;\n}\n.step-connector {\n\theight: 2px;\n\tbackground-color: #dee2e6;\n\tflex-grow: 1;\n\tmin-width: 20px;\n}\n.step-item.completed .step-connector {\n\tbackground-color: #28a745;\n}\n.bg-primary-light { background-color: #e7f1ff !important;\n}\n.bg-soft-primary { background-color: rgba(13, 110, 253, 0.1);\n}\n.bg-soft-info { background-color: rgba(13, 202, 240, 0.1);\n}\n.bg-soft-warning { background-color: rgba(255, 193, 7, 0.1);\n}\n.bg-soft-success { background-color: rgba(40, 167, 69, 0.1);\n}\n.bg-light-gradient { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);\n}\n.avatar-circle, .avatar-xl {\n\twidth: 48px;\n\theight: 48px;\n\tborder-radius: 50%;\n}\n.avatar-xl {\n\twidth: 100px;\n\theight: 100px;\n}\n.category-icon {\n\twidth: 50px;\n\theight: 50px;\n\tfont-size: 1.2rem;\n}\n.bg-cat-1 { background-color: rgba(111, 66, 193, 0.1); color: #6f42c1;\n}\n.bg-cat-2 { background-color: rgba(13, 110, 253, 0.1); color: #0d6efd;\n}\n.bg-cat-3 { background-color: rgba(25, 135, 84, 0.1); color: #198754;\n}\n.bg-cat-4 { background-color: rgba(255, 193, 7, 0.1); color: #ffc107;\n}\n.bg-cat-6 { background-color: rgba(220, 53, 69, 0.1); color: #dc3545;\n}\n.bg-cat-7 { background-color: rgba(13, 202, 240, 0.1); color: #0dcaf0;\n}\n.bg-cat-8 { background-color: rgba(108, 117, 125, 0.1); color: #6c757d;\n}\n.selectable-card {\n\tcursor: pointer;\n\tborder: 2px solid transparent !important;\n}\n.selectable-card:hover {\n\ttransform: translateY(-5px);\n\tbox-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;\n}\n.selectable-card.active {\n\tborder-color: #0d6efd !important;\n\tbackground-color: rgba(13, 110, 253, 0.02);\n}\n.custom-switch .form-check-input {\n\twidth: 3rem;\n\theight: 1.5rem;\n}\n.ticket-container {\n\tmax-width: 600px;\n\tmargin: 0 auto;\n}\n.border-dashed { border-style: dashed !important;\n}\n.transition-all { transition: all 0.3s ease;\n}\n.ls-1 { letter-spacing: 1px;\n}\n.btn-light-danger {\n\tbackground-color: #ffe5e5;\n\tcolor: #d9534f;\n\tborder: none;\n}\n.btn-light-danger:hover {\n\tbackground-color: #ffd1d1;\n}\n.bg-success-light { background-color: rgba(40, 167, 69, 0.1);\n}\n.text-warning-dark { color: #856404;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

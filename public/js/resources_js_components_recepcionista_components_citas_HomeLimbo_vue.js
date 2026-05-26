@@ -99,6 +99,13 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     prepararAcciones: function prepararAcciones(cita, index) {
       this.citaElegida = _objectSpread({}, cita.appointment);
       this.indiceElegido = index;
+      this.$nextTick(function () {
+        var el = document.getElementById('modalAcciones');
+        if (el && window.bootstrap) {
+          var modalInstance = window.bootstrap.Modal.getOrCreateInstance(el);
+          modalInstance.show();
+        }
+      });
     },
     horaLatam: function horaLatam(hora) {
       return moment__WEBPACK_IMPORTED_MODULE_2___default()(hora, 'HH:mm:ss').format('h:mm a');
@@ -311,9 +318,7 @@ var render = function render() {
     }, [_c("button", {
       staticClass: "action-btn",
       attrs: {
-        title: "Ver detalle",
-        "data-bs-toggle": "modal",
-        "data-bs-target": "#modalAcciones"
+        title: "Ver detalle"
       },
       on: {
         click: function click($event) {
@@ -347,11 +352,15 @@ var render = function render() {
       idUsuario: _vm.$attrs.idUser
     }
   }), _vm._v(" "), _vm.citaElegida.id ? _c("modal-acciones-cita", {
+    key: _vm.citaElegida.id,
     attrs: {
       cita: _vm.citaElegida,
       indiceElegido: _vm.indiceElegido,
       precios: _vm.precios,
       id: "modalAcciones"
+    },
+    on: {
+      actualizar: _vm.fetchLimbos
     }
   }) : _vm._e()], 1);
 };

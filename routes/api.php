@@ -151,6 +151,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('searchAppointment/{nombre}/{profesional?}/{fecha?}/{dni}', [AppointmentController::class, 'searchAppointment']);
         Route::get('searchByDateAppointment/{date}', [AppointmentController::class, 'searchByDateAppointment']);
         Route::post('updateStatus/{id}/{value}', [AppointmentController::class, 'updateStatus']);
+        Route::post('updateAttentionStatus/{id}', [AppointmentController::class, 'updateAttentionStatus']);
         Route::get('updateModeAppoinment/{id}', [AppointmentController::class, 'updateMode']);
         Route::put('reprogramado/{id}', [AppointmentController::class, 'reprogramado']);
         Route::put('mandarVacio/{id}', [AppointmentController::class, 'mandarVacio']);

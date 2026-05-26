@@ -84,7 +84,7 @@
 						<div class="row justify-content-center">
 							<div class="col-md-10">
 								<p class="mb-3 lead text-center font-weight-bold">Tipo de Consulta (Especialidad)</p>
-								
+
 								<div class="row mb-4">
 									<div v-for="cat in categorias" :key="cat.id" class="col-md-6 mb-3">
 										<div class="card h-100 border-0 shadow-sm rounded-4 selectable-card transition-all" :class="{ 'active': cita.clasification == cat.id }" @click="seleccionarCategoria(cat.id)">
@@ -131,7 +131,7 @@
 						<div class="row justify-content-center">
 							<div class="col-md-10">
 								<p class="mb-4 lead text-center font-weight-bold">Seleccionar Profesional</p>
-								
+
 								<div class="row">
 									<div v-for="prof in doctoresFiltradosPorCat" :key="prof.id" class="col-md-4 mb-3">
 										<div class="card h-100 border-0 shadow-sm rounded-4 selectable-card transition-all" :class="{ 'active': cita.professional_id == prof.id }" @click="seleccionarDoctor(prof)">
@@ -184,7 +184,7 @@
 						<div class="row justify-content-center">
 							<div class="col-md-10">
 								<p class="mb-4 lead text-center font-weight-bold">Modalidad de Atención</p>
-								
+
 								<div class="row justify-content-center">
 									<div class="col-md-4 mb-4">
 										<div class="card h-100 border-0 shadow-sm rounded-4 selectable-card transition-all p-4 text-center" :class="{ 'active': cita.mode == 1 }" @click="seleccionarModalidad(1)">
@@ -232,14 +232,14 @@
 						<div class="row justify-content-center">
 							<div class="col-md-10">
 								<p class="mb-4 lead text-center font-weight-bold">Información de Pago y Notas</p>
-								
+
 								<div class="row">
 									<div class="col-md-6 mb-4">
 										<div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
 											<h6 class="font-weight-bold mb-4 d-flex align-items-center">
 												<i class="fas fa-wallet text-primary me-2"></i>Configuración de Pago
 											</h6>
-											
+
 											<!-- Adelanto -->
 											<div class="form-check form-switch mb-3 custom-switch">
 												<input class="form-check-input" type="checkbox" id="checkAdelanto" v-model="tieneAdelanto" @change="precioDinamico()">
@@ -355,7 +355,7 @@
 						<div class="row justify-content-center">
 							<div class="col-md-10">
 								<p class="mb-4 lead text-center font-weight-bold">Resumen de la Cita</p>
-								
+
 								<div class="ticket-container bg-white shadow-lg rounded-5 overflow-hidden border">
 									<div class="ticket-header bg-soft-primary p-4 border-bottom d-flex align-items-center">
 										<div class="badge bg-primary p-3 rounded-circle me-3">
@@ -366,7 +366,7 @@
 											<p class="text-muted small mb-0">Por favor, revise los datos antes de registrar.</p>
 										</div>
 									</div>
-									
+
 									<div class="ticket-body p-4 p-md-5">
 										<div class="row mb-5">
 											<div class="col-md-6 mb-4">
@@ -422,7 +422,7 @@
 											<p class="mb-0 small text-dark fst-italic">{{ cita.recomendacion_comentario }}</p>
 										</div>
 									</div>
-									
+
 									<div class="ticket-footer bg-light p-4 text-center border-top">
 										<p class="text-muted small mb-0"><i class="fas fa-shield-alt me-2"></i>Sistema de Gestión de Citas Excelentemente - Recepción</p>
 									</div>
@@ -488,7 +488,7 @@
 								<input type="text" class="form-control" id="phone" v-model="cita.phone" placeholder="" @keypress="limitarCel($event)" autocomplete="off">
 							</div>
 						</div>
-	
+
 						<div class="form-group row">
 							<div class="col-4">
 								<label v-if="cita.type_dni==1" for="name">D.N.I. <span class="text-danger">*</span></label>
@@ -508,7 +508,7 @@
 								<input  type="text" class="form-control text-uppercase" id="name" v-model="cita.nombres" placeholder="" autocomplete="off">
 							</div>
 						</div>
-	
+
 						<div class="form-group row">
 							<div class="col-sm-4">
 									<label for="name">Fecha de nacimiento <span class="text-danger">*</span></label>
@@ -524,10 +524,10 @@
 										<option value="3">Viudo</option>
 									</select>
 							</div>
-	
+
 						</div>
-	
-	
+
+
 						<div class="form-group row" >
 							<div class="col-sm-4">
 									<label for="">Grado de instrucción <span class="text-danger">*</span></label>
@@ -545,8 +545,8 @@
 								<input type="text" class="form-control" name="address" id="address" v-model="cita.address" placeholder="" autocomplete="off">
 							</div>
 						</div>
-	
-	
+
+
 						<div class="form-group row">
 							<div class="col-sm-4">
 									<label for="name">Departamento <span class="text-danger">*</span></label>
@@ -567,13 +567,13 @@
 									</select>
 							</div>
 						</div>
-	
+
 						<div class="form-group row">
 							<div class="col-sm-4">
 									<label for="name">Ocupación <span class="text-danger">*</span></label>
 									<input type="text" class="form-control" name="occupation" id="occupation" v-model="cita.occupation"  placeholder="Ocupación del paciente" autocomplete="off">
 							</div>
-	
+
 							<div class="col-sm-4">
 								<label for="name">Género <span class="text-danger">*</span></label>
 								<select class="form-select" id="sexo" v-model="cita.gender">
@@ -590,7 +590,7 @@
 						</div>
 					</div>
 				</div>
-				
+
 				<p class="my-2 lead text-success"><strong><i class="fas fa-people-arrows"></i> Datos de Contacto de Emergencia</strong></p>
 				<div class="card">
 					<div class="card-body">
@@ -669,7 +669,7 @@ export default {
 				{ id: 6, label: 'Nutricional', desc: 'Consulta nutricional', icon: 'fa-apple-alt' },
 				{ id: 3, label: 'Certificado', desc: 'Certificado médico o psicológico', icon: 'fa-file-medical' },
 				{ id: 7, label: 'Terapia', desc: 'Masajes y terapia corporal', icon: 'fa-hands-helping' },
-				{ id: 8, label: 'Triaje', desc: 'Triaje por médico o psicólogo', icon: 'fa-stethoscope' },
+				{ id: 8, label: 'Tecnológo', desc: 'Triaje por tecnólogo médico', icon: 'fa-stethoscope' },
 				{ id: 4, label: 'Kurame', desc: 'Servicios de Kurame', icon: 'fa-star' }
 			],
 			precios: [], nosrecomienda:true, precioNuevo:true, esPresencial: true, masBasicos:true, masEmergencia:false, tieneDescuento:false, descuentoRebaja:0, tieneRebaja:false, razonPorcentaje:'', razonRebaja:'',
@@ -709,8 +709,8 @@ export default {
 				status:'', new_status:1, prev_status:1,
 				type_amount:1,
 				type_dni:1,
-				contacto: '', contacto_celular: '', parentezco:'', 
-				contacto2: '', contacto_celular2: '', parentezco2:'', 
+				contacto: '', contacto_celular: '', parentezco:'',
+				contacto2: '', contacto_celular2: '', parentezco2:'',
 				adelanto:0, vivo:1
 			},
 			ubigeo: {departamentos:[], provincias:[], distritos:[]},
@@ -723,7 +723,7 @@ export default {
 		this.$parent.$on('limpiarDescuentos', () => this.limpiarInputs(false) );
 		this.pedirMonedas();
 		this.fetchPacientes();
-		
+
 		const modal = document.getElementById('modalNuevaCita')
 		if (modal) {
 			// Sincronizar datos cada vez que el modal se muestra
@@ -743,7 +743,7 @@ export default {
 
 
 	},
-	 
+
 	methods: {
 		fetchPacientes() {
 			this.axios.get('/api/getLast10Patients')
@@ -972,7 +972,7 @@ export default {
 					let solos = res.data.solos.filter(h => h.professional_id == this.cita.professional_id);
 					let invalidos = res.data.invalidos;
 					this.horariosDisponibles = solos.filter(h => !invalidos.find(i => i.schedule_id == h.id));
-					
+
 					// Preselect if horaManualId is still valid, else clear
 					if (!this.horariosDisponibles.find(h => h.id == this.horaManualId)) {
 						this.horaManualId = '';
@@ -1007,20 +1007,20 @@ export default {
 				if( this.cita.membresia )
 					if( this.cita.membresia.tipo==15 ) //Pertenece a la membresía kurame, único en hacer descuento especial
 						precio = precioPadre.especialMembresias
-				
+
 				if( this.tieneAdelanto )
 					if( parseInt(this.descuentoAdelanto) <= 0 || this.descuentoAdelanto=='' ) this.descuentoAdelanto=0
 					else precio = precio - parseFloat(this.descuentoAdelanto);
 
 				if( this.tieneDescuento ){
 					if( parseInt(this.descuentoPorcentaje) <= 0 ) descuentoPorcentual=0
-					else descuentoPorcentual = parseFloat((precio * 1/ parseInt(this.descuentoPorcentaje)).toFixed(1));				
+					else descuentoPorcentual = parseFloat((precio * 1/ parseInt(this.descuentoPorcentaje)).toFixed(1));
 					precio = precio - descuentoPorcentual;
 				}
 
 				if( this.tieneRebaja )
 					precio = precio - parseFloat(this.descuentoRebaja);
-				
+
 				this.cita.price = precio;
 			}
 		},
@@ -1028,7 +1028,7 @@ export default {
 			this.axios('/api/listarMonedas')
 			.then(resp => this.monedas = resp.data )
 		},
-		async insertar(e){ 
+		async insertar(e){
 			e.preventDefault()
 			if (this.isProcessing) return;
 
@@ -1064,12 +1064,12 @@ export default {
 				formData.append('marital_status', this.cita.marital_status);
 				formData.append('instruction_degree', this.cita.instruction_degree);
 				formData.append('professional_id', this.cita.professional_id);
-				
+
 				let horaSel = this.horariosDisponibles.find(h => h.id == this.horaManualId);
 				formData.append('schedule_id', this.horaManualId);
 				formData.append('check_time', horaSel ? horaSel.check_time : '');
 				formData.append('date', this.fechaManual);
-				
+
 				formData.append('clasification', this.cita.clasification);
 				formData.append('price', this.cita.price);
 				formData.append('type', this.cita.type); //nueva lista de servicios
@@ -1194,7 +1194,7 @@ export default {
 			this.tieneAdelanto=false; this.tieneDescuento=false; this.tieneRebaja=false; this.razonAdelanto=''; this.razonRebaja=''
 			this.cita.vivo=1; this.monedaAdelanto=1; this.past_appointments=0; this.precioNuevo=true;
 		},
-		reniec(){ 
+		reniec(){
 			if (this.switchReciec === 0) return;
 			this.switchReciec = 0;
 			this.limpiarInputs(false)
@@ -1223,10 +1223,10 @@ export default {
 							this.cita.name = (`${response.data.apellido_paterno} ${response.data.apellido_materno} `).trim()
 							this.cita.nombres = `${response.data.nombres.trim()}`;
 							this.cita.vivo=1
-							
+
 							if (response.data.apellido_paterno) {
 								this.patientNew = false
-	
+
 								this.$swal.fire({
 									icon: 'success',
 									title: 'Okey',
@@ -1259,7 +1259,7 @@ export default {
 						}
 						this.alertaDeudas = true;
 						this.mensajeDeudas = `El paciente tiene <strong>${(cantDeudas==1) ? '1 deuda': cantDeudas+' deudas'}</strong> de <strong>${moment(res.data.deudas[0].fecha).fromNow()}</strong> por un total de <strong>S/ ${parseFloat(sumaDeudas).toFixed(2)}</strong>`;
-						
+
 					}else this.alertaDeudas=false;
 
 					if(res.data.patient.faults != 0){
@@ -1283,11 +1283,11 @@ export default {
 					this.cita.district = res.data.patient.address.district;
 					this.cita.vivo = res.data.patient.vivo;
 					this.cita.contacto = res.data.relacion[0].name ?? '' ;
-					this.cita.contacto_celular = res.data.relacion[0].phone ?? '' 
+					this.cita.contacto_celular = res.data.relacion[0].phone ?? ''
 					this.cita.parentezco = res.data.relacion[0].kinship ?? ''
 					this.cita.contacto2 = res.data.relacion[1]?.name ?? ''
-					this.cita.contacto_celular2 = res.data.relacion[1]?.phone ?? '' 
-					this.cita.parentezco2 = res.data.relacion[1]?.kinship ?? '' 
+					this.cita.contacto_celular2 = res.data.relacion[1]?.phone ?? ''
+					this.cita.parentezco2 = res.data.relacion[1]?.kinship ?? ''
 					this.cita.etiqueta = res.data.patient.etiqueta;
 					this.cita.deudas = res.data.patient.deudas;
 					this.cita.prev_status = res.data.patient.new_status;
@@ -1311,7 +1311,7 @@ export default {
 				this.switchReciec = 1;
 				document.querySelector(".btnReniec").classList.replace('btn-danger', 'btn-info')
 			})
-		},    
+		},
 		horaSimple1(horita){ return moment(horita, 'HH:mm:ss').format('h:mm')},
 		horaSimple2(horita){ return moment(horita, 'HH:mm:ss').format('h:mm a')},
 		fechaLatam(horita){ return moment(horita).format('DD [de] MMMM [de] YYYY')},
@@ -1356,14 +1356,14 @@ export default {
 			this.cita.new_status=1;
 			this.cita.recomendation='';
 			this.cita.membresia = null
-			
+
 			this.cita.contacto= ''; this.cita.contacto_celular= ''; this.cita.parentezco='';
 			this.cita.contacto2= ''; this.cita.contacto_celular2= ''; this.cita.parentezco='';
 
 			this.moverProvincias(false)
 			this.moverDistritos()
 			// value ? this.cita.mode = '' : false;
-			
+
 			this.cita.voucher = '';
 			this.cita.link = '';
 			this.cita.bank = '';
@@ -1389,7 +1389,7 @@ export default {
 			if (document.getElementById('clasification').value &&
 				document.getElementById('type').value &&
 				document.getElementById('mode').value && document.getElementById('type_amount').value) {
-					
+
 				let casificationValue = parseInt(document.getElementById('clasification').value) - 1,
 					typeValue = parseInt(document.getElementById('type').value) - 1,
 					modeValue = parseInt(document.getElementById('mode').value) - 1,
@@ -1399,7 +1399,7 @@ export default {
 					}else{
 						this.cita.price = this.priceCiteOld[casificationValue][modeValue][typeValue]
 					}
-				
+
 			}
 		},
 		async listarPrecios(){
@@ -1460,7 +1460,7 @@ export default {
 	},
 	updated(){
 		//this.cita.department = 12;
-		
+
 	},
 	watch:{
 		horaElegida: {
@@ -1487,7 +1487,7 @@ export default {
 		},
 		filtro(){
 			if(this.cita.professional_id){
-				return this.horas.filter(hora=> hora.professional_id == cita.professional_id)         
+				return this.horas.filter(hora=> hora.professional_id == cita.professional_id)
 			}
 		}
 	}

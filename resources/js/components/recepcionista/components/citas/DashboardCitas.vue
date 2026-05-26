@@ -208,7 +208,7 @@
                                               <i class="fas fa-ellipsis-h"></i>
                                           </button>
                                           <ul class="dropdown-menu dropdown-menu-right shadow border-0" style="border-radius: 10px; min-width: 200px;">
-                                              <li><a class="dropdown-item py-2" href="#" @click.prevent="abrirDetallesCita(cita)" data-bs-toggle="modal" data-bs-target="#modalAccionesCita"><i class="fas fa-eye text-primary mr-2" style="width: 16px;"></i> Ver Detalle</a></li>
+                                              <li><a class="dropdown-item py-2" href="#" @click.prevent="abrirDetallesCita(cita)"><i class="fas fa-eye text-primary mr-2" style="width: 16px;"></i> Ver Detalle</a></li>
                                               <li><a class="dropdown-item py-2" href="#" @click.prevent="intercambiarHorario(cita)" data-bs-toggle="modal" data-bs-target="#modalIntercambio"><i class="fas fa-retweet text-warning mr-2" style="width: 16px;"></i> Cambiar Horario</a></li>
                                               <li><a class="dropdown-item py-2" href="#" @click.prevent="prepararLimbo(cita)" data-bs-toggle="modal" data-bs-target="#reprogModal"><i class="fas fa-archive text-secondary mr-2" style="width: 16px;"></i> Enviar al Limbo</a></li>
                                           </ul>
@@ -226,22 +226,23 @@
       </div>
 
       <!-- Modales -->
-      <ModalAccionesCita v-if="cita && cita.id" :cita="cita" :indiceElegido="indexElegido" :precios="precios"
+      <ModalAccionesCita v-if="cita && cita.id" :key="cita.id" :cita="cita" :indiceElegido="indexElegido" :precios="precios"
           @changeMode="changeMode"
           @openModal="distribuirAperturaModal"
           @intercambiar="intercambiarHorario"
           @eliminar="validarYEliminar"
           @buscarRecetas="buscarRecetas"
           @tiemposEspera="abrirTiemposEspera"
+          @actualizar="actualizarListadoCitas"
       />
-      <reprog-modal ref="reprogModal" v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="actualizarListadoCitas"></reprog-modal>
-      <info-modal v-if="cita && cita.id" :dataCit="cita" :precios="precios"></info-modal>
+      <reprog-modal ref="reprogModal" v-if="cita && cita.id" :key="'reprog-'+cita.id" :dataCit="cita" :idUsuario="idUsuario" @ocultarCita="actualizarListadoCitas"></reprog-modal>
+      <info-modal v-if="cita && cita.id" :key="'info-'+cita.id" :dataCit="cita" :precios="precios"></info-modal>
       <ModalIntercambio :posibles="posibles" :primero="primero" @actualizar="actualizarListadoCitas"></ModalIntercambio>
-      <modalVerRecetas v-if="cita && cita.id" :prescriptions="recetas"></modalVerRecetas>
-      <modalTiemposEspera v-if="cita && cita.id" :cita="cita" @actualizar="actualizarListadoCitas"></modalTiemposEspera>
-      <modal-estado v-if="cita && cita.id" :dataCit="cita" :idUsuario="idUsuario" @actualizar="actualizarListadoCitas"></modal-estado>
-      <pago-modal v-if="cita && cita.id" :cita="cita" :idUsuario="idUsuario" :idSede="idSede" @actualizarAdelanto="actualizarAdelanto" @actualizar="actualizarListadoCitas"></pago-modal>
-      <modal-patient v-if="cita && cita.id" :dataCit="cita"></modal-patient>
+      <modalVerRecetas v-if="cita && cita.id" :key="'recetas-'+cita.id" :prescriptions="recetas"></modalVerRecetas>
+      <modalTiemposEspera v-if="cita && cita.id" :key="'tiempos-'+cita.id" :cita="cita" @actualizar="actualizarListadoCitas"></modalTiemposEspera>
+      <modal-estado v-if="cita && cita.id" :key="'estado-'+cita.id" :dataCit="cita" :idUsuario="idUsuario" @actualizar="actualizarListadoCitas"></modal-estado>
+      <pago-modal v-if="cita && cita.id" :key="'pago-'+cita.id" :cita="cita" :idUsuario="idUsuario" :idSede="idSede" @actualizarAdelanto="actualizarAdelanto" @actualizar="actualizarListadoCitas"></pago-modal>
+      <modal-patient v-if="cita && cita.id" :key="'patient-'+cita.id" :dataCit="cita"></modal-patient>
 
   </div>
 </template>
@@ -359,9 +360,16 @@ export default {
               }
           });
       },
-      abrirDetallesCita(cita) {
+       abrirDetallesCita(cita) {
           this.cita = cita;
           this.indexElegido = this.dashData.citasHoy.findIndex(x => x.id === cita.id);
+          this.$nextTick(() => {
+              const el = document.getElementById('modalAccionesCita');
+              if (el && window.bootstrap) {
+                  const modalInstance = window.bootstrap.Modal.getOrCreateInstance(el);
+                  modalInstance.show();
+              }
+          });
       },
       changeMode(id, indiceP) {
           this.$swal.fire({
