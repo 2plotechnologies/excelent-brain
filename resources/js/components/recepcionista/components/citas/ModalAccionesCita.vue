@@ -94,11 +94,7 @@
               </div>
               <div class="time-item px-2 border-left">
                 <div class="time-label">Hora de fin</div>
-                <div class="time-value" v-if="cita.hora_fin">{{ horaLatam2(cita.hora_fin) }}</div>
-                <div v-else class="d-flex flex-column align-items-center">
-                   <input type="time" v-model="departureTimeLocal" class="form-control form-control-sm mb-1 text-center font-weight-bold p-0" style="font-size: 0.75rem; height: 24px; width: 80px;" :disabled="!cita.attention" />
-                   <button @click.stop="registrarTiempo('fin')" class="btn btn-registrar btn-sm" :disabled="!departureTimeLocal || !cita.attention">Finalizar</button>
-                </div>
+                <div class="time-value">{{ horaLatam2(cita.hora_fin) }}</div>
               </div>
               <div class="time-item px-2 border-left">
                 <div class="time-label">Tiempo espera</div>
@@ -275,20 +271,17 @@ export default {
           if(this.cita.attention) return;
           this.cita.attention = moment().format('HH:mm:ss');
           payload.attention = this.cita.attention;
-          if (!this.cita.hora_fin && this.cita.precio && this.cita.precio.duracion) {
-            this.departureTimeLocal = moment(this.cita.attention, 'HH:mm:ss').add(this.cita.precio.duracion, 'minutes').format('HH:mm');
+          
+          let duracion = 60; // Fallback
+          if (this.cita.precio && this.cita.precio.duracion) {
+            duracion = parseInt(this.cita.precio.duracion);
+          } else if (this.cita.membresia && this.cita.membresia.precio && this.cita.membresia.precio.duracion) {
+            duracion = parseInt(this.cita.membresia.precio.duracion);
           }
-          break;
-        case 'fin':
-          if(!this.cita.entrance || !this.cita.attention) {
-             if(window.alertify) window.alertify.error('Debe registrar la hora de llegada y atención primero.');
-             return;
-          }
-          if(this.cita.hora_fin) return;
-          if(!this.departureTimeLocal) {
-             this.departureTimeLocal = moment().format('HH:mm');
-          }
-          payload.departure = this.departureTimeLocal;
+          let endTime = moment(this.cita.attention, 'HH:mm:ss').add(duracion, 'minutes').format('HH:mm:ss');
+          this.$set(this.cita, 'hora_fin', endTime);
+          payload.departure = endTime;
+          this.departureTimeLocal = moment(endTime, 'HH:mm:ss').format('HH:mm');
           break;
         default: break;
       }
@@ -296,9 +289,6 @@ export default {
       try {
         let response = await this.axios.post('/api/registrarHora', payload);
         if(response.data?.mensaje == 'Ok'){
-            if (tipo === 'fin') {
-                this.$set(this.cita, 'hora_fin', this.departureTimeLocal);
-            }
             this.$emit('actualizar', 'sksks');
             if (window.alertify) {
               window.alertify.notify('<i class="fa-regular fa-calendar-check"></i> Datos actualizados', 'success', 5);
@@ -400,9 +390,19 @@ export default {
       }
     },
     canSendSatisfaction(c) {
-      return c && c.status == 5 && c.hora_fin && c.patient && c.patient.phone;
+      return !!(c && c.patient);
     },
     async sendSatisfaction(c) {
+      if (!c || !c.patient || !c.patient.phone) {
+        if (window.alertify) {
+          window.alertify.error('El paciente no tiene un número de teléfono registrado.');
+        } else if (this.$swal) {
+          this.$swal('El paciente no tiene un número de teléfono registrado.');
+        } else {
+          alert('El paciente no tiene un número de teléfono registrado.');
+        }
+        return;
+      }
       try {
         const res = await this.axios.post(`/api/appointment/${c.id}/satisfaction-link`);
         const phone = (c.patient.phone || '').toString().replaceAll(' ', '');

@@ -6304,7 +6304,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     registrarTiempo: function registrarTiempo(tipo) {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var payload, _response$data, response;
+        var payload, duracion, endTime, _response$data, response;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
@@ -6320,7 +6320,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 attention: _this.cita.attention
               };
               _context.t0 = tipo;
-              _context.next = _context.t0 === 'llegada' ? 6 : _context.t0 === 'atención' ? 11 : _context.t0 === 'fin' ? 17 : 25;
+              _context.next = _context.t0 === 'llegada' ? 6 : _context.t0 === 'atención' ? 11 : 22;
               break;
             case 6:
               if (!_this.cita.entrance) {
@@ -6331,7 +6331,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 8:
               _this.cita.entrance = moment__WEBPACK_IMPORTED_MODULE_0___default()().format('HH:mm:ss');
               payload.entrance = _this.cita.entrance;
-              return _context.abrupt("break", 26);
+              return _context.abrupt("break", 23);
             case 11:
               if (!_this.cita.attention) {
                 _context.next = 13;
@@ -6341,57 +6341,42 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 13:
               _this.cita.attention = moment__WEBPACK_IMPORTED_MODULE_0___default()().format('HH:mm:ss');
               payload.attention = _this.cita.attention;
-              if (!_this.cita.hora_fin && _this.cita.precio && _this.cita.precio.duracion) {
-                _this.departureTimeLocal = moment__WEBPACK_IMPORTED_MODULE_0___default()(_this.cita.attention, 'HH:mm:ss').add(_this.cita.precio.duracion, 'minutes').format('HH:mm');
+              duracion = 60; // Fallback
+              if (_this.cita.precio && _this.cita.precio.duracion) {
+                duracion = parseInt(_this.cita.precio.duracion);
+              } else if (_this.cita.membresia && _this.cita.membresia.precio && _this.cita.membresia.precio.duracion) {
+                duracion = parseInt(_this.cita.membresia.precio.duracion);
               }
-              return _context.abrupt("break", 26);
-            case 17:
-              if (!(!_this.cita.entrance || !_this.cita.attention)) {
-                _context.next = 20;
-                break;
-              }
-              if (window.alertify) window.alertify.error('Debe registrar la hora de llegada y atención primero.');
-              return _context.abrupt("return");
-            case 20:
-              if (!_this.cita.hora_fin) {
-                _context.next = 22;
-                break;
-              }
-              return _context.abrupt("return");
+              endTime = moment__WEBPACK_IMPORTED_MODULE_0___default()(_this.cita.attention, 'HH:mm:ss').add(duracion, 'minutes').format('HH:mm:ss');
+              _this.$set(_this.cita, 'hora_fin', endTime);
+              payload.departure = endTime;
+              _this.departureTimeLocal = moment__WEBPACK_IMPORTED_MODULE_0___default()(endTime, 'HH:mm:ss').format('HH:mm');
+              return _context.abrupt("break", 23);
             case 22:
-              if (!_this.departureTimeLocal) {
-                _this.departureTimeLocal = moment__WEBPACK_IMPORTED_MODULE_0___default()().format('HH:mm');
-              }
-              payload.departure = _this.departureTimeLocal;
-              return _context.abrupt("break", 26);
-            case 25:
-              return _context.abrupt("break", 26);
-            case 26:
-              _context.prev = 26;
-              _context.next = 29;
+              return _context.abrupt("break", 23);
+            case 23:
+              _context.prev = 23;
+              _context.next = 26;
               return _this.axios.post('/api/registrarHora', payload);
-            case 29:
+            case 26:
               response = _context.sent;
               if (((_response$data = response.data) === null || _response$data === void 0 ? void 0 : _response$data.mensaje) == 'Ok') {
-                if (tipo === 'fin') {
-                  _this.$set(_this.cita, 'hora_fin', _this.departureTimeLocal);
-                }
                 _this.$emit('actualizar', 'sksks');
                 if (window.alertify) {
                   window.alertify.notify('<i class="fa-regular fa-calendar-check"></i> Datos actualizados', 'success', 5);
                 }
               }
-              _context.next = 36;
+              _context.next = 33;
               break;
-            case 33:
-              _context.prev = 33;
-              _context.t1 = _context["catch"](26);
+            case 30:
+              _context.prev = 30;
+              _context.t1 = _context["catch"](23);
               console.error(_context.t1);
-            case 36:
+            case 33:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[26, 33]]);
+        }, _callee, null, [[23, 30]]);
       }))();
     },
     cambiarEstadoAtencion: function cambiarEstadoAtencion(estado) {
@@ -6518,7 +6503,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     canSendSatisfaction: function canSendSatisfaction(c) {
-      return c && c.status == 5 && c.hora_fin && c.patient && c.patient.phone;
+      return !!(c && c.patient);
     },
     sendSatisfaction: function sendSatisfaction(c) {
       var _this3 = this;
@@ -6527,28 +6512,41 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              _context3.prev = 0;
-              _context3.next = 3;
-              return _this3.axios.post("/api/appointment/".concat(c.id, "/satisfaction-link"));
+              if (!(!c || !c.patient || !c.patient.phone)) {
+                _context3.next = 3;
+                break;
+              }
+              if (window.alertify) {
+                window.alertify.error('El paciente no tiene un número de teléfono registrado.');
+              } else if (_this3.$swal) {
+                _this3.$swal('El paciente no tiene un número de teléfono registrado.');
+              } else {
+                alert('El paciente no tiene un número de teléfono registrado.');
+              }
+              return _context3.abrupt("return");
             case 3:
+              _context3.prev = 3;
+              _context3.next = 6;
+              return _this3.axios.post("/api/appointment/".concat(c.id, "/satisfaction-link"));
+            case 6:
               res = _context3.sent;
               phone = (c.patient.phone || '').toString().replaceAll(' ', '');
               text = "Buen dia ".concat(c.patient.name, " ").concat(c.patient.nombres, ", esperamos se encuentre bien. Le enviamos la encuesta de satisfaccion de su cita en el Centro Psicologico y Psiquiatrico EXCELENTEMENTE. ").concat(res.data.url);
               window.open("https://wa.me/51".concat(phone, "?text=").concat(encodeURIComponent(text)), '_blank');
-              _context3.next = 13;
+              _context3.next = 16;
               break;
-            case 9:
-              _context3.prev = 9;
-              _context3.t0 = _context3["catch"](0);
+            case 12:
+              _context3.prev = 12;
+              _context3.t0 = _context3["catch"](3);
               console.error(_context3.t0);
               if (_this3.$swal) {
                 _this3.$swal('No se pudo generar el enlace de satisfaccion');
               }
-            case 13:
+            case 16:
             case "end":
               return _context3.stop();
           }
-        }, _callee3, null, [[0, 9]]);
+        }, _callee3, null, [[3, 12]]);
       }))();
     }
   }
@@ -8203,7 +8201,16 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   });
                   _this9.$emit('actualizarListadoCitas', true);
                 } else {
-                  console.log(error);
+                  console.error(error);
+                  var msg = 'Hubo un error al registrar la cita';
+                  if (error.response && error.response.data && error.response.data.error) {
+                    msg = error.response.data.error;
+                  }
+                  _this9.$swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: msg
+                  });
                 }
               })["finally"](function () {
                 _this9.isProcessing = false;
@@ -10570,23 +10577,15 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       ocupadas.forEach(function (cita) {
         var start = cita.attention ? cita.attention : cita.hora_inicio ? cita.hora_inicio : cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00';
         cita._computed_start = start;
-        var end = cita.hora_fin;
-        var duracion = cita.precio && cita.precio.duracion ? cita.precio.duracion : null;
-        if (!end && duracion && start !== '00:00:00') {
+        var duracion = 60; // Fallback predeterminado en minutos
+        if (cita.precio && cita.precio.duracion && !isNaN(parseInt(cita.precio.duracion))) {
+          duracion = parseInt(cita.precio.duracion);
+        } else if (cita.membresia && cita.membresia.precio && cita.membresia.precio.duracion && !isNaN(parseInt(cita.membresia.precio.duracion))) {
+          duracion = parseInt(cita.membresia.precio.duracion);
+        }
+        var end = '00:00:00';
+        if (start !== '00:00:00') {
           end = moment__WEBPACK_IMPORTED_MODULE_0___default()(start, 'HH:mm:ss').add(duracion, 'minutes').format('HH:mm:ss');
-        }
-        if (!end && start !== '00:00:00') {
-          // Calculate planned duration in minutes
-          var planDur = 15; // default fallback
-          if (cita.schedule && cita.schedule.check_time && cita.schedule.departure_date) {
-            var t1 = moment__WEBPACK_IMPORTED_MODULE_0___default()(cita.schedule.check_time, 'HH:mm:ss');
-            var t2 = moment__WEBPACK_IMPORTED_MODULE_0___default()(cita.schedule.departure_date, 'HH:mm:ss');
-            planDur = t2.diff(t1, 'minutes');
-          }
-          end = moment__WEBPACK_IMPORTED_MODULE_0___default()(start, 'HH:mm:ss').add(planDur, 'minutes').format('HH:mm:ss');
-        }
-        if (!end) {
-          end = cita.schedule && cita.schedule.departure_date ? cita.schedule.departure_date : '00:00:00';
         }
         cita._computed_end = end;
       });
@@ -11782,48 +11781,9 @@ var render = function render() {
     staticClass: "time-item px-2 border-left"
   }, [_c("div", {
     staticClass: "time-label"
-  }, [_vm._v("Hora de fin")]), _vm._v(" "), _vm.cita.hora_fin ? _c("div", {
+  }, [_vm._v("Hora de fin")]), _vm._v(" "), _c("div", {
     staticClass: "time-value"
-  }, [_vm._v(_vm._s(_vm.horaLatam2(_vm.cita.hora_fin)))]) : _c("div", {
-    staticClass: "d-flex flex-column align-items-center"
-  }, [_c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.departureTimeLocal,
-      expression: "departureTimeLocal"
-    }],
-    staticClass: "form-control form-control-sm mb-1 text-center font-weight-bold p-0",
-    staticStyle: {
-      "font-size": "0.75rem",
-      height: "24px",
-      width: "80px"
-    },
-    attrs: {
-      type: "time",
-      disabled: !_vm.cita.attention
-    },
-    domProps: {
-      value: _vm.departureTimeLocal
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.departureTimeLocal = $event.target.value;
-      }
-    }
-  }), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-registrar btn-sm",
-    attrs: {
-      disabled: !_vm.departureTimeLocal || !_vm.cita.attention
-    },
-    on: {
-      click: function click($event) {
-        $event.stopPropagation();
-        return _vm.registrarTiempo("fin");
-      }
-    }
-  }, [_vm._v("Finalizar")])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v(_vm._s(_vm.horaLatam2(_vm.cita.hora_fin)))])]), _vm._v(" "), _c("div", {
     staticClass: "time-item px-2 border-left"
   }, [_c("div", {
     staticClass: "time-label"

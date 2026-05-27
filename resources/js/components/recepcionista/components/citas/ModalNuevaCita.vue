@@ -1122,8 +1122,8 @@ export default {
 					this.clearModal()
 				})
 				.catch(error => {
-						//console.log(error)
-						if(error.response && error.response.status === 409){
+					//console.log(error)
+					if(error.response && error.response.status === 409){
 						this.$swal({
 							icon: 'error',
 							title: 'Horario no disponible',
@@ -1131,7 +1131,16 @@ export default {
 						})
 						this.$emit('actualizarListadoCitas', true)
 					}else{
-						console.log(error)
+						console.error(error)
+						let msg = 'Hubo un error al registrar la cita';
+						if (error.response && error.response.data && error.response.data.error) {
+							msg = error.response.data.error;
+						}
+						this.$swal.fire({
+							icon: 'error',
+							title: 'Error',
+							text: msg
+						})
 					}
 				})
 				.finally(() => {

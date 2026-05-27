@@ -152,8 +152,18 @@ class AppointmentController extends Controller
 
             $scheduleInfo = Schedule::find($request->get('schedule_id'));
             $hora_inicio = $scheduleInfo ? $scheduleInfo->check_time : null;
-            $hora_fin = null;
-            $duracion = null;
+            $duracion = 60; // Fallback
+            $precio = Precio::find($request->get('type'));
+            if ($precio && $precio->duracion) {
+                $duracion = intval($precio->duracion);
+            } elseif ($request->get('idMembresia')) {
+                $membresia = Membresia::with('precio')->find($request->get('idMembresia'));
+                if ($membresia && $membresia->precio && $membresia->precio->duracion) {
+                    $duracion = intval($membresia->precio->duracion);
+                }
+            }
+            $duracion = abs($duracion);
+            $hora_fin = $hora_inicio ? \Carbon\Carbon::parse($hora_inicio)->addMinutes($duracion)->format('H:i:s') : null;
 
 		/* $condition = Patient::where('dni', '=', $request->dni)
 		->with('medical_evolutions')
@@ -497,7 +507,7 @@ class AppointmentController extends Controller
 			}
 			throw $e;
 		} catch (\Throwable $th) {
-			echo $th;
+			return response()->json(['error' => 'Error al registrar la cita: ' . $th->getMessage()], 500);
 		}
 	}
 
@@ -886,8 +896,18 @@ Medical_evolution::create([
 
 		$scheduleInfo = Schedule::find($request->get('schedule_id'));
 		$hora_inicio = $scheduleInfo ? $scheduleInfo->check_time : null;
-		$hora_fin = null;
-		$duracion = null;
+		$duracion = 60; // Fallback
+		$precio = Precio::find($request->get('type'));
+		if ($precio && $precio->duracion) {
+			$duracion = intval($precio->duracion);
+		} elseif ($request->get('idMembresia')) {
+			$membresia = Membresia::with('precio')->find($request->get('idMembresia'));
+			if ($membresia && $membresia->precio && $membresia->precio->duracion) {
+				$duracion = intval($membresia->precio->duracion);
+			}
+		}
+		$duracion = abs($duracion);
+		$hora_fin = $hora_inicio ? \Carbon\Carbon::parse($hora_inicio)->addMinutes($duracion)->format('H:i:s') : null;
 
 		$nuevaCita = Appointment::create([
 			'professional_id' => $request->get('professional_id'),
@@ -964,7 +984,7 @@ Medical_evolution::create([
 
 		return response()->json(['mensaje' => 'se actualizó la cita']);
 	} catch (\Throwable $th) {
-		echo $th;
+		return response()->json(['error' => 'Error al reprogramar la cita: ' . $th->getMessage()], 500);
 	}
 	}
 	public function mandarVacio(Request $request, Appointment $appointment)
@@ -1445,7 +1465,16 @@ public function getPatientsPerMonth($date,$id){
 				if ($s1) {
 					$dataCita1['hora_inicio'] = $s1->check_time;
 					$dataCita1['hora_fin'] = $s1->departure_date;
-					$dataCita1['duracion'] = \Carbon\Carbon::parse($s1->departure_date)->diffInMinutes(\Carbon\Carbon::parse($s1->check_time));
+					
+					$duracion1 = 60; // Fallback
+					if ($cita->precio && $cita->precio->duracion) {
+						$duracion1 = intval($cita->precio->duracion);
+					} elseif ($cita->membresia && $cita->membresia->precio && $cita->membresia->precio->duracion) {
+						$duracion1 = intval($cita->membresia->precio->duracion);
+					} else {
+						$duracion1 = \Carbon\Carbon::parse($s1->departure_date)->diffInMinutes(\Carbon\Carbon::parse($s1->check_time));
+					}
+					$dataCita1['duracion'] = abs(intval($duracion1));
 				}
 			}
 			$cita->update($dataCita1);
@@ -1458,7 +1487,16 @@ public function getPatientsPerMonth($date,$id){
 				if ($s2) {
 					$dataCita2['hora_inicio'] = $s2->check_time;
 					$dataCita2['hora_fin'] = $s2->departure_date;
-					$dataCita2['duracion'] = \Carbon\Carbon::parse($s2->departure_date)->diffInMinutes(\Carbon\Carbon::parse($s2->check_time));
+					
+					$duracion2 = 60; // Fallback
+					if ($cita2->precio && $cita2->precio->duracion) {
+						$duracion2 = intval($cita2->precio->duracion);
+					} elseif ($cita2->membresia && $cita2->membresia->precio && $cita2->membresia->precio->duracion) {
+						$duracion2 = intval($cita2->membresia->precio->duracion);
+					} else {
+						$duracion2 = \Carbon\Carbon::parse($s2->departure_date)->diffInMinutes(\Carbon\Carbon::parse($s2->check_time));
+					}
+					$dataCita2['duracion'] = abs(intval($duracion2));
 				}
 			}
 			$cita2->update($dataCita2);
@@ -1496,14 +1534,60 @@ public function getPatientsPerMonth($date,$id){
 		if ($request->has('departure') && $request->input('departure')) {
 			$updateData['hora_fin'] = $request->input('departure');
 			
-			// Calcular duración exacta
-			$hora_inicio = $cita->hora_inicio ?: ($cita->schedule ? $cita->schedule->check_time : null);
-			if ($hora_inicio) {
-				$updateData['duracion'] = \Carbon\Carbon::parse($request->input('departure'))->diffInMinutes(\Carbon\Carbon::parse($hora_inicio));
+			// Calcular duración establecida de la cita
+			$duracion = 60; // Fallback
+			if ($cita->precio && $cita->precio->duracion) {
+				$duracion = intval($cita->precio->duracion);
+			} elseif ($cita->membresia && $cita->membresia->precio && $cita->membresia->precio->duracion) {
+				$duracion = intval($cita->membresia->precio->duracion);
+			} else {
+				$hora_inicio = $cita->hora_inicio ?: ($cita->schedule ? $cita->schedule->check_time : null);
+				if ($hora_inicio) {
+					$duracion = \Carbon\Carbon::parse($request->input('departure'))->diffInMinutes(\Carbon\Carbon::parse($hora_inicio));
+				}
 			}
+			$updateData['duracion'] = abs(intval($duracion));
 		}
 
 		$cita->update($updateData);
+
+		// Si se actualizó la hora_fin (atención iniciada) y es una cita de Psiquiatría de paciente nuevo
+		if (isset($updateData['hora_fin']) && $updateData['hora_fin'] && $cita->clasification == 1 && $cita->patient_condition == "1") {
+			$pacienteBloqueo = Patient::where('name', 'like', '%bloqueo%')->orWhere('nombres', 'like', '%bloqueo%')->first();
+			if ($pacienteBloqueo) {
+				$hora_inicio_original = $cita->hora_inicio ?: ($cita->schedule ? $cita->schedule->check_time : null);
+				if ($hora_inicio_original) {
+					$duracion_original = intval($cita->duracion ?: 45);
+					$hora_fin_programada = \Carbon\Carbon::parse($hora_inicio_original)->addMinutes($duracion_original)->format('H:i:s');
+					
+					// Encontrar el schedule del bloqueo automático original
+					$scheduleInfo = $cita->schedule;
+					if ($scheduleInfo) {
+						$nextSchedule = Schedule::where('professional_id', $cita->professional_id)
+							->where('day', $scheduleInfo->day)
+							->where('check_time', '>=', $hora_fin_programada)
+							->orderBy('check_time', 'asc')
+							->first();
+						
+						if ($nextSchedule) {
+							$bloqueo = Appointment::where('professional_id', $cita->professional_id)
+								->where('date', $cita->date)
+								->where('patient_id', $pacienteBloqueo->id)
+								->where('schedule_id', $nextSchedule->id)
+								->first();
+							
+							if ($bloqueo) {
+								$bloqueo->update([
+									'attention' => $updateData['hora_fin'],
+									'hora_fin' => \Carbon\Carbon::parse($updateData['hora_fin'])->addMinutes(15)->format('H:i:s'),
+									'duracion' => 15
+								]);
+							}
+						}
+					}
+				}
+			}
+		}
 
 		return response()->json(['mensaje' => 'Ok']);
 	}

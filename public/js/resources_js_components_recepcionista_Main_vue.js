@@ -384,7 +384,7 @@ var render = function render() {
     staticClass: "sidebar-divider"
   }), _vm._v(" "), _c("div", {
     staticClass: "sidebar-heading"
-  }, [_vm._v("\n\t\t\t\t\t\tSecciones\n\t\t\t\t")]), _vm._v(" "), _c("li", {
+  }, [_vm._v("\n\t\t\t\t\t\t\t\tSecciones\n\t\t\t\t\t\t")]), _vm._v(" "), _c("li", {
     staticClass: "nav-item nav__list",
     on: {
       click: function click($event) {
@@ -584,7 +584,7 @@ var render = function render() {
     staticClass: "sidebar-divider"
   }), _vm._v(" "), _c("div", {
     staticClass: "sidebar-heading"
-  }, [_vm._v("\n\t\t\t\t\t\tSecciones\n\t\t\t\t")]), _vm._v(" "), _c("li", {
+  }, [_vm._v("\n\t\t\t\t\t\t\t\tSecciones\n\t\t\t\t\t\t")]), _vm._v(" "), _c("li", {
     staticClass: "nav-item nav__list",
     on: {
       click: function click($event) {
@@ -705,7 +705,7 @@ var render = function render() {
     staticClass: "sidebar-divider"
   }), _vm._v(" "), _c("div", {
     staticClass: "sidebar-heading"
-  }, [_vm._v("\n\t\t\t\t\t\tSecciones\n\t\t\t\t")]), _vm._v(" "), _c("li", {
+  }, [_vm._v("\n\t\t\t\t\t\t\t\tSecciones\n\t\t\t\t\t\t")]), _vm._v(" "), _c("li", {
     staticClass: "nav-item nav__list",
     on: {
       click: function click($event) {
@@ -765,7 +765,7 @@ var render = function render() {
     staticClass: "sidebar-divider"
   }), _vm._v(" "), _c("div", {
     staticClass: "sidebar-heading"
-  }, [_vm._v("\n\t\t\t\t\t\tSecciones\n\t\t\t\t")]), _vm._v(" "), _c("li", {
+  }, [_vm._v("\n\t\t\t\t\t\t\t\tSecciones\n\t\t\t\t\t\t")]), _vm._v(" "), _c("li", {
     staticClass: "nav-item nav__list",
     on: {
       click: function click($event) {
@@ -934,20 +934,6 @@ var render = function render() {
   }, [_c("i", {
     staticClass: "fas fa-hospital-user"
   }), _vm._v(" "), _c("span", [_vm._v("Cartera de clientes")])])], 1), _vm._v(" "), _c("li", {
-    staticClass: "nav-item nav__list",
-    on: {
-      click: function click($event) {
-        return _vm.activeSidebar();
-      }
-    }
-  }, [_c("router-link", {
-    staticClass: "nav-link",
-    attrs: {
-      to: "/recepcionista/recordatorios"
-    }
-  }, [_c("i", {
-    staticClass: "fas fa-laptop-medical"
-  }), _vm._v(" "), _c("span", [_vm._v("Gestor de datos")])])], 1), _vm._v(" "), _c("li", {
     staticClass: "nav-item nav__list",
     on: {
       click: function click($event) {
@@ -1169,7 +1155,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.sidebar .nav-item .nav-link i[data-v-65bb863c]{ font-size: 1.2rem!important;\n}\n.sidebar .nav-item .nav-link span[data-v-65bb863c] {font-size: 0.9rem!important;\n}\n.logout-btn[data-v-65bb863c]:hover {\r\n\tcolor: #fff !important;\n}\n.sidebar.toggled .sidebar-user-info[data-v-65bb863c] {\r\n\tpadding: 1rem 0 !important;\r\n\tjustify-content: center;\r\n\tflex-direction: column;\n}\n.sidebar.toggled .sidebar-user-info .user-details[data-v-65bb863c] {\r\n\tdisplay: none;\n}\n.sidebar.toggled .sidebar-user-info .logout-btn[data-v-65bb863c] {\r\n\tmargin-left: 0 !important;\r\n\tmargin-top: 0.5rem;\n}\n.sidebar.toggled .sidebar-brand img[data-v-65bb863c] {\r\n\tmax-height: 30px !important;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.sidebar .nav-item .nav-link i[data-v-65bb863c]{ font-size: 1.2rem!important;\n}\n.sidebar .nav-item .nav-link span[data-v-65bb863c] {font-size: 0.9rem!important;\n}\n.logout-btn[data-v-65bb863c]:hover {\n\tcolor: #fff !important;\n}\n.sidebar.toggled .sidebar-user-info[data-v-65bb863c] {\n\tpadding: 1rem 0 !important;\n\tjustify-content: center;\n\tflex-direction: column;\n}\n.sidebar.toggled .sidebar-user-info .user-details[data-v-65bb863c] {\n\tdisplay: none;\n}\n.sidebar.toggled .sidebar-user-info .logout-btn[data-v-65bb863c] {\n\tmargin-left: 0 !important;\n\tmargin-top: 0.5rem;\n}\n.sidebar.toggled .sidebar-brand img[data-v-65bb863c] {\n\tmax-height: 30px !important;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

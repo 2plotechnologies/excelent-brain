@@ -360,23 +360,16 @@
 					let start = cita.attention ? cita.attention : (cita.hora_inicio ? cita.hora_inicio : (cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00'));
 					cita._computed_start = start;
 
-					let end = cita.hora_fin;
-					let duracion = (cita.precio && cita.precio.duracion) ? cita.precio.duracion : null;
-					if (!end && duracion && start !== '00:00:00') {
+					let duracion = 60; // Fallback predeterminado en minutos
+					if (cita.precio && cita.precio.duracion && !isNaN(parseInt(cita.precio.duracion))) {
+						duracion = parseInt(cita.precio.duracion);
+					} else if (cita.membresia && cita.membresia.precio && cita.membresia.precio.duracion && !isNaN(parseInt(cita.membresia.precio.duracion))) {
+						duracion = parseInt(cita.membresia.precio.duracion);
+					}
+
+					let end = '00:00:00';
+					if (start !== '00:00:00') {
 						end = moment(start, 'HH:mm:ss').add(duracion, 'minutes').format('HH:mm:ss');
-					}
-					if (!end && start !== '00:00:00') {
-						// Calculate planned duration in minutes
-						let planDur = 15; // default fallback
-						if (cita.schedule && cita.schedule.check_time && cita.schedule.departure_date) {
-							let t1 = moment(cita.schedule.check_time, 'HH:mm:ss');
-							let t2 = moment(cita.schedule.departure_date, 'HH:mm:ss');
-							planDur = t2.diff(t1, 'minutes');
-						}
-						end = moment(start, 'HH:mm:ss').add(planDur, 'minutes').format('HH:mm:ss');
-					}
-					if (!end) {
-						end = cita.schedule && cita.schedule.departure_date ? cita.schedule.departure_date : '00:00:00';
 					}
 					cita._computed_end = end;
 				});
