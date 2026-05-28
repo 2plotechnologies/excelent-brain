@@ -1376,23 +1376,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       nuevaFecha: {
         fecha: moment__WEBPACK_IMPORTED_MODULE_0___default()().format('YYYY-MM-DD')
       },
-      doctores: [],
-      horarios: [],
-      horariosAll: [],
-      hoursProfessional: [],
-      schedulesInvalid: {},
-      horasSolas: [],
-      horasMalas: [],
-      dayWeek: {
-        0: 'Lunes',
-        1: "Martes",
-        2: "Miercoles",
-        3: "Jueves",
-        4: "Viernes",
-        5: "Sabado",
-        6: "Domingo"
-      },
-      doctorSeleccionado: -1,
       sesionesAcumuladas: [],
       idHorario: '',
       comentarios: '',
@@ -1400,7 +1383,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       selectedEspecialidadPaquete: '',
       selectedPublicoPaquete: '',
       selectedSubtipoPaquete: '',
-      guardando: false
+      guardando: false,
+      monedas: []
     };
   },
   props: ['idUsuario', 'vista'],
@@ -1477,6 +1461,149 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         }, _callee2);
       }))();
     },
+    cargarMonedas: function cargarMonedas() {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var response;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
+            case 0:
+              _context3.prev = 0;
+              _context3.next = 3;
+              return _this3.axios.get("/api/listarMonedas");
+            case 3:
+              response = _context3.sent;
+              _this3.monedas = response.data;
+              _context3.next = 10;
+              break;
+            case 7:
+              _context3.prev = 7;
+              _context3.t0 = _context3["catch"](0);
+              console.error("Error cargando monedas:", _context3.t0);
+            case 10:
+            case "end":
+              return _context3.stop();
+          }
+        }, _callee3, null, [[0, 7]]);
+      }))();
+    },
+    alCambiarPago: function alCambiarPago(fecha, index) {
+      var _this4 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var opcionesMetodos, _yield$_this4$$swal, formValues;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              if (!fecha.pago) {
+                _context4.next = 14;
+                break;
+              }
+              if (!(!_this4.monedas || _this4.monedas.length === 0)) {
+                _context4.next = 4;
+                break;
+              }
+              _context4.next = 4;
+              return _this4.cargarMonedas();
+            case 4:
+              if (!_this4.monedas || _this4.monedas.length === 0) {
+                _this4.monedas = [{
+                  id: 1,
+                  tipo: 'Efectivo'
+                }, {
+                  id: 2,
+                  tipo: 'Depósito bancario'
+                }, {
+                  id: 4,
+                  tipo: 'Yape'
+                }, {
+                  id: 10,
+                  tipo: 'Aplicativo Plin'
+                }];
+              }
+              // Opciones para el select de métodos de pago
+              opcionesMetodos = '';
+              _this4.monedas.forEach(function (m) {
+                var selectedAttr = m.id == 1 ? 'selected' : '';
+                opcionesMetodos += "<option value=\"".concat(m.id, "\">").concat(m.tipo, "</option>");
+              });
+              _context4.next = 9;
+              return _this4.$swal({
+                title: 'Registrar Pago de Cuota',
+                target: '#modalMembresias',
+                html: "<div class=\"text-start mb-3\">" + "  <p class=\"mb-2\">Cuota: <strong>#".concat(index + 1, "</strong></p>") + "  <p class=\"mb-3\">Monto a pagar: <strong class=\"text-success fs-5\">S/ ".concat(parseFloat(fecha.monto).toFixed(2), "</strong></p>") + "  <div class=\"mb-3\">" + "    <label class=\"form-label small fw-bold text-muted text-uppercase mb-1\">M\xE9todo de Pago <span class=\"text-danger\">*</span></label>" + "    <select id=\"swal-pago-metodo\" class=\"form-select\">".concat(opcionesMetodos, "</select>") + "  </div>" + "  <div class=\"mb-3\">" + "    <label class=\"form-label small fw-bold text-muted text-uppercase mb-1\">Motivo / Concepto <span class=\"text-danger\">*</span></label>" + "    <input id=\"swal-pago-motivo\" class=\"form-control\" type=\"text\" value=\"Pago de cuota #".concat(index + 1, "\">") + "  </div>" + "  <div class=\"mb-3\">" + "    <label class=\"form-label small fw-bold text-muted text-uppercase mb-1\">N\xFAmero de Operaci\xF3n <span class=\"text-muted\">(Yape, Plin, Transferencia, etc.)</span></label>" + "    <input id=\"swal-pago-voucher\" class=\"form-control\" type=\"text\" placeholder=\"Ej: 123456\">" + "  </div>" + "</div>",
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-hand-holding-usd me-1"></i> Confirmar Pago',
+                cancelButtonText: 'Cancelar',
+                preConfirm: function preConfirm() {
+                  var metodoId = document.getElementById('swal-pago-metodo').value;
+                  var motivo = document.getElementById('swal-pago-motivo').value;
+                  var voucher = document.getElementById('swal-pago-voucher').value;
+                  if (!metodoId) {
+                    _this4.$swal.showValidationMessage('Debe seleccionar un método de pago');
+                    return false;
+                  }
+                  if (!motivo) {
+                    _this4.$swal.showValidationMessage('Debe ingresar un motivo/concepto');
+                    return false;
+                  }
+                  return {
+                    metodoId: parseInt(metodoId),
+                    motivo: motivo,
+                    voucher: voucher
+                  };
+                }
+              });
+            case 9:
+              _yield$_this4$$swal = _context4.sent;
+              formValues = _yield$_this4$$swal.value;
+              if (formValues) {
+                _this4.$set(fecha, 'metodo_pago_id', formValues.metodoId);
+                _this4.$set(fecha, 'motivo', formValues.motivo);
+                _this4.$set(fecha, 'voucher', formValues.voucher);
+              } else {
+                fecha.pago = false;
+              }
+              _context4.next = 17;
+              break;
+            case 14:
+              // Si se desmarca, limpiar los campos de pago
+              _this4.$delete(fecha, 'metodo_pago_id');
+              _this4.$delete(fecha, 'motivo');
+              _this4.$delete(fecha, 'voucher');
+            case 17:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4);
+      }))();
+    },
+    limpiarFormulario: function limpiarFormulario() {
+      this.txtBusqueda = '';
+      this.pacientes = [];
+      this.indexGlobal = null;
+      this.pacienteElegido = {};
+      this.membresia = {
+        tipo: null,
+        cuotas: 1,
+        precio: 0,
+        fin: moment__WEBPACK_IMPORTED_MODULE_0___default()().add(1, 'month').format('YYYY-MM-DD'),
+        descuento: 0,
+        conDescuento: false
+      };
+      this.fechas = [];
+      this.activaResultados = false;
+      this.nuevaFecha = {
+        fecha: moment__WEBPACK_IMPORTED_MODULE_0___default()().format('YYYY-MM-DD')
+      };
+      this.sesionesAcumuladas = [];
+      this.idHorario = '';
+      this.comentarios = '';
+      this.selectedTipoPaquete = '';
+      this.selectedEspecialidadPaquete = '';
+      this.selectedPublicoPaquete = '';
+      this.selectedSubtipoPaquete = '';
+    },
     calcularFechas: function calcularFechas() {
       this.fechas = [];
       if (!this.membresia.tipo) return;
@@ -1542,7 +1669,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     evaluarPaqueteSeleccionado: function evaluarPaqueteSeleccionado() {
-      var _this3 = this;
+      var _this5 = this;
       var buscar = false;
       if (this.selectedTipoPaquete === 'sesiones' || this.selectedTipoPaquete === 'tiempo') {
         if (this.selectedEspecialidadPaquete && this.selectedPublicoPaquete && this.selectedSubtipoPaquete) buscar = true;
@@ -1551,7 +1678,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
       if (buscar) {
         var paqueteEncontrado = this.precios.find(function (p) {
-          return p.paquete_tipo === _this3.selectedTipoPaquete && p.paquete_especialidad === _this3.selectedEspecialidadPaquete && (_this3.selectedTipoPaquete === 'otros' || p.paquete_publico === _this3.selectedPublicoPaquete || p.paquete_publico === 'ambos' || !p.paquete_publico) && p.paquete_subtipo === _this3.selectedSubtipoPaquete;
+          return p.paquete_tipo === _this5.selectedTipoPaquete && p.paquete_especialidad === _this5.selectedEspecialidadPaquete && (_this5.selectedTipoPaquete === 'otros' || p.paquete_publico === _this5.selectedPublicoPaquete || p.paquete_publico === 'ambos' || !p.paquete_publico) && p.paquete_subtipo === _this5.selectedSubtipoPaquete;
         });
         if (paqueteEncontrado) {
           this.membresia.tipo = paqueteEncontrado.id;
@@ -1566,9 +1693,9 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     obtenerPrecioSubtipo: function obtenerPrecioSubtipo(subtipo) {
-      var _this4 = this;
+      var _this6 = this;
       var paquete = this.precios.find(function (p) {
-        return p.paquete_tipo === _this4.selectedTipoPaquete && p.paquete_especialidad === _this4.selectedEspecialidadPaquete && (_this4.selectedTipoPaquete === 'otros' || p.paquete_publico === _this4.selectedPublicoPaquete || p.paquete_publico === 'ambos' || !p.paquete_publico) && p.paquete_subtipo === subtipo;
+        return p.paquete_tipo === _this6.selectedTipoPaquete && p.paquete_especialidad === _this6.selectedEspecialidadPaquete && (_this6.selectedTipoPaquete === 'otros' || p.paquete_publico === _this6.selectedPublicoPaquete || p.paquete_publico === 'ambos' || !p.paquete_publico) && p.paquete_subtipo === subtipo;
       });
       return paquete ? parseFloat(paquete.nuevos).toFixed(2) : null;
     },
@@ -1600,70 +1727,74 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     guardar: function guardar() {
-      var _this5 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      var _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var nombreMembresiaSeleccionada, pkg, datos, servidor, respuesta;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) switch (_context3.prev = _context3.next) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
             case 0:
-              if (_this5.pacienteElegido.id) {
-                _context3.next = 3;
+              if (_this7.pacienteElegido.id) {
+                _context5.next = 3;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> Seleccione un paciente', 'danger', 10);
-              return _context3.abrupt("return", false);
+              return _context5.abrupt("return", false);
             case 3:
-              if (_this5.membresia.tipo) {
-                _context3.next = 6;
+              if (_this7.membresia.tipo) {
+                _context5.next = 6;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> Seleccione un paquete válido', 'danger', 10);
-              return _context3.abrupt("return", false);
+              return _context5.abrupt("return", false);
             case 6:
-              if (!(_this5.membresia.cuotas <= 0)) {
-                _context3.next = 9;
+              if (!(_this7.membresia.cuotas <= 0)) {
+                _context5.next = 9;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> El número de cuotas mínimo debe ser 1', 'danger', 10);
-              return _context3.abrupt("return", false);
+              return _context5.abrupt("return", false);
             case 9:
-              if (_this5.membresia.fin) {
-                _context3.next = 12;
+              if (_this7.membresia.fin) {
+                _context5.next = 12;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> Ingrese el último día del paquete', 'danger', 10);
-              return _context3.abrupt("return", false);
+              return _context5.abrupt("return", false);
             case 12:
-              if (!(_this5.membresia.descuento > 0 && _this5.comentarios == '')) {
-                _context3.next = 17;
+              if (!(_this7.membresia.descuento > 0 && _this7.comentarios == '')) {
+                _context5.next = 17;
                 break;
               }
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-solid fa-bomb"></i> Debe agregar un motivo por el descuento', 'danger', 10);
-              return _context3.abrupt("return", false);
+              return _context5.abrupt("return", false);
             case 17:
-              _this5.comentarios = _this5.membresia.descuento > 0 ? 'Descuento por: S/ ' + _this5.membresia.descuento + ' ' + _this5.comentarios : _this5.comentarios;
+              _this7.comentarios = _this7.membresia.descuento > 0 ? 'Descuento por: S/ ' + _this7.membresia.descuento + ' ' + _this7.comentarios : _this7.comentarios;
             case 18:
-              _this5.guardando = true;
+              _this7.guardando = true;
               nombreMembresiaSeleccionada = '';
-              pkg = _this5.precios.find(function (p) {
-                return p.id == _this5.membresia.tipo;
+              pkg = _this7.precios.find(function (p) {
+                return p.id == _this7.membresia.tipo;
               });
               if (pkg) nombreMembresiaSeleccionada = pkg.descripcion;
               datos = new FormData();
-              datos.append('idPaciente', _this5.pacienteElegido.id);
-              datos.append('customer', _this5.pacienteElegido.name + ' ' + _this5.pacienteElegido.nombres);
-              datos.append('motivo', _this5.pacienteElegido.id);
-              datos.append('membresia', JSON.stringify(_this5.membresia));
-              datos.append('user_id', _this5.idUsuario);
+              datos.append('idPaciente', _this7.pacienteElegido.id);
+              datos.append('customer', _this7.pacienteElegido.name + ' ' + _this7.pacienteElegido.nombres);
+              datos.append('motivo', _this7.pacienteElegido.id);
+              datos.append('membresia', JSON.stringify(_this7.membresia));
+              datos.append('user_id', _this7.idUsuario);
               datos.append('nombreMembresia', nombreMembresiaSeleccionada);
-              datos.append('fechas', JSON.stringify(_this5.fechas));
-              datos.append('fechas_membresias', JSON.stringify(_this5.sesionesAcumuladas));
-              datos.append('comentarios', _this5.comentarios);
-              datos.append('meses', _this5.cantMeses);
+              datos.append('fechas', JSON.stringify(_this7.fechas));
+              datos.append('fechas_membresias', JSON.stringify(_this7.sesionesAcumuladas));
+              datos.append('comentarios', _this7.comentarios);
+              datos.append('meses', _this7.cantMeses);
               datos.append('num_sesion', 0);
-              datos.append('descuento', _this5.membresia.descuento);
-              _context3.prev = 35;
-              _context3.next = 38;
+              datos.append('descuento', _this7.membresia.descuento);
+              console.log('--- ENVIANDO MEMBRESÍA DESDE EL FRONTEND ---');
+              console.log('idPaciente:', _this7.pacienteElegido.id);
+              console.log('membresia:', _this7.membresia);
+              console.log('fechas:', _this7.fechas);
+              _context5.prev = 39;
+              _context5.next = 42;
               return fetch('/api/guardarMembresia', {
                 method: 'POST',
                 body: datos,
@@ -1671,119 +1802,41 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   'Authorization': 'Bearer ' + localStorage.getItem('token')
                 }
               });
-            case 38:
-              servidor = _context3.sent;
-              _context3.next = 41;
+            case 42:
+              servidor = _context5.sent;
+              _context5.next = 45;
               return servidor.json();
-            case 41:
-              respuesta = _context3.sent;
-              _this5.guardando = false;
+            case 45:
+              respuesta = _context5.sent;
+              _this7.guardando = false;
               if (respuesta.mensaje) {
-                _this5.pacienteElegido = {};
-                _this5.fechas = [];
-                _this5.$swal({
+                _this7.limpiarFormulario();
+                $('#modalMembresias').modal('hide');
+                _this7.$swal({
                   title: 'Se guardó el paquete',
                   showConfirmButton: false,
                   icon: 'success',
                   timer: 1000
                 });
                 alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-regular fa-calendar-check"></i> Paquete guardado', 'success', 10);
-                _this5.$emit('membresiaGuardada');
+                _this7.$emit('membresiaGuardada');
               } else {
                 alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-regular fa-bomb"></i> Hubo un error guardando', 'danger', 10);
               }
-              _context3.next = 51;
+              _context5.next = 55;
               break;
-            case 46:
-              _context3.prev = 46;
-              _context3.t0 = _context3["catch"](35);
-              console.error(_context3.t0);
-              _this5.guardando = false;
+            case 50:
+              _context5.prev = 50;
+              _context5.t0 = _context5["catch"](39);
+              console.error(_context5.t0);
+              _this7.guardando = false;
               alertifyjs__WEBPACK_IMPORTED_MODULE_1___default().notify('<i class="fa-regular fa-bomb"></i> Hubo un error de conexión', 'danger', 10);
-            case 51:
-            case "end":
-              return _context3.stop();
-          }
-        }, _callee3, null, [[35, 46]]);
-      }))();
-    },
-    listarProfesionales: function listarProfesionales() {
-      var _this6 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
-            case 0:
-              _context4.next = 2;
-              return _this6.axios.get('/api/profesional').then(function (response) {
-                _this6.doctores = response.data;
-                _this6.listarhorario();
-              });
-            case 2:
-            case "end":
-              return _context4.stop();
-          }
-        }, _callee4);
-      }))();
-    },
-    listarhorario: function listarhorario() {
-      var _this7 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var id;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
-            case 0:
-              id = _this7.doctorSeleccionado;
-              _context5.next = 3;
-              return _this7.axios.get("/api/horario/".concat(id)).then(function (res) {
-                _this7.horarios = res.data.schedulesInvalid;
-                _this7.horariosAll = res.data.schedules;
-                _this7.hoursProfessional = _this7.horarios;
-                _this7.emitSchedule(_this7.nuevaFecha.fecha);
-                _this7.schedulesInvalid = [];
-                _this7.hoursProfessional.forEach(function (el) {
-                  _this7.schedulesInvalid.push(el.schedule_id);
-                });
-              })["catch"](function (err) {
-                console.error(err);
-              });
-            case 3:
+            case 55:
             case "end":
               return _context5.stop();
           }
-        }, _callee5);
+        }, _callee5, null, [[39, 50]]);
       }))();
-    },
-    emitSchedule: function emitSchedule() {
-      var _this8 = this;
-      var info = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.nuevaFecha.fecha;
-      this.horarios = [];
-      var arraySchedulesInvalid = [];
-      this.hoursProfessional.forEach(function (el) {
-        if (!arraySchedulesInvalid.includes(el.schedule_id)) {
-          arraySchedulesInvalid.push(el.schedule_id);
-        }
-      });
-      var dayIndex = parseInt(moment__WEBPACK_IMPORTED_MODULE_0___default()(info).format('d')) - 1;
-      if (dayIndex === -1) dayIndex = 6;
-      var targetDay = this.dayWeek[dayIndex];
-      this.horariosAll.forEach(function (el) {
-        if (el.active !== 0 && el.day && targetDay && el.day.toLowerCase() === targetDay.toLowerCase()) {
-          if (el.date && el.date !== info) {
-            return;
-          }
-          if (arraySchedulesInvalid.includes(el.id)) {
-            // Hay cita
-            if (el.appointments.find(function (el) {
-              return el.date === info && el.status != 3;
-            }) ? true : false) {} else {
-              _this8.horarios.push(el);
-            }
-          } else {
-            // No hay cita
-            _this8.horarios.push(el);
-          }
-        }
-      });
     },
     fechaLatam: function fechaLatam(fecha) {
       return moment__WEBPACK_IMPORTED_MODULE_0___default()(fecha).format('DD/MM/YYYY');
@@ -1800,16 +1853,16 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   computed: {
     descripcionPaqueteElegido: function descripcionPaqueteElegido() {
-      var _this9 = this;
+      var _this8 = this;
       var paquete = this.precios.find(function (x) {
-        return x.id == _this9.membresia.tipo;
+        return x.id == _this8.membresia.tipo;
       });
       return paquete ? paquete.descripcion : '';
     },
     mostrarPrecio: function mostrarPrecio() {
-      var _this10 = this;
+      var _this9 = this;
       var nuevos = this.precios.find(function (x) {
-        return x.id == _this10.membresia.tipo;
+        return x.id == _this9.membresia.tipo;
       });
       return nuevos ? parseFloat(nuevos.nuevos).toFixed(2) : 0;
     },
@@ -1828,16 +1881,16 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       return moment__WEBPACK_IMPORTED_MODULE_0___default()(this.membresia.fin).fromNow();
     },
     cantSesiones: function cantSesiones() {
-      var _this11 = this;
+      var _this10 = this;
       var precio = this.precios.find(function (x) {
-        return x.id == _this11.membresia.tipo;
+        return x.id == _this10.membresia.tipo;
       });
       return precio ? precio.sesiones : '';
     },
     cantMeses: function cantMeses() {
-      var _this12 = this;
+      var _this11 = this;
       var precio = this.precios.find(function (x) {
-        return x.id == _this12.membresia.tipo;
+        return x.id == _this11.membresia.tipo;
       });
       return precio ? precio.meses : 0;
     },
@@ -1847,13 +1900,13 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       return false;
     },
     opcionesDisponibles: function opcionesDisponibles() {
-      var _this13 = this;
+      var _this12 = this;
       if (!this.selectedTipoPaquete || !this.selectedEspecialidadPaquete) return [];
       if (this.selectedTipoPaquete !== 'otros' && !this.selectedPublicoPaquete) return [];
 
       // Filtrar todos los precios que coincidan con la combinación actual
       var paquetes = this.precios.filter(function (p) {
-        return p.paquete_tipo === _this13.selectedTipoPaquete && p.paquete_especialidad === _this13.selectedEspecialidadPaquete && (_this13.selectedTipoPaquete === 'otros' || p.paquete_publico === _this13.selectedPublicoPaquete || p.paquete_publico === 'ambos' || !p.paquete_publico);
+        return p.paquete_tipo === _this12.selectedTipoPaquete && p.paquete_especialidad === _this12.selectedEspecialidadPaquete && (_this12.selectedTipoPaquete === 'otros' || p.paquete_publico === _this12.selectedPublicoPaquete || p.paquete_publico === 'ambos' || !p.paquete_publico);
       });
 
       // Extraer los subtipos únicos ignorando nulos/indefinidos
@@ -1873,7 +1926,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   mounted: function mounted() {
     this.preciosMembresias();
-    this.listarProfesionales();
+    this.cargarMonedas();
     this.$on('alertaSimple', this.notifica());
   }
 });
@@ -4489,42 +4542,6 @@ var render = function render() {
   }, [_c("i", {
     staticClass: "fa-solid fa-triangle-exclamation me-2"
   }), _vm._v(" No se encontró un precio configurado para esta combinación en la base de datos.\n\t\t\t\t\t")]) : _vm._e()]) : _vm._e(), _vm._v(" "), _c("div", {
-    staticClass: "mb-4"
-  }, [_vm._m(7), _vm._v(" "), _c("select", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.doctorSeleccionado,
-      expression: "doctorSeleccionado"
-    }],
-    staticClass: "form-select",
-    attrs: {
-      id: "sltDoctor"
-    },
-    on: {
-      change: [function ($event) {
-        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
-          return o.selected;
-        }).map(function (o) {
-          var val = "_value" in o ? o._value : o.value;
-          return val;
-        });
-        _vm.doctorSeleccionado = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
-      }, function ($event) {
-        return _vm.listarhorario();
-      }]
-    }
-  }, [_c("option", {
-    attrs: {
-      value: "-1"
-    }
-  }, [_vm._v("Seleccione un profesional")]), _vm._v(" "), _vm._l(_vm.doctores, function (doctor) {
-    return _c("option", {
-      domProps: {
-        value: doctor.id
-      }
-    }, [_vm._v(_vm._s(doctor.nombre))]);
-  })], 2)]), _vm._v(" "), _c("div", {
     staticClass: "card border-0 mb-4",
     staticStyle: {
       "background-color": "#f8f9fa",
@@ -4532,7 +4549,7 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "card-body p-4"
-  }, [_vm._m(8), _vm._v(" "), _c("div", {
+  }, [_vm._m(7), _vm._v(" "), _c("div", {
     staticClass: "row g-3"
   }, [_c("div", {
     staticClass: "col-md-6"
@@ -4639,7 +4656,7 @@ var render = function render() {
     }
   })]) : _vm._e()]), _vm._v(" "), _vm.fechas.length > 0 ? _c("div", {
     staticClass: "mt-4"
-  }, [_vm._m(9), _vm._v(" "), _c("div", {
+  }, [_vm._m(8), _vm._v(" "), _c("div", {
     staticClass: "row g-3"
   }, _vm._l(_vm.fechas, function (fecha, index) {
     return _c("div", {
@@ -4660,8 +4677,8 @@ var render = function render() {
       directives: [{
         name: "model",
         rawName: "v-model",
-        value: fecha.pago,
-        expression: "fecha.pago"
+        value: _vm.fechas[index].pago,
+        expression: "fechas[index].pago"
       }],
       staticClass: "form-check-input",
       attrs: {
@@ -4669,25 +4686,27 @@ var render = function render() {
         id: "pago" + index
       },
       domProps: {
-        checked: Array.isArray(fecha.pago) ? _vm._i(fecha.pago, null) > -1 : fecha.pago
+        checked: Array.isArray(_vm.fechas[index].pago) ? _vm._i(_vm.fechas[index].pago, null) > -1 : _vm.fechas[index].pago
       },
       on: {
-        change: function change($event) {
-          var $$a = fecha.pago,
+        change: [function ($event) {
+          var $$a = _vm.fechas[index].pago,
             $$el = $event.target,
             $$c = $$el.checked ? true : false;
           if (Array.isArray($$a)) {
             var $$v = null,
               $$i = _vm._i($$a, $$v);
             if ($$el.checked) {
-              $$i < 0 && _vm.$set(fecha, "pago", $$a.concat([$$v]));
+              $$i < 0 && _vm.$set(_vm.fechas[index], "pago", $$a.concat([$$v]));
             } else {
-              $$i > -1 && _vm.$set(fecha, "pago", $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
+              $$i > -1 && _vm.$set(_vm.fechas[index], "pago", $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
             }
           } else {
-            _vm.$set(fecha, "pago", $$c);
+            _vm.$set(_vm.fechas[index], "pago", $$c);
           }
-        }
+        }, function ($event) {
+          return _vm.alCambiarPago(_vm.fechas[index], index);
+        }]
       }
     }), _vm._v(" "), _c("label", {
       staticClass: "form-check-label small",
@@ -4703,20 +4722,20 @@ var render = function render() {
       directives: [{
         name: "model",
         rawName: "v-model",
-        value: fecha.dia,
-        expression: "fecha.dia"
+        value: _vm.fechas[index].dia,
+        expression: "fechas[index].dia"
       }],
       staticClass: "form-control bg-white",
       attrs: {
         type: "date"
       },
       domProps: {
-        value: fecha.dia
+        value: _vm.fechas[index].dia
       },
       on: {
         input: function input($event) {
           if ($event.target.composing) return;
-          _vm.$set(fecha, "dia", $event.target.value);
+          _vm.$set(_vm.fechas[index], "dia", $event.target.value);
         }
       }
     })])]);
@@ -4853,14 +4872,6 @@ var staticRenderFns = [function () {
   return _c("label", {
     staticClass: "form-label text-secondary small fw-medium mb-2"
   }, [_vm._v("\n\t\t\t\t\t\tOpción / Duración "), _c("span", {
-    staticClass: "text-danger"
-  }, [_vm._v("*")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("label", {
-    staticClass: "form-label text-secondary small fw-medium mb-1"
-  }, [_vm._v("Profesional "), _c("span", {
     staticClass: "text-danger"
   }, [_vm._v("*")])]);
 }, function () {

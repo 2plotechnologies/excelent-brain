@@ -178,14 +178,7 @@
 						</div>
 					</div>
 
-					<!-- Profesional. -->
-					<div class="mb-4">
-						<label class="form-label text-secondary small fw-medium mb-1">Profesional <span class="text-danger">*</span></label>
-						<select class="form-select" id="sltDoctor" v-model="doctorSeleccionado" @change="listarhorario()">
-							<option value="-1">Seleccione un profesional</option>
-							<option v-for="doctor in doctores" :value="doctor.id">{{ doctor.nombre }}</option>
-						</select>
-					</div>
+
 
 					<!-- Precio y Cuotas. -->
 					<div class="card border-0 mb-4" style="background-color: #f8f9fa; border-radius: 1rem;">
@@ -230,12 +223,12 @@
 												Cuota {{ index + 1 }} <span v-if="index === 0 && membresia.cuotas > 1" class="text-black-50">(editable)</span>
 											</label>
 											<div class="form-check form-check-inline mb-0 me-0" title="¿Paga?">
-												<input class="form-check-input" type="checkbox" v-model="fecha.pago" :id="'pago' + index">
+												<input class="form-check-input" type="checkbox" :id="'pago' + index" v-model="fechas[index].pago" @change="alCambiarPago(fechas[index], index)">
 												<label class="form-check-label small" :for="'pago' + index" style="font-size: 0.75rem;">¿Pagado?</label>
 											</div>
 										</div>
 										<div class="position-relative">
-											<input type="date" class="form-control bg-white" v-model="fecha.dia">
+											<input type="date" class="form-control bg-white" v-model="fechas[index].dia">
 										</div>
 									</div>
 								</div>
@@ -295,8 +288,9 @@ export default {
 			txtBusqueda: '', pacientes: [], indexGlobal: null, pacienteElegido: {}, precios: [],
 			membresia: { tipo: null, cuotas: 1, precio: 0, fin: moment().add(1, 'month').format('YYYY-MM-DD'), descuento:0, conDescuento:false },
 			fechas: [], activaResultados: false, nuevaFecha: { fecha: moment().format('YYYY-MM-DD') },
-			doctores: [], horarios: [], horariosAll: [], hoursProfessional: [], schedulesInvalid: {}, horasSolas: [], horasMalas: [], dayWeek: { 0: 'Lunes', 1: "Martes", 2: "Miercoles", 3: "Jueves", 4: "Viernes", 5: "Sabado", 6: "Domingo", }, doctorSeleccionado: -1, sesionesAcumuladas:[], idHorario:'', comentarios:'',
-			selectedTipoPaquete: '', selectedEspecialidadPaquete: '', selectedPublicoPaquete: '', selectedSubtipoPaquete: '', guardando: false
+			sesionesAcumuladas:[], idHorario:'', comentarios:'',
+			selectedTipoPaquete: '', selectedEspecialidadPaquete: '', selectedPublicoPaquete: '', selectedSubtipoPaquete: '', guardando: false,
+			monedas: []
 		}
 	},
 	props: ['idUsuario', 'vista'],
@@ -346,6 +340,112 @@ export default {
 		async preciosMembresias() {
 			const servidor = await fetch('/api/preciosMembresias')
 			this.precios = await servidor.json();
+		},
+		async cargarMonedas() {
+			try {
+				const response = await this.axios.get("/api/listarMonedas");
+				this.monedas = response.data;
+			} catch (error) {
+				console.error("Error cargando monedas:", error);
+			}
+		},
+		async alCambiarPago(fecha, index) {
+			if (fecha.pago) {
+				if (!this.monedas || this.monedas.length === 0) {
+					await this.cargarMonedas();
+				}
+				if (!this.monedas || this.monedas.length === 0) {
+					this.monedas = [
+						{ id: 1, tipo: 'Efectivo' },
+						{ id: 2, tipo: 'Depósito bancario' },
+						{ id: 4, tipo: 'Yape' },
+						{ id: 10, tipo: 'Aplicativo Plin' }
+					];
+				}
+				// Opciones para el select de métodos de pago
+				let opcionesMetodos = '';
+				this.monedas.forEach(m => {
+					const selectedAttr = m.id == 1 ? 'selected' : '';
+					opcionesMetodos += `<option value="${m.id}">${m.tipo}</option>`;
+				});
+
+				const { value: formValues } = await this.$swal({
+					title: 'Registrar Pago de Cuota',
+					target: '#modalMembresias',
+					html:
+						`<div class="text-start mb-3">` +
+						`  <p class="mb-2">Cuota: <strong>#${index + 1}</strong></p>` +
+						`  <p class="mb-3">Monto a pagar: <strong class="text-success fs-5">S/ ${parseFloat(fecha.monto).toFixed(2)}</strong></p>` +
+						`  <div class="mb-3">` +
+						`    <label class="form-label small fw-bold text-muted text-uppercase mb-1">Método de Pago <span class="text-danger">*</span></label>` +
+						`    <select id="swal-pago-metodo" class="form-select">${opcionesMetodos}</select>` +
+						`  </div>` +
+						`  <div class="mb-3">` +
+						`    <label class="form-label small fw-bold text-muted text-uppercase mb-1">Motivo / Concepto <span class="text-danger">*</span></label>` +
+						`    <input id="swal-pago-motivo" class="form-control" type="text" value="Pago de cuota #${index + 1}">` +
+						`  </div>` +
+						`  <div class="mb-3">` +
+						`    <label class="form-label small fw-bold text-muted text-uppercase mb-1">Número de Operación <span class="text-muted">(Yape, Plin, Transferencia, etc.)</span></label>` +
+						`    <input id="swal-pago-voucher" class="form-control" type="text" placeholder="Ej: 123456">` +
+						`  </div>` +
+						`</div>`,
+					focusConfirm: false,
+					showCancelButton: true,
+					confirmButtonText: '<i class="fas fa-hand-holding-usd me-1"></i> Confirmar Pago',
+					cancelButtonText: 'Cancelar',
+					preConfirm: () => {
+						const metodoId = document.getElementById('swal-pago-metodo').value;
+						const motivo = document.getElementById('swal-pago-motivo').value;
+						const voucher = document.getElementById('swal-pago-voucher').value;
+						if (!metodoId) {
+							this.$swal.showValidationMessage('Debe seleccionar un método de pago');
+							return false;
+						}
+						if (!motivo) {
+							this.$swal.showValidationMessage('Debe ingresar un motivo/concepto');
+							return false;
+						}
+						return { metodoId: parseInt(metodoId), motivo: motivo, voucher: voucher };
+					}
+				});
+
+				if (formValues) {
+					this.$set(fecha, 'metodo_pago_id', formValues.metodoId);
+					this.$set(fecha, 'motivo', formValues.motivo);
+					this.$set(fecha, 'voucher', formValues.voucher);
+				} else {
+					fecha.pago = false;
+				}
+			} else {
+				// Si se desmarca, limpiar los campos de pago
+				this.$delete(fecha, 'metodo_pago_id');
+				this.$delete(fecha, 'motivo');
+				this.$delete(fecha, 'voucher');
+			}
+		},
+		limpiarFormulario() {
+			this.txtBusqueda = '';
+			this.pacientes = [];
+			this.indexGlobal = null;
+			this.pacienteElegido = {};
+			this.membresia = { 
+				tipo: null, 
+				cuotas: 1, 
+				precio: 0, 
+				fin: moment().add(1, 'month').format('YYYY-MM-DD'), 
+				descuento: 0, 
+				conDescuento: false 
+			};
+			this.fechas = [];
+			this.activaResultados = false;
+			this.nuevaFecha = { fecha: moment().format('YYYY-MM-DD') };
+			this.sesionesAcumuladas = [];
+			this.idHorario = '';
+			this.comentarios = '';
+			this.selectedTipoPaquete = '';
+			this.selectedEspecialidadPaquete = '';
+			this.selectedPublicoPaquete = '';
+			this.selectedSubtipoPaquete = '';
 		},
 		calcularFechas() {
 			this.fechas = [];
@@ -525,6 +625,11 @@ export default {
 			datos.append('num_sesion', 0 )
 			datos.append('descuento', this.membresia.descuento )
 
+			console.log('--- ENVIANDO MEMBRESÍA DESDE EL FRONTEND ---');
+			console.log('idPaciente:', this.pacienteElegido.id);
+			console.log('membresia:', this.membresia);
+			console.log('fechas:', this.fechas);
+
 			try {
 				const servidor = await fetch('/api/guardarMembresia', {
 								method: 'POST',
@@ -535,8 +640,8 @@ export default {
 				const respuesta = await servidor.json();
 				this.guardando = false;
 				if (respuesta.mensaje) {
-					this.pacienteElegido = {}
-					this.fechas = []
+					this.limpiarFormulario();
+					$('#modalMembresias').modal('hide');
 					this.$swal({
 						title: 'Se guardó el paquete',
 						showConfirmButton: false,
@@ -554,66 +659,7 @@ export default {
 				alertify.notify('<i class="fa-regular fa-bomb"></i> Hubo un error de conexión', 'danger', 10);
 			}
 		},
-		async listarProfesionales() {
-			await this.axios.get('/api/profesional')
-				.then(response => {
-					this.doctores = response.data;
-					this.listarhorario();
-				})
-		},
-		async listarhorario() {
-			let id = this.doctorSeleccionado;
 
-			await this.axios.get(`/api/horario/${id}`)
-				.then(res => {
-					this.horarios = res.data.schedulesInvalid;
-					this.horariosAll = res.data.schedules;
-					this.hoursProfessional = this.horarios;
-
-					this.emitSchedule(this.nuevaFecha.fecha);
-
-					this.schedulesInvalid = []
-					this.hoursProfessional.forEach(el => {
-						this.schedulesInvalid.push(el.schedule_id)
-					});
-				})
-				.catch(err => {
-					console.error(err)
-				})
-		},
-
-		emitSchedule(info = this.nuevaFecha.fecha) {
-			this.horarios = []
-
-			let arraySchedulesInvalid = []
-			this.hoursProfessional.forEach(el => {
-				if (!arraySchedulesInvalid.includes(el.schedule_id)) {
-					arraySchedulesInvalid.push(el.schedule_id)
-				}
-			})
-
-			let dayIndex = parseInt(moment(info).format('d')) - 1;
-			if (dayIndex === -1) dayIndex = 6;
-			let targetDay = this.dayWeek[dayIndex];
-
-			this.horariosAll.forEach(el => {
-				if (el.active !== 0 && el.day && targetDay && el.day.toLowerCase() === targetDay.toLowerCase()) {
-					if (el.date && el.date !== info) {
-						return;
-					}
-					if (arraySchedulesInvalid.includes(el.id)) {
-						// Hay cita
-						if (el.appointments.find(el => el.date === info && el.status != 3) ? true : false) {
-						} else {
-							this.horarios.push(el)
-						}
-					} else {
-						// No hay cita
-						this.horarios.push(el)
-					}
-				}
-			})
-		},
 		fechaLatam(fecha) { return moment(fecha).format('DD/MM/YYYY'); },
 		horaLatam1(horita) { return moment(horita, 'HH:mm:ss').format('hh:mm') },
 		horaLatam2(horita) { return moment(horita, 'HH:mm:ss').format('hh:mm a') },
@@ -681,7 +727,7 @@ export default {
 	},
 	mounted() {
 		this.preciosMembresias();
-		this.listarProfesionales();
+		this.cargarMonedas();
 		this.$on('alertaSimple', this.notifica())
 	}
 }

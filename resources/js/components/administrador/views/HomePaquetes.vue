@@ -1259,34 +1259,89 @@ export default {
       return deuda / cuotas;
     },
     async procesarPago(cuota) {
-      if(!confirm('¿Seguro que deseas registrar el pago de S/ ' + parseFloat(cuota.monto).toFixed(2) + '?')) return;
-      
-      this.procesandoPago = true;
-      try {
-        const payload = {
-          idDeuda: cuota.id,
-          user_id: this.idUsuario,
-          estado: 2, 
-          observacion: 'Pago de cuota desde administrador',
-          nombre: this.paqueteSeleccionado.patient_name + ' ' + (this.paqueteSeleccionado.patient_nombres || ''),
-          precio: cuota.monto,
-          tipo: 8, 
-          idMembresia: this.paqueteSeleccionado.id,
-          idMoneda: cuota.metodo_pago_id || this.metodoPago
-        };
+      // Opciones para el select de métodos de pago
+      let opcionesMetodos = '';
+      this.monedas.forEach(m => {
+        const selectedAttr = (cuota.metodo_pago_id == m.id || (!cuota.metodo_pago_id && m.id == 1)) ? 'selected' : '';
+        opcionesMetodos += `<option value="${m.id}" ${selectedAttr}>${m.tipo}</option>`;
+      });
 
-        await this.axios.post('/api/pagarDeudaMembresia', payload);
-        
-        cuota.estado = 2;
-        cuota.metodo_pago_nombre = this.monedas.find(m => m.id == (cuota.metodo_pago_id || 1))?.tipo;
-        this.actualizarPermisosPago();
-        this.cargarPaquetes(this.pagination.current_page);
-        
-      } catch (error) {
-        console.error(error);
-        alert('Ocurrió un error procesando el pago. Verifica tu conexión.');
-      } finally {
-        this.procesandoPago = false;
+      const { value: formValues } = await this.$swal({
+        title: 'Registrar Pago de Cuota',
+        html:
+          `<div class="text-start mb-3">` +
+          `  <p class="mb-2">Cuota: <strong>#${cuota.numero_cuota || ''}</strong></p>` +
+          `  <p class="mb-3">Monto a pagar: <strong class="text-success fs-5">S/ ${parseFloat(cuota.monto).toFixed(2)}</strong></p>` +
+          `  <div class="mb-3">` +
+          `    <label class="form-label small fw-bold text-muted text-uppercase mb-1">Método de Pago <span class="text-danger">*</span></label>` +
+          `    <select id="swal-pago-metodo" class="form-select">${opcionesMetodos}</select>` +
+          `  </div>` +
+          `  <div class="mb-3">` +
+          `    <label class="form-label small fw-bold text-muted text-uppercase mb-1">Motivo / Concepto <span class="text-danger">*</span></label>` +
+          `    <input id="swal-pago-motivo" class="form-control" type="text" value="Pago de cuota ${cuota.numero_cuota ? '#' + cuota.numero_cuota : ''}">` +
+          `  </div>` +
+          `  <div class="mb-3">` +
+          `    <label class="form-label small fw-bold text-muted text-uppercase mb-1">Número de Operación <span class="text-muted">(Yape, Plin, Transferencia, etc.)</span></label>` +
+          `    <input id="swal-pago-voucher" class="form-control" type="text" placeholder="Ej: 123456">` +
+          `  </div>` +
+          `</div>`,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: '<i class="fas fa-hand-holding-usd me-1"></i> Confirmar Pago',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+          const metodoId = document.getElementById('swal-pago-metodo').value;
+          const motivo = document.getElementById('swal-pago-motivo').value;
+          const voucher = document.getElementById('swal-pago-voucher').value;
+          if (!metodoId) {
+            this.$swal.showValidationMessage('Debe seleccionar un método de pago');
+            return false;
+          }
+          if (!motivo) {
+            this.$swal.showValidationMessage('Debe ingresar un motivo/concepto');
+            return false;
+          }
+          return { metodoId: parseInt(metodoId), motivo: motivo, voucher: voucher };
+        }
+      });
+
+      if (formValues) {
+        this.procesandoPago = true;
+        try {
+          const payload = {
+            idDeuda: cuota.id,
+            user_id: this.idUsuario,
+            estado: 2, 
+            observacion: formValues.motivo,
+            nombre: this.paqueteSeleccionado.patient_name + ' ' + (this.paqueteSeleccionado.patient_nombres || ''),
+            precio: cuota.monto,
+            tipo: 8, 
+            idMembresia: this.paqueteSeleccionado.id,
+            idMoneda: formValues.metodoId,
+            voucher: formValues.voucher
+          };
+
+          await this.axios.post('/api/pagarDeudaMembresia', payload);
+          
+          cuota.estado = 2;
+          cuota.metodo_pago_nombre = this.monedas.find(m => m.id == formValues.metodoId)?.tipo;
+          this.actualizarPermisosPago();
+          this.cargarPaquetes(this.pagination.current_page);
+
+          this.$swal({
+            icon: 'success',
+            title: 'Pago registrado',
+            text: 'El pago de la cuota se registró correctamente.',
+            timer: 2000,
+            showConfirmButton: false
+          });
+          
+        } catch (error) {
+          console.error(error);
+          this.$swal('Error', error.response?.data?.error || 'Ocurrió un error al procesar el pago.', 'error');
+        } finally {
+          this.procesandoPago = false;
+        }
       }
     },
     abrirModalPago(paquete) {

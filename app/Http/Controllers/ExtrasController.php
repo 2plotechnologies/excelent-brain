@@ -572,22 +572,37 @@ class ExtrasController extends Controller
             $pagoExtra = new Extra_payment;
             $pagoExtra->customer = $request->input('customer');
             $pagoExtra->price = $fecha->monto;
-            $pagoExtra->moneda = 1;
-            $pagoExtra->voucher = '';
+            $pagoExtra->moneda = isset($fecha->metodo_pago_id) ? $fecha->metodo_pago_id : 1;
+            $pagoExtra->voucher = isset($fecha->voucher) ? $fecha->voucher : '';
             $pagoExtra->appointment_id = 0;
             $pagoExtra->patient_id =$request->input('idPaciente');
             $pagoExtra->type = 7; // pago de membresía
-            $pagoExtra->observation = '';
+            $pagoExtra->observation = isset($fecha->motivo) ? $fecha->motivo : 'Pago de cuota de paquete';
             $pagoExtra->continuo = 3;
             $pagoExtra->idMembresia = $idMembresia;
             $pagoExtra->user_id = $request->input('user_id');
             $pagoExtra->numero_cuota = $numeroCuota;
+            $pagoExtra->date = $fecha->dia;
 
             // Asignar la IdSede que corresponde al usuario
             $pagoExtra->idSede = $idSede;
 						//$pagoExtra->idSede = $request->input('idSede');
 
             $pagoExtra->save();
+
+            // Insertar también en la tabla de deudas como pagada (estado = 2)
+            DB::table('deudas')->insert([
+                'patient_id' => $request->input('idPaciente'),
+                'motivo' => $request->input('nombreMembresia'),
+                'user_id' => $request->input('user_id'),
+                'fecha' => $fecha->dia,
+                'monto' => $fecha->monto,
+                'idMembresia' => $idMembresia,
+                'idPago' => $membresia['tipo'],
+                'numero_cuota' => $numeroCuota,
+                'estado' => 2,
+                'observaciones' => isset($fecha->motivo) ? $fecha->motivo : 'Pago de cuota de paquete'
+            ]);
 
             // Actualizar estado de la membresía
             Membresia::where('id', $idMembresia)
@@ -995,10 +1010,10 @@ class ExtrasController extends Controller
 				$pagoExtra->customer = $request->input('nombre');
 				$pagoExtra->price = $request->input('precio');
 				$pagoExtra->moneda = $request->input('idMoneda', 1);
-				$pagoExtra->voucher = '';
+				$pagoExtra->voucher = $request->input('voucher', '');
 				$pagoExtra->appointment_id = 0;
 				$pagoExtra->type = $request->input('tipo');
-				$pagoExtra->observation = 'Cancelación de deuda';
+				$pagoExtra->observation = $observacion ?: 'Cancelación de deuda';
 				$pagoExtra->continuo = 3;
 				$pagoExtra->idMembresia = $idMembresia;
 				$pagoExtra->user_id = $request->input('user_id');
