@@ -24,6 +24,7 @@ const RecepcionistaReportesGerenciales = () => import('./components/administrado
 const HomeHorasTrabajadas = () => import('./components/administrador/views/HomeHorasTrabajadas.vue');
 const HomeSedes = () => import('./components/administrador/views/HomeSedes.vue');
 const HomeSatisfaccionClientes = () => import('./components/administrador/views/HomeSatisfaccionClientes.vue');
+const GestionHorariosGlobal = () => import('./components/administrador/views/GestionHorariosGlobal.vue');
 
 const HomeAdministradorRouterReportes = () => import('./components/administrador/views/reportes/HomeRouterReportes.vue');
 const HomeAdministradorReportes = () => import('./components/administrador/views/reportes/HomeReportes.vue');
@@ -449,6 +450,11 @@ export const routes = [
         path: '/administrador/horas-trabajadas',
         name: 'horasTrabajadas',
         component: HomeHorasTrabajadas
+      },
+      {
+        path: '/administrador/gestion-horarios',
+        name: 'gestionHorariosAdminGlobal',
+        component: GestionHorariosGlobal
       },
       {
         path: '/administrador/satisfaccion-clientes',

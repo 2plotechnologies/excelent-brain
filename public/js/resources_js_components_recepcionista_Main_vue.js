@@ -408,6 +408,20 @@ var render = function render() {
   }, [_c("router-link", {
     staticClass: "nav-link",
     attrs: {
+      to: "/administrador/gestion-horarios"
+    }
+  }, [_c("i", {
+    staticClass: "fa-regular fa-calendar-days"
+  }), _vm._v(" "), _c("span", [_vm._v("Gestión de Horarios")])])], 1), _vm._v(" "), _c("li", {
+    staticClass: "nav-item nav__list",
+    on: {
+      click: function click($event) {
+        return _vm.activeSidebar();
+      }
+    }
+  }, [_c("router-link", {
+    staticClass: "nav-link",
+    attrs: {
       to: "/administrador/editar/pacientes"
     }
   }, [_c("i", {

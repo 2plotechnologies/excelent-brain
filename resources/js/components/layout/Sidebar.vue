@@ -38,6 +38,12 @@
 								</router-link>
 						</li>
 						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link  to="/administrador/gestion-horarios" class="nav-link">
+										<i class="fa-regular fa-calendar-days"></i>
+										<span>Gestión de Horarios</span>
+								</router-link>
+						</li>
+						<li class="nav-item nav__list" @click="activeSidebar()">
 							<router-link  to="/administrador/editar/pacientes" class="nav-link">
 								<i class="fas fa-user-nurse"></i>
 									<span>Pacientes</span>
