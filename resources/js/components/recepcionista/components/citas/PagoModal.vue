@@ -149,41 +149,46 @@ import moment from 'moment'
         this.isProcessing = true;
 				await this.axios.put(`/api/pagarCita/${this.dataCita.id}`, {dataCita: this.dataCita, caso: this.caso, idSede:this.idSede})
 				.then(res => {
-					//console.log(res.data)
-					this.$set(this.dataCita.payment, 'pay_status', this.caso.pago);
-					this.closeModal()
-					//this.$swal('Pago actualizado con éxito')
-					if( this.caso.pago ==2){
-						this.$swal.fire({
-							title: 'Pago actualizado con éxito',
-							icon: 'info',
-							showCancelButton: true,
-							confirmButtonText:
-								`<span>Ver Cupón</span>`,
-							cancelButtonText:
-								'Salir'
-						}).then(result=>{
-							if(result.isConfirmed){
-								this.abrirCupon();
-							}
-						})
-					}else{
-						this.$swal.fire({
-							title: 'Pago actualizado con éxito',
-							icon: 'info',
-							showCancelButton: true,
-							cancelButtonText:
-								'Salir'
-						})
-					}
-					if(this.caso.pago == '3' || this.caso.pago==3){
-						this.caso.pago = 1
-						this.$set(this.dataCita.payment, 'pay_status', this.caso.pago);
+					const pagoFinal = (this.caso.pago == '3' || this.caso.pago == 3) ? 1 : parseInt(this.caso.pago);
+					this.$set(this.dataCita.payment, 'pay_status', pagoFinal);
+					this.closeModal();
+
+					if (this.caso.pago == '3' || this.caso.pago == 3) {
 						this.$set(this.dataCita.payment, 'adelanto', parseFloat(this.dataCita.payment.adelanto || 0) + parseFloat(this.caso.monto_adelanto));
 						this.$set(this.dataCita.payment, 'price', parseFloat(this.dataCita.payment.price) - parseFloat(this.caso.monto_adelanto));
-						this.$emit('actualizarAdelanto', this.caso.monto_adelanto, this.dataCita.id)
+						this.$emit('actualizarAdelanto', this.caso.monto_adelanto, this.dataCita.id);
+						this.$swal.fire({
+							title: 'Adelanto registrado con éxito',
+							icon: 'info',
+							confirmButtonText: 'Aceptar'
+						}).then(() => {
+							// Emite el id y payStatus para actualización inmediata del ícono en el calendario
+							this.$emit('actualizar', { id: this.dataCita.id, payStatus: pagoFinal });
+						});
+					} else if (pagoFinal == 2) {
+						this.$swal.fire({
+							title: 'Pago actualizado con éxito',
+							icon: 'info',
+							showCancelButton: true,
+							confirmButtonText: '<span>Ver Cupón</span>',
+							cancelButtonText: 'Salir'
+						}).then(result => {
+							if (result.isConfirmed) {
+								this.abrirCupon();
+							}
+							// Emite el id y payStatus para actualización inmediata del ícono en el calendario
+							this.$emit('actualizar', { id: this.dataCita.id, payStatus: pagoFinal });
+						});
+					} else {
+						this.$swal.fire({
+							title: 'Pago actualizado con éxito',
+							icon: 'info',
+							confirmButtonText: 'Aceptar'
+						}).then(() => {
+							// Emite el id y payStatus para actualización inmediata del ícono en el calendario
+							this.$emit('actualizar', { id: this.dataCita.id, payStatus: pagoFinal });
+						});
 					}
-					this.$emit('actualizar')
 				})
 				.catch(err => {
 					console.error(err);

@@ -9199,38 +9199,54 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 caso: _this2.caso,
                 idSede: _this2.idSede
               }).then(function (res) {
-                //console.log(res.data)
-                _this2.$set(_this2.dataCita.payment, 'pay_status', _this2.caso.pago);
+                var pagoFinal = _this2.caso.pago == '3' || _this2.caso.pago == 3 ? 1 : parseInt(_this2.caso.pago);
+                _this2.$set(_this2.dataCita.payment, 'pay_status', pagoFinal);
                 _this2.closeModal();
-                //this.$swal('Pago actualizado con éxito')
-                if (_this2.caso.pago == 2) {
+                if (_this2.caso.pago == '3' || _this2.caso.pago == 3) {
+                  _this2.$set(_this2.dataCita.payment, 'adelanto', parseFloat(_this2.dataCita.payment.adelanto || 0) + parseFloat(_this2.caso.monto_adelanto));
+                  _this2.$set(_this2.dataCita.payment, 'price', parseFloat(_this2.dataCita.payment.price) - parseFloat(_this2.caso.monto_adelanto));
+                  _this2.$emit('actualizarAdelanto', _this2.caso.monto_adelanto, _this2.dataCita.id);
+                  _this2.$swal.fire({
+                    title: 'Adelanto registrado con éxito',
+                    icon: 'info',
+                    confirmButtonText: 'Aceptar'
+                  }).then(function () {
+                    // Emite el id y payStatus para actualización inmediata del ícono en el calendario
+                    _this2.$emit('actualizar', {
+                      id: _this2.dataCita.id,
+                      payStatus: pagoFinal
+                    });
+                  });
+                } else if (pagoFinal == 2) {
                   _this2.$swal.fire({
                     title: 'Pago actualizado con éxito',
                     icon: 'info',
                     showCancelButton: true,
-                    confirmButtonText: "<span>Ver Cup\xF3n</span>",
+                    confirmButtonText: '<span>Ver Cupón</span>',
                     cancelButtonText: 'Salir'
                   }).then(function (result) {
                     if (result.isConfirmed) {
                       _this2.abrirCupon();
                     }
+                    // Emite el id y payStatus para actualización inmediata del ícono en el calendario
+                    _this2.$emit('actualizar', {
+                      id: _this2.dataCita.id,
+                      payStatus: pagoFinal
+                    });
                   });
                 } else {
                   _this2.$swal.fire({
                     title: 'Pago actualizado con éxito',
                     icon: 'info',
-                    showCancelButton: true,
-                    cancelButtonText: 'Salir'
+                    confirmButtonText: 'Aceptar'
+                  }).then(function () {
+                    // Emite el id y payStatus para actualización inmediata del ícono en el calendario
+                    _this2.$emit('actualizar', {
+                      id: _this2.dataCita.id,
+                      payStatus: pagoFinal
+                    });
                   });
                 }
-                if (_this2.caso.pago == '3' || _this2.caso.pago == 3) {
-                  _this2.caso.pago = 1;
-                  _this2.$set(_this2.dataCita.payment, 'pay_status', _this2.caso.pago);
-                  _this2.$set(_this2.dataCita.payment, 'adelanto', parseFloat(_this2.dataCita.payment.adelanto || 0) + parseFloat(_this2.caso.monto_adelanto));
-                  _this2.$set(_this2.dataCita.payment, 'price', parseFloat(_this2.dataCita.payment.price) - parseFloat(_this2.caso.monto_adelanto));
-                  _this2.$emit('actualizarAdelanto', _this2.caso.monto_adelanto, _this2.dataCita.id);
-                }
-                _this2.$emit('actualizar');
               })["catch"](function (err) {
                 console.error(err);
                 _this2.$swal({
@@ -10573,9 +10589,9 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         return h.professional_id == idProf;
       });
 
-      // Map computed properties first, including attention shift
+      // Map computed properties first (attention shift removed as requested)
       ocupadas.forEach(function (cita) {
-        var start = cita.attention ? cita.attention : cita.hora_inicio ? cita.hora_inicio : cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00';
+        var start = cita.hora_inicio ? cita.hora_inicio : cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00';
         cita._computed_start = start;
         var duracion = 60; // Fallback predeterminado en minutos
         if (cita.precio && cita.precio.duracion && !isNaN(parseInt(cita.precio.duracion))) {
@@ -10832,9 +10848,44 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         }, _callee3);
       }))();
     },
-    actualizarListadoCitas: function actualizarListadoCitas() {
-      this.obtenerHorarios();
-      this.$emit('actualizarListadoCitas');
+    actualizarListadoCitas: function actualizarListadoCitas(paymentInfo) {
+      var _this6 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var aplicarPago;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              // Función auxiliar: reemplaza horasMalas con nuevo array donde la cita pagada
+              // tiene un nuevo objeto payment. Nueva referencia = Vue 2 detecta el cambio garantizadamente.
+              aplicarPago = function aplicarPago() {
+                if (paymentInfo && _typeof(paymentInfo) === 'object' && paymentInfo.id && paymentInfo.payStatus !== undefined) {
+                  _this6.horasMalas = _this6.horasMalas.map(function (h) {
+                    if (h.id == paymentInfo.id && h.payment) {
+                      return Object.assign({}, h, {
+                        payment: Object.assign({}, h.payment, {
+                          pay_status: paymentInfo.payStatus
+                        })
+                      });
+                    }
+                    return h;
+                  });
+                }
+              }; // 1. Actualización inmediata antes del request
+              aplicarPago();
+
+              // 2. Recarga completa del servidor
+              _context4.next = 4;
+              return _this6.obtenerHorarios();
+            case 4:
+              // 3. Re-aplicar después del request (por si el servidor devuelve datos desactualizados)
+              aplicarPago();
+              _this6.$emit('actualizarListadoCitas');
+            case 6:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4);
+      }))();
     },
     verHorariosAyer: function verHorariosAyer() {
       this.fecha = moment__WEBPACK_IMPORTED_MODULE_0___default()().subtract(1, 'day').format('YYYY-MM-DD');
@@ -10852,7 +10903,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       this.obtenerHorarios();
     },
     changeMode: function changeMode(id, indiceP) {
-      var _this6 = this;
+      var _this7 = this;
       var targetIndex = this.indexElegido > -1 ? this.indexElegido : indiceP;
       this.$swal.fire({
         title: 'Actualizar',
@@ -10865,26 +10916,26 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         cancelButtonText: 'No'
       }).then(function (result) {
         if (result.isConfirmed) {
-          _this6.axios.get("/api/updateModeAppoinment/".concat(id)).then(function (res) {
+          _this7.axios.get("/api/updateModeAppoinment/".concat(id)).then(function (res) {
             //this.horasMalas[targetIndex].mode==1? this.horasMalas[targetIndex].mode=0: this.horasMalas[targetIndex].mode=1
-            _this6.obtenerHorarios();
+            _this7.obtenerHorarios();
           });
         }
       });
     },
     buscarRecetas: function buscarRecetas(id) {
-      var _this7 = this;
+      var _this8 = this;
       this.axios("/api/verRecetaPorId/".concat(id)).then(function (res) {
-        _this7.recetas = res.data;
-        _this7.$parent.recetas = _this7.recetas;
+        _this8.recetas = res.data;
+        _this8.$parent.recetas = _this8.recetas;
       });
     },
     intercambiarHorario: function intercambiarHorario(laCita) {
-      var _this8 = this;
+      var _this9 = this;
       var idProf = laCita.professional_id;
       this.primero = laCita;
       this.posibles = this.horasMalas.filter(function (posible) {
-        return posible.professional_id == idProf && posible.date == _this8.fecha && laCita.id != posible.id;
+        return posible.professional_id == idProf && posible.date == _this9.fecha && laCita.id != posible.id;
       });
     },
     abrirTiemposEspera: function abrirTiemposEspera(cita) {
@@ -10892,15 +10943,15 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     }
   },
   mounted: function mounted() {
-    var _this9 = this;
+    var _this10 = this;
     this.axios.get('/api/user').then(function (res) {
-      _this9.idUsuario = parseInt(res.data.user.id);
+      _this10.idUsuario = parseInt(res.data.user.id);
     });
     this.listarProfesionales();
     this.listarPrecios();
     this.$nextTick(function () {
-      if (_this9.$refs.bodyScroll && _this9.$refs.headerScroll) {
-        _this9.$refs.headerScroll.scrollLeft = _this9.$refs.bodyScroll.scrollLeft;
+      if (_this10.$refs.bodyScroll && _this10.$refs.headerScroll) {
+        _this10.$refs.headerScroll.scrollLeft = _this10.$refs.bodyScroll.scrollLeft;
       }
     });
   }
@@ -19669,7 +19720,7 @@ var render = function render() {
       });
     }), _vm._v(" "), _vm._l(_vm.getHorasOcupadas(doctor.id), function (horaOcup, hIndex) {
       return _c("div", {
-        key: "ocup-" + horaOcup.id,
+        key: "ocup-" + horaOcup.id + "-pay-" + (horaOcup.payment ? horaOcup.payment.pay_status : 0),
         staticClass: "booked-slot shadow-sm p-1",
         style: [_vm.slotStyle(horaOcup._computed_start, horaOcup._computed_end, horaOcup), {
           borderLeft: _vm.isBlocked(horaOcup) ? "4px solid #dc3545" : "4px solid " + _vm.stringToColor(doctor.name)

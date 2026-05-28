@@ -1551,44 +1551,6 @@ public function getPatientsPerMonth($date,$id){
 
 		$cita->update($updateData);
 
-		// Si se actualizó la hora_fin (atención iniciada) y es una cita de Psiquiatría de paciente nuevo
-		if (isset($updateData['hora_fin']) && $updateData['hora_fin'] && $cita->clasification == 1 && $cita->patient_condition == "1") {
-			$pacienteBloqueo = Patient::where('name', 'like', '%bloqueo%')->orWhere('nombres', 'like', '%bloqueo%')->first();
-			if ($pacienteBloqueo) {
-				$hora_inicio_original = $cita->hora_inicio ?: ($cita->schedule ? $cita->schedule->check_time : null);
-				if ($hora_inicio_original) {
-					$duracion_original = intval($cita->duracion ?: 45);
-					$hora_fin_programada = \Carbon\Carbon::parse($hora_inicio_original)->addMinutes($duracion_original)->format('H:i:s');
-					
-					// Encontrar el schedule del bloqueo automático original
-					$scheduleInfo = $cita->schedule;
-					if ($scheduleInfo) {
-						$nextSchedule = Schedule::where('professional_id', $cita->professional_id)
-							->where('day', $scheduleInfo->day)
-							->where('check_time', '>=', $hora_fin_programada)
-							->orderBy('check_time', 'asc')
-							->first();
-						
-						if ($nextSchedule) {
-							$bloqueo = Appointment::where('professional_id', $cita->professional_id)
-								->where('date', $cita->date)
-								->where('patient_id', $pacienteBloqueo->id)
-								->where('schedule_id', $nextSchedule->id)
-								->first();
-							
-							if ($bloqueo) {
-								$bloqueo->update([
-									'attention' => $updateData['hora_fin'],
-									'hora_fin' => \Carbon\Carbon::parse($updateData['hora_fin'])->addMinutes(15)->format('H:i:s'),
-									'duracion' => 15
-								]);
-							}
-						}
-					}
-				}
-			}
-		}
-
 		return response()->json(['mensaje' => 'Ok']);
 	}
 

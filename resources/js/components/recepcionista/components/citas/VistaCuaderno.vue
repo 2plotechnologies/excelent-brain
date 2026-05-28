@@ -107,7 +107,7 @@
 						</div>
 
 						<!-- Slots Ocupados (Citas) -->
-						<div v-for="(horaOcup, hIndex) in getHorasOcupadas(doctor.id)" :key="'ocup-'+horaOcup.id" 
+						<div v-for="(horaOcup, hIndex) in getHorasOcupadas(doctor.id)" :key="'ocup-'+horaOcup.id+'-pay-'+(horaOcup.payment ? horaOcup.payment.pay_status : 0)" 
 								class="booked-slot shadow-sm p-1" 
 								:style="[slotStyle(horaOcup._computed_start, horaOcup._computed_end, horaOcup), { borderLeft: isBlocked(horaOcup) ? '4px solid #dc3545' : '4px solid ' + stringToColor(doctor.name) }]"
 								@click="abrirDetallesCita(horaOcup)"
@@ -355,9 +355,9 @@
 			getHorasOcupadas(idProf) {
 				let ocupadas = this.horasMalas.filter(h => h.professional_id == idProf);
 				
-				// Map computed properties first, including attention shift
+				// Map computed properties first (attention shift removed as requested)
 				ocupadas.forEach(cita => {
-					let start = cita.attention ? cita.attention : (cita.hora_inicio ? cita.hora_inicio : (cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00'));
+					let start = cita.hora_inicio ? cita.hora_inicio : (cita.schedule && cita.schedule.check_time ? cita.schedule.check_time : '00:00:00');
 					cita._computed_start = start;
 
 					let duracion = 60; // Fallback predeterminado en minutos
@@ -595,8 +595,29 @@
 				await this.axios.get('/api/listarPreciosTodos')
 				.then( response => this.precios = response.data)
 			},
-			actualizarListadoCitas(){ 
-				this.obtenerHorarios(); 
+			async actualizarListadoCitas(paymentInfo){ 
+				// Función auxiliar: reemplaza horasMalas con nuevo array donde la cita pagada
+				// tiene un nuevo objeto payment. Nueva referencia = Vue 2 detecta el cambio garantizadamente.
+				const aplicarPago = () => {
+					if (paymentInfo && typeof paymentInfo === 'object' && paymentInfo.id && paymentInfo.payStatus !== undefined) {
+						this.horasMalas = this.horasMalas.map(h => {
+							if (h.id == paymentInfo.id && h.payment) {
+								return Object.assign({}, h, { payment: Object.assign({}, h.payment, { pay_status: paymentInfo.payStatus }) });
+							}
+							return h;
+						});
+					}
+				};
+
+				// 1. Actualización inmediata antes del request
+				aplicarPago();
+
+				// 2. Recarga completa del servidor
+				await this.obtenerHorarios(); 
+
+				// 3. Re-aplicar después del request (por si el servidor devuelve datos desactualizados)
+				aplicarPago();
+
 				this.$emit('actualizarListadoCitas');
 			},
 			verHorariosAyer(){ this.fecha = moment().subtract(1, 'day').format('YYYY-MM-DD'); this.obtenerHorarios(); },
