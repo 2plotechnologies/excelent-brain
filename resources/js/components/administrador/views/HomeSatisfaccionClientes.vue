@@ -60,13 +60,13 @@
       <div class="col-md-3 mb-2">
         <div class="metric bg-info text-white">
           <span>Promotores</span>
-          <strong>{{ summary.promoters }}</strong>
+          <strong>{{ summary.promoters }} ({{ summary.pct_promoters }}%)</strong>
         </div>
       </div>
       <div class="col-md-3 mb-2">
         <div class="metric bg-warning text-dark">
           <span>Detractores</span>
-          <strong>{{ summary.detractors }}</strong>
+          <strong>{{ summary.detractors }} ({{ summary.pct_detractors }}%)</strong>
         </div>
       </div>
     </div>
@@ -131,6 +131,9 @@ export default {
         promoters: 0,
         neutral: 0,
         detractors: 0,
+        pct_promoters: 0,
+        pct_neutral: 0,
+        pct_detractors: 0,
       },
     }
   },

@@ -14,6 +14,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_0__);
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
@@ -31,6 +36,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       profesionales: [],
       profesionalElegido: '',
       horarios: [],
+      bloqueos: [],
+      mesSeleccionado: moment__WEBPACK_IMPORTED_MODULE_0___default()().format('YYYY-MM'),
       diasSemana: ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'],
       // Grid settings
       horasGrid: [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
@@ -44,14 +51,26 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         date: ''
       },
       guardando: false,
-      horarioSeleccionado: null
+      horarioSeleccionado: null,
+      horarioSeleccionadoContextoFecha: null
     };
   },
   computed: {
-    horariosEspecificos: function horariosEspecificos() {
-      return this.horarios.filter(function (h) {
-        return h.date !== null && h.date !== '';
-      });
+    diasDelMes: function diasDelMes() {
+      if (!this.mesSeleccionado) return [];
+      var dateObj = moment__WEBPACK_IMPORTED_MODULE_0___default()(this.mesSeleccionado, 'YYYY-MM');
+      var daysInMonth = dateObj.daysInMonth();
+      var dias = [];
+      var nombresDias = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+      for (var i = 1; i <= daysInMonth; i++) {
+        var currentDate = dateObj.clone().date(i);
+        dias.push({
+          fechaCompleta: currentDate.format('YYYY-MM-DD'),
+          numeroDia: i,
+          nombreDia: nombresDias[currentDate.day()]
+        });
+      }
+      return dias;
     }
   },
   methods: {
@@ -84,14 +103,17 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     cambioProfesional: function cambioProfesional() {
       this.obtenerHorarios();
     },
+    cambioMes: function cambioMes() {
+      this.obtenerHorarios();
+    },
     obtenerHorarios: function obtenerHorarios() {
       var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var res;
+        var _yield$Promise$all, _yield$Promise$all2, resHorarios, resBloqueos;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              if (_this2.profesionalElegido) {
+              if (!(!_this2.profesionalElegido || !_this2.mesSeleccionado)) {
                 _context2.next = 2;
                 break;
               }
@@ -99,27 +121,78 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 2:
               _context2.prev = 2;
               _context2.next = 5;
-              return _this2.axios.get("/api/professional/".concat(_this2.profesionalElegido, "/schedules/all"));
+              return Promise.all([_this2.axios.get("/api/professional/".concat(_this2.profesionalElegido, "/schedules/all")), _this2.axios.get("/api/reporte-horas-trabajadas", {
+                params: {
+                  professional_id: _this2.profesionalElegido,
+                  month: _this2.mesSeleccionado
+                }
+              })]);
             case 5:
-              res = _context2.sent;
-              _this2.horarios = res.data;
-              _context2.next = 12;
+              _yield$Promise$all = _context2.sent;
+              _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 2);
+              resHorarios = _yield$Promise$all2[0];
+              resBloqueos = _yield$Promise$all2[1];
+              _this2.horarios = resHorarios.data;
+              _this2.bloqueos = resBloqueos.data.bloqueos || [];
+              _context2.next = 16;
               break;
-            case 9:
-              _context2.prev = 9;
+            case 13:
+              _context2.prev = 13;
               _context2.t0 = _context2["catch"](2);
-              console.error("Error cargando horarios", _context2.t0);
-            case 12:
+              console.error("Error cargando horarios o bloqueos", _context2.t0);
+            case 16:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[2, 9]]);
+        }, _callee2, null, [[2, 13]]);
       }))();
     },
-    getHorariosRecurrentesPorDia: function getHorariosRecurrentesPorDia(dia) {
-      return this.horarios.filter(function (h) {
-        return (h.date === null || h.date === '') && h.day === dia;
+    getHorariosDia: function getHorariosDia(diaObj) {
+      var fechaCompleta = diaObj.fechaCompleta;
+      var nombreDia = diaObj.nombreDia;
+      var recurrentes = this.horarios.filter(function (h) {
+        return (h.date === null || h.date === '') && h.day && h.day.toLowerCase() === nombreDia.toLowerCase();
       });
+      var especificos = this.horarios.filter(function (h) {
+        return h.date === fechaCompleta;
+      });
+      var bloqueosHoy = this.bloqueos.filter(function (b) {
+        return b.date === fechaCompleta;
+      });
+      var result = [];
+      recurrentes.forEach(function (h) {
+        var blocked = bloqueosHoy.find(function (b) {
+          return b.schedule_id == h.id;
+        });
+        if (blocked) {
+          result.push(_objectSpread(_objectSpread({}, h), {}, {
+            isBlocked: true,
+            appointment_id: blocked.id,
+            block_reason: blocked.recomendation
+          }));
+        } else {
+          result.push(_objectSpread(_objectSpread({}, h), {}, {
+            isBlocked: false
+          }));
+        }
+      });
+      especificos.forEach(function (h) {
+        var blocked = bloqueosHoy.find(function (b) {
+          return b.schedule_id == h.id;
+        });
+        if (blocked) {
+          result.push(_objectSpread(_objectSpread({}, h), {}, {
+            isBlocked: true,
+            appointment_id: blocked.id,
+            block_reason: blocked.recomendation
+          }));
+        } else {
+          result.push(_objectSpread(_objectSpread({}, h), {}, {
+            isBlocked: false
+          }));
+        }
+      });
+      return result;
     },
     slotStyle: function slotStyle(check_time, departure_date) {
       if (!check_time || !departure_date) return {};
@@ -148,6 +221,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       if (!f) return '';
       return moment__WEBPACK_IMPORTED_MODULE_0___default()(f, 'YYYY-MM-DD').format('DD/MM/YYYY');
     },
+    syncScrollX: function syncScrollX(e) {
+      if (this.$refs.headerScroll) {
+        this.$refs.headerScroll.scrollLeft = e.target.scrollLeft;
+      }
+    },
     guardarHorario: function guardarHorario() {
       var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
@@ -161,17 +239,13 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 _context3.next = 13;
                 break;
               }
-              // Logica para crear mensual
               fechaSeleccionada = moment__WEBPACK_IMPORTED_MODULE_0___default()(_this3.nuevoHorario.date, 'YYYY-MM-DD');
               mes = fechaSeleccionada.month();
-              diaSemanaTarget = fechaSeleccionada.day(); // 0: Dom, 1: Lun...
-              // Encontrar el primer día de ese mes con el mismo día de la semana
+              diaSemanaTarget = fechaSeleccionada.day();
               iterador = fechaSeleccionada.clone().startOf('month');
               while (iterador.day() !== diaSemanaTarget) {
                 iterador.add(1, 'day');
               }
-
-              // Agregar todas las fechas que caen en ese día durante el mes
               fechasDelMes = [];
               while (iterador.month() === mes) {
                 fechasDelMes.push(iterador.format('YYYY-MM-DD'));
@@ -225,8 +299,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 });
                 _this3.obtenerHorarios();
                 _this3.$refs.closeModalBtn.click();
-
-                // Reset
                 _this3.nuevoHorario.check_time = '';
                 _this3.nuevoHorario.departure_date = '';
                 _this3.nuevoHorario.daysSelected = [];
@@ -258,9 +330,9 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         }, _callee3, null, [[19, 27, 31, 34]]);
       }))();
     },
-    abrirDetallesHorario: function abrirDetallesHorario(horario) {
+    abrirDetallesHorario: function abrirDetallesHorario(horario, fechaContexto) {
       this.horarioSeleccionado = horario;
-      // Usando Bootstrap 5 para abrir el modal
+      this.horarioSeleccionadoContextoFecha = fechaContexto;
       var modalElement = document.getElementById('modalDetallesHorario');
       if (modalElement && window.bootstrap) {
         var modal = window.bootstrap.Modal.getOrCreateInstance(modalElement);
@@ -274,72 +346,183 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         if (modal) modal.hide();
       }
     },
-    toggleActive: function toggleActive(id) {
+    bloquearHorario: function bloquearHorario(horario, fecha) {
       var _this4 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var res;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
             case 0:
-              _context4.prev = 0;
-              _context4.next = 3;
-              return _this4.axios.put("/api/schedule/".concat(id, "/toggle"));
+              _this4.cerrarDetallesHorario();
+              setTimeout(function () {
+                _this4.$swal({
+                  title: 'Bloquear Horario',
+                  text: 'Indique el motivo del bloqueo:',
+                  input: 'text',
+                  showCancelButton: true,
+                  confirmButtonText: 'Bloquear',
+                  cancelButtonText: 'Cancelar'
+                }).then(/*#__PURE__*/function () {
+                  var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4(result) {
+                    return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+                      while (1) switch (_context4.prev = _context4.next) {
+                        case 0:
+                          if (!result.isConfirmed) {
+                            _context4.next = 12;
+                            break;
+                          }
+                          _context4.prev = 1;
+                          _context4.next = 4;
+                          return _this4.axios.post('/api/bloquear-horarios', {
+                            professional_id: _this4.profesionalElegido,
+                            date: fecha,
+                            schedule_id: horario.id,
+                            motivo: result.value || 'Bloqueo'
+                          });
+                        case 4:
+                          _this4.$swal('Horario bloqueado con éxito');
+                          _this4.obtenerHorarios();
+                          _context4.next = 12;
+                          break;
+                        case 8:
+                          _context4.prev = 8;
+                          _context4.t0 = _context4["catch"](1);
+                          console.error(_context4.t0);
+                          _this4.$swal('Error al bloquear horario');
+                        case 12:
+                        case "end":
+                          return _context4.stop();
+                      }
+                    }, _callee4, null, [[1, 8]]);
+                  }));
+                  return function (_x) {
+                    return _ref.apply(this, arguments);
+                  };
+                }());
+              }, 300);
+            case 2:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5);
+      }))();
+    },
+    desbloquearHorario: function desbloquearHorario(horario) {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+          while (1) switch (_context7.prev = _context7.next) {
+            case 0:
+              _this5.$swal({
+                title: '¿Desbloquear este horario?',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, desbloquear',
+                cancelButtonText: 'Cancelar'
+              }).then(/*#__PURE__*/function () {
+                var _ref2 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6(result) {
+                  return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+                    while (1) switch (_context6.prev = _context6.next) {
+                      case 0:
+                        if (!result.isConfirmed) {
+                          _context6.next = 13;
+                          break;
+                        }
+                        _context6.prev = 1;
+                        _context6.next = 4;
+                        return _this5.axios["delete"]('/api/desbloquear-horario/' + horario.appointment_id);
+                      case 4:
+                        _this5.$swal('Horario desbloqueado con éxito');
+                        _this5.obtenerHorarios();
+                        _this5.cerrarDetallesHorario();
+                        _context6.next = 13;
+                        break;
+                      case 9:
+                        _context6.prev = 9;
+                        _context6.t0 = _context6["catch"](1);
+                        console.error(_context6.t0);
+                        _this5.$swal('Error al desbloquear');
+                      case 13:
+                      case "end":
+                        return _context6.stop();
+                    }
+                  }, _callee6, null, [[1, 9]]);
+                }));
+                return function (_x2) {
+                  return _ref2.apply(this, arguments);
+                };
+              }());
+            case 1:
+            case "end":
+              return _context7.stop();
+          }
+        }, _callee7);
+      }))();
+    },
+    toggleActive: function toggleActive(id) {
+      var _this6 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+          while (1) switch (_context8.prev = _context8.next) {
+            case 0:
+              _context8.prev = 0;
+              _context8.next = 3;
+              return _this6.axios.put("/api/schedule/".concat(id, "/toggle"));
             case 3:
-              res = _context4.sent;
+              res = _context8.sent;
               if (res.data.mensaje === 'success') {
-                _this4.obtenerHorarios();
-                _this4.cerrarDetallesHorario();
+                _this6.obtenerHorarios();
+                _this6.cerrarDetallesHorario();
               }
-              _context4.next = 10;
+              _context8.next = 10;
               break;
             case 7:
-              _context4.prev = 7;
-              _context4.t0 = _context4["catch"](0);
-              console.error(_context4.t0);
+              _context8.prev = 7;
+              _context8.t0 = _context8["catch"](0);
+              console.error(_context8.t0);
             case 10:
             case "end":
-              return _context4.stop();
+              return _context8.stop();
           }
-        }, _callee4, null, [[0, 7]]);
+        }, _callee8, null, [[0, 7]]);
       }))();
     },
     eliminarHorario: function eliminarHorario(id) {
-      var _this5 = this;
+      var _this7 = this;
       this.$swal({
         title: '¿Quieres eliminar este horario?',
         showDenyButton: true,
         confirmButtonText: 'Sí',
         denyButtonText: 'No'
       }).then(/*#__PURE__*/function () {
-        var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5(result) {
-          return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-            while (1) switch (_context5.prev = _context5.next) {
+        var _ref3 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9(result) {
+          return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+            while (1) switch (_context9.prev = _context9.next) {
               case 0:
                 if (!result.isConfirmed) {
-                  _context5.next = 12;
+                  _context9.next = 12;
                   break;
                 }
-                _context5.prev = 1;
-                _context5.next = 4;
-                return _this5.axios["delete"]('/api/schedule/' + id);
+                _context9.prev = 1;
+                _context9.next = 4;
+                return _this7.axios["delete"]('/api/schedule/' + id);
               case 4:
-                _this5.$swal('Horario eliminado con éxito');
-                _this5.obtenerHorarios();
-                _this5.cerrarDetallesHorario();
-                _context5.next = 12;
+                _this7.$swal('Horario eliminado con éxito');
+                _this7.obtenerHorarios();
+                _this7.cerrarDetallesHorario();
+                _context9.next = 12;
                 break;
               case 9:
-                _context5.prev = 9;
-                _context5.t0 = _context5["catch"](1);
-                console.error(_context5.t0);
+                _context9.prev = 9;
+                _context9.t0 = _context9["catch"](1);
+                console.error(_context9.t0);
               case 12:
               case "end":
-                return _context5.stop();
+                return _context9.stop();
             }
-          }, _callee5, null, [[1, 9]]);
+          }, _callee9, null, [[1, 9]]);
         }));
-        return function (_x) {
-          return _ref.apply(this, arguments);
+        return function (_x3) {
+          return _ref3.apply(this, arguments);
         };
       }());
     }
@@ -370,7 +553,7 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "row mb-3 gx-3 align-items-center"
   }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "col-md-4"
+    staticClass: "col-md-3"
   }, [_c("select", {
     directives: [{
       name: "model",
@@ -404,7 +587,30 @@ var render = function render() {
       }
     }, [_vm._v("\n\t\t\t\t\t" + _vm._s(prof.name) + " (" + _vm._s(prof.profession) + ")\n\t\t\t\t")]);
   })], 2)]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-4 text-end"
+    staticClass: "col-md-3"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.mesSeleccionado,
+      expression: "mesSeleccionado"
+    }],
+    staticClass: "form-control font-weight-bold shadow-sm",
+    attrs: {
+      type: "month"
+    },
+    domProps: {
+      value: _vm.mesSeleccionado
+    },
+    on: {
+      change: _vm.cambioMes,
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.mesSeleccionado = $event.target.value;
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-2 text-end"
   }, [_c("button", {
     staticClass: "btn btn-primary font-weight-bold shadow-sm",
     attrs: {
@@ -414,7 +620,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-plus"
-  }), _vm._v(" Nuevo Horario\n\t\t\t")])])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" Nuevo\n\t\t\t")])])]), _vm._v(" "), _c("div", {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -435,20 +641,30 @@ var render = function render() {
       "border-top-right-radius": "8px"
     }
   }, [_vm._m(1), _vm._v(" "), _c("div", {
+    ref: "headerScroll",
     staticClass: "doctors-header-container d-flex flex-grow-1",
     staticStyle: {
       "overflow-x": "auto",
       "overflow-y": "hidden",
       "min-width": "0"
     }
-  }, [_vm._l(_vm.diasSemana, function (dia) {
+  }, _vm._l(_vm.diasDelMes, function (dia) {
     return _c("div", {
-      key: dia,
-      staticClass: "doctor-header text-center py-2 border-right text-dark"
-    }, [_c("div", [_c("strong", {
-      staticClass: "mx-1 text-uppercase"
-    }, [_vm._v(_vm._s(dia))])])]);
-  }), _vm._v(" "), _vm._m(2)], 2)]), _vm._v(" "), _c("div", {
+      key: dia.fechaCompleta,
+      staticClass: "doctor-header text-center py-2 border-right text-dark",
+      "class": {
+        "bg-light": dia.nombreDia === "Domingo" || dia.nombreDia === "Sabado"
+      }
+    }, [_c("div", {
+      staticStyle: {
+        "line-height": "1.2"
+      }
+    }, [_c("strong", {
+      staticClass: "mx-1"
+    }, [_vm._v(_vm._s(dia.numeroDia))]), _c("br"), _vm._v(" "), _c("small", {
+      staticClass: "text-uppercase"
+    }, [_vm._v(_vm._s(dia.nombreDia))])])]);
+  }), 0)]), _vm._v(" "), _c("div", {
     staticClass: "calendar-body d-flex"
   }, [_c("div", {
     staticClass: "time-axis border-right bg-white",
@@ -470,12 +686,16 @@ var render = function render() {
       }
     }, [_vm._v(_vm._s(hora) + ":00")])]);
   }), 0), _vm._v(" "), _c("div", {
+    ref: "bodyScroll",
     staticClass: "doctors-body-container d-flex flex-grow-1",
     staticStyle: {
       "overflow-x": "auto",
       "overflow-y": "hidden",
       position: "relative",
       "min-width": "0"
+    },
+    on: {
+      scroll: _vm.syncScrollX
     }
   }, [_c("div", {
     staticClass: "grid-lines-container",
@@ -493,36 +713,39 @@ var render = function render() {
       key: "gl-" + hora,
       staticClass: "grid-line border-bottom"
     });
-  }), 0), _vm._v(" "), _vm._l(_vm.diasSemana, function (dia) {
+  }), 0), _vm._v(" "), _vm._l(_vm.diasDelMes, function (dia) {
     return _c("div", {
-      key: "col-" + dia,
+      key: "col-" + dia.fechaCompleta,
       staticClass: "doctor-column border-right position-relative",
+      "class": {
+        "bg-light": dia.nombreDia === "Domingo" || dia.nombreDia === "Sabado"
+      },
       staticStyle: {
         "z-index": "1"
       }
-    }, _vm._l(_vm.getHorariosRecurrentesPorDia(dia), function (horario) {
+    }, _vm._l(_vm.getHorariosDia(dia), function (horario) {
       return _c("div", {
-        key: horario.id,
+        key: horario.id + "-" + dia.fechaCompleta,
         staticClass: "booked-slot shadow-sm p-1",
         style: [_vm.slotStyle(horario.check_time, horario.departure_date), {
-          borderLeft: "4px solid " + (horario.active ? "#1cc88a" : "#e74a3b")
+          borderLeft: "4px solid " + (horario.isBlocked ? "#6c757d" : horario.active ? "#1cc88a" : "#e74a3b")
         }],
         on: {
           click: function click($event) {
-            return _vm.abrirDetallesHorario(horario);
+            return _vm.abrirDetallesHorario(horario, dia.fechaCompleta);
           }
         }
       }, [_c("div", {
         staticClass: "booked-content h-100 position-relative overflow-hidden d-flex flex-column",
-        "class": horario.active ? "bg-success text-white" : "bg-danger text-white"
+        "class": horario.isBlocked ? "bg-secondary text-white" : horario.active ? "bg-success text-white" : "bg-danger text-white"
       }, [_c("div", {
         staticClass: "font-weight-bold text-truncate lh-1",
         staticStyle: {
           "font-size": "0.75rem"
         }
       }, [_c("i", {
-        "class": horario.active ? "fas fa-check-circle" : "fas fa-times-circle"
-      }), _vm._v(" " + _vm._s(horario.active ? "Activo" : "Inactivo") + "\n\t\t\t\t\t\t\t")]), _vm._v(" "), _c("div", {
+        "class": horario.isBlocked ? "fas fa-ban" : horario.active ? "fas fa-check-circle" : "fas fa-times-circle"
+      }), _vm._v(" \n\t\t\t\t\t\t\t\t" + _vm._s(horario.isBlocked ? "Bloqueado" : horario.active ? "Activo" : "Inactivo") + "\n\t\t\t\t\t\t\t")]), _vm._v(" "), _c("div", {
         staticClass: "mt-1 text-truncate",
         staticStyle: {
           "font-size": "0.65rem",
@@ -530,40 +753,7 @@ var render = function render() {
         }
       }, [_vm._v("\n\t\t\t\t\t\t\t\t" + _vm._s(_vm.formatHora(horario.check_time)) + " - " + _vm._s(_vm.formatHora(horario.departure_date)) + "\n\t\t\t\t\t\t\t")])])]);
     }), 0);
-  }), _vm._v(" "), _c("div", {
-    staticClass: "doctor-column position-relative bg-light",
-    staticStyle: {
-      "z-index": "1"
-    }
-  }, _vm._l(_vm.horariosEspecificos, function (horario) {
-    return _c("div", {
-      key: "esp-" + horario.id,
-      staticClass: "booked-slot shadow-sm p-1",
-      style: [_vm.slotStyle(horario.check_time, horario.departure_date), {
-        borderLeft: "4px solid #f6c23e"
-      }],
-      on: {
-        click: function click($event) {
-          return _vm.abrirDetallesHorario(horario);
-        }
-      }
-    }, [_c("div", {
-      staticClass: "booked-content h-100 position-relative overflow-hidden d-flex flex-column bg-warning text-dark"
-    }, [_c("div", {
-      staticClass: "font-weight-bold text-truncate lh-1",
-      staticStyle: {
-        "font-size": "0.75rem"
-      }
-    }, [_c("i", {
-      staticClass: "far fa-calendar-alt"
-    }), _vm._v(" " + _vm._s(_vm.fechaLatam(horario.date)) + "\n\t\t\t\t\t\t\t")]), _vm._v(" "), _c("div", {
-      staticClass: "mt-1 text-truncate",
-      staticStyle: {
-        "font-size": "0.65rem",
-        "line-height": "1"
-      }
-    }, [_vm._v("\n\t\t\t\t\t\t\t\t" + _vm._s(_vm.formatHora(horario.check_time)) + " - " + _vm._s(_vm.formatHora(horario.departure_date)) + "\n\t\t\t\t\t\t\t")])])]);
-  }), 0)], 2)])]), _vm._v(" "), _c("div", {
+  })], 2)])]), _vm._v(" "), _c("div", {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -715,7 +905,7 @@ var render = function render() {
         _vm.$set(_vm.nuevoHorario, "date", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(3)]) : _vm._e(), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _vm._m(2)]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-6 mb-3"
@@ -792,7 +982,6 @@ var render = function render() {
     staticClass: "modal fade",
     attrs: {
       id: "modalDetallesHorario",
-      tabindex: "-1",
       "aria-labelledby": "modalDetallesHorarioLabel",
       "aria-hidden": "true"
     }
@@ -800,16 +989,45 @@ var render = function render() {
     staticClass: "modal-dialog modal-sm"
   }, [_c("div", {
     staticClass: "modal-content"
-  }, [_vm._m(4), _vm._v(" "), _vm.horarioSeleccionado ? _c("div", {
+  }, [_vm._m(3), _vm._v(" "), _vm.horarioSeleccionado ? _c("div", {
     staticClass: "modal-body text-center"
   }, [_c("p", {
     staticClass: "mb-2"
-  }, [_c("strong", [_vm._v("Día/Fecha:")]), _vm._v(" " + _vm._s(_vm.horarioSeleccionado.date ? _vm.fechaLatam(_vm.horarioSeleccionado.date) : _vm.horarioSeleccionado.day))]), _vm._v(" "), _c("p", {
+  }, [_c("strong", [_vm._v("Día/Fecha:")]), _vm._v(" " + _vm._s(_vm.fechaLatam(_vm.horarioSeleccionadoContextoFecha)))]), _vm._v(" "), _c("p", {
     staticClass: "mb-3"
-  }, [_c("strong", [_vm._v("Hora:")]), _vm._v(" " + _vm._s(_vm.formatHora(_vm.horarioSeleccionado.check_time)) + " - " + _vm._s(_vm.formatHora(_vm.horarioSeleccionado.departure_date)))]), _vm._v(" "), _c("div", {
+  }, [_c("strong", [_vm._v("Hora:")]), _vm._v(" " + _vm._s(_vm.formatHora(_vm.horarioSeleccionado.check_time)) + " - " + _vm._s(_vm.formatHora(_vm.horarioSeleccionado.departure_date)))]), _vm._v(" "), _vm.horarioSeleccionado.isBlocked ? _c("div", {
+    staticClass: "alert alert-secondary py-1 px-2 mb-3",
+    staticStyle: {
+      "font-size": "0.8rem"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-lock"
+  }), _vm._v(" Bloqueado: " + _vm._s(_vm.horarioSeleccionado.block_reason || "Bloqueo manual") + "\n\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "d-grid gap-2"
-  }, [_c("button", {
-    staticClass: "btn",
+  }, [!_vm.horarioSeleccionado.isBlocked ? _c("button", {
+    staticClass: "btn btn-dark",
+    on: {
+      click: function click($event) {
+        return _vm.bloquearHorario(_vm.horarioSeleccionado, _vm.horarioSeleccionadoContextoFecha);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-ban"
+  }), _vm._v(" Bloquear en esta fecha\n\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm.horarioSeleccionado.isBlocked ? _c("button", {
+    staticClass: "btn btn-outline-dark",
+    on: {
+      click: function click($event) {
+        return _vm.desbloquearHorario(_vm.horarioSeleccionado);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-unlock"
+  }), _vm._v(" Desbloquear Horario\n\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _c("hr", {
+    staticClass: "my-2"
+  }), _vm._v(" "), _c("small", {
+    staticClass: "text-muted d-block mb-1"
+  }, [_vm._v("Opciones Generales de este Horario:")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm",
     "class": _vm.horarioSeleccionado.active ? "btn-warning" : "btn-success",
     on: {
       click: function click($event) {
@@ -818,8 +1036,8 @@ var render = function render() {
     }
   }, [_c("i", {
     "class": _vm.horarioSeleccionado.active ? "fas fa-pause" : "fas fa-play"
-  }), _vm._v(" \n\t\t\t\t\t\t\t" + _vm._s(_vm.horarioSeleccionado.active ? "Desactivar Horario" : "Activar Horario") + "\n\t\t\t\t\t\t")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-outline-danger",
+  }), _vm._v(" \n\t\t\t\t\t\t\t" + _vm._s(_vm.horarioSeleccionado.active ? "Desactivar Recurrencia" : "Activar Recurrencia") + "\n\t\t\t\t\t\t")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm btn-outline-danger",
     on: {
       click: function click($event) {
         return _vm.eliminarHorario(_vm.horarioSeleccionado.id);
@@ -827,7 +1045,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-trash"
-  }), _vm._v(" Eliminar Horario\n\t\t\t\t\t\t")])])]) : _vm._e()])])])]);
+  }), _vm._v(" Eliminar Horario Base\n\t\t\t\t\t\t")])])]) : _vm._e()])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -851,17 +1069,6 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "far fa-clock"
   })]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "doctor-header text-center py-2 text-dark bg-warning",
-    staticStyle: {
-      "min-width": "250px"
-    }
-  }, [_c("div", [_c("strong", {
-    staticClass: "mx-1 text-uppercase"
-  }, [_vm._v("Fechas Específicas")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -905,7 +1112,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.calendar-wrapper[data-v-88fdbfe2] { \n\tdisplay: flex; \n\tflex-direction: column; \n\tborder-radius: 8px; \n\tposition: relative; \n\tbackground: white;\n\twidth: 100%;\n}\n.calendar-header[data-v-88fdbfe2] {\n\tposition: sticky;\n\ttop: 0;\n\tz-index: 100;\n\tbackground-color: #f8f9fc !important;\n\tborder-top-left-radius: 8px;\n\tborder-top-right-radius: 8px;\n\tbox-shadow: 0 2px 4px rgba(0,0,0,0.05);\n\twidth: 100%;\n}\n.doctor-header[data-v-88fdbfe2],\n.doctor-column[data-v-88fdbfe2] {\n\tmin-width: 150px;\n\tflex: 1 1 150px;\n\tbackground-color: rgba(0,0,0,0.01);\n}\n.time-slot-label[data-v-88fdbfe2] { height: 90px;\n} /* 60 mins * 1.5px/min */\n.grid-line[data-v-88fdbfe2] { height: 90px; box-sizing: border-box;\n}\n.booked-slot[data-v-88fdbfe2] { position: absolute; width: calc(100% - 10px); left: 5px; cursor: pointer; transition: transform 0.1s; border-radius: 6px; overflow: hidden; background-color: rgba(248, 249, 252, 0.9);}\n.booked-slot[data-v-88fdbfe2]:hover { transform: scale(1.02); z-index: 10!important;\n}\n.booked-content[data-v-88fdbfe2] { padding: 4px; border-radius: 4px;\n}\n.doctors-header-container[data-v-88fdbfe2]::-webkit-scrollbar { display: none;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.calendar-wrapper[data-v-88fdbfe2] { \n\tdisplay: flex; \n\tflex-direction: column; \n\tborder-radius: 8px; \n\tposition: relative; \n\tbackground: white;\n\twidth: 100%;\n}\n.calendar-header[data-v-88fdbfe2] {\n\tposition: sticky;\n\ttop: 0;\n\tz-index: 100;\n\tbackground-color: #f8f9fc !important;\n\tborder-top-left-radius: 8px;\n\tborder-top-right-radius: 8px;\n\tbox-shadow: 0 2px 4px rgba(0,0,0,0.05);\n\twidth: 100%;\n}\n.doctor-header[data-v-88fdbfe2],\n.doctor-column[data-v-88fdbfe2] {\n\tmin-width: 150px;\n\tflex: 0 0 150px;\n\tbackground-color: rgba(0,0,0,0.01);\n}\n.time-slot-label[data-v-88fdbfe2] { height: 90px;\n} /* 60 mins * 1.5px/min */\n.grid-line[data-v-88fdbfe2] { height: 90px; box-sizing: border-box;\n}\n.booked-slot[data-v-88fdbfe2] { position: absolute; width: calc(100% - 10px); left: 5px; cursor: pointer; transition: transform 0.1s; border-radius: 6px; overflow: hidden; background-color: rgba(248, 249, 252, 0.9);}\n.booked-slot[data-v-88fdbfe2]:hover { transform: scale(1.02); z-index: 10!important;\n}\n.booked-content[data-v-88fdbfe2] { padding: 4px; border-radius: 4px;\n}\n.doctors-header-container[data-v-88fdbfe2]::-webkit-scrollbar { display: none;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

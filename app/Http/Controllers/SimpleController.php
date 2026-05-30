@@ -61,69 +61,73 @@ class SimpleController extends Controller
 	}
 
 	public function buscarDni($dni){
-		$token = env('RENIEC_TOKEN');
-		$url = "https://dniruc.apisperu.com/api/v1/dni/" . urlencode($dni).'?token='.$token;
+		$token = env('PERUAPI_TOKEN');
+		$url = "https://peruapi.com/api/dni/" . urlencode($dni).'?api_token='.$token;
 				
 		$curl = curl_init();
-		// Configurar opciones de cURL
-    curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true); // Devuelve el resultado como string
-    curl_setopt($curl, CURLOPT_TIMEOUT, 30);          // Tiempo máximo de espera
-    curl_setopt($curl, CURLOPT_HTTPHEADER, [
-        'Accept: application/json'
-    ]);
-    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false); // Opcional: desactivar verificación SSL (no recomendado en producción)
+		// Configurar opciones de cURL.
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true); // Devuelve el resultado como string.
+		curl_setopt($curl, CURLOPT_TIMEOUT, 30);          // Tiempo máximo de espera.
+		curl_setopt($curl, CURLOPT_HTTPHEADER, [
+			'Accept: application/json'
+		]);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false); // Opcional: desactivar verificación SSL (no recomendado en producción).
 
-		$response = curl_exec($curl);
-    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-		curl_close($curl);
+			$response = curl_exec($curl);
+		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+			curl_close($curl);
 
-		$persona = json_decode($response, true);
-		// Si la respuesta es null o no es un array, retornar estructura vacía
-    if (!is_array($persona) || empty($persona)) {
+			$persona = json_decode($response, true);
+			// Si la respuesta es null o no es un array, retornar estructura vacía.
+		if (!is_array($persona) || empty($persona)) {
+				return [
+					'apellido_paterno' => '',
+					'apellido_materno' => '',
+					'nombres' => '',
+					'dni' => $dni,
+					'error' => true,
+					'message' => 'No se encontraron datos para el DNI ingresado'
+				];
+		}
+
+			// Si la API devolvió un error.
+		if (isset($persona['error']) || $httpCode !== 200) {
+				return [
+					'apellido_paterno' => '',
+					'apellido_materno' => '',
+					'nombres' => '',
+					'dni' => $dni,
+					'error' => true,
+					'message' => $persona['mensaje'] ?? $persona['message'] ?? 'Error al consultar el DNI'
+				];
+		}
+
+		// PeruAPI puede devolver los datos directamente o anidados en un nodo "data".
+		$data = (isset($persona['data']) && is_array($persona['data'])) ? $persona['data'] : $persona;
+
+			// Formatear datos usando null coalescing operator
+		$apellidoPaterno = $data['apellido_paterno'] ?? $data['apellidoPaterno'] ?? '';
+		$apellidoMaterno = $data['apellido_materno'] ?? $data['apellidoMaterno'] ?? '';
+		$nombres = $data['nombres'] ?? '';
+		
+		// Limpiar valores UNDEFINED.
+		$apellidoPaterno = ($apellidoPaterno === 'UNDEFINED') ? '' : $apellidoPaterno;
+		$apellidoMaterno = ($apellidoMaterno === 'UNDEFINED') ? '' : $apellidoMaterno;
+		$nombres = ($nombres === 'UNDEFINED') ? '' : $nombres;
+
 			return [
-				'apellidoPaterno' => '',
-				'apellidoMaterno' => '',
-				'nombres' => '',
-				'dni' => $dni,
-				'error' => true,
-				'message' => 'No se encontraron datos para el DNI ingresado'
-			];
-    }
-
-		// Si la API devolvió un error
-    if (isset($persona['error']) || $httpCode !== 200) {
-			return [
-				'apellidoPaterno' => '',
-				'apellidoMaterno' => '',
-				'nombres' => '',
-				'dni' => $dni,
-				'error' => true,
-				'message' => $persona['message'] ?? 'Error al consultar el DNI'
-			];
-    }
-
-		// Formatear datos usando null coalescing operator
-    $apellidoPaterno = $persona['apellidoPaterno'] ?? '';
-    $apellidoMaterno = $persona['apellidoMaterno'] ?? '';
-    $nombres = $persona['nombres'] ?? '';
-    
-    // Limpiar valores UNDEFINED
-    $apellidoPaterno = ($apellidoPaterno === 'UNDEFINED') ? '' : $apellidoPaterno;
-    $apellidoMaterno = ($apellidoMaterno === 'UNDEFINED') ? '' : $apellidoMaterno;
-    $nombres = ($nombres === 'UNDEFINED') ? '' : $nombres;
-
-		return [
-        'apellido_paterno' => $apellidoPaterno,
-        'apellido_materno' => $apellidoMaterno,
-        'nombres' => $nombres,
-        'dni' => $persona['dni'] ?? $dni,
-        'error' => false
-    ];
+			'apellido_paterno' => $apellidoPaterno,
+			'apellido_materno' => $apellidoMaterno,
+			'nombres' => $nombres,
+			'dni' => $data['dni'] ?? $dni,
+			'error' => false
+		];
 	}
+
 	public function buscarRUC($ruc){
 		
-		$token = env('RENIEC_TOKEN');
+		$token = env('PERUAPI_TOKEN');
 		$url = "https://dniruc.apisperu.com/api/v1/ruc/" . urlencode($ruc).'?token='.$token;
 		
 				

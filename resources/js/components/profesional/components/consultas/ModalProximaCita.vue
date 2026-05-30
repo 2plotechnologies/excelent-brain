@@ -108,6 +108,13 @@ export default{
 				let indexProf = this.profesional.findIndex(x=> x.id == this.idProfesional)
 				this.preciosFiltrados = this.precios.filter(x=> x.idClasificacion == this.profesional[indexProf].idProfesion)
 			}
+
+			// Restricción para paquetes Sucamec.
+			if (this.idServicio == 102) {
+				this.preciosFiltrados = this.precios.filter(x => x.id == 13);
+			} else if (this.idServicio == 103) {
+				this.preciosFiltrados = this.precios.filter(x => x.id == 14);
+			}
 		},
 		async listarPrecios(){
 			const resp = await this.axios.get('/api/listarPrecios')

@@ -1134,7 +1134,7 @@ class ExtrasController extends Controller
 			'nuevos' => 0,
 			'continuos' => 0,
 			'sesiones' => 0,
-			'servicio' => in_array($request->input('precioNuevo.tipo'), [1,2,3,6]) ? 1 : 0,
+			'servicio' => in_array($request->input('precioNuevo.tipo'), [1,2,3,6,7,8]) ? 1 : 0,
 			'target_age' => $request->input('precioNuevo.target_age', 0),
 		]);
 		return response()->json([ 'mensaje' => 'Registro exitoso' ]);

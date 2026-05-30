@@ -42,7 +42,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         average: 0,
         promoters: 0,
         neutral: 0,
-        detractors: 0
+        detractors: 0,
+        pct_promoters: 0,
+        pct_neutral: 0,
+        pct_detractors: 0
       }
     };
   },
@@ -309,11 +312,11 @@ var render = function render() {
     staticClass: "col-md-3 mb-2"
   }, [_c("div", {
     staticClass: "metric bg-info text-white"
-  }, [_c("span", [_vm._v("Promotores")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.summary.promoters))])])]), _vm._v(" "), _c("div", {
+  }, [_c("span", [_vm._v("Promotores")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.summary.promoters) + " (" + _vm._s(_vm.summary.pct_promoters) + "%)")])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-3 mb-2"
   }, [_c("div", {
     staticClass: "metric bg-warning text-dark"
-  }, [_c("span", [_vm._v("Detractores")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.summary.detractors))])])])]), _vm._v(" "), _c("div", {
+  }, [_c("span", [_vm._v("Detractores")]), _vm._v(" "), _c("strong", [_vm._v(_vm._s(_vm.summary.detractors) + " (" + _vm._s(_vm.summary.pct_detractors) + "%)")])])])]), _vm._v(" "), _c("div", {
     staticClass: "card border-0 shadow-sm"
   }, [_c("div", {
     staticClass: "card-body"

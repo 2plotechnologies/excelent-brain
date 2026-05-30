@@ -131,7 +131,7 @@ import moment from 'moment'
 		
 		data() {
 			return{
-				dataCita: null,
+				dataCita: null, isSubmitting: false,
 				caso: {pago:1, moneda:1, comprobante:'', continuo: 1, user_id:-1, rebaja:0, motivoRebaja:''}, maximo:15, monedas:[], neto:0, monto_adelanto:0,
         isProcessing: false
 			}
@@ -247,6 +247,7 @@ import moment from 'moment'
 	
 		watch:{
 			cita: function (){
+				this.isSubmitting = false;
 				this.dataCita = this.cita;
 				this.caso.pago = this.dataCita.payment?.pay_status;
 				this.caso.moneda = this.dataCita.payment?.payment_method == undefined ? 1:this.dataCita.payment?.payment_method ;
