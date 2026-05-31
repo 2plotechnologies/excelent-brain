@@ -2,8 +2,17 @@
 	<div class="container-fluid p-2">
 		<!-- Cabecera y Filtros -->
 		<div class="row mb-3 gx-3 align-items-center">
-			<div class="col-md-4">
+			<div class="col-md-3">
 				<h4 class="m-0 font-weight-bold text-primary"><i class="fa-regular fa-calendar-days"></i> Gestión de Horarios</h4>
+				<small class="text-muted font-weight-bold">Sede Admin: {{ nameSedeAdmin }}</small>
+			</div>
+			<div class="col-md-2">
+				<select v-model="sedeFiltro" class="form-select font-weight-bold shadow-sm">
+					<option value="">Todas las Sedes</option>
+					<option v-for="sede in sedes" :key="sede.id" :value="sede.id">
+						Sede: {{ sede.nombre }}
+					</option>
+				</select>
 			</div>
 			<div class="col-md-3">
 				<select v-model="profesionalElegido" class="form-select font-weight-bold shadow-sm" @change="cambioProfesional">
@@ -13,11 +22,11 @@
 					</option>
 				</select>
 			</div>
-			<div class="col-md-3">
+			<div class="col-md-2">
 				<input type="month" v-model="mesSeleccionado" class="form-control font-weight-bold shadow-sm" @change="cambioMes">
 			</div>
 			<div class="col-md-2 text-end">
-				<button class="btn btn-primary font-weight-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevoHorario" :disabled="!profesionalElegido">
+				<button class="btn btn-primary font-weight-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevoHorario" :disabled="!profesionalElegido" @click="abrirNuevoHorario">
 					<i class="fas fa-plus"></i> Nuevo
 				</button>
 			</div>
@@ -99,6 +108,16 @@
 								<select class="form-select" v-model="tipoHorario">
 									<option value="recurrente">Días Recurrentes (Semanal)</option>
 									<option value="especifico">Fechas Específicas (Mensual)</option>
+								</select>
+							</div>
+
+							<div class="mb-3">
+								<label class="form-label font-weight-bold">Sede</label>
+								<select class="form-select" v-model="nuevoHorario.idSede" required>
+									<option value="" disabled selected>Seleccione una Sede</option>
+									<option v-for="sede in sedes" :key="sede.id" :value="sede.id">
+										{{ sede.nombre }}
+									</option>
 								</select>
 							</div>
 
@@ -189,6 +208,12 @@ import moment from 'moment'
 
 export default {
 	name: 'GestionHorariosGlobal',
+	props: {
+		idSede: {
+			type: [Number, String],
+			default: ''
+		}
+	},
 	data() {
 		return {
 			profesionales: [],
@@ -197,6 +222,8 @@ export default {
 			bloqueos: [],
 			mesSeleccionado: moment().format('YYYY-MM'),
 			diasSemana: ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'],
+			sedes: [],
+			sedeFiltro: '',
 			
 			// Grid settings
 			horasGrid: [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
@@ -208,7 +235,8 @@ export default {
 				check_time: '',
 				departure_date: '',
 				daysSelected: [],
-				date: ''
+				date: '',
+				idSede: ''
 			},
 			guardando: false,
 			horarioSeleccionado: null,
@@ -231,6 +259,19 @@ export default {
 				});
 			}
 			return dias;
+		},
+		nameSedeAdmin() {
+			if (!this.sedes || this.sedes.length === 0) return 'Cargando...';
+			const sede = this.sedes.find(s => s.id == this.idSede);
+			return sede ? sede.nombre : 'General';
+		}
+	},
+	watch: {
+		idSede: {
+			immediate: true,
+			handler(newVal) {
+				this.sedeFiltro = newVal;
+			}
 		}
 	},
 	methods: {
@@ -240,6 +281,14 @@ export default {
 				this.profesionales = res.data;
 			} catch (err) {
 				console.error("Error cargando profesionales", err);
+			}
+		},
+		async obtenerSedes() {
+			try {
+				const res = await this.axios.get('/api/sedes');
+				this.sedes = res.data;
+			} catch (err) {
+				console.error("Error cargando sedes", err);
 			}
 		},
 		cambioProfesional() {
@@ -274,6 +323,11 @@ export default {
 			let especificos = this.horarios.filter(h => h.date === fechaCompleta);
 			let bloqueosHoy = this.bloqueos.filter(b => b.date === fechaCompleta);
 
+			if (this.sedeFiltro) {
+				recurrentes = recurrentes.filter(h => h.idSede == this.sedeFiltro);
+				especificos = especificos.filter(h => h.idSede == this.sedeFiltro);
+			}
+
 			let result = [];
 
 			recurrentes.forEach(h => {
@@ -295,6 +349,13 @@ export default {
 			});
 
 			return result;
+		},
+		abrirNuevoHorario() {
+			if (this.sedeFiltro) {
+				this.nuevoHorario.idSede = this.sedeFiltro;
+			} else {
+				this.nuevoHorario.idSede = this.idSede || '';
+			}
 		},
 		slotStyle(check_time, departure_date) {
 			if(!check_time || !departure_date) return {};
@@ -326,6 +387,11 @@ export default {
 			}
 		},
 		async guardarHorario() {
+			if (!this.nuevoHorario.idSede) {
+				this.$swal({icon: 'warning', title: 'Debe seleccionar una sede'});
+				return;
+			}
+
 			this.guardando = true;
 			
 			let peticiones = [];
@@ -352,7 +418,8 @@ export default {
 						check_time: this.nuevoHorario.check_time,
 						departure_date: this.nuevoHorario.departure_date,
 						date: fecha,
-						daysSelected: []
+						daysSelected: [],
+						idSede: this.nuevoHorario.idSede
 					};
 					peticiones.push(this.axios.post('/api/schedule', payload));
 				});
@@ -368,7 +435,8 @@ export default {
 					check_time: this.nuevoHorario.check_time,
 					departure_date: this.nuevoHorario.departure_date,
 					daysSelected: this.nuevoHorario.daysSelected,
-					date: ''
+					date: '',
+					idSede: this.nuevoHorario.idSede
 				};
 				peticiones.push(this.axios.post('/api/schedule', payload));
 			}
@@ -386,6 +454,7 @@ export default {
 					this.nuevoHorario.departure_date = '';
 					this.nuevoHorario.daysSelected = [];
 					this.nuevoHorario.date = '';
+					this.nuevoHorario.idSede = '';
 				} else {
 					this.$swal({icon: 'error', title: 'Hubo cruce con otros horarios'});
 				}
@@ -418,11 +487,29 @@ export default {
 			setTimeout(() => {
 				this.$swal({
 					title: 'Bloquear Horario',
-					text: 'Indique el motivo del bloqueo:',
-					input: 'text',
+					text: 'Seleccione el motivo del bloqueo:',
+					input: 'select',
+					inputOptions: {
+						'CUMPLEAÑOS --> RETRIBUIDO': 'CUMPLEAÑOS --> RETRIBUIDO',
+						'PERMISOS --> NO RETRIBUIDO': 'PERMISOS --> NO RETRIBUIDO',
+						'VACACIONES --> RETRIBUIDO': 'VACACIONES --> RETRIBUIDO',
+						'APOYO A GRABACIONES --> RETRIBUIDO': 'APOYO A GRABACIONES --> RETRIBUIDO',
+						'APOYO A GRUPOS TERAPEUTICOS --> RETRIBUIDO': 'APOYO A GRUPOS TERAPEUTICOS --> RETRIBUIDO',
+						'OTROS APOYOS --> RETRIBUIDO': 'OTROS APOYOS --> RETRIBUIDO'
+					},
+					inputPlaceholder: 'Seleccione un motivo',
 					showCancelButton: true,
 					confirmButtonText: 'Bloquear',
 					cancelButtonText: 'Cancelar',
+					inputValidator: (value) => {
+						return new Promise((resolve) => {
+							if (value) {
+								resolve();
+							} else {
+								resolve('Debe seleccionar un motivo');
+							}
+						});
+					}
 				}).then(async (result) => {
 					if (result.isConfirmed) {
 						try {
@@ -430,13 +517,13 @@ export default {
 								professional_id: this.profesionalElegido,
 								date: fecha,
 								schedule_id: horario.id,
-								motivo: result.value || 'Bloqueo'
+								motivo: result.value
 							});
-							this.$swal('Horario bloqueado con éxito');
+							this.$swal({icon: 'success', title: 'Horario bloqueado con éxito'});
 							this.obtenerHorarios();
 						} catch(err) {
 							console.error(err);
-							this.$swal('Error al bloquear horario');
+							this.$swal({icon: 'error', title: 'Error al bloquear horario'});
 						}
 					}
 				});
@@ -495,6 +582,7 @@ export default {
 	},
 	mounted() {
 		this.obtenerProfesionales();
+		this.obtenerSedes();
 	}
 }
 </script>

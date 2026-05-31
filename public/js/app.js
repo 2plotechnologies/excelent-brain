@@ -9148,6 +9148,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   data: function data() {
     return {
       dataCita: null,
+      isSubmitting: false,
       caso: {
         pago: 1,
         moneda: 1,
@@ -9308,6 +9309,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   watch: {
     cita: function cita() {
       var _this$dataCita$paymen, _this$dataCita$paymen2, _this$dataCita$paymen3, _this$dataCita$paymen4, _this$dataCita$paymen5;
+      this.isSubmitting = false;
       this.dataCita = this.cita;
       this.caso.pago = (_this$dataCita$paymen = this.dataCita.payment) === null || _this$dataCita$paymen === void 0 ? void 0 : _this$dataCita$paymen.pay_status;
       this.caso.moneda = ((_this$dataCita$paymen2 = this.dataCita.payment) === null || _this$dataCita$paymen2 === void 0 ? void 0 : _this$dataCita$paymen2.payment_method) == undefined ? 1 : (_this$dataCita$paymen3 = this.dataCita.payment) === null || _this$dataCita$paymen3 === void 0 ? void 0 : _this$dataCita$paymen3.payment_method;
@@ -20144,6 +20146,17 @@ Object.defineProperty(vue__WEBPACK_IMPORTED_MODULE_0__["default"].prototype, '$t
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_9__["default"]({
   mode: 'history',
   routes: _routes__WEBPACK_IMPORTED_MODULE_4__.routes
+});
+axios__WEBPACK_IMPORTED_MODULE_3___default().interceptors.response.use(function (response) {
+  return response;
+}, function (error) {
+  if (error.response && (error.response.status === 401 || error.response.status === 419)) {
+    localStorage.removeItem('token');
+    if (router.currentRoute.name !== 'login') {
+      router.push('/login');
+    }
+  }
+  return Promise.reject(error);
 });
 router.beforeEach(function (to, from, next) {
   var element = document.getElementsByClassName('modal-backdrop');

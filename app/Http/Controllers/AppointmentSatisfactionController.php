@@ -113,14 +113,26 @@ class AppointmentSatisfactionController extends Controller
         }
 
         $rows = $query->get();
+        $total = $rows->count();
+        $promoters = $rows->where('rating', '>=', 9)->count();
+        $neutral = $rows->whereBetween('rating', [7, 8])->count();
+        $detractors = $rows->where('rating', '<=', 6)->count();
+
+        $pctPromoters = $total ? ($promoters / $total) * 100 : 0;
+        $pctNeutral = $total ? ($neutral / $total) * 100 : 0;
+        $pctDetractors = $total ? ($detractors / $total) * 100 : 0;
+        $average = $total ? round($pctPromoters - $pctDetractors, 2) . '%' : '0%';
 
         return response()->json([
             'summary' => [
-                'total' => $rows->count(),
-                'average' => $rows->count() ? round($rows->avg('rating'), 2) : 0,
-                'promoters' => $rows->where('rating', '>=', 9)->count(),
-                'neutral' => $rows->whereBetween('rating', [7, 8])->count(),
-                'detractors' => $rows->where('rating', '<=', 6)->count(),
+                'total' => $total,
+                'average' => $average,
+                'promoters' => $promoters,
+                'neutral' => $neutral,
+                'detractors' => $detractors,
+                'pct_promoters' => round($pctPromoters, 2),
+                'pct_neutral' => round($pctNeutral, 2),
+                'pct_detractors' => round($pctDetractors, 2),
             ],
             'data' => $rows->values(),
         ]);

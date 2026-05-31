@@ -222,6 +222,40 @@ var render = function render() {
   }, [_vm._m(9), _vm._v(" "), _c("table", {
     staticClass: "table table-hover"
   }, [_vm._m(10), _vm._v(" "), _c("tbody", _vm._l(_vm.precios, function (precio, index) {
+    return precio.idClasificacion == 8 && precio.servicio == 1 ? _c("tr", [_c("td", [_vm._v(_vm._s(precio.descripcion))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.nuevos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.continuos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.especialMembresias).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(precio.sesiones))]), _vm._v(" "), _c("td", [_c("button", {
+      staticClass: "btn btn-sm btn-outline-primary",
+      on: {
+        click: function click($event) {
+          return _vm.editarPrecio(index, precio.idClasificacion);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "far fa-edit"
+    })])])]) : _vm._e();
+  }), 0)])])]), _vm._v(" "), _c("div", {
+    staticClass: "card my-2"
+  }, [_c("div", {
+    staticClass: "card-body"
+  }, [_vm._m(11), _vm._v(" "), _c("table", {
+    staticClass: "table table-hover"
+  }, [_vm._m(12), _vm._v(" "), _c("tbody", _vm._l(_vm.precios, function (precio, index) {
+    return precio.idClasificacion == 7 && precio.servicio == 1 ? _c("tr", [_c("td", [_vm._v(_vm._s(precio.descripcion))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.nuevos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.continuos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.especialMembresias).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(precio.sesiones))]), _vm._v(" "), _c("td", [_c("button", {
+      staticClass: "btn btn-sm btn-outline-primary",
+      on: {
+        click: function click($event) {
+          return _vm.editarPrecio(index, precio.idClasificacion);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "far fa-edit"
+    })])])]) : _vm._e();
+  }), 0)])])]), _vm._v(" "), _c("div", {
+    staticClass: "card my-2"
+  }, [_c("div", {
+    staticClass: "card-body"
+  }, [_vm._m(13), _vm._v(" "), _c("table", {
+    staticClass: "table table-hover"
+  }, [_vm._m(14), _vm._v(" "), _c("tbody", _vm._l(_vm.precios, function (precio, index) {
     return precio.servicio == 0 ? _c("tr", [_c("td", [_vm._v(_vm._s(precio.descripcion))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.nuevos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.continuos).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v("S/ " + _vm._s(parseFloat(precio.especialMembresias).toFixed(2)))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(precio.sesiones))]), _vm._v(" "), _c("td", [_c("button", {
       staticClass: "btn btn-sm btn-outline-primary",
       on: {
@@ -290,6 +324,26 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("thead", [_c("tr", [_c("th", [_vm._v("Servicio")]), _vm._v(" "), _c("th", [_vm._v("Precio nuevos")]), _vm._v(" "), _c("th", [_vm._v("Precio continuos")]), _vm._v(" "), _c("th", [_vm._v("Precio Club Exc.")]), _vm._v(" "), _c("th", [_vm._v("Duración")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("p", {
+    staticClass: "text-muted"
+  }, [_c("strong", [_vm._v("Precios de Tecnólogo")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Servicio")]), _vm._v(" "), _c("th", [_vm._v("Precio nuevos")]), _vm._v(" "), _c("th", [_vm._v("Precio continuos")]), _vm._v(" "), _c("th", [_vm._v("Precio Club Exc.")]), _vm._v(" "), _c("th", [_vm._v("N° Sesiones")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("p", {
+    staticClass: "text-muted"
+  }, [_c("strong", [_vm._v("Precios de Terapista")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Servicio")]), _vm._v(" "), _c("th", [_vm._v("Precio nuevos")]), _vm._v(" "), _c("th", [_vm._v("Precio continuos")]), _vm._v(" "), _c("th", [_vm._v("Precio Club Exc.")]), _vm._v(" "), _c("th", [_vm._v("N° Sesiones")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -610,11 +664,19 @@ var render = function render() {
     attrs: {
       value: "3"
     }
-  }, [_vm._v("Certificabdos")]), _vm._v(" "), _c("option", {
+  }, [_vm._v("Certificados")]), _vm._v(" "), _c("option", {
     attrs: {
       value: "6"
     }
   }, [_vm._v("Nutrición")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "7"
+    }
+  }, [_vm._v("Terapia")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "8"
+    }
+  }, [_vm._v("Tecnología médica")]), _vm._v(" "), _c("option", {
     attrs: {
       value: "4"
     }

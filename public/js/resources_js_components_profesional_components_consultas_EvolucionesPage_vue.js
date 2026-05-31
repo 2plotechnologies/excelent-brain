@@ -1730,6 +1730,17 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           return x.idClasificacion == _this2.profesional[indexProf].idProfesion;
         });
       }
+
+      // Restricción para paquetes Sucamec.
+      if (this.idServicio == 102) {
+        this.preciosFiltrados = this.precios.filter(function (x) {
+          return x.id == 13;
+        });
+      } else if (this.idServicio == 103) {
+        this.preciosFiltrados = this.precios.filter(function (x) {
+          return x.id == 14;
+        });
+      }
     },
     listarPrecios: function listarPrecios() {
       var _this3 = this;
