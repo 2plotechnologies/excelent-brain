@@ -87,6 +87,7 @@ const HomeRecordatorios = () => import('./components/recepcionista/components/re
 const HomeLimbo = () => import('./components/recepcionista/components/citas/HomeLimbo.vue')
 const HomeAltas = () => import('./components/shared/HomeAltas.vue')
 const HomeSeguimiento = () => import('./components/recepcionista/components/pacientes/HomeSeguimiento.vue')
+const HomePacienteCertificado = () => import('./components/recepcionista/components/pacientes/HomePacienteCertificado.vue')
 
 
 
@@ -542,6 +543,11 @@ export const routes = [
         path: 'pacientes/seguimiento',
         name: 'seguimientoRecepcionista',
         component: HomeSeguimiento
+      },
+      {
+        path: 'pacientes/certificado',
+        name: 'certificadoRecepcionista',
+        component: HomePacienteCertificado
       },
       {
         path: 'reportes',

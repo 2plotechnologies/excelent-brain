@@ -290,6 +290,13 @@
 						</li>
 
 						<li class="nav-item nav__list" @click="activeSidebar()">
+								<router-link  to="/recepcionista/pacientes/certificado" class="nav-link">
+										<i class="fas fa-certificate"></i>
+										<span>Certificados</span>
+								</router-link>
+						</li>
+
+						<li class="nav-item nav__list" @click="activeSidebar()">
 								<router-link  to="/recepcionista/home" class="nav-link">
 										<i class="fas fa-calendar-check"></i>
 										<span>Citas</span>
