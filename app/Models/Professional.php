@@ -9,17 +9,17 @@ class Professional extends Model
 {
     use HasFactory;
     protected $fillable=['name','lastname','phone','profession', 'idProfesion','cv_description','photo','signing','user_id', 'idProfesion', 'activo', 'especialidad_receta', 'cmp', 'rne', 'cpsp'];
-    
+
     // Verificar si el profesional puede emitir recetas (debe ser Psiquiatra con CMP y RNE)
     public function puedeEmitirRecetas(){
         return $this->profession === 'Psiquiatra' && !empty($this->cmp) && !empty($this->rne);
     }
-    
+
     // Verificar si el profesional puede mostrar su firma en recetas
     public function puedeMostrarFirma(){
         return !empty($this->signing) && $this->signing !== '-';
     }
-    
+
     //Relación de uno a muchos Professional-Schedule
     public function schedules() {
         return $this->hasMany("App\Models\Schedule");
@@ -43,18 +43,34 @@ class Professional extends Model
      {
          return $this->hasOne("App\Models\User");
      }
-    //Relación de uno a muchos Professiobnal-Medical_evolutions
+    //Relación de uno a muchos Professiobnal-Medical_evolutions.
     public function medical_evolutions() {
         return $this->hasMany("App\Models\Medical_evolution");
     }
 
-		/* --- Lista todos los horarios no relacionados pero no reconoce el día*/
+		/* --- Lista todos los horarios no relacionados pero no reconoce el día. */
 		public function schedulesNoUsados()
 		{
 			return $this->schedules()
 				->whereDoesntHave('appointments')
 				->get();
-		} 
+		}
 
-     
+        // Relación uno a muchos Professional-Attendances.
+        public function attendances()
+        {
+            return $this->hasMany(EmployeeAttendance::class);
+        }
+
+        // Relación uno a muchos Professional-ExtraSchedules.
+        public function extraSchedules()
+        {
+            return $this->hasMany(ProfessionalExtraSchedule::class);
+        }
+
+        // Relación uno a uno Professional-SalaryConfig
+        public function salaryConfig()
+        {
+            return $this->hasOne(EmployeeSalaryConfig::class);
+        }
 }

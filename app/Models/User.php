@@ -47,4 +47,16 @@ class User extends Authenticatable
     {
         return $this->hasOne("App\Models\Professional");
     }
+
+    // Relación uno a muchos User-Attendances
+    public function attendances()
+    {
+        return $this->hasMany(EmployeeAttendance::class);
+    }
+
+    // Relación uno a uno User-SalaryConfig
+    public function salaryConfig()
+    {
+        return $this->hasOne(EmployeeSalaryConfig::class);
+    }
 }

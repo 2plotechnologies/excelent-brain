@@ -93,6 +93,12 @@
 								</router-link>
 						</li>
 						<li class="nav-item nav__list" @click="activeSidebar()">
+							<router-link  to="/administrador/rrhh" class="nav-link">
+									<i class="fas fa-users-cog"></i>
+									<span>Recursos Humanos</span>
+							</router-link>
+						</li>
+						<li class="nav-item nav__list" @click="activeSidebar()">
 							<router-link  to="/administrador/usuarios-simples" class="nav-link">
 									<i class="fas fa-file-alt"></i>
 									<span>Usuarios</span>

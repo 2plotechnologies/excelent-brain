@@ -26,6 +26,8 @@ const HomeSedes = () => import('./components/administrador/views/HomeSedes.vue')
 const HomeSatisfaccionClientes = () => import('./components/administrador/views/HomeSatisfaccionClientes.vue');
 const GestionHorariosGlobal = () => import('./components/administrador/views/GestionHorariosGlobal.vue');
 
+const HomeRRHH = () => import('./components/administrador/views/rrhh/HomeRRHH.vue');
+
 const HomeAdministradorRouterReportes = () => import('./components/administrador/views/reportes/HomeRouterReportes.vue');
 const HomeAdministradorReportes = () => import('./components/administrador/views/reportes/HomeReportes.vue');
 const HomeAdministradorReporteMedicamentos = () => import('./components/administrador/views/reportes/ReporteMedicamentos.vue')
@@ -436,6 +438,11 @@ export const routes = [
         path: '/administrador/notas-credito',
         name: 'notasCreditoAdmin',
         component: NotasCredito
+      },
+      {
+        path: '/administrador/rrhh',
+        name: 'rrhhAdmin',
+        component: HomeRRHH
       },
       {
         path: '/administrador/usuarios-simples',

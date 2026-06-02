@@ -36,6 +36,10 @@ use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\QuestionnaireController;
 use App\Http\Controllers\HorasTrabajadasController;
 use App\Http\Controllers\SedeController;
+use App\Http\Controllers\EmployeeAttendanceController;
+use App\Http\Controllers\EmployeePayrollController;
+use App\Http\Controllers\RRHHDashboardController;
+use App\Http\Controllers\PacienteCertificadoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -236,7 +240,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('listarPreciosTodos', [ExtrasController::class, 'listarPreciosTodos']);
         Route::post('reportsJimmy', [SimpleController::class, 'reportsJimmy']);
         Route::get('seguimiento-crm', [ExtrasController::class, 'seguimientoCrm']);
-        
+
         // Horas Trabajadas y Bloqueos
         Route::get('reporte-horas-trabajadas', [HorasTrabajadasController::class, 'getReporte']);
         Route::get('satisfaccion-clientes', [AppointmentSatisfactionController::class, 'report']);
@@ -247,7 +251,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // ── REPORTS (incluyendo profesional) ──────────────────────────────────────────────────
     Route::middleware('role:administrador,recepcionista,profesional')->group(function () {
         Route::post('buscarCartera', [ExtrasController::class, 'buscarCartera']);
-    }); 
+    });
 
     // ── EXTRAS ────────────────────────────────────────────────────────────────
     Route::group([], function () {
@@ -373,7 +377,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/seguimientosCRM/{id}', [SeguimientoCRMController::class, 'update']);
     Route::delete('/seguimientosCRM/{id}', [SeguimientoCRMController::class, 'destroy']);
 
-    //Reportes      
+    //Reportes
     Route::prefix('reportes')->group(function () {
         Route::get('/medios-pago', [ReporteController::class, 'mediosPago']);
         Route::get('/ingresos', [ReporteController::class, 'ingresos']);
@@ -387,4 +391,83 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/reprogramaciones', [ReporteController::class, 'reprogramaciones']);
         Route::get('/altas', [ReporteController::class, 'altas']);
     });
+
+    // Employee Attendances
+    Route::get(
+        '/employee-attendances',
+        [EmployeeAttendanceController::class, 'index']
+    );
+
+    Route::post(
+        '/employee-attendances',
+        [EmployeeAttendanceController::class, 'store']
+    );
+
+    Route::get(
+        '/employee-attendances/{id}',
+        [EmployeeAttendanceController::class, 'show']
+    );
+
+    Route::put(
+        '/employee-attendances/{id}',
+        [EmployeeAttendanceController::class, 'update']
+    );
+
+    Route::delete(
+        '/employee-attendances/{id}',
+        [EmployeeAttendanceController::class, 'destroy']
+    );
+
+    Route::post(
+        '/employee-attendances/quick-check-in',
+        [EmployeeAttendanceController::class, 'quickCheckIn']
+    );
+
+    Route::post(
+        '/employee-attendances/quick-check-out',
+        [EmployeeAttendanceController::class, 'quickCheckOut']
+    );
+
+    // Employee Payroll.
+    Route::get(
+        '/employee-payrolls',
+        [EmployeePayrollController::class, 'index']
+    );
+    Route::post(
+        '/employee-payrolls/generate',
+        [EmployeePayrollController::class, 'generatePayroll']
+    );
+    Route::get(
+        '/employee-payrolls/{id}',
+        [EmployeePayrollController::class, 'show']
+    );
+    Route::put(
+        '/employee-payrolls/{id}',
+        [EmployeePayrollController::class, 'update']
+    );
+    Route::delete(
+        '/employee-payrolls/{id}',
+        [EmployeePayrollController::class, 'destroy']
+    );
+    Route::post(
+        '/employee-payrolls/{id}/toggle-payment',
+        [EmployeePayrollController::class, 'togglePaymentStatus']
+    );
+
+    // RRHH Dashboard
+    Route::get(
+        '/rrhh/dashboard',
+        [RRHHDashboardController::class, 'index']
+    );
+
+    // =========================================
+    // PACIENTE CERTIFICADOS.
+    // =========================================
+
+    Route::get('/paciente-certificado', [PacienteCertificadoController::class, 'index']);
+    Route::post('/paciente-certificado', [PacienteCertificadoController::class, 'store']);
+    Route::get('/paciente-certificado/{id}', [PacienteCertificadoController::class, 'show']);
+    Route::put('/paciente-certificado/{id}', [PacienteCertificadoController::class, 'update']);
+    Route::delete('/paciente-certificado/{id}', [PacienteCertificadoController::class, 'destroy']);
+
 });
