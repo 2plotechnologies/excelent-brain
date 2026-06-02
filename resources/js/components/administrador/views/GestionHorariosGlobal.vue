@@ -132,9 +132,9 @@
 							</div>
 
 							<div class="mb-3" v-if="tipoHorario === 'especifico'">
-								<label class="form-label font-weight-bold">Seleccionar Fecha (Creación Mensual)</label>
+								<label class="form-label font-weight-bold">Seleccionar Fecha Específica</label>
 								<input type="date" class="form-control" v-model="nuevoHorario.date" required>
-								<small class="text-muted d-block mt-1">Al elegir una fecha (ej. Martes 15), se crearán horarios para <strong>todos los martes de ese mes</strong> automáticamente.</small>
+								<small class="text-muted d-block mt-1">Se creará un horario <strong>únicamente para la fecha seleccionada</strong>.</small>
 							</div>
 
 							<div class="row">
@@ -191,8 +191,16 @@
 								<i :class="horarioSeleccionado.active ? 'fas fa-pause' : 'fas fa-play'"></i> 
 								{{ horarioSeleccionado.active ? 'Desactivar Recurrencia' : 'Activar Recurrencia' }}
 							</button>
-							<button class="btn btn-sm btn-outline-danger" @click="eliminarHorario(horarioSeleccionado.id)">
-								<i class="fas fa-trash"></i> Eliminar Horario Base
+
+							<button class="btn btn-sm mt-1 btn-outline-warning" v-if="(!horarioSeleccionado.date || horarioSeleccionado.date === '') && horarioSeleccionado.active" @click="crearExcepcion(horarioSeleccionado.id, horarioSeleccionadoContextoFecha)">
+								<i class="fas fa-calendar-times"></i> Desactivar en esta fecha
+							</button>
+							<button class="btn btn-sm mt-1 btn-outline-success" v-if="(!horarioSeleccionado.date || horarioSeleccionado.date === '') && !horarioSeleccionado.active" @click="crearExcepcion(horarioSeleccionado.id, horarioSeleccionadoContextoFecha)">
+								<i class="fas fa-calendar-check"></i> Activar en esta fecha
+							</button>
+
+							<button class="btn btn-sm btn-outline-danger mt-1" @click="eliminarHorario(horarioSeleccionado.id)">
+								<i class="fas fa-trash"></i> {{ (!horarioSeleccionado.date || horarioSeleccionado.date === '') ? 'Eliminar Horario Recurrente' : 'Eliminar Excepción / Específico' }}
 							</button>
 						</div>
 					</div>
@@ -321,16 +329,21 @@ export default {
 
 			let recurrentes = this.horarios.filter(h => (h.date === null || h.date === '') && h.day && h.day.toLowerCase() === nombreDia.toLowerCase());
 			let especificos = this.horarios.filter(h => h.date === fechaCompleta);
-			let bloqueosHoy = this.bloqueos.filter(b => b.date === fechaCompleta);
 
 			if (this.sedeFiltro) {
 				recurrentes = recurrentes.filter(h => h.idSede == this.sedeFiltro);
 				especificos = especificos.filter(h => h.idSede == this.sedeFiltro);
 			}
 
-			let result = [];
+			// Resolver overrides: Si hay un específico para esta hora y sede, el recurrente se oculta
+			let recurrentesValidos = recurrentes.filter(r => {
+				return !especificos.some(e => e.check_time === r.check_time && e.idSede === r.idSede);
+			});
 
-			recurrentes.forEach(h => {
+			let result = [];
+			let bloqueosHoy = this.bloqueos.filter(b => b.date === fechaCompleta);
+
+			recurrentesValidos.forEach(h => {
 				let blocked = bloqueosHoy.find(b => b.schedule_id == h.id);
 				if (blocked) {
 					result.push({ ...h, isBlocked: true, appointment_id: blocked.id, block_reason: blocked.recomendation });
@@ -397,33 +410,15 @@ export default {
 			let peticiones = [];
 			
 			if (this.tipoHorario === 'especifico' && this.nuevoHorario.date) {
-				let fechaSeleccionada = moment(this.nuevoHorario.date, 'YYYY-MM-DD');
-				let mes = fechaSeleccionada.month();
-				let diaSemanaTarget = fechaSeleccionada.day();
-				
-				let iterador = fechaSeleccionada.clone().startOf('month');
-				while (iterador.day() !== diaSemanaTarget) {
-					iterador.add(1, 'day');
-				}
-				
-				let fechasDelMes = [];
-				while (iterador.month() === mes) {
-					fechasDelMes.push(iterador.format('YYYY-MM-DD'));
-					iterador.add(7, 'days');
-				}
-				
-				fechasDelMes.forEach(fecha => {
-					let payload = {
-						professional_id: this.profesionalElegido,
-						check_time: this.nuevoHorario.check_time,
-						departure_date: this.nuevoHorario.departure_date,
-						date: fecha,
-						daysSelected: [],
-						idSede: this.nuevoHorario.idSede
-					};
-					peticiones.push(this.axios.post('/api/schedule', payload));
-				});
-				
+				let payload = {
+					professional_id: this.profesionalElegido,
+					check_time: this.nuevoHorario.check_time,
+					departure_date: this.nuevoHorario.departure_date,
+					date: this.nuevoHorario.date,
+					daysSelected: [],
+					idSede: this.nuevoHorario.idSede
+				};
+				peticiones.push(this.axios.post('/api/schedule', payload));
 			} else {
 				if (this.nuevoHorario.daysSelected.length === 0) {
 					this.$swal({icon: 'warning', title: 'Debe seleccionar al menos un día'});
@@ -578,6 +573,24 @@ export default {
 					}
 				}
 			});
+		},
+		async crearExcepcion(schedule_id, fecha) {
+			try {
+				const res = await this.axios.post('/api/schedule/exception', {
+					schedule_id: schedule_id,
+					date: fecha
+				});
+				if (res.data.mensaje === 'success') {
+					this.$swal({icon: 'success', title: 'Excepción aplicada', timer: 1500, showConfirmButton: false});
+					this.obtenerHorarios();
+					this.cerrarDetallesHorario();
+				} else {
+					this.$swal({icon: 'error', title: 'Error al aplicar excepción'});
+				}
+			} catch(err) {
+				console.error(err);
+				this.$swal({icon: 'error', title: 'Error de servidor'});
+			}
 		}
 	},
 	mounted() {

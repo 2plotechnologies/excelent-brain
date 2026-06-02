@@ -50,8 +50,6 @@ class ScheduleController extends Controller
         ]);
     }
     public function horarioOcupado($id, $fecha){
-			//var_dump($fecha);die();
-        
       $appointment = Appointment::where('professional_id', $id)
 			->whereDate('appointments.date', '=', $fecha)
 			->where('appointments.status', '<>', 6) // limbo
@@ -60,18 +58,30 @@ class ScheduleController extends Controller
 			->with('schedule')
 			->get();
         
-			$solos = Schedule::where('professional_id', $id)
-            ->where('active', 1)
+			$schedules = Schedule::where('professional_id', $id)
             ->where(function($query) use ($fecha) {
                 $query->whereNull('date')
                       ->orWhereDate('date', $fecha);
             })
 			->orderBy('check_time', 'asc')
 			->get();
+            
+            $resolved = collect();
+            $grouped = $schedules->groupBy(function($item) {
+                return $item->check_time . '-' . $item->idSede;
+            });
+            
+            foreach ($grouped as $group) {
+                $specific = $group->firstWhere('date', '!=', null);
+                $finalSchedule = $specific ? $specific : $group->first();
+                if ($finalSchedule->active == 1) {
+                    $resolved->push($finalSchedule);
+                }
+            }
         
 			return response()->json([
 				'invalidos' => $appointment,
-				'solos' => $solos,
+				'solos' => $resolved->values(),
 			]);
     }
 		public function horarioLibre($id, $fecha){
@@ -81,9 +91,8 @@ class ScheduleController extends Controller
 			$dia = $dias[$indice];
 
 			//Lista el día y el id de profesional, luego compara con appointments y saca los que NO estan en appointments
-			$citasLibres = Schedule::where('day', $dia)
+			$schedules = Schedule::where('day', $dia)
 			->where('professional_id', $id)
-            ->where('active', 1)
             ->where(function($query) use ($fecha) {
                 $query->whereNull('date')
                       ->orWhereDate('date', $fecha);
@@ -97,10 +106,21 @@ class ScheduleController extends Controller
 				->whereIn('appointments.status', [1,2,5]);
 			})
 			->get();
+            
+            $resolved = collect();
+            $grouped = $schedules->groupBy(function($item) {
+                return $item->check_time . '-' . $item->idSede;
+            });
+            
+            foreach ($grouped as $group) {
+                $specific = $group->firstWhere('date', '!=', null);
+                $finalSchedule = $specific ? $specific : $group->first();
+                if ($finalSchedule->active == 1) {
+                    $resolved->push($finalSchedule);
+                }
+            }
 
-			return $citasLibres;
-
-			
+			return $resolved->values();
 		}
     public function horarioCuadernoOcupado($fecha, $dia, Request $request){
 			$idSede = $request->query('idSede', null);
@@ -155,9 +175,7 @@ class ScheduleController extends Controller
         }
 
 
-       $solosQuery = Schedule::selectRaw('MIN(id) as id, professional_id, day, check_time, departure_date')
-        ->where('day', '=', $dia)
-        ->where('active', 1)
+       $solosQuery = Schedule::where('day', '=', $dia)
         ->where(function($query) use ($fecha) {
             $query->whereNull('date')
                   ->orWhereDate('date', $fecha);
@@ -169,10 +187,23 @@ class ScheduleController extends Controller
             $solosQuery->where('idSede', $idSede);
         }
 
-        $solos = $solosQuery->groupBy('professional_id', 'day', 'check_time', 'departure_date')
-        ->orderBy('professional_id', 'asc')
+        $schedules = $solosQuery->orderBy('professional_id', 'asc')
         ->orderBy('check_time', 'asc')
         ->get();
+        
+        $resolved = collect();
+        $grouped = $schedules->groupBy(function($item) {
+            return $item->professional_id . '-' . $item->check_time . '-' . $item->idSede;
+        });
+        
+        foreach ($grouped as $group) {
+            $specific = $group->firstWhere('date', '!=', null);
+            $finalSchedule = $specific ? $specific : $group->first();
+            if ($finalSchedule->active == 1) {
+                $resolved->push($finalSchedule);
+            }
+        }
+        $solos = $resolved->values();
 
         return response()->json([
             'invalidos' => $appointment,
@@ -180,65 +211,27 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function verifHours($check_time, $departure_date, $professional_id, $dia){
-        $schedule = Schedule::where('check_time',$check_time)
-                            ->where('departure_date', $departure_date)
-                            ->where('professional_id', $professional_id)
-                            ->where('day', $dia)
-                            ->get();
-        if($schedule->isNotEmpty()){
-            return false;
-        }else{
-            return true;
+    public function validateSchedule($check_time, $departure_date, $professional_id, $dia, $idSede = 1, $date = null, $ignore_id = null){
+        $query = Schedule::where('professional_id', $professional_id)
+            ->where('day', $dia)
+            ->where('idSede', $idSede)
+            ->where(function($q) use ($check_time, $departure_date) {
+                $q->where('check_time', '<', $departure_date)
+                  ->where('departure_date', '>', $check_time);
+            });
+            
+        if ($date) {
+            $query->where(function($q) use ($date) {
+                $q->whereNull('date')->orWhere('date', $date);
+            });
         }
-    }
-
-    public function verifEntre($check_time, $departure_date, $professional_id, $dia){
-        $schedule = Schedule::where('professional_id', $professional_id)
-                            ->where('day', $dia)
-                            ->where(function($q) use ($check_time,$departure_date){
-                                $q->where('check_time','<',$check_time)
-                                    ->where('departure_date','>', $check_time)
-                                    ->orWhere(function($query) use ($departure_date){
-                                        $query->where('check_time','>',$departure_date)
-                                                ->where('departure_date','<', $departure_date);
-                                    });
-                            })
-                            ->get();
-
-        if($schedule->isNotEmpty()){
-            return false;
-        }else{
-            return true;
+        
+        if ($ignore_id) {
+            $query->where('id', '!=', $ignore_id);
         }
-    }
-
-    public function validateSchedule($check_time, $departure_date, $professional_id, $dia){
-
-        $salida_max = DB::table('schedules')->where('day',$dia)->where('professional_id',$professional_id)->max('departure_date');
-        $entrada_min = DB::table('schedules')->where('day',$dia)->where('professional_id',$professional_id)->min('check_time');
-
-        if($check_time<$entrada_min){
-            if($departure_date>$entrada_min){
-                $authTime = false;
-            }else{
-                if($this->verifHours($check_time, $departure_date, $professional_id, $dia)){
-                    $authTime = true;
-                }else{
-                    $authTime = false;
-                }
-            }
-        }else if($entrada_min <= $check_time && $check_time < $salida_max){
-            if($this->verifHours($check_time, $departure_date, $professional_id, $dia) && $this->verifEntre($check_time, $departure_date, $professional_id, $dia)){
-                $authTime = true;
-            }else{
-                $authTime = false;
-            }
-        }else if($salida_max <= $departure_date){
-            $authTime = true;
-        }
-
-        return $authTime;
+        
+        $conflicts = $query->count();
+        return $conflicts === 0;
     }
 
     /**
@@ -255,6 +248,8 @@ class ScheduleController extends Controller
         $dias = $request->get('daysSelected', []);
         $date = $request->get('date', null);
 
+        $idSede = $request->get('idSede', 1);
+
         if ($date && empty($dias)) {
             $carbonFecha = Carbon::parse($date);
             $diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
@@ -265,7 +260,7 @@ class ScheduleController extends Controller
 
         foreach ($dias as $dia)
         {
-            if($this->validateSchedule($check_time, $departure_date, $professional_id, $dia)){
+            if($this->validateSchedule($check_time, $departure_date, $professional_id, $dia, $idSede, $date)){
                 Schedule::create([
                     'check_time' => $check_time,
                     'departure_date' => $departure_date,
@@ -273,7 +268,7 @@ class ScheduleController extends Controller
                     'date' => $date,
                     'active' => 1,
                     'professional_id' => $professional_id,
-                    'idSede' => $request->get('idSede', 1)
+                    'idSede' => $idSede
                 ]);
 
                 $res = 'Exito';
@@ -329,13 +324,16 @@ class ScheduleController extends Controller
         } else {
             $day = $request->get('daySelected') ?? $scheduleToUpdate->day; // Fallback
         }
+        
+        $idSede = $request->get('idSede', $scheduleToUpdate->idSede);
 
-        if($this->validateSchedule($check_time, $departure_date, $scheduleToUpdate->professional_id, $day)){
+        if($this->validateSchedule($check_time, $departure_date, $scheduleToUpdate->professional_id, $day, $idSede, $date, $id)){
             Schedule::where('id',$id)->update([
                 'check_time' => $check_time,
                 'departure_date' => $departure_date,
                 'day' => $day,
-                'date' => $date
+                'date' => $date,
+                'idSede' => $idSede
             ]);
 
             Appointment::where('schedule_id', $id)->update([
@@ -388,5 +386,43 @@ class ScheduleController extends Controller
             return response()->json(['mensaje' => 'success', 'active' => $schedule->active]);
         }
         return response()->json(['mensaje' => 'failed'], 404);
+    }
+
+    public function createException(Request $request)
+    {
+        $base_id = $request->get('schedule_id');
+        $date = $request->get('date');
+        
+        $baseSchedule = Schedule::find($base_id);
+        if (!$baseSchedule) {
+            return response()->json(['mensaje' => 'failed', 'error' => 'Base schedule not found'], 404);
+        }
+
+        // Check if exception already exists
+        $existing = Schedule::where('professional_id', $baseSchedule->professional_id)
+            ->where('idSede', $baseSchedule->idSede)
+            ->where('check_time', $baseSchedule->check_time)
+            ->where('date', $date)
+            ->first();
+
+        if ($existing) {
+            // Toggle it
+            $existing->active = !$existing->active;
+            $existing->save();
+            return response()->json(['mensaje' => 'success', 'active' => $existing->active]);
+        }
+
+        // Create new exception
+        $exception = Schedule::create([
+            'check_time' => $baseSchedule->check_time,
+            'departure_date' => $baseSchedule->departure_date,
+            'day' => $baseSchedule->day,
+            'date' => $date,
+            'active' => !$baseSchedule->active,
+            'professional_id' => $baseSchedule->professional_id,
+            'idSede' => $baseSchedule->idSede
+        ]);
+
+        return response()->json(['mensaje' => 'success', 'active' => $exception->active]);
     }
 }

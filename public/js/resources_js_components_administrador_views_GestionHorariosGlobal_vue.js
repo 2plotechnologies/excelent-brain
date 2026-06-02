@@ -208,9 +208,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       var especificos = this.horarios.filter(function (h) {
         return h.date === fechaCompleta;
       });
-      var bloqueosHoy = this.bloqueos.filter(function (b) {
-        return b.date === fechaCompleta;
-      });
       if (this.sedeFiltro) {
         recurrentes = recurrentes.filter(function (h) {
           return h.idSede == _this5.sedeFiltro;
@@ -219,8 +216,18 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           return h.idSede == _this5.sedeFiltro;
         });
       }
+
+      // Resolver overrides: Si hay un específico para esta hora y sede, el recurrente se oculta
+      var recurrentesValidos = recurrentes.filter(function (r) {
+        return !especificos.some(function (e) {
+          return e.check_time === r.check_time && e.idSede === r.idSede;
+        });
+      });
       var result = [];
-      recurrentes.forEach(function (h) {
+      var bloqueosHoy = this.bloqueos.filter(function (b) {
+        return b.date === fechaCompleta;
+      });
+      recurrentesValidos.forEach(function (h) {
         var blocked = bloqueosHoy.find(function (b) {
           return b.schedule_id == h.id;
         });
@@ -296,7 +303,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     guardarHorario: function guardarHorario() {
       var _this6 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var peticiones, fechaSeleccionada, mes, diaSemanaTarget, iterador, fechasDelMes, payload, resultados, exito;
+        var peticiones, payload, _payload, resultados, exito;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
@@ -313,37 +320,23 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _this6.guardando = true;
               peticiones = [];
               if (!(_this6.tipoHorario === 'especifico' && _this6.nuevoHorario.date)) {
-                _context4.next = 16;
+                _context4.next = 10;
                 break;
               }
-              fechaSeleccionada = moment__WEBPACK_IMPORTED_MODULE_0___default()(_this6.nuevoHorario.date, 'YYYY-MM-DD');
-              mes = fechaSeleccionada.month();
-              diaSemanaTarget = fechaSeleccionada.day();
-              iterador = fechaSeleccionada.clone().startOf('month');
-              while (iterador.day() !== diaSemanaTarget) {
-                iterador.add(1, 'day');
-              }
-              fechasDelMes = [];
-              while (iterador.month() === mes) {
-                fechasDelMes.push(iterador.format('YYYY-MM-DD'));
-                iterador.add(7, 'days');
-              }
-              fechasDelMes.forEach(function (fecha) {
-                var payload = {
-                  professional_id: _this6.profesionalElegido,
-                  check_time: _this6.nuevoHorario.check_time,
-                  departure_date: _this6.nuevoHorario.departure_date,
-                  date: fecha,
-                  daysSelected: [],
-                  idSede: _this6.nuevoHorario.idSede
-                };
-                peticiones.push(_this6.axios.post('/api/schedule', payload));
-              });
-              _context4.next = 22;
+              payload = {
+                professional_id: _this6.profesionalElegido,
+                check_time: _this6.nuevoHorario.check_time,
+                departure_date: _this6.nuevoHorario.departure_date,
+                date: _this6.nuevoHorario.date,
+                daysSelected: [],
+                idSede: _this6.nuevoHorario.idSede
+              };
+              peticiones.push(_this6.axios.post('/api/schedule', payload));
+              _context4.next = 16;
               break;
-            case 16:
+            case 10:
               if (!(_this6.nuevoHorario.daysSelected.length === 0)) {
-                _context4.next = 20;
+                _context4.next = 14;
                 break;
               }
               _this6.$swal({
@@ -352,8 +345,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               });
               _this6.guardando = false;
               return _context4.abrupt("return");
-            case 20:
-              payload = {
+            case 14:
+              _payload = {
                 professional_id: _this6.profesionalElegido,
                 check_time: _this6.nuevoHorario.check_time,
                 departure_date: _this6.nuevoHorario.departure_date,
@@ -361,12 +354,12 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 date: '',
                 idSede: _this6.nuevoHorario.idSede
               };
-              peticiones.push(_this6.axios.post('/api/schedule', payload));
-            case 22:
-              _context4.prev = 22;
-              _context4.next = 25;
+              peticiones.push(_this6.axios.post('/api/schedule', _payload));
+            case 16:
+              _context4.prev = 16;
+              _context4.next = 19;
               return Promise.all(peticiones);
-            case 25:
+            case 19:
               resultados = _context4.sent;
               exito = resultados.some(function (r) {
                 return r.data.mensaje === 'Exito';
@@ -389,25 +382,25 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   title: 'Hubo cruce con otros horarios'
                 });
               }
-              _context4.next = 34;
+              _context4.next = 28;
               break;
-            case 30:
-              _context4.prev = 30;
-              _context4.t0 = _context4["catch"](22);
+            case 24:
+              _context4.prev = 24;
+              _context4.t0 = _context4["catch"](16);
               console.error(_context4.t0);
               _this6.$swal({
                 icon: 'error',
                 title: 'Error al guardar horario'
               });
-            case 34:
-              _context4.prev = 34;
+            case 28:
+              _context4.prev = 28;
               _this6.guardando = false;
-              return _context4.finish(34);
-            case 37:
+              return _context4.finish(28);
+            case 31:
             case "end":
               return _context4.stop();
           }
-        }, _callee4, null, [[22, 30, 34, 37]]);
+        }, _callee4, null, [[16, 24, 28, 31]]);
       }))();
     },
     abrirDetallesHorario: function abrirDetallesHorario(horario, fechaContexto) {
@@ -629,6 +622,53 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           return _ref3.apply(this, arguments);
         };
       }());
+    },
+    crearExcepcion: function crearExcepcion(schedule_id, fecha) {
+      var _this11 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee11$(_context11) {
+          while (1) switch (_context11.prev = _context11.next) {
+            case 0:
+              _context11.prev = 0;
+              _context11.next = 3;
+              return _this11.axios.post('/api/schedule/exception', {
+                schedule_id: schedule_id,
+                date: fecha
+              });
+            case 3:
+              res = _context11.sent;
+              if (res.data.mensaje === 'success') {
+                _this11.$swal({
+                  icon: 'success',
+                  title: 'Excepción aplicada',
+                  timer: 1500,
+                  showConfirmButton: false
+                });
+                _this11.obtenerHorarios();
+                _this11.cerrarDetallesHorario();
+              } else {
+                _this11.$swal({
+                  icon: 'error',
+                  title: 'Error al aplicar excepción'
+                });
+              }
+              _context11.next = 11;
+              break;
+            case 7:
+              _context11.prev = 7;
+              _context11.t0 = _context11["catch"](0);
+              console.error(_context11.t0);
+              _this11.$swal({
+                icon: 'error',
+                title: 'Error de servidor'
+              });
+            case 11:
+            case "end":
+              return _context11.stop();
+          }
+        }, _callee11, null, [[0, 7]]);
+      }))();
     }
   },
   mounted: function mounted() {
@@ -1067,7 +1107,7 @@ var render = function render() {
     staticClass: "mb-3"
   }, [_c("label", {
     staticClass: "form-label font-weight-bold"
-  }, [_vm._v("Seleccionar Fecha (Creación Mensual)")]), _vm._v(" "), _c("input", {
+  }, [_vm._v("Seleccionar Fecha Específica")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -1219,8 +1259,26 @@ var render = function render() {
     }
   }, [_c("i", {
     "class": _vm.horarioSeleccionado.active ? "fas fa-pause" : "fas fa-play"
-  }), _vm._v(" \n\t\t\t\t\t\t\t" + _vm._s(_vm.horarioSeleccionado.active ? "Desactivar Recurrencia" : "Activar Recurrencia") + "\n\t\t\t\t\t\t")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-sm btn-outline-danger",
+  }), _vm._v(" \n\t\t\t\t\t\t\t" + _vm._s(_vm.horarioSeleccionado.active ? "Desactivar Recurrencia" : "Activar Recurrencia") + "\n\t\t\t\t\t\t")]), _vm._v(" "), (!_vm.horarioSeleccionado.date || _vm.horarioSeleccionado.date === "") && _vm.horarioSeleccionado.active ? _c("button", {
+    staticClass: "btn btn-sm mt-1 btn-outline-warning",
+    on: {
+      click: function click($event) {
+        return _vm.crearExcepcion(_vm.horarioSeleccionado.id, _vm.horarioSeleccionadoContextoFecha);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-calendar-times"
+  }), _vm._v(" Desactivar en esta fecha\n\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), (!_vm.horarioSeleccionado.date || _vm.horarioSeleccionado.date === "") && !_vm.horarioSeleccionado.active ? _c("button", {
+    staticClass: "btn btn-sm mt-1 btn-outline-success",
+    on: {
+      click: function click($event) {
+        return _vm.crearExcepcion(_vm.horarioSeleccionado.id, _vm.horarioSeleccionadoContextoFecha);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-calendar-check"
+  }), _vm._v(" Activar en esta fecha\n\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm btn-outline-danger mt-1",
     on: {
       click: function click($event) {
         return _vm.eliminarHorario(_vm.horarioSeleccionado.id);
@@ -1228,7 +1286,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-trash"
-  }), _vm._v(" Eliminar Horario Base\n\t\t\t\t\t\t")])])]) : _vm._e()])])])]);
+  }), _vm._v(" " + _vm._s(!_vm.horarioSeleccionado.date || _vm.horarioSeleccionado.date === "" ? "Eliminar Horario Recurrente" : "Eliminar Excepción / Específico") + "\n\t\t\t\t\t\t")])])]) : _vm._e()])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -1255,7 +1313,7 @@ var staticRenderFns = [function () {
     _c = _vm._self._c;
   return _c("small", {
     staticClass: "text-muted d-block mt-1"
-  }, [_vm._v("Al elegir una fecha (ej. Martes 15), se crearán horarios para "), _c("strong", [_vm._v("todos los martes de ese mes")]), _vm._v(" automáticamente.")]);
+  }, [_vm._v("Se creará un horario "), _c("strong", [_vm._v("únicamente para la fecha seleccionada")]), _vm._v(".")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;

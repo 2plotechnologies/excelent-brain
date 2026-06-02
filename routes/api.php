@@ -302,6 +302,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // ── PROFESSIONALS & SCHEDULES ─────────────────────────────────────────────
     Route::resource('professional', ProfessionalController::class)->only(['index', 'store', 'update', 'show', 'destroy']);
     Route::resource('schedule', ScheduleController::class)->only(['index', 'store', 'update', 'show', 'destroy']);
+    Route::post('schedule/exception', [ScheduleController::class, 'createException']);
     Route::get('horario/{id}', [ScheduleController::class, 'getschedules']);
     Route::get('professional/{id}/schedules/all', [ScheduleController::class, 'getAllSchedules']);
     Route::put('schedule/{id}/toggle', [ScheduleController::class, 'toggleActive']);
