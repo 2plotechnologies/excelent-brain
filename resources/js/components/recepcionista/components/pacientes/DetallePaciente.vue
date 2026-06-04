@@ -2598,6 +2598,17 @@ export default {
       };
       return tipos[tipo] || 'Documento';
     },
+    getTipoDocumentoNombre(tipo) {
+      const nombres = {
+        'orden': 'Orden de Examen',
+        'resultado': 'Resultado de Laboratorio/Imagen',
+        'referencias': 'Referencia/Contrarreferencia',
+        'consentimiento': 'Consentimiento Informado',
+        'recetas': 'Receta Externa',
+        'otro': 'Otro Documento'
+      };
+      return nombres[tipo] || 'Otro Documento';
+    },
     getBadgeClassDocumento(tipo) {
       const classes = {
         'orden': 'bg-primary bg-opacity-10 border border-primary border-opacity-25',

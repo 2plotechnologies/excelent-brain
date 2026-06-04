@@ -317,7 +317,53 @@
           @endif
         </div>
 
-        
+        {{-- Autotriaje --}}
+        <div>
+          @if ( isset($historia->autotriaje) && $historia->autotriaje )
+            <div class="py-30 new-page">
+              <div class="position-relative ">
+                <p class="title-h4 text-center">Ficha de Autotriaje</p>
+                <p class="title-h5 date position-absolute right-0 top-0">Fecha {{ date('d-m-Y',strtotime($historia->autotriaje->fecha ?? $historia->autotriaje->fecha_registro)) }}</p>
+              </div>
+            </div>
+
+            <div>
+              <div class="px-15 mt-2">
+                <div>
+                  <p class="title-h5">Motivo de consulta</p>
+                  <p class="py-0 d-block">{{ $historia->autotriaje->motivo ?? 'No especificado' }}</p>
+                </div>
+                <div>
+                  <p class="title-h5">Expectativas</p>
+                  <p class="py-0 d-block">{{ $historia->autotriaje->expectativa ?? 'No especificadas' }}</p>
+                </div>
+                <div>
+                  <p class="title-h5">Síntomas Reportados</p>
+                  <p class="py-0 d-block">{{ isset($historia->autotriaje->sintomas) && is_array($historia->autotriaje->sintomas) ? implode(', ', $historia->autotriaje->sintomas) : 'Ninguno' }}</p>
+                  @if(isset($historia->autotriaje->sintomas_desde) && $historia->autotriaje->sintomas_desde)
+                    <p class="py-0 d-block mt-1"><strong>Desde:</strong> {{ $historia->autotriaje->sintomas_desde }}</p>
+                  @endif
+                </div>
+
+                @if(isset($historia->autotriaje->seguridad))
+                <div>
+                  <p class="title-h5">Seguridad</p>
+                  @foreach((array)$historia->autotriaje->seguridad as $pregunta => $respuesta)
+                    <p class="py-0 d-block"><strong>{{ $pregunta }}:</strong> {{ $respuesta }}</p>
+                  @endforeach
+                </div>
+                @endif
+                
+                @if(isset($historia->autotriaje->dificultad) && $historia->autotriaje->dificultad)
+                <div>
+                  <p class="title-h5">Dificultad Funcional</p>
+                  <p class="py-0 d-block">{{ $historia->autotriaje->dificultad }}</p>
+                </div>
+                @endif
+              </div>
+            </div>
+          @endif
+        </div>
         
         {{-- Evoluciones --}}
         <div>

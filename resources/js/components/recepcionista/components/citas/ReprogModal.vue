@@ -30,9 +30,12 @@
               </div>
             </div>
 
-            <select class="d-none" name="professional_id" v-model="data.professional_id" @change="listarhorario()">
-               <option v-for="(professional, index) in professionals" :key="index" :value="professional.id">{{professional.name}}</option>
-            </select>
+            <div class="mb-3">
+              <label class="form-label mb-1" style="color: #475569; font-size: 14px;">Profesional</label>
+              <select class="form-select custom-input text-secondary shadow-none" name="professional_id" v-model="data.professional_id" @change="listarhorario()">
+                 <option v-for="(professional, index) in filteredProfessionals" :key="index" :value="professional.id">{{professional.name}}</option>
+              </select>
+            </div>
 
             <div class="mb-3">
               <label class="form-label mb-1" style="color: #475569; font-size: 14px;">Nueva Fecha</label>
@@ -301,6 +304,11 @@ export default {
     repromingSchedule () {
       this.data = this.dataCit
       return this.data.reschedule = ''
+    },
+    filteredProfessionals() {
+      if (!this.dataCit || !this.dataCit.professional || !this.professionals) return [];
+      const profession = this.dataCit.professional.profession;
+      return Object.values(this.professionals).filter(p => p.profession === profession);
     }
   },
 	watch:{

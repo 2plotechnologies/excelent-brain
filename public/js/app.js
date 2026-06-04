@@ -9643,6 +9643,13 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     repromingSchedule: function repromingSchedule() {
       this.data = this.dataCit;
       return this.data.reschedule = '';
+    },
+    filteredProfessionals: function filteredProfessionals() {
+      if (!this.dataCit || !this.dataCit.professional || !this.professionals) return [];
+      var profession = this.dataCit.professional.profession;
+      return Object.values(this.professionals).filter(function (p) {
+        return p.profession === profession;
+      });
     }
   },
   watch: {
@@ -10942,6 +10949,25 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     },
     abrirTiemposEspera: function abrirTiemposEspera(cita) {
       this.citaTemp = cita;
+    },
+    handleKeyDown: function handleKeyDown(e) {
+      var activeEl = document.activeElement;
+      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT' || activeEl.isContentEditable)) {
+        return;
+      }
+      if (e.key === 'ArrowLeft') {
+        var body = this.$refs.bodyScroll;
+        if (body) {
+          body.scrollLeft -= 150;
+          e.preventDefault();
+        }
+      } else if (e.key === 'ArrowRight') {
+        var _body = this.$refs.bodyScroll;
+        if (_body) {
+          _body.scrollLeft += 150;
+          e.preventDefault();
+        }
+      }
     }
   },
   mounted: function mounted() {
@@ -10956,6 +10982,10 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         _this10.$refs.headerScroll.scrollLeft = _this10.$refs.bodyScroll.scrollLeft;
       }
     });
+    window.addEventListener('keydown', this.handleKeyDown);
+  },
+  beforeDestroy: function beforeDestroy() {
+    window.removeEventListener('keydown', this.handleKeyDown);
   }
 });
 
@@ -18052,7 +18082,13 @@ var render = function render() {
     staticClass: "text-muted small font-weight-bold text-uppercase"
   }, [_vm._v("Rebajado")]), _vm._v(" "), _c("span", {
     staticClass: "font-weight-bold text-success"
-  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.dataCita.payment.rebaja).toFixed(2)))])]) : _vm._e(), _vm._v(" "), _vm.dataCita.payment.adelanto > 0 ? _c("div", {
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.dataCita.payment.rebaja).toFixed(2)))])]) : _vm._e(), _vm._v(" "), _vm.dataCita.payment.descuento > 0 ? _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mt-1"
+  }, [_c("span", {
+    staticClass: "text-muted small font-weight-bold text-uppercase"
+  }, [_vm._v("Descuento")]), _vm._v(" "), _c("span", {
+    staticClass: "font-weight-bold text-success"
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.dataCita.payment.descuento).toFixed(2)))])]) : _vm._e(), _vm._v(" "), _vm.dataCita.payment.adelanto > 0 ? _c("div", {
     staticClass: "d-flex justify-content-between align-items-center mt-1"
   }, [_c("span", {
     staticClass: "text-muted small font-weight-bold text-uppercase"
@@ -18470,14 +18506,22 @@ var render = function render() {
       color: "#64748b",
       "font-size": "13px"
     }
-  }, [_vm._v("\n              " + _vm._s(_vm.dataCit.date || "...") + " · \n              " + _vm._s(_vm.dataCit.schedule ? _vm.horaLatam1(_vm.dataCit.schedule.check_time) : "...") + " - " + _vm._s(_vm.dataCit.schedule ? _vm.horaLatam1(_vm.dataCit.schedule.departure_date) : "...") + " · \n              " + _vm._s(_vm.dataCit.professional ? _vm.dataCit.professional.name : "Profesional") + "\n            ")])]), _vm._v(" "), _c("select", {
+  }, [_vm._v("\n              " + _vm._s(_vm.dataCit.date || "...") + " · \n              " + _vm._s(_vm.dataCit.schedule ? _vm.horaLatam1(_vm.dataCit.schedule.check_time) : "...") + " - " + _vm._s(_vm.dataCit.schedule ? _vm.horaLatam1(_vm.dataCit.schedule.departure_date) : "...") + " · \n              " + _vm._s(_vm.dataCit.professional ? _vm.dataCit.professional.name : "Profesional") + "\n            ")])]), _vm._v(" "), _c("div", {
+    staticClass: "mb-3"
+  }, [_c("label", {
+    staticClass: "form-label mb-1",
+    staticStyle: {
+      color: "#475569",
+      "font-size": "14px"
+    }
+  }, [_vm._v("Profesional")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.data.professional_id,
       expression: "data.professional_id"
     }],
-    staticClass: "d-none",
+    staticClass: "form-select custom-input text-secondary shadow-none",
     attrs: {
       name: "professional_id"
     },
@@ -18494,14 +18538,14 @@ var render = function render() {
         return _vm.listarhorario();
       }]
     }
-  }, _vm._l(_vm.professionals, function (professional, index) {
+  }, _vm._l(_vm.filteredProfessionals, function (professional, index) {
     return _c("option", {
       key: index,
       domProps: {
         value: professional.id
       }
     }, [_vm._v(_vm._s(professional.name))]);
-  }), 0), _vm._v(" "), _c("div", {
+  }), 0)]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
   }, [_c("label", {
     staticClass: "form-label mb-1",
@@ -19593,7 +19637,7 @@ var render = function render() {
     staticClass: "calendar-wrapper bg-white shadow-sm border",
     staticStyle: {
       "border-radius": "8px",
-      height: "calc(100vh - 215px)",
+      height: "calc(100vh - 170px)",
       "overflow-y": "auto",
       "overflow-x": "hidden"
     }

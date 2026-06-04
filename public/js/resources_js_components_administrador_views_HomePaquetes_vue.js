@@ -167,6 +167,12 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     preciosFiltrados: function preciosFiltrados() {
       if (!this.paqueteSeleccionado || !this.precios || !this.precios.length) return [];
+      var nombre = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
+      if (this.paqueteSeleccionado.idClasificacion == 9 || nombre.includes('sucamec')) {
+        return this.precios.filter(function (precio) {
+          return (precio.id == 13 || precio.id == 14 || precio.descripcion.toLowerCase().includes('sucamec')) && precio.servicio == '1' && precio.activo == '1';
+        });
+      }
       var clasificacion = this.especialidadResuelta;
       return this.precios.filter(function (precio) {
         return precio.idClasificacion == clasificacion && precio.servicio == '1' && precio.id != 48 && precio.id != 49 && precio.activo == '1';

@@ -891,6 +891,19 @@ Medical_evolution::create([
 		if($limbo) $limbo->delete();
 
 		$cita = Appointment::find($request->get('id'));
+
+		$pacienteBloqueo = \App\Models\Patient::where('dni', 'BLOQUEO')->first();
+		if ($pacienteBloqueo && $cita->hora_fin) {
+			$bloqueo = \App\Models\Appointment::where('patient_id', $pacienteBloqueo->id)
+				->where('date', $cita->date)
+				->where('professional_id', $cita->professional_id)
+				->where('hora_inicio', $cita->hora_fin)
+				->whereIn('status', [1, 2, 5])
+				->first();
+			if ($bloqueo) {
+				$bloqueo->update(['status' => 3, 'active_slot' => null]);
+			}
+		}
 		
 		//return var_dump( $cita->id ); die();
 
@@ -989,16 +1002,46 @@ Medical_evolution::create([
 	}
 	public function mandarVacio(Request $request, Appointment $appointment)
 	{
-		//var_dump($request->all()); die();
 		try {
-		
 		$cita = Appointment::find($request->get('id'));
-		//return var_dump( $cita->id ); die();
-		$cita->update($request->all() );
 
-		return response()->json(['mensaje' => 'se actualizó la cita']);
+		$pacienteBloqueo = \App\Models\Patient::where('dni', 'BLOQUEO')->first();
+		if ($pacienteBloqueo && $cita->hora_fin) {
+			$bloqueo = \App\Models\Appointment::where('patient_id', $pacienteBloqueo->id)
+				->where('date', $cita->date)
+				->where('professional_id', $cita->professional_id)
+				->where('hora_inicio', $cita->hora_fin)
+				->whereIn('status', [1, 2, 5])
+				->first();
+			if ($bloqueo) {
+				$bloqueo->update(['status' => 3, 'active_slot' => null]);
+			}
+		}
+
+		$scheduleInfo = \App\Models\Schedule::find($request->get('schedule_id'));
+		$hora_inicio = $scheduleInfo ? $scheduleInfo->check_time : null;
+		$duracion = 60; // Fallback
+		$precio = \App\Models\Precio::find($cita->type);
+		if ($precio && $precio->duracion) {
+			$duracion = intval($precio->duracion);
+		} elseif ($cita->idMembresia) {
+			$membresia = \App\Models\Membresia::with('precio')->find($cita->idMembresia);
+			if ($membresia && $membresia->precio && $membresia->precio->duracion) {
+				$duracion = intval($membresia->precio->duracion);
+			}
+		}
+		$duracion = abs($duracion);
+		$hora_fin = $hora_inicio ? \Carbon\Carbon::parse($hora_inicio)->addMinutes($duracion)->format('H:i:s') : null;
+
+		$payload = $request->all();
+		$payload['hora_inicio'] = $hora_inicio;
+		$payload['hora_fin'] = $hora_fin;
+		
+		$cita->update($payload);
+
+		return response()->json(['mensaje' => 'se actualizo la cita']);
 	} catch (\Throwable $th) {
-		echo $th;
+		return response()->json(['error' => 'Error al mandar vacio: ' . $th->getMessage()], 500);
 	}
 	}
 
@@ -1122,6 +1165,19 @@ Medical_evolution::create([
 		//var_dump($request->all()); die();
 		try {
 			$cita = Appointment::find($id);
+
+		$pacienteBloqueo = \App\Models\Patient::where('dni', 'BLOQUEO')->first();
+		if ($pacienteBloqueo && $cita->hora_fin) {
+			$bloqueo = \App\Models\Appointment::where('patient_id', $pacienteBloqueo->id)
+				->where('date', $cita->date)
+				->where('professional_id', $cita->professional_id)
+				->where('hora_inicio', $cita->hora_fin)
+				->whereIn('status', [1, 2, 5])
+				->first();
+			if ($bloqueo) {
+				$bloqueo->update(['status' => 3, 'active_slot' => null]);
+			}
+		}
 		DB::table('faltas')->insert([
 			'idPaciente' => $cita->patient_id,
 			'idCita' => $cita->id,
@@ -1134,7 +1190,7 @@ Medical_evolution::create([
 
 		//$cita->delete();
 		$cita->update([
-			'status' => 5, //indicando que se elimina.
+			'status' => 3, //indicando que se elimina. (Anulada)
 			'active_slot' => null
 		]);
 		} catch (\Throwable $th) {

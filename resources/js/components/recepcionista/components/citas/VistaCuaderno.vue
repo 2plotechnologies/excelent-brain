@@ -41,7 +41,7 @@
 		</div>
 
 		<!-- Contenedor del Calendario Grid -->
-		<div class="calendar-wrapper bg-white shadow-sm border" style="border-radius: 8px; height: calc(100vh - 215px); overflow-y: auto; overflow-x: hidden;">
+		<div class="calendar-wrapper bg-white shadow-sm border" style="border-radius: 8px; height: calc(100vh - 170px); overflow-y: auto; overflow-x: hidden;">
 			
 			<div class="calendar-header d-flex border-bottom bg-light" style="border-top-left-radius: 8px; border-top-right-radius: 8px;">
 				<!-- Cabecera Esquina (Eje Y) -->
@@ -660,6 +660,25 @@
 			},
 			abrirTiemposEspera(cita) {
 				this.citaTemp = cita;
+			},
+			handleKeyDown(e) {
+				const activeEl = document.activeElement;
+				if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT' || activeEl.isContentEditable)) {
+					return;
+				}
+				if (e.key === 'ArrowLeft') {
+					const body = this.$refs.bodyScroll;
+					if (body) {
+						body.scrollLeft -= 150;
+						e.preventDefault();
+					}
+				} else if (e.key === 'ArrowRight') {
+					const body = this.$refs.bodyScroll;
+					if (body) {
+						body.scrollLeft += 150;
+						e.preventDefault();
+					}
+				}
 			}
 		},
 		mounted(){
@@ -675,6 +694,10 @@
 					this.$refs.headerScroll.scrollLeft = this.$refs.bodyScroll.scrollLeft;
 				}
 			});
+			window.addEventListener('keydown', this.handleKeyDown);
+		},
+		beforeDestroy() {
+			window.removeEventListener('keydown', this.handleKeyDown);
 		}
 	}
 </script>

@@ -33,7 +33,7 @@
 		</div>
 
 		<!-- Contenedor del Calendario Grid -->
-		<div class="calendar-wrapper bg-white shadow-sm border" style="border-radius: 8px; height: calc(100vh - 180px); overflow-y: auto; overflow-x: hidden;" v-show="profesionalElegido">
+		<div class="calendar-wrapper bg-white shadow-sm border" style="border-radius: 8px; height: calc(100vh - 140px); overflow-y: auto; overflow-x: hidden;" v-show="profesionalElegido">
 			
 			<div class="calendar-header d-flex border-bottom bg-light" style="border-top-left-radius: 8px; border-top-right-radius: 8px;">
 				<!-- Cabecera Esquina (Eje Y) -->

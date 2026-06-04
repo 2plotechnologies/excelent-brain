@@ -77,6 +77,12 @@ class Medical_evolutionController extends Controller
 			->with('initial_psychiatric_history.professional', 'initial_psychological_history', 'medical_evolutions.professional')
 			->first();
 
+		$autotriaje = DB::table('patient_questionnaire_answers')->where('patient_id', $id)->orderBy('created_at', 'desc')->first();
+		if ($autotriaje) {
+			$historia->autotriaje = json_decode($autotriaje->answers);
+			if ($historia->autotriaje) $historia->autotriaje->fecha_registro = $autotriaje->created_at;
+		}
+
 		// Procesamiento de firmas a Base64 para dompdf
 		$historia = $this->procesarFirmasBase64($historia);
 
@@ -102,6 +108,12 @@ class Medical_evolutionController extends Controller
 				->whereBetween('date', [ $threeMonthsAgo, now() ]);
 			}])
 			->first();
+
+		$autotriaje = DB::table('patient_questionnaire_answers')->where('patient_id', $id)->orderBy('created_at', 'desc')->first();
+		if ($autotriaje) {
+			$historia->autotriaje = json_decode($autotriaje->answers);
+			if ($historia->autotriaje) $historia->autotriaje->fecha_registro = $autotriaje->created_at;
+		}
 
 		// Procesamiento de firmas
 		$historia = $this->procesarFirmasBase64($historia);

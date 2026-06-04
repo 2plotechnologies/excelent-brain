@@ -43,6 +43,10 @@
                 <span class="text-muted small font-weight-bold text-uppercase">Rebajado</span>
                 <span class="font-weight-bold text-success">S/ {{ parseFloat(dataCita.payment.rebaja).toFixed(2) }}</span>
               </div>
+              <div v-if="dataCita.payment.descuento>0" class="d-flex justify-content-between align-items-center mt-1">
+                <span class="text-muted small font-weight-bold text-uppercase">Descuento</span>
+                <span class="font-weight-bold text-success">S/ {{ parseFloat(dataCita.payment.descuento).toFixed(2) }}</span>
+              </div>
               <div v-if="dataCita.payment.adelanto>0" class="d-flex justify-content-between align-items-center mt-1">
                 <span class="text-muted small font-weight-bold text-uppercase">Adelanto</span>
                 <span class="font-weight-bold text-warning">S/ {{ parseFloat(dataCita.payment.adelanto).toFixed(2) }}</span>

@@ -814,7 +814,7 @@ var render = function render() {
     staticClass: "calendar-wrapper bg-white shadow-sm border",
     staticStyle: {
       "border-radius": "8px",
-      height: "calc(100vh - 180px)",
+      height: "calc(100vh - 140px)",
       "overflow-y": "auto",
       "overflow-x": "hidden"
     }

@@ -585,7 +585,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       });
     }
   },
-  methods: {
+  methods: _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty({
     countItems: function countItems(text) {
       if (!text) return 0;
       return text.split('\n').filter(function (line) {
@@ -1099,89 +1099,95 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         'otro': 'Otro Documento'
       };
       return tipos[tipo] || 'Documento';
-    },
-    getBadgeClassDocumento: function getBadgeClassDocumento(tipo) {
-      var classes = {
-        'orden': 'bg-primary bg-opacity-10 border border-primary border-opacity-25',
-        'resultado': 'bg-success bg-opacity-10 border border-success border-opacity-25',
-        'referencias': 'bg-info bg-opacity-10 border border-info border-opacity-25',
-        'consentimiento': 'bg-warning bg-opacity-10 border border-warning border-opacity-25',
-        'recetas': 'bg-secondary bg-opacity-10 border border-secondary border-opacity-25',
-        'otro': 'bg-light text-dark border'
-      };
-      return classes[tipo] || classes['otro'];
-    },
-    subirNuevoDocumento: function subirNuevoDocumento() {
-      var _this10 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var fileInput, formData, response;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
-            case 0:
-              fileInput = document.getElementById('fileInputDocumento');
-              if (fileInput.files.length) {
-                _context5.next = 4;
-                break;
-              }
-              _this10.$swal.fire('Error', 'Seleccione un archivo', 'warning');
-              return _context5.abrupt("return");
-            case 4:
-              _this10.subiendoDocumento = true;
-              _context5.prev = 5;
-              formData = new FormData();
-              formData.append('file', fileInput.files[0]);
-              formData.append('idPaciente', _this10.paciente.id);
-              formData.append('idProfesional', _this10.$attrs.idUser || -1);
-              formData.append('tipo', _this10.nuevoDocumentoTipo);
-              _context5.next = 13;
-              return _this10.axios.post('/api/subirArchivo', formData);
-            case 13:
-              response = _context5.sent;
-              if (!_this10.paciente.archivos_list) {
-                _this10.$set(_this10.paciente, 'archivos_list', []);
-              }
-              _this10.paciente.archivos_list.unshift(response.data);
-              fileInput.value = '';
-              _this10.nuevoDocumentoTipo = '';
-              $('#modalSubirDocumento').modal('hide');
-              _this10.$swal.fire({
-                icon: 'success',
-                title: 'Documento subido',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000
-              });
-              _context5.next = 26;
-              break;
-            case 22:
-              _context5.prev = 22;
-              _context5.t0 = _context5["catch"](5);
-              console.error(_context5.t0);
-              _this10.$swal.fire('Error', 'No se pudo subir el archivo. Puede que exceda el tamaño permitido (10MB) o el formato no sea válido.', 'error');
-            case 26:
-              _context5.prev = 26;
-              _this10.subiendoDocumento = false;
-              return _context5.finish(26);
-            case 29:
-            case "end":
-              return _context5.stop();
-          }
-        }, _callee5, null, [[5, 22, 26, 29]]);
-      }))();
-    },
-    prepararSemaforo: function prepararSemaforo() {
-      this.queId = this.paciente.id;
-      if (!this.paciente.semaforo) {
-        // Alias semaforo_estados to semaforo if it exists, otherwise initialize empty
-        this.paciente.semaforo = this.paciente.semaforo_estados || [];
-      }
-    },
-    prepararHobbies: function prepararHobbies() {
-      this.queId = this.paciente.id;
-      this.misHobbies = this.getHobbies(this.paciente.hobbies);
     }
-  },
+  }, "getTipoDocumentoNombre", function getTipoDocumentoNombre(tipo) {
+    var nombres = {
+      'orden': 'Orden de Examen',
+      'resultado': 'Resultado de Laboratorio/Imagen',
+      'referencias': 'Referencia/Contrarreferencia',
+      'consentimiento': 'Consentimiento Informado',
+      'recetas': 'Receta Externa',
+      'otro': 'Otro Documento'
+    };
+    return nombres[tipo] || 'Otro Documento';
+  }), "getBadgeClassDocumento", function getBadgeClassDocumento(tipo) {
+    var classes = {
+      'orden': 'bg-primary bg-opacity-10 border border-primary border-opacity-25',
+      'resultado': 'bg-success bg-opacity-10 border border-success border-opacity-25',
+      'referencias': 'bg-info bg-opacity-10 border border-info border-opacity-25',
+      'consentimiento': 'bg-warning bg-opacity-10 border border-warning border-opacity-25',
+      'recetas': 'bg-secondary bg-opacity-10 border border-secondary border-opacity-25',
+      'otro': 'bg-light text-dark border'
+    };
+    return classes[tipo] || classes['otro'];
+  }), "subirNuevoDocumento", function subirNuevoDocumento() {
+    var _this10 = this;
+    return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+      var fileInput, formData, response;
+      return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+        while (1) switch (_context5.prev = _context5.next) {
+          case 0:
+            fileInput = document.getElementById('fileInputDocumento');
+            if (fileInput.files.length) {
+              _context5.next = 4;
+              break;
+            }
+            _this10.$swal.fire('Error', 'Seleccione un archivo', 'warning');
+            return _context5.abrupt("return");
+          case 4:
+            _this10.subiendoDocumento = true;
+            _context5.prev = 5;
+            formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('idPaciente', _this10.paciente.id);
+            formData.append('idProfesional', _this10.$attrs.idUser || -1);
+            formData.append('tipo', _this10.nuevoDocumentoTipo);
+            _context5.next = 13;
+            return _this10.axios.post('/api/subirArchivo', formData);
+          case 13:
+            response = _context5.sent;
+            if (!_this10.paciente.archivos_list) {
+              _this10.$set(_this10.paciente, 'archivos_list', []);
+            }
+            _this10.paciente.archivos_list.unshift(response.data);
+            fileInput.value = '';
+            _this10.nuevoDocumentoTipo = '';
+            $('#modalSubirDocumento').modal('hide');
+            _this10.$swal.fire({
+              icon: 'success',
+              title: 'Documento subido',
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 3000
+            });
+            _context5.next = 26;
+            break;
+          case 22:
+            _context5.prev = 22;
+            _context5.t0 = _context5["catch"](5);
+            console.error(_context5.t0);
+            _this10.$swal.fire('Error', 'No se pudo subir el archivo. Puede que exceda el tamaño permitido (10MB) o el formato no sea válido.', 'error');
+          case 26:
+            _context5.prev = 26;
+            _this10.subiendoDocumento = false;
+            return _context5.finish(26);
+          case 29:
+          case "end":
+            return _context5.stop();
+        }
+      }, _callee5, null, [[5, 22, 26, 29]]);
+    }))();
+  }), "prepararSemaforo", function prepararSemaforo() {
+    this.queId = this.paciente.id;
+    if (!this.paciente.semaforo) {
+      // Alias semaforo_estados to semaforo if it exists, otherwise initialize empty
+      this.paciente.semaforo = this.paciente.semaforo_estados || [];
+    }
+  }), "prepararHobbies", function prepararHobbies() {
+    this.queId = this.paciente.id;
+    this.misHobbies = this.getHobbies(this.paciente.hobbies);
+  }),
   mounted: function mounted() {
     var _this11 = this;
     this.fetchPatientDetails();
