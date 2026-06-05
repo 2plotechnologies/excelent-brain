@@ -97,6 +97,7 @@
               <th>Teléfono</th>
               <th>Correo Electrónico</th>
               <th class="text-center">Tipo Certificado</th>
+              <th class="text-center">Estado</th>
               <th class="text-center">Fecha Registro</th>
               <th class="pe-4 text-end">Acciones</th>
             </tr>
@@ -141,18 +142,25 @@
                 <span class="text-xs text-muted fst-italic" v-else>-</span>
               </td>
               <td class="text-center">
-                <span v-if="paciente.tipo_certificado === 'trabajo'" class="badge badge-trabajo px-3 py-2 rounded-pill font-weight-bold">
-                  <i class="fas fa-briefcase mr-1"></i> Trabajo
+                <span class="badge bg-light text-dark px-3 py-2 rounded-pill font-weight-bold border">
+                  {{ getNombreServicio(paciente.tipo_certificado) }}
                 </span>
-                <span v-else class="badge badge-estudios px-3 py-2 rounded-pill font-weight-bold">
-                  <i class="fas fa-graduation-cap mr-1"></i> Estudios
-                </span>
+              </td>
+              <td class="text-center">
+                <select class="form-select form-select-sm d-inline-block w-auto font-weight-bold shadow-sm" style="border-radius: 8px;" v-model="paciente.estado" @change="cambiarEstado(paciente)">
+                  <option value="En proceso">En proceso</option>
+                  <option value="Recepcionado">Recepcionado</option>
+                  <option value="Entregado">Entregado</option>
+                </select>
               </td>
               <td class="text-center">
                 <span class="text-xs text-muted">{{ formatDate(paciente.created_at) }}</span>
               </td>
               <td class="pe-4 text-end">
                 <div class="d-flex justify-content-end align-items-center gap-2">
+                  <button class="btn btn-icon-edit text-success" @click="openPaymentModal(paciente)" title="Pagar">
+                    <i class="fas fa-money-bill-wave"></i>
+                  </button>
                   <button class="btn btn-icon-edit" @click="openEditModal(paciente)" title="Editar">
                     <i class="far fa-edit"></i>
                   </button>
@@ -214,7 +222,12 @@
                 </div>
                 <div class="col-md-6">
                   <label class="form-label small fw-bold text-muted text-uppercase">DNI / Documento <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" v-model="form.dni" required placeholder="8 dígitos" maxlength="20" />
+                  <div class="input-group">
+                    <input type="text" class="form-control border-end-0" v-model="form.dni" @blur="buscarDatosDNI" required placeholder="8 dígitos" maxlength="20" />
+                    <button class="btn btn-outline-secondary border bg-light text-muted" type="button" @click="buscarDatosDNI" title="Buscar en RENIEC" style="border-top-right-radius: 10px; border-bottom-right-radius: 10px;">
+                      <i class="fas fa-search"></i>
+                    </button>
+                  </div>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label small fw-bold text-muted text-uppercase">Teléfono <span class="text-danger">*</span></label>
@@ -228,8 +241,7 @@
                   <label class="form-label small fw-bold text-muted text-uppercase">Tipo de Certificado <span class="text-danger">*</span></label>
                   <select class="form-select" v-model="form.tipo_certificado" required>
                     <option value="" disabled>Seleccione una opción</option>
-                    <option value="trabajo">Certificado de Trabajo</option>
-                    <option value="estudios">Certificado de Estudios</option>
+                    <option v-for="serv in servicios" :key="serv.id" :value="serv.id.toString()">{{ serv.descripcion }}</option>
                   </select>
                 </div>
               </div>
@@ -240,6 +252,59 @@
                 <span v-if="saving" class="spinner-border spinner-border-sm mr-2" role="status"></span>
                 <i class="fas fa-save mr-1" v-else></i>
                 {{ isEditMode ? 'Guardar Cambios' : 'Registrar Paciente' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL PAGO -->
+    <div class="modal fade" id="modalPagoCertificado" tabindex="-1" aria-labelledby="modalPagoCertificadoLabel" aria-hidden="true" ref="modalPaymentForm">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+          <div class="modal-header border-0 pb-0 px-4 pt-4">
+            <h5 class="modal-title font-weight-bold text-dark" id="modalPagoCertificadoLabel">
+              <i class="fas fa-money-bill-wave text-success mr-2"></i> Pagar Certificado
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closePaymentModal"></button>
+          </div>
+          <form @submit.prevent="submitPago">
+            <div class="modal-body p-4">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-muted text-uppercase">Precio <span class="text-danger">*</span></label>
+                  <input type="number" class="form-control" v-model="pagoForm.precio" step="0.01" required readonly />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-muted text-uppercase">Método de Pago <span class="text-danger">*</span></label>
+                  <select class="form-select" v-model="pagoForm.moneda_id" required>
+                    <option value="" disabled>Seleccione método</option>
+                    <option v-for="m in monedas" :key="m.id" :value="m.id">{{ m.tipo }}</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-muted text-uppercase">Comprobante <span class="text-danger">*</span></label>
+                  <select class="form-select" v-model="pagoForm.tipo_comprobante" required>
+                    <option value="1">Boleta</option>
+                    <option value="2">Factura</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-muted text-uppercase">Nro Comprobante <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" v-model="pagoForm.voucher" required />
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-bold text-muted text-uppercase">Motivo / Observación <span class="text-danger">*</span></label>
+                  <textarea class="form-control" v-model="pagoForm.motivo" rows="2" required placeholder="Motivo escrito por el recepcionista"></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+              <button type="button" class="btn btn-light rounded-pill px-4 text-muted font-weight-bold" data-bs-dismiss="modal" @click="closePaymentModal">Cancelar</button>
+              <button type="submit" class="btn btn-success rounded-pill px-4 shadow font-weight-bold" :disabled="savingPago">
+                <span v-if="savingPago" class="spinner-border spinner-border-sm mr-2" role="status"></span>
+                <i class="fas fa-check mr-1" v-else></i> Confirmar Pago
               </button>
             </div>
           </form>
@@ -274,6 +339,19 @@ export default {
         correo: '',
         tipo_certificado: ''
       },
+      
+      servicios: [],
+      monedas: [],
+      modalPayment: null,
+      savingPago: false,
+      pagoForm: {
+        paciente_id: null,
+        precio: 0,
+        moneda_id: '',
+        tipo_comprobante: '1',
+        voucher: '',
+        motivo: ''
+      },
 
       pagination: {
         current_page: 1,
@@ -302,6 +380,55 @@ export default {
     }
   },
   methods: {
+    async cargarListas() {
+      try {
+        const [monedasRes, preciosRes] = await Promise.all([
+          this.axios.get('/api/listarMonedas'),
+          this.axios.get('/api/listarPreciosTodos')
+        ]);
+        this.monedas = monedasRes.data;
+        
+        const permitidos = [
+          'Rotación de servicio',
+          'Prácticas pre profesionales',
+          'Serum',
+          'Nombramiento',
+          'Certificado de trabajo simple'
+        ];
+        
+        this.servicios = preciosRes.data.filter(p => 
+          p.idClasificacion === 3 && permitidos.includes(p.descripcion.trim())
+        );
+      } catch (error) {
+        console.error('Error cargando listas:', error);
+      }
+    },
+    async buscarDatosDNI() {
+      if (!this.form.dni || this.form.dni.length < 8) return;
+      try {
+        const localRes = await this.axios.get(`/api/paciente-certificado/dni/${this.form.dni}`);
+        if (localRes.data.encontrado_bd) {
+          const p = localRes.data.paciente;
+          this.form.nombres = p.nombres;
+          this.form.apellidos = p.apellidos;
+          this.form.telefono = p.telefono;
+          this.form.correo = p.correo;
+          this.form.tipo_certificado = p.tipo_certificado;
+          this.$swal({ toast: true, position: 'top-end', icon: 'info', title: 'Datos recuperados', showConfirmButton: false, timer: 1500 });
+          return;
+        }
+        
+        const apiRes = await this.axios.get(`/api/buscarDni/${this.form.dni}`);
+        if (!apiRes.data.error) {
+          this.form.nombres = apiRes.data.nombres;
+          this.form.apellidos = `${apiRes.data.apellido_paterno} ${apiRes.data.apellido_materno}`.trim();
+        } else {
+          this.$swal({ toast: true, position: 'top-end', icon: 'warning', title: 'No se encontraron datos en Reniec', showConfirmButton: false, timer: 2000 });
+        }
+      } catch (error) {
+        console.error('Error buscando DNI:', error);
+      }
+    },
     async cargarPacientes(page = 1) {
       this.loading = true;
       try {
@@ -401,6 +528,50 @@ export default {
         this.modal.hide();
       }
     },
+    async cambiarEstado(paciente) {
+      try {
+        await this.axios.put(`/api/paciente-certificado/${paciente.id}/estado`, { estado: paciente.estado });
+        this.$swal({ toast: true, position: 'top-end', icon: 'success', title: 'Estado actualizado', showConfirmButton: false, timer: 1500 });
+      } catch (error) {
+        console.error('Error cambiando estado:', error);
+        this.$swal({ icon: 'error', title: 'Error', text: 'No se pudo actualizar el estado.' });
+        this.cargarPacientes(this.pagination.current_page);
+      }
+    },
+    openPaymentModal(paciente) {
+      const s = this.servicios.find(x => x.id.toString() === paciente.tipo_certificado?.toString());
+      const precio = s ? (s.nuevos || 0) : 0;
+      
+      this.pagoForm = {
+        paciente_id: paciente.id,
+        precio: precio,
+        moneda_id: '',
+        tipo_comprobante: '1',
+        voucher: '',
+        motivo: ''
+      };
+      if (!this.modalPayment) {
+        this.modalPayment = new window.bootstrap.Modal(this.$refs.modalPaymentForm);
+      }
+      this.modalPayment.show();
+    },
+    closePaymentModal() {
+      if (this.modalPayment) this.modalPayment.hide();
+    },
+    async submitPago() {
+      this.savingPago = true;
+      try {
+        await this.axios.post(`/api/paciente-certificado/${this.pagoForm.paciente_id}/pagar`, this.pagoForm);
+        this.$swal({ icon: 'success', title: 'Pago Registrado', text: 'El pago se registró en caja correctamente.', showConfirmButton: false, timer: 1500 });
+        this.closePaymentModal();
+        this.cargarPacientes(this.pagination.current_page);
+      } catch (error) {
+        console.error('Error guardando pago:', error);
+        this.$swal({ icon: 'error', title: 'Error', text: 'Ocurrió un error al registrar el pago.' });
+      } finally {
+        this.savingPago = false;
+      }
+    },
     async savePaciente() {
       this.saving = true;
       try {
@@ -470,11 +641,15 @@ export default {
             this.$swal({
               icon: 'error',
               title: 'Error',
-              text: 'No se pudo eliminar el registro.'
+              text: error.response?.data?.message || 'No se pudo eliminar el registro.'
             });
           }
         }
       });
+    },
+    getNombreServicio(id) {
+      const s = this.servicios.find(x => x.id.toString() === id?.toString());
+      return s ? s.descripcion : 'Desconocido';
     },
     getInitials(nombres, apellidos) {
       const n = nombres ? nombres.trim().split(' ')[0][0] : '';
@@ -491,13 +666,13 @@ export default {
       return new Date(dateStr).toLocaleDateString('es-ES', options);
     }
   },
-  mounted() {
+  async mounted() {
+    await this.cargarListas();
     this.cargarPacientes();
   },
   beforeDestroy() {
-    if (this.modal) {
-      this.modal.dispose();
-    }
+    if (this.modal) this.modal.dispose();
+    if (this.modalPayment) this.modalPayment.dispose();
   }
 };
 </script>

@@ -15,7 +15,7 @@ class LimboController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Limbo::with(['appointment.patient', 'appointment.professional', 'appointment.precio', 'appointment.schedule', 'appointment.payment']);
+        $query = Limbo::with(['appointment.patient', 'appointment.professional', 'appointment.precio', 'appointment.schedule', 'appointment.payment'])->orderBy('created_at', 'desc');
         
         if ($request->has('idSede') && $request->idSede) {
             $query->where('idSede', $request->idSede);

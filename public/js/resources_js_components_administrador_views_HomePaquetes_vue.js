@@ -609,6 +609,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             text: 'Reprogramado',
             "class": 'bg-info text-dark'
           };
+        case 5:
+          return {
+            text: 'Atendido / Confirmado',
+            "class": 'bg-success text-white'
+          };
         default:
           return {
             text: 'Otro',
@@ -2022,7 +2027,7 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fas fa-calendar-plus me-1"
-    }), _vm._v(" Agendar sesión\n            ")]) : _vm._e(), _vm._v(" "), paquete.debe > 0 ? _c("button", {
+    }), _vm._v(" Agendar sesión\n            ")]) : _vm._e(), _vm._v(" "), paquete.total_cuotas > 0 ? _c("button", {
       staticClass: "btn btn-light btn-sm shadow-sm action-btn outline-btn",
       on: {
         click: function click($event) {
@@ -2031,7 +2036,7 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "far fa-credit-card me-1"
-    }), _vm._v(" Pagar cuota\n            ")]) : _vm._e()])]), _vm._v(" "), _c("div", {
+    }), _vm._v(" " + _vm._s(paquete.estado !== 4 && paquete.debe > 0 ? "Pagar cuota" : "Ver cuotas") + "\n            ")]) : _vm._e()])]), _vm._v(" "), _c("div", {
       staticClass: "d-flex justify-content-between align-items-center mt-3 pt-2"
     }, [_c("div", {
       staticClass: "d-flex gap-3 small"
@@ -2476,7 +2481,9 @@ var render = function render() {
       }
     })])]), _vm._v(" "), _c("td", [cuota.estado == 2 ? _c("span", {
       staticClass: "badge bg-success-subtle border border-success-subtle text-success"
-    }, [_vm._v("Pagado")]) : _c("span", {
+    }, [_vm._v("Pagado")]) : cuota.estado == 3 ? _c("span", {
+      staticClass: "badge bg-danger-subtle border border-danger-subtle text-danger"
+    }, [_vm._v("Anulado / Prorrateado")]) : _c("span", {
       staticClass: "badge bg-warning-subtle border border-warning-subtle text-warning"
     }, [_vm._v("Pendiente")])]), _vm._v(" "), _c("td", [cuota.estado == 1 ? _c("select", {
       directives: [{

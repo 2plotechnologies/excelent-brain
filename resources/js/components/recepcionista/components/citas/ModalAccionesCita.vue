@@ -200,6 +200,9 @@
               <button @click="$emit('openModal', cita, '#modalMoverVacio', indiceElegido)" data-bs-target="#modalMoverVacio" data-bs-toggle="modal" class="btn btn-link text-muted p-0 small" title="Mover a sitio Vacio">
                 <i class="fas fa-share-square"></i> Mover a Vacio
               </button>
+              <button @click="enviarAlLimbo(cita)" data-bs-dismiss="modal" class="btn btn-link text-muted p-0 small" title="Enviar al Limbo">
+                <i class="fas fa-satellite-dish"></i> Envia al Limbo
+              </button>
               <button @click="$emit('buscarRecetas', cita.patient.id)" data-bs-toggle="modal" :data-bs-target="targetRecetas" class="btn btn-link text-muted p-0 small" title="Recetas">
                 <i class="fas fa-file-medical"></i> Recetas
               </button>
@@ -412,6 +415,47 @@ export default {
         console.error(error);
         if (this.$swal) {
           this.$swal('No se pudo generar el enlace de satisfaccion');
+        }
+      }
+    },
+    async enviarAlLimbo(cita) {
+      if (!cita) return;
+      
+      const { value: motivo } = await this.$swal({
+        title: 'Enviar al Limbo',
+        input: 'text',
+        inputLabel: 'Motivo para enviar al limbo',
+        inputPlaceholder: 'Especifique el motivo...',
+        showCancelButton: true,
+        confirmButtonText: 'Enviar',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+          if (!value) {
+            return '¡Necesitas escribir un motivo!';
+          }
+        }
+      });
+
+      if (motivo) {
+        try {
+          let userRes = await this.axios.get('/api/user');
+          let userId = userRes.data && userRes.data.user ? userRes.data.user.id : null;
+          
+          await this.axios.post('/api/limbos', {
+            appointment_id: cita.id,
+            user_id: userId,
+            motivo: motivo
+          });
+          
+          if (window.alertify) {
+            window.alertify.notify('<i class="fa-regular fa-check-circle"></i> Cita enviada al limbo', 'success', 5);
+          } else {
+            this.$swal({icon: 'success', title: 'Cita enviada al limbo'});
+          }
+          this.$emit('actualizar'); 
+        } catch (error) {
+          console.error(error);
+          this.$swal({icon: 'error', title: 'Ocurrió un error al enviar al limbo'});
         }
       }
     }

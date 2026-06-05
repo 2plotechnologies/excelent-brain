@@ -105,7 +105,7 @@
 						</td>
 						<td>
 							<span class="monto-txt" :class="transaction.isIncome ? 'monto-positivo' : 'monto-negativo'">
-								{{ transaction.isIncome ? '+' : '-' }}S/ {{ retornarFloat(transaction.displayAmount) }}
+								{{ transaction.isIncome ? '+' : '-' }}S/ {{ retornarFloat(Math.abs(transaction.displayAmount)) }}
 							</span>
 						</td>
 						<td class="text-center">
@@ -175,31 +175,51 @@
 
 		<!-- Resumen de totales -->
 		<div class="row mt-4 mb-4" v-if="unifiedTransactions.length > 0">
-			<div class="col-md-6">
-				<div class="card border-0 shadow-sm p-3">
+			<div class="col-md-4 mb-3">
+				<div class="card border-0 shadow-sm p-3 d-flex flex-column h-100">
 					<h6 class="text-primary fw-bold mb-3"><i class="fas fa-list-check me-2"></i>Resumen por Moneda (Ingresos)</h6>
-					<div v-for="tipo in sumaTipos" :key="tipo.moneda" class="d-flex justify-content-between mb-1">
-						<span class="text-muted">{{ tipo.moneda }}:</span>
-						<span class="fw-bold">S/ {{ tipo.suma.toFixed(2) }}</span>
+					<div class="flex-grow-1">
+						<div v-for="tipo in sumaTipos" :key="tipo.moneda" class="d-flex justify-content-between mb-1">
+							<span class="text-muted">{{ tipo.moneda }}:</span>
+							<span class="fw-bold">S/ {{ tipo.suma.toFixed(2) }}</span>
+						</div>
 					</div>
-					<hr>
-					<div class="d-flex justify-content-between">
+					<hr class="mt-3">
+					<div class="d-flex justify-content-between mt-auto">
 						<span class="fw-bold">Total Ingresos:</span>
 						<span class="text-primary fw-bold">S/ {{ parseFloat(suma).toFixed(2) }}</span>
 					</div>
 				</div>
 			</div>
-			<div class="col-md-6" v-if="sumaSalidas.length > 0">
-				<div class="card border-0 shadow-sm p-3">
+			<div class="col-md-4 mb-3">
+				<div class="card border-0 shadow-sm p-3 d-flex flex-column h-100">
 					<h6 class="text-danger fw-bold mb-3"><i class="fas fa-list-check me-2"></i>Resumen por Moneda (Egresos)</h6>
-					<div v-for="tipo in sumaSalidas" :key="tipo.moneda" class="d-flex justify-content-between mb-1">
-						<span class="text-muted">{{ tipo.moneda }}:</span>
-						<span class="fw-bold">S/ {{ tipo.suma.toFixed(2) }}</span>
+					<div class="flex-grow-1">
+						<div v-for="tipo in sumaSalidas" :key="tipo.moneda" class="d-flex justify-content-between mb-1">
+							<span class="text-muted">{{ tipo.moneda }}:</span>
+							<span class="fw-bold">S/ {{ tipo.suma.toFixed(2) }}</span>
+						</div>
 					</div>
-					<hr>
-					<div class="d-flex justify-content-between">
+					<hr class="mt-3">
+					<div class="d-flex justify-content-between mt-auto">
 						<span class="fw-bold">Total Egresos:</span>
 						<span class="text-danger fw-bold">S/ {{ parseFloat(sumaSal).toFixed(2) }}</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 mb-3">
+				<div class="card border-0 shadow-sm p-3 d-flex flex-column h-100">
+					<h6 class="text-success fw-bold mb-3"><i class="fas fa-wallet me-2"></i>Saldo Neto de Caja</h6>
+					<div class="flex-grow-1">
+						<div v-for="tipo in saldoNetoPorMoneda" :key="tipo.moneda" class="d-flex justify-content-between mb-1">
+							<span class="text-muted">{{ tipo.moneda }}:</span>
+							<span :class="tipo.suma >= 0 ? 'text-success fw-bold' : 'text-danger fw-bold'">S/ {{ tipo.suma.toFixed(2) }}</span>
+						</div>
+					</div>
+					<hr class="mt-3">
+					<div class="d-flex justify-content-between mt-auto">
+						<span class="fw-bold">Saldo Neto:</span>
+						<span :class="totalSaldoNeto >= 0 ? 'text-success fw-bold' : 'text-danger fw-bold'">S/ {{ totalSaldoNeto.toFixed(2) }}</span>
 					</div>
 				</div>
 			</div>
@@ -251,7 +271,7 @@
 						</span>
 					</td>
 					<td>{{ payment.observation }}</td>
-					<td :class="{'text-danger' : payment.type==6, 'text-primary': payment.type!=6}">S/ <span v-if="payment.type==6">-</span> {{ retornarFloat(payment.price)}}</td>
+					<td :class="{'text-danger' : payment.type==6 || parseFloat(payment.price ?? 0) < 0, 'text-primary': payment.type!=6 && parseFloat(payment.price ?? 0) >= 0}">S/ <span v-if="payment.type==6 || parseFloat(payment.price ?? 0) < 0">-</span> {{ retornarFloat(Math.abs(payment.price))}}</td>
 					<td>
 						<span v-if="payment.type==6">Salida de dinero</span>
 						<span v-if="payment.type==5">Pago de cita</span>
@@ -366,7 +386,7 @@ export default{
 	data(){
 		return{
 			filtroActual: 'Todos',
-			payments:[], sumaTipos:[], sumaSalidas:[], salidas:[], monedas:['Efectivo', 'Depósito bancario',  'POS', 'Aplicativo Yape', 'Banco: BCP', 'Banco: BBVA', 'Banco: Interbank', 'Banco: Nación', 'Banco: Scotiabank', 'Aplicativo Plin', 'Open pay'], idSeleccionado:-1,
+			payments:[], salidas:[], monedas:['Efectivo', 'Depósito bancario',  'POS', 'Aplicativo Yape', 'Banco: BCP', 'Banco: BBVA', 'Banco: Interbank', 'Banco: Nación', 'Banco: Scotiabank', 'Aplicativo Plin', 'Open pay'], idSeleccionado:-1,
 			idUsuario: null, tienePrivilegios: null, razon:'', queId:null, queINdex:null, contenido:'', eliminados:[], caso:{id:-1,index:-1,moneda:1, boleta:'', comprobante:'', observacion:'', tipo:-1}, foto:'', habilitarEliminado:false, fecha:moment().format('YYYY-MM-DD'), monedas:[], idSede:1, pagoSeleccionado:null,
 			buscarVacio:true, token: localStorage.getItem('token')
 		}
@@ -495,7 +515,10 @@ export default{
 				return this.monedas.find(x=> x.id == idMoneda)?.tipo
 			},
 			getDisplayType(payment) {
-				if (payment.type == 8) return 'Adelanto';
+				if (parseFloat(payment.price ?? 0) < 0) return 'Devolución';
+				if (payment.type == 8) {
+					return (payment.idMembresia && payment.idMembresia > 0) ? 'Pago de Paquete' : 'Adelanto';
+				}
 				if (payment.type == 5) return 'Cita';
 				if ([1, 2, 7, 15].includes(payment.type)) return 'Cuota';
 				if (payment.type == 4) return 'Ing. Extra';
@@ -503,7 +526,10 @@ export default{
 				return 'Otro';
 			},
 			getDisplayIcon(payment) {
-				if (payment.type == 8) return 'fa-clock';
+				if (parseFloat(payment.price ?? 0) < 0) return 'fa-arrow-down-long';
+				if (payment.type == 8) {
+					return (payment.idMembresia && payment.idMembresia > 0) ? 'fa-box-open' : 'fa-clock';
+				}
 				if (payment.type == 5) return 'fa-calendar-check';
 				if ([1, 2, 7, 15].includes(payment.type)) return 'fa-receipt';
 				if (payment.type == 4) return 'fa-arrow-up-long';
@@ -511,7 +537,10 @@ export default{
 				return 'fa-circle-info';
 			},
 			getBadgeClass(payment) {
-				if (payment.type == 8) return 'badge-adelanto';
+				if (parseFloat(payment.price ?? 0) < 0) return 'badge-egreso';
+				if (payment.type == 8) {
+					return (payment.idMembresia && payment.idMembresia > 0) ? 'badge-cuota' : 'badge-adelanto';
+				}
 				if (payment.type == 5) return 'badge-cita';
 				if ([1, 2, 7, 15].includes(payment.type)) return 'badge-cuota';
 				if (payment.type == 4) return 'badge-ingreso';
@@ -519,7 +548,10 @@ export default{
 				return 'badge-secondary';
 			},
 			getIconBoxClass(payment) {
-				if (payment.type == 8) return 'icon-adelanto';
+				if (parseFloat(payment.price ?? 0) < 0) return 'icon-egreso';
+				if (payment.type == 8) {
+					return (payment.idMembresia && payment.idMembresia > 0) ? 'icon-cuota' : 'icon-adelanto';
+				}
 				if (payment.type == 5) return 'icon-cita';
 				if ([1, 2, 7, 15].includes(payment.type)) return 'icon-cuota';
 				if (payment.type == 4) return 'icon-ingreso';
@@ -527,10 +559,29 @@ export default{
 				return 'icon-otros';
 			},
 			getDisplayTitle(payment) {
-				if (payment.type == 5 || payment.type == 8) {
-					let motivo = payment.detalle || 'Cita';
-					return `${motivo} - ${payment.customer}`;
+				let desc = '';
+				if (payment.idMembresia > 0) {
+					desc = payment.observation || 'Pago de Paquete';
+				} else if (payment.type == 5 || payment.type == 8) {
+					desc = payment.detalle || 'Cita';
+				} else {
+					desc = payment.observation || 'Pago';
 				}
+
+				if (payment.patient) {
+					const patientName = `${payment.patient.name || ''} ${payment.patient.nombres || ''}`.trim();
+					if (patientName) {
+						return `${desc} - ${patientName}`;
+					}
+				}
+
+				// If there is no patient association
+				if (payment.idMembresia > 0 || payment.type == 5 || payment.type == 8) {
+					if (payment.customer) {
+						return `${desc} - ${payment.customer}`;
+					}
+				}
+
 				return payment.observation || payment.customer || 'Sin descripción';
 			}
 
@@ -561,11 +612,11 @@ export default{
 				return item;
 			});
 
-			if (this.filtroActual === 'Ingresos') return result;
-			if (this.filtroActual === 'Egresos') return result.filter(item => item.type == 6);
+			if (this.filtroActual === 'Ingresos') return result.filter(item => parseFloat(item.price ?? 0) >= 0);
+			if (this.filtroActual === 'Egresos') return result.filter(item => item.type == 6 || parseFloat(item.price ?? 0) < 0);
 			if (this.filtroActual === 'Citas') return result.filter(item => item.type == 5);
-			if (this.filtroActual === 'Adelantos') return result.filter(item => item.type == 8);
-			if (this.filtroActual === 'Cuotas') return result.filter(item => [1, 2, 7, 15].includes(item.type));
+			if (this.filtroActual === 'Adelantos') return result.filter(item => item.type == 8 && !(item.idMembresia > 0));
+			if (this.filtroActual === 'Cuotas') return result.filter(item => [1, 2, 7, 15].includes(item.type) || (item.type == 8 && item.idMembresia > 0));
 			if (this.filtroActual === 'Ing. Extra') return result.filter(item => item.type == 4);
 			if (this.filtroActual === 'Egr. Extra') return [];
 
@@ -590,7 +641,7 @@ export default{
 			this.filteredPayments.forEach(p => {
 				combined.push({
 					...p,
-					isIncome: p.type != 6,
+					isIncome: p.type != 6 && parseFloat(p.price) >= 0,
 					displayType: this.getDisplayType(p),
 					displayIcon: this.getDisplayIcon(p),
 					displayBadgeClass: this.getBadgeClass(p),
@@ -624,103 +675,140 @@ export default{
 		},
 
 		totalIngresosStats() {
-			if(this.payments.length > 0){
-				return this.payments.reduce((suma, item)=>{
-					if(item.type == 6){
-						return suma - parseFloat(item.price ?? 0)
-					} else {
-						return suma + parseFloat(item.price ?? 0)
-					}
-				}, 0)
-			}
-			return 0;
+			return this.payments.reduce((suma, item) => {
+				const price = parseFloat(item.price ?? 0);
+				if (price >= 0) {
+					return suma + price;
+				}
+				return suma;
+			}, 0);
 		},
 		totalEgresosStats() {
-			if(this.salidas.length > 0){
-				let sal = this.salidas.reduce((suma, item)=>{
-					if(item.type == 6){
-						return suma - parseFloat(item.price ?? 0)
-					} else {
-						return suma + parseFloat(item.price ?? 0)
-					}
+			let total = 0;
+			if (this.salidas.length > 0) {
+				total += this.salidas.reduce((suma, item) => {
+					return suma + parseFloat(item.price ?? 0);
 				}, 0);
-				return Math.abs(sal);
 			}
-			return 0;
+			if (this.payments.length > 0) {
+				total += this.payments.reduce((suma, item) => {
+					const price = parseFloat(item.price ?? 0);
+					if (price < 0) {
+						return suma + Math.abs(price);
+					}
+					return suma;
+				}, 0);
+			}
+			return total;
 		},
 		netoDiaStats() {
 			return this.totalIngresosStats - this.totalEgresosStats;
 		},
 		totalCitasCobradas() {
 			return this.payments.reduce((sum, item) => {
-				if (item.type == 5) return sum + parseFloat(item.price ?? 0);
+				const price = parseFloat(item.price ?? 0);
+				if (item.type == 5 && price >= 0) return sum + price;
 				return sum;
 			}, 0);
 		},
 		totalAdelantos() {
 			return this.payments.reduce((sum, item) => {
-				if (item.type == 8) return sum + parseFloat(item.price ?? 0);
+				const price = parseFloat(item.price ?? 0);
+				if (item.type == 8 && price >= 0) return sum + price;
 				return sum;
 			}, 0);
 		},
-		suma: function (){
-			this.sumaTipos=[]
-			if(this.filteredPayments.length>0){
-				return this.filteredPayments.reduce((suma, item)=>{ //console.log(item);
-					let queIndex= this.sumaTipos.findIndex(x=> x.moneda== this.queMoneda(item.moneda) );
-					if( queIndex>-1 ){ //encuentra
-						if( item.type==6)
-							this.sumaTipos[queIndex].suma-= parseFloat(item.price ?? 0)
-						else
-							this.sumaTipos[queIndex].suma+= parseFloat(item.price ?? 0)
-					}else{
-						if( item.type==6 )
-							this.sumaTipos.push({suma: -parseFloat(item.price ?? 0), moneda: this.queMoneda(item.moneda)})
-						else
-							this.sumaTipos.push({suma: parseFloat(item.price ?? 0), moneda: this.queMoneda(item.moneda)})
+		suma() {
+			if (this.filteredPayments.length > 0) {
+				return this.filteredPayments.reduce((suma, item) => {
+					const price = parseFloat(item.price ?? 0);
+					if (price >= 0) {
+						return suma + price;
 					}
-					//console.log(item.type==6);
-
-					if(item.type==6){
-						return suma- parseFloat(item.price??0)
-					}else{
-						return suma+ parseFloat(item.price??0)
-					}
-
-				}, 0)
-			}else{
-				return 0;
+					return suma;
+				}, 0);
 			}
+			return 0;
 		},
-		sumaSal: function (){
-			this.sumaSalidas=[]
-			if(this.filteredSalidas.length>0){
-				return this.filteredSalidas.reduce((suma, item)=>{
-					let queIndex= this.sumaSalidas.findIndex(x=> x.moneda== this.queMoneda(item.moneda ));
-					//console.log(queIndex);
-					if( queIndex>-1 ){ //encuentra
-						if( item.type==6)
-							this.sumaSalidas[queIndex].suma-= parseFloat(item.price ?? 0)
-						else
-							this.sumaSalidas[queIndex].suma+= parseFloat(item.price ?? 0)
-					}else{
-						if( item.type==6 )
-							this.sumaSalidas.push({suma: -parseFloat(item.price ?? 0), moneda: this.queMoneda(item.moneda)})
-						else
-							this.sumaSalidas.push({suma: parseFloat(item.price ?? 0), moneda: this.queMoneda(item.moneda)})
-					}
-					//console.log(item.type==6);
-
-					if(item.type==6){
-						return suma- parseFloat(item.price??0)
-					}else{
-						return suma+ parseFloat(item.price??0)
-					}
-
-				}, 0)
-			}else{
-				return 0;
+		sumaSal() {
+			let total = 0;
+			if (this.filteredSalidas.length > 0) {
+				total += this.filteredSalidas.reduce((suma, item) => {
+					return suma + parseFloat(item.price ?? 0);
+				}, 0);
 			}
+			if (this.filteredPayments.length > 0) {
+				total += this.filteredPayments.reduce((suma, item) => {
+					const price = parseFloat(item.price ?? 0);
+					if (price < 0) {
+						return suma + Math.abs(price);
+					}
+					return suma;
+				}, 0);
+			}
+			return total;
+		},
+		sumaTipos() {
+			let res = [];
+			this.filteredPayments.forEach(item => {
+				let monedaName = this.queMoneda(item.moneda) || 'Otro';
+				let value = parseFloat(item.price ?? 0);
+				if (value >= 0) {
+					let existing = res.find(x => x.moneda === monedaName);
+					if (existing) {
+						existing.suma += value;
+					} else {
+						res.push({ moneda: monedaName, suma: value });
+					}
+				}
+			});
+			return res;
+		},
+		sumaSalidas() {
+			let res = [];
+			this.filteredSalidas.forEach(item => {
+				let monedaName = this.queMoneda(item.moneda) || 'Otro';
+				let value = parseFloat(item.price ?? 0);
+				let existing = res.find(x => x.moneda === monedaName);
+				if (existing) {
+					existing.suma += value;
+				} else {
+					res.push({ moneda: monedaName, suma: value });
+				}
+			});
+			this.filteredPayments.forEach(item => {
+				let value = parseFloat(item.price ?? 0);
+				if (value < 0) {
+					let monedaName = this.queMoneda(item.moneda) || 'Otro';
+					let absValue = Math.abs(value);
+					let existing = res.find(x => x.moneda === monedaName);
+					if (existing) {
+						existing.suma += absValue;
+					} else {
+						res.push({ moneda: monedaName, suma: absValue });
+					}
+				}
+			});
+			return res;
+		},
+		saldoNetoPorMoneda() {
+			let res = [];
+			let monedas = new Set([
+				...this.sumaTipos.map(x => x.moneda),
+				...this.sumaSalidas.map(x => x.moneda)
+			]);
+			monedas.forEach(moneda => {
+				let ing = this.sumaTipos.find(x => x.moneda === moneda)?.suma || 0;
+				let egr = this.sumaSalidas.find(x => x.moneda === moneda)?.suma || 0;
+				res.push({
+					moneda: moneda,
+					suma: ing - egr
+				});
+			});
+			return res;
+		},
+		totalSaldoNeto() {
+			return this.suma - this.sumaSal;
 		}
 	}
 }

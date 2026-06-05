@@ -6548,6 +6548,80 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           }
         }, _callee3, null, [[3, 12]]);
       }))();
+    },
+    enviarAlLimbo: function enviarAlLimbo(cita) {
+      var _this4 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var _yield$_this4$$swal, motivo, userRes, userId;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              if (cita) {
+                _context4.next = 2;
+                break;
+              }
+              return _context4.abrupt("return");
+            case 2:
+              _context4.next = 4;
+              return _this4.$swal({
+                title: 'Enviar al Limbo',
+                input: 'text',
+                inputLabel: 'Motivo para enviar al limbo',
+                inputPlaceholder: 'Especifique el motivo...',
+                showCancelButton: true,
+                confirmButtonText: 'Enviar',
+                cancelButtonText: 'Cancelar',
+                inputValidator: function inputValidator(value) {
+                  if (!value) {
+                    return '¡Necesitas escribir un motivo!';
+                  }
+                }
+              });
+            case 4:
+              _yield$_this4$$swal = _context4.sent;
+              motivo = _yield$_this4$$swal.value;
+              if (!motivo) {
+                _context4.next = 22;
+                break;
+              }
+              _context4.prev = 7;
+              _context4.next = 10;
+              return _this4.axios.get('/api/user');
+            case 10:
+              userRes = _context4.sent;
+              userId = userRes.data && userRes.data.user ? userRes.data.user.id : null;
+              _context4.next = 14;
+              return _this4.axios.post('/api/limbos', {
+                appointment_id: cita.id,
+                user_id: userId,
+                motivo: motivo
+              });
+            case 14:
+              if (window.alertify) {
+                window.alertify.notify('<i class="fa-regular fa-check-circle"></i> Cita enviada al limbo', 'success', 5);
+              } else {
+                _this4.$swal({
+                  icon: 'success',
+                  title: 'Cita enviada al limbo'
+                });
+              }
+              _this4.$emit('actualizar');
+              _context4.next = 22;
+              break;
+            case 18:
+              _context4.prev = 18;
+              _context4.t0 = _context4["catch"](7);
+              console.error(_context4.t0);
+              _this4.$swal({
+                icon: 'error',
+                title: 'Ocurrió un error al enviar al limbo'
+              });
+            case 22:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4, null, [[7, 18]]);
+      }))();
     }
   }
 });
@@ -12060,6 +12134,19 @@ var render = function render() {
   }, [_c("i", {
     staticClass: "fas fa-share-square"
   }), _vm._v(" Mover a Vacio\n            ")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-link text-muted p-0 small",
+    attrs: {
+      "data-bs-dismiss": "modal",
+      title: "Enviar al Limbo"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.enviarAlLimbo(_vm.cita);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-satellite-dish"
+  }), _vm._v(" Envia al Limbo\n            ")]), _vm._v(" "), _c("button", {
     staticClass: "btn btn-link text-muted p-0 small",
     attrs: {
       "data-bs-toggle": "modal",

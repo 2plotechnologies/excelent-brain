@@ -454,50 +454,6 @@ class AppointmentController extends Controller
 		}
 
 						//echo 'nombre: '. trim(str_replace('  ', ' ' , $request->get('name')));
-		if ($request->get('clasification') == 1 && $patient_condition == "1" && in_array($duracion, [45, 60])) {
-			$pacienteBloqueo = Patient::where('name', 'like', '%bloqueo%')->orWhere('nombres', 'like', '%bloqueo%')->first();
-			if ($pacienteBloqueo) {
-				$nextSchedule = Schedule::where('professional_id', $request->get('professional_id'))
-					->where('day', $scheduleInfo->day)
-					->where('check_time', '>=', $hora_fin)
-					->orderBy('check_time', 'asc')
-					->first();
-				
-				if ($nextSchedule) {
-					// Verificar si el siguiente horario no está ya ocupado
-					$bloqueoOcupado = Appointment::where('schedule_id', $nextSchedule->id)
-						->where('date', $request->get('date'))
-						->where('active_slot', 1)
-						->first();
-					
-					if (!$bloqueoOcupado) {
-						$hora_inicio_bloq = $nextSchedule->check_time;
-						$hora_fin_bloq = null;
-						Appointment::create([
-							'professional_id' => $request->get('professional_id'),
-							'date' => $request->get('date'),
-							'schedule_id' => $nextSchedule->id,
-							'clasification' => 1,
-							'type' => $request->get('type'),
-							'patient_condition' => '1',
-							'recomendation' => 'Bloqueo automático de 15 min tras consulta inicial',
-							'mode' => 1,
-							'link' => '',
-							'status' => 2, // Confirmado para que ocupe espacio y no aparezca pendiente
-							'patient_id' => $pacienteBloqueo->id,
-							'formato_nuevo' => $request->get('formato_nuevo'),
-							'recomendacion_comentario' => 'Bloqueo automático de 15 min tras consulta inicial',
-							'active_slot' => 1,
-							'hora_inicio' => $hora_inicio_bloq,
-							'hora_fin' => $hora_fin_bloq,
-							'duracion' => 15,
-							'idSede' => $request->get('idSede', 1)
-						]);
-					}
-				}
-			}
-		}
-
 		return response()->json([ 'cita'=>$appointment, 'estado' => $request->get('price') ]);
 
 		}); // end DB::transaction

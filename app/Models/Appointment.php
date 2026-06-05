@@ -21,7 +21,7 @@ class Appointment extends Model
                         $membresia->save();
                     } elseif ($membresia->estado == 2) {
                         $citas = \App\Models\Appointment::where('idMembresia', $membresia->id)->get();
-                        $sesionesEfectivas = $citas->where('status', 2)->count();
+                        $sesionesEfectivas = $citas->whereIn('status', [2, 5])->count();
                     
                     $precio = \Illuminate\Support\Facades\DB::table('precios')->where('id', $membresia->tipo)->first();
                     $total_sesiones = $precio ? $precio->sesiones : 0;

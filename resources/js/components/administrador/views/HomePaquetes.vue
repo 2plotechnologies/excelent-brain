@@ -208,9 +208,9 @@
                 <i class="fas fa-calendar-plus me-1"></i> Agendar sesión
               </button>
               <button class="btn btn-light btn-sm shadow-sm action-btn outline-btn" 
-                v-if="paquete.debe > 0" 
+                v-if="paquete.total_cuotas > 0" 
                 @click="abrirModalPago(paquete)">
-                <i class="far fa-credit-card me-1"></i> Pagar cuota
+                <i class="far fa-credit-card me-1"></i> {{ (paquete.estado !== 4 && paquete.debe > 0) ? 'Pagar cuota' : 'Ver cuotas' }}
               </button>
             </div>
           </div>
@@ -433,6 +433,7 @@
                     </td>
                     <td>
                       <span v-if="cuota.estado == 2" class="badge bg-success-subtle border border-success-subtle text-success">Pagado</span>
+                      <span v-else-if="cuota.estado == 3" class="badge bg-danger-subtle border border-danger-subtle text-danger">Anulado / Prorrateado</span>
                       <span v-else class="badge bg-warning-subtle border border-warning-subtle text-warning">Pendiente</span>
                     </td>
                     <td>
@@ -1146,6 +1147,7 @@ export default {
         case 2: return { text: 'Atendido / Confirmado', class: 'bg-success text-white' };
         case 3: return { text: 'Anulado', class: 'bg-danger text-white' };
         case 4: return { text: 'Reprogramado', class: 'bg-info text-dark' };
+        case 5: return { text: 'Atendido / Confirmado', class: 'bg-success text-white' };
         default: return { text: 'Otro', class: 'bg-secondary text-white' };
       }
     },

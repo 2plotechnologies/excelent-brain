@@ -31,7 +31,8 @@ class Extra_payment extends Model
         'tipo',
         'idSede',
         'correlativo',
-        'numero_cuota'
+        'numero_cuota',
+        'paciente_certificado_id'
     ];
     use HasFactory;
 
@@ -64,5 +65,10 @@ class Extra_payment extends Model
 
     public function user(){
     return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function pacienteCertificado()
+    {
+        return $this->belongsTo(PacienteCertificado::class, 'paciente_certificado_id', 'id');
     }
 }

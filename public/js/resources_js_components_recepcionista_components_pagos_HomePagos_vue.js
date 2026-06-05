@@ -307,8 +307,6 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     return _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty({
       filtroActual: 'Todos',
       payments: [],
-      sumaTipos: [],
-      sumaSalidas: [],
       salidas: [],
       monedas: ['Efectivo', 'Depósito bancario', 'POS', 'Aplicativo Yape', 'Banco: BCP', 'Banco: BBVA', 'Banco: Interbank', 'Banco: Nación', 'Banco: Scotiabank', 'Aplicativo Plin', 'Open pay'],
       idSeleccionado: -1,
@@ -484,7 +482,11 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       })) === null || _this$monedas$find === void 0 ? void 0 : _this$monedas$find.tipo;
     },
     getDisplayType: function getDisplayType(payment) {
-      if (payment.type == 8) return 'Adelanto';
+      var _payment$price;
+      if (parseFloat((_payment$price = payment.price) !== null && _payment$price !== void 0 ? _payment$price : 0) < 0) return 'Devolución';
+      if (payment.type == 8) {
+        return payment.idMembresia && payment.idMembresia > 0 ? 'Pago de Paquete' : 'Adelanto';
+      }
       if (payment.type == 5) return 'Cita';
       if ([1, 2, 7, 15].includes(payment.type)) return 'Cuota';
       if (payment.type == 4) return 'Ing. Extra';
@@ -492,7 +494,11 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       return 'Otro';
     },
     getDisplayIcon: function getDisplayIcon(payment) {
-      if (payment.type == 8) return 'fa-clock';
+      var _payment$price2;
+      if (parseFloat((_payment$price2 = payment.price) !== null && _payment$price2 !== void 0 ? _payment$price2 : 0) < 0) return 'fa-arrow-down-long';
+      if (payment.type == 8) {
+        return payment.idMembresia && payment.idMembresia > 0 ? 'fa-box-open' : 'fa-clock';
+      }
       if (payment.type == 5) return 'fa-calendar-check';
       if ([1, 2, 7, 15].includes(payment.type)) return 'fa-receipt';
       if (payment.type == 4) return 'fa-arrow-up-long';
@@ -500,7 +506,11 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       return 'fa-circle-info';
     },
     getBadgeClass: function getBadgeClass(payment) {
-      if (payment.type == 8) return 'badge-adelanto';
+      var _payment$price3;
+      if (parseFloat((_payment$price3 = payment.price) !== null && _payment$price3 !== void 0 ? _payment$price3 : 0) < 0) return 'badge-egreso';
+      if (payment.type == 8) {
+        return payment.idMembresia && payment.idMembresia > 0 ? 'badge-cuota' : 'badge-adelanto';
+      }
       if (payment.type == 5) return 'badge-cita';
       if ([1, 2, 7, 15].includes(payment.type)) return 'badge-cuota';
       if (payment.type == 4) return 'badge-ingreso';
@@ -508,7 +518,11 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       return 'badge-secondary';
     },
     getIconBoxClass: function getIconBoxClass(payment) {
-      if (payment.type == 8) return 'icon-adelanto';
+      var _payment$price4;
+      if (parseFloat((_payment$price4 = payment.price) !== null && _payment$price4 !== void 0 ? _payment$price4 : 0) < 0) return 'icon-egreso';
+      if (payment.type == 8) {
+        return payment.idMembresia && payment.idMembresia > 0 ? 'icon-cuota' : 'icon-adelanto';
+      }
       if (payment.type == 5) return 'icon-cita';
       if ([1, 2, 7, 15].includes(payment.type)) return 'icon-cuota';
       if (payment.type == 4) return 'icon-ingreso';
@@ -516,9 +530,26 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       return 'icon-otros';
     },
     getDisplayTitle: function getDisplayTitle(payment) {
-      if (payment.type == 5 || payment.type == 8) {
-        var motivo = payment.detalle || 'Cita';
-        return "".concat(motivo, " - ").concat(payment.customer);
+      var desc = '';
+      if (payment.idMembresia > 0) {
+        desc = payment.observation || 'Pago de Paquete';
+      } else if (payment.type == 5 || payment.type == 8) {
+        desc = payment.detalle || 'Cita';
+      } else {
+        desc = payment.observation || 'Pago';
+      }
+      if (payment.patient) {
+        var patientName = "".concat(payment.patient.name || '', " ").concat(payment.patient.nombres || '').trim();
+        if (patientName) {
+          return "".concat(desc, " - ").concat(patientName);
+        }
+      }
+
+      // If there is no patient association
+      if (payment.idMembresia > 0 || payment.type == 5 || payment.type == 8) {
+        if (payment.customer) {
+          return "".concat(desc, " - ").concat(payment.customer);
+        }
       }
       return payment.observation || payment.customer || 'Sin descripción';
     }
@@ -549,18 +580,22 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         item.originalIndex = index;
         return item;
       });
-      if (this.filtroActual === 'Ingresos') return result;
+      if (this.filtroActual === 'Ingresos') return result.filter(function (item) {
+        var _item$price;
+        return parseFloat((_item$price = item.price) !== null && _item$price !== void 0 ? _item$price : 0) >= 0;
+      });
       if (this.filtroActual === 'Egresos') return result.filter(function (item) {
-        return item.type == 6;
+        var _item$price2;
+        return item.type == 6 || parseFloat((_item$price2 = item.price) !== null && _item$price2 !== void 0 ? _item$price2 : 0) < 0;
       });
       if (this.filtroActual === 'Citas') return result.filter(function (item) {
         return item.type == 5;
       });
       if (this.filtroActual === 'Adelantos') return result.filter(function (item) {
-        return item.type == 8;
+        return item.type == 8 && !(item.idMembresia > 0);
       });
       if (this.filtroActual === 'Cuotas') return result.filter(function (item) {
-        return [1, 2, 7, 15].includes(item.type);
+        return [1, 2, 7, 15].includes(item.type) || item.type == 8 && item.idMembresia > 0;
       });
       if (this.filtroActual === 'Ing. Extra') return result.filter(function (item) {
         return item.type == 4;
@@ -585,7 +620,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       // Add income (payments)
       this.filteredPayments.forEach(function (p) {
         combined.push(_objectSpread(_objectSpread({}, p), {}, {
-          isIncome: p.type != 6,
+          isIncome: p.type != 6 && parseFloat(p.price) >= 0,
           displayType: _this7.getDisplayType(p),
           displayIcon: _this7.getDisplayIcon(p),
           displayBadgeClass: _this7.getBadgeClass(p),
@@ -627,124 +662,175 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       });
     },
     totalIngresosStats: function totalIngresosStats() {
-      if (this.payments.length > 0) {
-        return this.payments.reduce(function (suma, item) {
-          if (item.type == 6) {
-            var _item$price;
-            return suma - parseFloat((_item$price = item.price) !== null && _item$price !== void 0 ? _item$price : 0);
-          } else {
-            var _item$price2;
-            return suma + parseFloat((_item$price2 = item.price) !== null && _item$price2 !== void 0 ? _item$price2 : 0);
-          }
-        }, 0);
-      }
-      return 0;
+      return this.payments.reduce(function (suma, item) {
+        var _item$price3;
+        var price = parseFloat((_item$price3 = item.price) !== null && _item$price3 !== void 0 ? _item$price3 : 0);
+        if (price >= 0) {
+          return suma + price;
+        }
+        return suma;
+      }, 0);
     },
     totalEgresosStats: function totalEgresosStats() {
+      var total = 0;
       if (this.salidas.length > 0) {
-        var sal = this.salidas.reduce(function (suma, item) {
-          if (item.type == 6) {
-            var _item$price3;
-            return suma - parseFloat((_item$price3 = item.price) !== null && _item$price3 !== void 0 ? _item$price3 : 0);
-          } else {
-            var _item$price4;
-            return suma + parseFloat((_item$price4 = item.price) !== null && _item$price4 !== void 0 ? _item$price4 : 0);
-          }
+        total += this.salidas.reduce(function (suma, item) {
+          var _item$price4;
+          return suma + parseFloat((_item$price4 = item.price) !== null && _item$price4 !== void 0 ? _item$price4 : 0);
         }, 0);
-        return Math.abs(sal);
       }
-      return 0;
+      if (this.payments.length > 0) {
+        total += this.payments.reduce(function (suma, item) {
+          var _item$price5;
+          var price = parseFloat((_item$price5 = item.price) !== null && _item$price5 !== void 0 ? _item$price5 : 0);
+          if (price < 0) {
+            return suma + Math.abs(price);
+          }
+          return suma;
+        }, 0);
+      }
+      return total;
     },
     netoDiaStats: function netoDiaStats() {
       return this.totalIngresosStats - this.totalEgresosStats;
     },
     totalCitasCobradas: function totalCitasCobradas() {
       return this.payments.reduce(function (sum, item) {
-        var _item$price5;
-        if (item.type == 5) return sum + parseFloat((_item$price5 = item.price) !== null && _item$price5 !== void 0 ? _item$price5 : 0);
+        var _item$price6;
+        var price = parseFloat((_item$price6 = item.price) !== null && _item$price6 !== void 0 ? _item$price6 : 0);
+        if (item.type == 5 && price >= 0) return sum + price;
         return sum;
       }, 0);
     },
     totalAdelantos: function totalAdelantos() {
       return this.payments.reduce(function (sum, item) {
-        var _item$price6;
-        if (item.type == 8) return sum + parseFloat((_item$price6 = item.price) !== null && _item$price6 !== void 0 ? _item$price6 : 0);
+        var _item$price7;
+        var price = parseFloat((_item$price7 = item.price) !== null && _item$price7 !== void 0 ? _item$price7 : 0);
+        if (item.type == 8 && price >= 0) return sum + price;
         return sum;
       }, 0);
     },
     suma: function suma() {
-      var _this8 = this;
-      this.sumaTipos = [];
       if (this.filteredPayments.length > 0) {
         return this.filteredPayments.reduce(function (suma, item) {
-          //console.log(item);
-          var queIndex = _this8.sumaTipos.findIndex(function (x) {
-            return x.moneda == _this8.queMoneda(item.moneda);
-          });
-          if (queIndex > -1) {
-            var _item$price7, _item$price8;
-            //encuentra
-            if (item.type == 6) _this8.sumaTipos[queIndex].suma -= parseFloat((_item$price7 = item.price) !== null && _item$price7 !== void 0 ? _item$price7 : 0);else _this8.sumaTipos[queIndex].suma += parseFloat((_item$price8 = item.price) !== null && _item$price8 !== void 0 ? _item$price8 : 0);
-          } else {
-            var _item$price9, _item$price10;
-            if (item.type == 6) _this8.sumaTipos.push({
-              suma: -parseFloat((_item$price9 = item.price) !== null && _item$price9 !== void 0 ? _item$price9 : 0),
-              moneda: _this8.queMoneda(item.moneda)
-            });else _this8.sumaTipos.push({
-              suma: parseFloat((_item$price10 = item.price) !== null && _item$price10 !== void 0 ? _item$price10 : 0),
-              moneda: _this8.queMoneda(item.moneda)
-            });
+          var _item$price8;
+          var price = parseFloat((_item$price8 = item.price) !== null && _item$price8 !== void 0 ? _item$price8 : 0);
+          if (price >= 0) {
+            return suma + price;
           }
-          //console.log(item.type==6);
-
-          if (item.type == 6) {
-            var _item$price11;
-            return suma - parseFloat((_item$price11 = item.price) !== null && _item$price11 !== void 0 ? _item$price11 : 0);
-          } else {
-            var _item$price12;
-            return suma + parseFloat((_item$price12 = item.price) !== null && _item$price12 !== void 0 ? _item$price12 : 0);
-          }
+          return suma;
         }, 0);
-      } else {
-        return 0;
       }
+      return 0;
     },
     sumaSal: function sumaSal() {
-      var _this9 = this;
-      this.sumaSalidas = [];
+      var total = 0;
       if (this.filteredSalidas.length > 0) {
-        return this.filteredSalidas.reduce(function (suma, item) {
-          var queIndex = _this9.sumaSalidas.findIndex(function (x) {
-            return x.moneda == _this9.queMoneda(item.moneda);
+        total += this.filteredSalidas.reduce(function (suma, item) {
+          var _item$price9;
+          return suma + parseFloat((_item$price9 = item.price) !== null && _item$price9 !== void 0 ? _item$price9 : 0);
+        }, 0);
+      }
+      if (this.filteredPayments.length > 0) {
+        total += this.filteredPayments.reduce(function (suma, item) {
+          var _item$price10;
+          var price = parseFloat((_item$price10 = item.price) !== null && _item$price10 !== void 0 ? _item$price10 : 0);
+          if (price < 0) {
+            return suma + Math.abs(price);
+          }
+          return suma;
+        }, 0);
+      }
+      return total;
+    },
+    sumaTipos: function sumaTipos() {
+      var _this8 = this;
+      var res = [];
+      this.filteredPayments.forEach(function (item) {
+        var _item$price11;
+        var monedaName = _this8.queMoneda(item.moneda) || 'Otro';
+        var value = parseFloat((_item$price11 = item.price) !== null && _item$price11 !== void 0 ? _item$price11 : 0);
+        if (value >= 0) {
+          var existing = res.find(function (x) {
+            return x.moneda === monedaName;
           });
-          //console.log(queIndex);
-          if (queIndex > -1) {
-            var _item$price13, _item$price14;
-            //encuentra
-            if (item.type == 6) _this9.sumaSalidas[queIndex].suma -= parseFloat((_item$price13 = item.price) !== null && _item$price13 !== void 0 ? _item$price13 : 0);else _this9.sumaSalidas[queIndex].suma += parseFloat((_item$price14 = item.price) !== null && _item$price14 !== void 0 ? _item$price14 : 0);
+          if (existing) {
+            existing.suma += value;
           } else {
-            var _item$price15, _item$price16;
-            if (item.type == 6) _this9.sumaSalidas.push({
-              suma: -parseFloat((_item$price15 = item.price) !== null && _item$price15 !== void 0 ? _item$price15 : 0),
-              moneda: _this9.queMoneda(item.moneda)
-            });else _this9.sumaSalidas.push({
-              suma: parseFloat((_item$price16 = item.price) !== null && _item$price16 !== void 0 ? _item$price16 : 0),
-              moneda: _this9.queMoneda(item.moneda)
+            res.push({
+              moneda: monedaName,
+              suma: value
             });
           }
-          //console.log(item.type==6);
-
-          if (item.type == 6) {
-            var _item$price17;
-            return suma - parseFloat((_item$price17 = item.price) !== null && _item$price17 !== void 0 ? _item$price17 : 0);
+        }
+      });
+      return res;
+    },
+    sumaSalidas: function sumaSalidas() {
+      var _this9 = this;
+      var res = [];
+      this.filteredSalidas.forEach(function (item) {
+        var _item$price12;
+        var monedaName = _this9.queMoneda(item.moneda) || 'Otro';
+        var value = parseFloat((_item$price12 = item.price) !== null && _item$price12 !== void 0 ? _item$price12 : 0);
+        var existing = res.find(function (x) {
+          return x.moneda === monedaName;
+        });
+        if (existing) {
+          existing.suma += value;
+        } else {
+          res.push({
+            moneda: monedaName,
+            suma: value
+          });
+        }
+      });
+      this.filteredPayments.forEach(function (item) {
+        var _item$price13;
+        var value = parseFloat((_item$price13 = item.price) !== null && _item$price13 !== void 0 ? _item$price13 : 0);
+        if (value < 0) {
+          var monedaName = _this9.queMoneda(item.moneda) || 'Otro';
+          var absValue = Math.abs(value);
+          var existing = res.find(function (x) {
+            return x.moneda === monedaName;
+          });
+          if (existing) {
+            existing.suma += absValue;
           } else {
-            var _item$price18;
-            return suma + parseFloat((_item$price18 = item.price) !== null && _item$price18 !== void 0 ? _item$price18 : 0);
+            res.push({
+              moneda: monedaName,
+              suma: absValue
+            });
           }
-        }, 0);
-      } else {
-        return 0;
-      }
+        }
+      });
+      return res;
+    },
+    saldoNetoPorMoneda: function saldoNetoPorMoneda() {
+      var _this10 = this;
+      var res = [];
+      var monedas = new Set([].concat(_toConsumableArray(this.sumaTipos.map(function (x) {
+        return x.moneda;
+      })), _toConsumableArray(this.sumaSalidas.map(function (x) {
+        return x.moneda;
+      }))));
+      monedas.forEach(function (moneda) {
+        var _this10$sumaTipos$fin, _this10$sumaSalidas$f;
+        var ing = ((_this10$sumaTipos$fin = _this10.sumaTipos.find(function (x) {
+          return x.moneda === moneda;
+        })) === null || _this10$sumaTipos$fin === void 0 ? void 0 : _this10$sumaTipos$fin.suma) || 0;
+        var egr = ((_this10$sumaSalidas$f = _this10.sumaSalidas.find(function (x) {
+          return x.moneda === moneda;
+        })) === null || _this10$sumaSalidas$f === void 0 ? void 0 : _this10$sumaSalidas$f.suma) || 0;
+        res.push({
+          moneda: moneda,
+          suma: ing - egr
+        });
+      });
+      return res;
+    },
+    totalSaldoNeto: function totalSaldoNeto() {
+      return this.suma - this.sumaSal;
     }
   }
 });
@@ -2820,7 +2906,7 @@ var render = function render() {
     }, [_vm._v(_vm._s(transaction.voucher_issued || "—"))])]), _vm._v(" "), _c("td", [_c("span", {
       staticClass: "monto-txt",
       "class": transaction.isIncome ? "monto-positivo" : "monto-negativo"
-    }, [_vm._v("\n\t\t\t\t\t\t\t\t" + _vm._s(transaction.isIncome ? "+" : "-") + "S/ " + _vm._s(_vm.retornarFloat(transaction.displayAmount)) + "\n\t\t\t\t\t\t\t")])]), _vm._v(" "), _c("td", {
+    }, [_vm._v("\n\t\t\t\t\t\t\t\t" + _vm._s(transaction.isIncome ? "+" : "-") + "S/ " + _vm._s(_vm.retornarFloat(Math.abs(transaction.displayAmount))) + "\n\t\t\t\t\t\t\t")])]), _vm._v(" "), _c("td", {
       staticClass: "text-center"
     }, [_c("div", {
       staticClass: "d-flex justify-content-center gap-1"
@@ -2919,10 +3005,12 @@ var render = function render() {
   }), 0)])]), _vm._v(" "), _vm.unifiedTransactions.length > 0 ? _c("div", {
     staticClass: "row mt-4 mb-4"
   }, [_c("div", {
-    staticClass: "col-md-6"
+    staticClass: "col-md-4 mb-3"
   }, [_c("div", {
-    staticClass: "card border-0 shadow-sm p-3"
-  }, [_vm._m(8), _vm._v(" "), _vm._l(_vm.sumaTipos, function (tipo) {
+    staticClass: "card border-0 shadow-sm p-3 d-flex flex-column h-100"
+  }, [_vm._m(8), _vm._v(" "), _c("div", {
+    staticClass: "flex-grow-1"
+  }, _vm._l(_vm.sumaTipos, function (tipo) {
     return _c("div", {
       key: tipo.moneda,
       staticClass: "d-flex justify-content-between mb-1"
@@ -2931,17 +3019,21 @@ var render = function render() {
     }, [_vm._v(_vm._s(tipo.moneda) + ":")]), _vm._v(" "), _c("span", {
       staticClass: "fw-bold"
     }, [_vm._v("S/ " + _vm._s(tipo.suma.toFixed(2)))])]);
-  }), _vm._v(" "), _c("hr"), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-between"
+  }), 0), _vm._v(" "), _c("hr", {
+    staticClass: "mt-3"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-between mt-auto"
   }, [_c("span", {
     staticClass: "fw-bold"
   }, [_vm._v("Total Ingresos:")]), _vm._v(" "), _c("span", {
     staticClass: "text-primary fw-bold"
-  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.suma).toFixed(2)))])])], 2)]), _vm._v(" "), _vm.sumaSalidas.length > 0 ? _c("div", {
-    staticClass: "col-md-6"
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.suma).toFixed(2)))])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4 mb-3"
   }, [_c("div", {
-    staticClass: "card border-0 shadow-sm p-3"
-  }, [_vm._m(9), _vm._v(" "), _vm._l(_vm.sumaSalidas, function (tipo) {
+    staticClass: "card border-0 shadow-sm p-3 d-flex flex-column h-100"
+  }, [_vm._m(9), _vm._v(" "), _c("div", {
+    staticClass: "flex-grow-1"
+  }, _vm._l(_vm.sumaSalidas, function (tipo) {
     return _c("div", {
       key: tipo.moneda,
       staticClass: "d-flex justify-content-between mb-1"
@@ -2950,24 +3042,49 @@ var render = function render() {
     }, [_vm._v(_vm._s(tipo.moneda) + ":")]), _vm._v(" "), _c("span", {
       staticClass: "fw-bold"
     }, [_vm._v("S/ " + _vm._s(tipo.suma.toFixed(2)))])]);
-  }), _vm._v(" "), _c("hr"), _vm._v(" "), _c("div", {
-    staticClass: "d-flex justify-content-between"
+  }), 0), _vm._v(" "), _c("hr", {
+    staticClass: "mt-3"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-between mt-auto"
   }, [_c("span", {
     staticClass: "fw-bold"
   }, [_vm._v("Total Egresos:")]), _vm._v(" "), _c("span", {
     staticClass: "text-danger fw-bold"
-  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.sumaSal).toFixed(2)))])])], 2)]) : _vm._e()]) : _vm._e(), _vm._v(" "), _vm.eliminados.length > 0 ? _c("p", {
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.sumaSal).toFixed(2)))])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4 mb-3"
+  }, [_c("div", {
+    staticClass: "card border-0 shadow-sm p-3 d-flex flex-column h-100"
+  }, [_vm._m(10), _vm._v(" "), _c("div", {
+    staticClass: "flex-grow-1"
+  }, _vm._l(_vm.saldoNetoPorMoneda, function (tipo) {
+    return _c("div", {
+      key: tipo.moneda,
+      staticClass: "d-flex justify-content-between mb-1"
+    }, [_c("span", {
+      staticClass: "text-muted"
+    }, [_vm._v(_vm._s(tipo.moneda) + ":")]), _vm._v(" "), _c("span", {
+      "class": tipo.suma >= 0 ? "text-success fw-bold" : "text-danger fw-bold"
+    }, [_vm._v("S/ " + _vm._s(tipo.suma.toFixed(2)))])]);
+  }), 0), _vm._v(" "), _c("hr", {
+    staticClass: "mt-3"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "d-flex justify-content-between mt-auto"
+  }, [_c("span", {
+    staticClass: "fw-bold"
+  }, [_vm._v("Saldo Neto:")]), _vm._v(" "), _c("span", {
+    "class": _vm.totalSaldoNeto >= 0 ? "text-success fw-bold" : "text-danger fw-bold"
+  }, [_vm._v("S/ " + _vm._s(_vm.totalSaldoNeto.toFixed(2)))])])])])]) : _vm._e(), _vm._v(" "), _vm.eliminados.length > 0 ? _c("p", {
     staticClass: "mt-2 text-danger"
   }, [_c("strong", [_vm._v("Pagos eliminados")])]) : _vm._e(), _vm._v(" "), _vm.eliminados.length > 0 ? _c("table", {
     staticClass: "table table-hover w-100 mt-1",
     attrs: {
       id: "table_eliminados"
     }
-  }, [_c("thead", {}, [_vm._m(10), _vm._v(" "), _c("tr", [_vm.tienePrivilegios == "1" ? _c("td", {
+  }, [_c("thead", {}, [_vm._m(11), _vm._v(" "), _c("tr", [_vm.tienePrivilegios == "1" ? _c("td", {
     staticClass: "text-danger d-print-none"
   }, [_vm._v("@")]) : _vm._e(), _vm._v(" "), _c("td", {
     staticClass: "text-danger"
-  }, [_vm._v("N°")]), _vm._v(" "), _vm._m(11), _vm._v(" "), _c("td", {
+  }, [_vm._v("N°")]), _vm._v(" "), _vm._m(12), _vm._v(" "), _c("td", {
     staticClass: "text-danger"
   }, [_vm._v("Fact. Bol.")]), _vm._v(" "), _c("td", {
     staticClass: "text-danger"
@@ -2990,6 +3107,7 @@ var render = function render() {
   }, [_vm._v("Hora")]), _vm._v(" "), _c("td", {
     staticClass: "text-danger d-print-none"
   }, [_vm._v("@")])])]), _vm._v(" "), _c("tbody", _vm._l(_vm.eliminados, function (payment, index) {
+    var _payment$price, _payment$price2, _payment$price3;
     return _c("tr", [_c("td", [_c("span", [_vm._v(_vm._s(index + 1))])]), _vm._v(" "), payment.usuario ? _c("td", {
       staticStyle: {
         "white-space": "nowrap"
@@ -3018,10 +3136,10 @@ var render = function render() {
       staticClass: "text-danger"
     }, [_c("br"), _c("strong", [_vm._v("Motivo: ")]), _vm._v(_vm._s(payment.razon))])]), _vm._v(" "), _c("td", [payment.continuo == "1" ? _c("span", [_vm._v("N")]) : payment.continuo == "2" ? _c("span", [_vm._v("C")]) : payment.continuo == "3" ? _c("span", [_vm._v("M")]) : _c("span", [payment.continuo == "-1" ? _c("span", [_vm._v("X")]) : _vm._e(), _vm._v(" "), payment.continuo == null ? _c("span", [_vm._v("X")]) : _vm._e()])]), _vm._v(" "), _c("td", [_vm._v(_vm._s(payment.observation))]), _vm._v(" "), _c("td", {
       "class": {
-        "text-danger": payment.type == 6,
-        "text-primary": payment.type != 6
+        "text-danger": payment.type == 6 || parseFloat((_payment$price = payment.price) !== null && _payment$price !== void 0 ? _payment$price : 0) < 0,
+        "text-primary": payment.type != 6 && parseFloat((_payment$price2 = payment.price) !== null && _payment$price2 !== void 0 ? _payment$price2 : 0) >= 0
       }
-    }, [_vm._v("S/ "), payment.type == 6 ? _c("span", [_vm._v("-")]) : _vm._e(), _vm._v(" " + _vm._s(_vm.retornarFloat(payment.price)))]), _vm._v(" "), _c("td", [payment.type == 6 ? _c("span", [_vm._v("Salida de dinero")]) : _vm._e(), _vm._v(" "), payment.type == 5 ? _c("span", [_vm._v("Pago de cita")]) : _vm._e(), _vm._v(" "), payment.type == 3 ? _c("span", [_vm._v("Informe")]) : _vm._e(), _vm._v(" "), payment.type == 2 ? _c("span", [_vm._v("Paquete Kurame")]) : _vm._e(), _vm._v(" "), payment.type == 1 ? _c("span", [_vm._v("Paquete")]) : _vm._e(), _vm._v(" "), payment.type == 0 ? _c("span", [_vm._v("Certificado")]) : _vm._e()]), _vm._v(" "), _c("td", {
+    }, [_vm._v("S/ "), payment.type == 6 || parseFloat((_payment$price3 = payment.price) !== null && _payment$price3 !== void 0 ? _payment$price3 : 0) < 0 ? _c("span", [_vm._v("-")]) : _vm._e(), _vm._v(" " + _vm._s(_vm.retornarFloat(Math.abs(payment.price))))]), _vm._v(" "), _c("td", [payment.type == 6 ? _c("span", [_vm._v("Salida de dinero")]) : _vm._e(), _vm._v(" "), payment.type == 5 ? _c("span", [_vm._v("Pago de cita")]) : _vm._e(), _vm._v(" "), payment.type == 3 ? _c("span", [_vm._v("Informe")]) : _vm._e(), _vm._v(" "), payment.type == 2 ? _c("span", [_vm._v("Paquete Kurame")]) : _vm._e(), _vm._v(" "), payment.type == 1 ? _c("span", [_vm._v("Paquete")]) : _vm._e(), _vm._v(" "), payment.type == 0 ? _c("span", [_vm._v("Certificado")]) : _vm._e()]), _vm._v(" "), _c("td", {
       staticClass: "text-capitalize"
     }, [_c("span", [_vm._v(_vm._s(_vm.queMoneda(payment.moneda)))])]), _vm._v(" "), _c("td", [_vm._v(_vm._s(payment.voucher_issued))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(payment.profesional_name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.horaLatam(payment.created_at)))]), _vm._v(" "), _c("td", {
       staticClass: "d-print-none",
@@ -3071,7 +3189,7 @@ var render = function render() {
     staticClass: "modal-dialog"
   }, [_c("div", {
     staticClass: "modal-content"
-  }, [_vm._m(12), _vm._v(" "), _c("div", {
+  }, [_vm._m(13), _vm._v(" "), _c("div", {
     staticClass: "modal-body"
   }, [_c("p", {
     staticClass: "mb-0"
@@ -3130,7 +3248,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-sm"
   }, [_c("div", {
     staticClass: "modal-content"
-  }, [_vm._m(13), _vm._v(" "), _c("div", {
+  }, [_vm._m(14), _vm._v(" "), _c("div", {
     staticClass: "modal-body"
   }, [_c("div", {
     staticClass: "form-group row"
@@ -3438,6 +3556,14 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fas fa-list-check me-2"
   }), _vm._v("Resumen por Moneda (Egresos)")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "text-success fw-bold mb-3"
+  }, [_c("i", {
+    staticClass: "fas fa-wallet me-2"
+  }), _vm._v("Saldo Neto de Caja")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;

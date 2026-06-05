@@ -74,6 +74,7 @@
                   :class="{ 'cl-input--error': errors.email }"
                   placeholder="nombre@clinica.com"
                   autocomplete="email"
+                  @keyup.enter="login"
                 />
               </div>
               <span class="cl-error-msg" v-if="errors.email">{{ Array.isArray(errors.email) ? errors.email[0] : errors.email }}</span>
@@ -95,6 +96,7 @@
                   :class="{ 'cl-input--error': errors.password }"
                   placeholder="••••••••••"
                   autocomplete="current-password"
+                  @keyup.enter="login"
                 />
                 <button type="button" class="cl-toggle-pw" @click="showPassword = !showPassword" tabindex="-1">
                   <svg v-if="!showPassword" viewBox="0 0 24 24" fill="none">
@@ -617,9 +619,44 @@ export default {
   margin: 0 !important;
 }
 
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  #clinic-login-root .cl-panel-left {
+    flex: 0 0 35% !important;
+  }
+  #clinic-login-root .cl-panel-left-inner {
+    padding: 2rem 1.5rem !important;
+  }
+  #clinic-login-root .cl-quote-text {
+    font-size: 1rem !important;
+  }
+  #clinic-login-root .cl-deco-svg {
+    width: 120px !important;
+  }
+}
+
 @media (max-width: 660px) {
   #clinic-login-root .cl-panel-left { display: none !important; }
   #clinic-login-root .cl-panel-right { padding: 2.2rem 1.6rem !important; }
   #clinic-login-root .cl-card { border-radius: 14px !important; }
+}
+
+@media (max-width: 420px) {
+  #clinic-login-root {
+    padding: 1rem !important;
+  }
+  #clinic-login-root .cl-panel-right {
+    padding: 1.8rem 1.2rem !important;
+  }
+  #clinic-login-root .cl-title {
+    font-size: 1.5rem !important;
+  }
+  #clinic-login-root .cl-badges {
+    gap: 0.3rem !important;
+  }
+  #clinic-login-root .cl-badge {
+    font-size: 0.62rem !important;
+    padding: 0.22rem 0.5rem !important;
+  }
 }
 </style>

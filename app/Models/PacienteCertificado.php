@@ -17,8 +17,14 @@ class PacienteCertificado extends Model
         'dni',
         'telefono',
         'correo',
-        'tipo_certificado'
+        'tipo_certificado',
+        'estado'
     ];
+
+    public function pagos()
+    {
+        return $this->hasMany(Extra_payment::class, 'paciente_certificado_id', 'id');
+    }
 
     protected $casts = [
         'created_at' => 'datetime',

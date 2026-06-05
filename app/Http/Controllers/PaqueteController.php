@@ -156,7 +156,7 @@ class PaqueteController extends Controller
                     Membresia::where('id', $membresia->id)->update(['estado' => 2]);
                 }
             } elseif ($membresia->estado == 2) { // Activo
-                $sesionesEfectivas = $citas->where('status', 2)->count();
+                $sesionesEfectivas = $citas->whereIn('status', [2, 5])->count();
                 if ($membresia->total_sesiones > 0 && $sesionesEfectivas >= $membresia->total_sesiones && floatval($membresia->pagado) >= floatval($membresia->monto)) {
                     $membresia->estado = 3; // Completado
                     Membresia::where('id', $membresia->id)->update(['estado' => 3]);
@@ -375,20 +375,27 @@ class PaqueteController extends Controller
                 return response()->json(['error' => 'No se puede prorratear porque no se definió el número de sesiones.'], 400);
             }
 
-            // Cancelar citas futuras o pendientes (1 = Agendado, 4 = Reprogramado)
+            // 1. Asegurar que las citas que sí se dieron (tienen evolución médica) tengan status 2 (Atendido/Confirmado)
             Appointment::where('idMembresia', $id)
                 ->whereIn('status', [1, 4])
+                ->whereHas('medical_evolutions')
+                ->update(['status' => 2]);
+
+            // 2. Cancelar citas futuras o pendientes reales (1 = Agendado, 4 = Reprogramado) que NO tengan evoluciones médicas
+            Appointment::where('idMembresia', $id)
+                ->whereIn('status', [1, 4])
+                ->whereDoesntHave('medical_evolutions')
                 ->update(['status' => 3]); // 3 = Anulado
 
-            // Anular deudas pendientes
+            // 3. Anular deudas pendientes (mantenemos activo = 1 y ponemos estado = 3 para que se muestren en el modal de pagos)
             DB::table('deudas')
                 ->where('idMembresia', $id)
                 ->where('estado', 1) // Pendiente
-                ->update(['activo' => 0]);
+                ->update(['estado' => 3]);
 
-            // Calcular sesiones efectivas (status 2 = Atendido)
+            // Calcular sesiones efectivas (status 2 = Atendido, status 5 = Atendida)
             $sesiones_efectivas = Appointment::where('idMembresia', $id)
-                ->where('status', 2)
+                ->whereIn('status', [2, 5])
                 ->count();
 
             // El prorrateo se basa en el precio base de la membresía (monto + descuento).

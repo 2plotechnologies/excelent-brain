@@ -470,5 +470,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/paciente-certificado/{id}', [PacienteCertificadoController::class, 'show']);
     Route::put('/paciente-certificado/{id}', [PacienteCertificadoController::class, 'update']);
     Route::delete('/paciente-certificado/{id}', [PacienteCertificadoController::class, 'destroy']);
+    
+    Route::get('/paciente-certificado/dni/{dni}', [PacienteCertificadoController::class, 'buscarPorDni']);
+    Route::put('/paciente-certificado/{id}/estado', [PacienteCertificadoController::class, 'cambiarEstado']);
+    Route::post('/paciente-certificado/{id}/pagar', [PacienteCertificadoController::class, 'pagar']);
 
 });
