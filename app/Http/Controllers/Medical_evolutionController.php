@@ -7,6 +7,7 @@ use App\Models\Medical_evolution;
 use App\Models\Patient;
 use App\Models\Prescription;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use Illuminate\Support\Facades\DB;
 
 
 class Medical_evolutionController extends Controller
