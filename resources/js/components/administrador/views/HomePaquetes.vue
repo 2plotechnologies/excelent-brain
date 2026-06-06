@@ -1009,14 +1009,37 @@ export default {
         const fechaObj = new Date(this.nuevaSesion.fecha + 'T00:00:00');
         const diaNombre = diasSemana[fechaObj.getDay()];
 
-        // Filtrar horarios por el día y que no tengan cita
+        const timeToMinutes = (t) => {
+          if (!t) return 0;
+          let p = t.split(':').map(Number);
+          return p[0] * 60 + (p[1] || 0);
+        };
+
+        // Filtrar horarios por el día y que no tengan cita solapada
         this.horariosDisponibles = schedulesAll.filter(h => {
           if (h.day !== diaNombre) return false;
           
-          // Verificar si ya hay una cita en este horario para esta fecha
-          const ocupado = schedulesInvalid.some(inv => 
-            inv.schedule_id === h.id && inv.date === this.nuevaSesion.fecha && inv.status != 6
-          );
+          const ocupado = schedulesInvalid.some(inv => {
+            if (inv.date !== this.nuevaSesion.fecha) return false;
+            if (inv.status == 3 || inv.status == 4 || inv.status == 6) return false;
+
+            let appStart = inv.hora_inicio ? inv.hora_inicio : (inv.schedule && inv.schedule.check_time ? inv.schedule.check_time : '00:00:00');
+            let duracion = 60; // Fallback
+            if (inv.duracion && !isNaN(parseInt(inv.duracion))) {
+              duracion = parseInt(inv.duracion);
+            } else if (inv.precio && inv.precio.duracion && !isNaN(parseInt(inv.precio.duracion))) {
+              duracion = parseInt(inv.precio.duracion);
+            } else if (inv.membresia && inv.membresia.precio && inv.membresia.precio.duracion && !isNaN(parseInt(inv.membresia.precio.duracion))) {
+              duracion = parseInt(inv.membresia.precio.duracion);
+            }
+
+            let sStart = timeToMinutes(h.check_time);
+            let sEnd = timeToMinutes(h.departure_date);
+            let aStart = timeToMinutes(appStart);
+            let aEnd = aStart + duracion;
+
+            return sStart < aEnd && sEnd > aStart;
+          });
           
           return !ocupado;
         });

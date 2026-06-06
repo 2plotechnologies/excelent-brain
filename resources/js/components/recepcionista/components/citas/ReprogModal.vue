@@ -236,12 +236,11 @@ export default {
     emitSchedule (info = this.data ? this.data.date : '') {
       this.horarios = []
 
-      let arraySchedulesInvalid = []
-      this.hoursProfessional.forEach(el => {
-        if (!arraySchedulesInvalid.includes(el.schedule_id)) {
-          arraySchedulesInvalid.push(el.schedule_id)
-        }
-      })
+      const timeToMinutes = (t) => {
+        if (!t) return 0;
+        let p = t.split(':').map(Number);
+        return p[0] * 60 + (p[1] || 0);
+      };
 
       let dayIndex = parseInt(moment(info).format('d')) - 1;
       if (dayIndex === -1) dayIndex = 6;
@@ -252,20 +251,32 @@ export default {
           if (el.date && el.date !== info) {
             return;
           }
-          if (arraySchedulesInvalid.includes(el.id)) {
-            // Hay cita
-            //console.log("Hya citas")
 
-            //console.log(el.appointments.forEach(el => console.log(el.date, info, el.status)))
-            if (el.appointments.find(el => el.date === info && el.status != 3) ? true : false) {
-              
-            } else {
-              this.horarios.push(el)
+          let hasOverlap = this.hoursProfessional.some(i => {
+            if (i.id === this.dataCit.id) return false;
+            if (i.date !== info) return false;
+            if (i.status == 3 || i.status == 4 || i.status == 6) return false;
+
+            let appStart = i.hora_inicio ? i.hora_inicio : (i.schedule && i.schedule.check_time ? i.schedule.check_time : '00:00:00');
+            let duracion = 60; // Fallback
+            if (i.duracion && !isNaN(parseInt(i.duracion))) {
+              duracion = parseInt(i.duracion);
+            } else if (i.precio && i.precio.duracion && !isNaN(parseInt(i.precio.duracion))) {
+              duracion = parseInt(i.precio.duracion);
+            } else if (i.membresia && i.membresia.precio && i.membresia.precio.duracion && !isNaN(parseInt(i.membresia.precio.duracion))) {
+              duracion = parseInt(i.membresia.precio.duracion);
             }
-          } else {
-            //console.log("No Hya citas")
-            // No hay cita
-            this.horarios.push(el)
+
+            let sStart = timeToMinutes(el.check_time);
+            let sEnd = timeToMinutes(el.departure_date);
+            let aStart = timeToMinutes(appStart);
+            let aEnd = aStart + duracion;
+
+            return sStart < aEnd && sEnd > aStart;
+          });
+
+          if (!hasOverlap) {
+            this.horarios.push(el);
           }
         }
       })

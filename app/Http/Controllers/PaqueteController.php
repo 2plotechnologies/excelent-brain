@@ -325,6 +325,53 @@ class PaqueteController extends Controller
     public function agendarCitaPaquete(Request $request)
     {
         try {
+            $schedule_id = $request->input('schedule_id');
+            $scheduleInfo = \App\Models\Schedule::find($schedule_id);
+            $hora_inicio = $scheduleInfo ? $scheduleInfo->check_time : null;
+            $duracion = 60; // Fallback
+            $precio = \App\Models\Precio::find($request->input('type'));
+            if ($precio && $precio->duracion) {
+                $duracion = intval($precio->duracion);
+            } elseif ($request->input('idMembresia')) {
+                $membresia = Membresia::with('precio')->find($request->input('idMembresia'));
+                if ($membresia && $membresia->precio && $membresia->precio->duracion) {
+                    $duracion = intval($membresia->precio->duracion);
+                }
+            }
+            $duracion = abs($duracion);
+            $hora_fin = $hora_inicio ? \Carbon\Carbon::parse($hora_inicio)->addMinutes($duracion)->format('H:i:s') : null;
+
+            // Verificar cruce de horarios para agendar cita de paquete
+            if ($hora_inicio && $hora_fin) {
+                $existing = Appointment::where('professional_id', $request->input('professional_id'))
+                    ->where('date', $request->input('date'))
+                    ->whereIn('status', [1, 2, 5])
+                    ->with(['schedule', 'precio', 'membresia.precio'])
+                    ->get();
+
+                foreach ($existing as $ext) {
+                    $extStart = $ext->hora_inicio ?? ($ext->schedule ? $ext->schedule->check_time : null);
+                    if (!$extStart) continue;
+
+                    $extDuration = $ext->duracion;
+                    if (!$extDuration) {
+                        if ($ext->precio && $ext->precio->duracion) {
+                            $extDuration = intval($ext->precio->duracion);
+                        } elseif ($ext->membresia && $ext->membresia->precio && $ext->membresia->precio->duracion) {
+                            $extDuration = intval($ext->membresia->precio->duracion);
+                        } else {
+                            $extDuration = 60;
+                        }
+                    }
+                    $extDuration = abs($extDuration);
+                    $extEnd = $ext->hora_fin ?? \Carbon\Carbon::parse($extStart)->addMinutes($extDuration)->format('H:i:s');
+
+                    if ($hora_inicio < $extEnd && $hora_fin > $extStart) {
+                        return response()->json(['error' => 'El horario ya fue reservado o tiene un cruce con otra cita.'], 409);
+                    }
+                }
+            }
+
             $cita = Appointment::create([
                 'date' => $request->input('date'),
                 'patient_condition' => $request->input('patient_condition', 2),
@@ -339,7 +386,10 @@ class PaqueteController extends Controller
                 'byDoctor' => 0,
                 'num_sesion' => $request->input('num_sesion'),
                 'idMembresia' => $request->input('idMembresia'),
-                'idSede' => $request->input('idSede', 1)
+                'idSede' => $request->input('idSede', 1),
+                'hora_inicio' => $hora_inicio,
+                'hora_fin' => $hora_fin,
+                'duracion' => $duracion,
             ]);
 
             // Crear el pago ficticio para la cita

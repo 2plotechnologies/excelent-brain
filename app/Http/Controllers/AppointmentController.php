@@ -137,33 +137,54 @@ class AppointmentController extends Controller
 		try {
 			return DB::transaction(function () use ($request) {
 
-			// Verificar que el horario no esté ocupado (pessimistic lock)
-			$slotOcupado = Appointment::where('schedule_id', $request->get('schedule_id'))
-				->where('date', $request->get('date'))
-				->where('active_slot', 1)
-				->lockForUpdate()
-				->first();
+			$scheduleInfo = Schedule::find($request->get('schedule_id'));
+			$hora_inicio = $scheduleInfo ? $scheduleInfo->check_time : null;
+			$duracion = 60; // Fallback
+			$precio = Precio::find($request->get('type'));
+			if ($precio && $precio->duracion) {
+				$duracion = intval($precio->duracion);
+			} elseif ($request->get('idMembresia')) {
+				$membresia = Membresia::with('precio')->find($request->get('idMembresia'));
+				if ($membresia && $membresia->precio && $membresia->precio->duracion) {
+					$duracion = intval($membresia->precio->duracion);
+				}
+			}
+			$duracion = abs($duracion);
+			$hora_fin = $hora_inicio ? \Carbon\Carbon::parse($hora_inicio)->addMinutes($duracion)->format('H:i:s') : null;
 
-			if ($slotOcupado) {
-				return response()->json(['error' => 'El horario ya fue reservado por otro usuario'], 409);
+			// Verificar que el horario y sus slots no estén ocupados/solapados (pessimistic lock)
+			if ($hora_inicio && $hora_fin) {
+				$existing = Appointment::where('professional_id', $request->get('professional_id'))
+					->where('date', $request->get('date'))
+					->whereIn('status', [1, 2, 5])
+					->with(['schedule', 'precio', 'membresia.precio'])
+					->lockForUpdate()
+					->get();
+
+				foreach ($existing as $ext) {
+					$extStart = $ext->hora_inicio ?? ($ext->schedule ? $ext->schedule->check_time : null);
+					if (!$extStart) continue;
+
+					$extDuration = $ext->duracion;
+					if (!$extDuration) {
+						if ($ext->precio && $ext->precio->duracion) {
+							$extDuration = intval($ext->precio->duracion);
+						} elseif ($ext->membresia && $ext->membresia->precio && $ext->membresia->precio->duracion) {
+							$extDuration = intval($ext->membresia->precio->duracion);
+						} else {
+							$extDuration = 60;
+						}
+					}
+					$extDuration = abs($extDuration);
+					$extEnd = $ext->hora_fin ?? \Carbon\Carbon::parse($extStart)->addMinutes($extDuration)->format('H:i:s');
+
+					if ($hora_inicio < $extEnd && $hora_fin > $extStart) {
+						return response()->json(['error' => 'El horario ya fue reservado o tiene un cruce con otra cita.'], 409);
+					}
+				}
 			}
 
 			$paciente_prueba = Patient::where('dni',$request->get('dni'))->first();
-
-            $scheduleInfo = Schedule::find($request->get('schedule_id'));
-            $hora_inicio = $scheduleInfo ? $scheduleInfo->check_time : null;
-            $duracion = 60; // Fallback
-            $precio = Precio::find($request->get('type'));
-            if ($precio && $precio->duracion) {
-                $duracion = intval($precio->duracion);
-            } elseif ($request->get('idMembresia')) {
-                $membresia = Membresia::with('precio')->find($request->get('idMembresia'));
-                if ($membresia && $membresia->precio && $membresia->precio->duracion) {
-                    $duracion = intval($membresia->precio->duracion);
-                }
-            }
-            $duracion = abs($duracion);
-            $hora_fin = $hora_inicio ? \Carbon\Carbon::parse($hora_inicio)->addMinutes($duracion)->format('H:i:s') : null;
 
 		/* $condition = Patient::where('dni', '=', $request->dni)
 		->with('medical_evolutions')
@@ -878,6 +899,38 @@ Medical_evolution::create([
 		$duracion = abs($duracion);
 		$hora_fin = $hora_inicio ? \Carbon\Carbon::parse($hora_inicio)->addMinutes($duracion)->format('H:i:s') : null;
 
+		// Verificar cruce de horarios para la reprogramación
+		if ($hora_inicio && $hora_fin) {
+			$existing = Appointment::where('professional_id', $request->get('professional_id'))
+				->where('date', $request->get('date'))
+				->whereIn('status', [1, 2, 5])
+				->where('id', '!=', $cita->id)
+				->with(['schedule', 'precio', 'membresia.precio'])
+				->get();
+
+			foreach ($existing as $ext) {
+				$extStart = $ext->hora_inicio ?? ($ext->schedule ? $ext->schedule->check_time : null);
+				if (!$extStart) continue;
+
+				$extDuration = $ext->duracion;
+				if (!$extDuration) {
+					if ($ext->precio && $ext->precio->duracion) {
+						$extDuration = intval($ext->precio->duracion);
+					} elseif ($ext->membresia && $ext->membresia->precio && $ext->membresia->precio->duracion) {
+						$extDuration = intval($ext->membresia->precio->duracion);
+					} else {
+						$extDuration = 60;
+					}
+				}
+				$extDuration = abs($extDuration);
+				$extEnd = $ext->hora_fin ?? \Carbon\Carbon::parse($extStart)->addMinutes($extDuration)->format('H:i:s');
+
+				if ($hora_inicio < $extEnd && $hora_fin > $extStart) {
+					return response()->json(['error' => 'El horario ya fue reservado o tiene un cruce con otra cita.'], 409);
+				}
+			}
+		}
+
 		$nuevaCita = Appointment::create([
 			'professional_id' => $request->get('professional_id'),
 			'date' => $request->get('date'),
@@ -988,6 +1041,38 @@ Medical_evolution::create([
 		}
 		$duracion = abs($duracion);
 		$hora_fin = $hora_inicio ? \Carbon\Carbon::parse($hora_inicio)->addMinutes($duracion)->format('H:i:s') : null;
+
+		// Verificar cruce de horarios para mover la cita
+		if ($hora_inicio && $hora_fin) {
+			$existing = Appointment::where('professional_id', $cita->professional_id)
+				->where('date', $request->get('date'))
+				->whereIn('status', [1, 2, 5])
+				->where('id', '!=', $cita->id)
+				->with(['schedule', 'precio', 'membresia.precio'])
+				->get();
+
+			foreach ($existing as $ext) {
+				$extStart = $ext->hora_inicio ?? ($ext->schedule ? $ext->schedule->check_time : null);
+				if (!$extStart) continue;
+
+				$extDuration = $ext->duracion;
+				if (!$extDuration) {
+					if ($ext->precio && $ext->precio->duracion) {
+						$extDuration = intval($ext->precio->duracion);
+					} elseif ($ext->membresia && $ext->membresia->precio && $ext->membresia->precio->duracion) {
+						$extDuration = intval($ext->membresia->precio->duracion);
+					} else {
+						$extDuration = 60;
+					}
+				}
+				$extDuration = abs($extDuration);
+				$extEnd = $ext->hora_fin ?? \Carbon\Carbon::parse($extStart)->addMinutes($extDuration)->format('H:i:s');
+
+				if ($hora_inicio < $extEnd && $hora_fin > $extStart) {
+					return response()->json(['error' => 'El horario ya fue reservado o tiene un cruce con otra cita.'], 409);
+				}
+			}
+		}
 
 		$payload = $request->all();
 		$payload['hora_inicio'] = $hora_inicio;

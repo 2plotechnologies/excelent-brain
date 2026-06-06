@@ -1,12 +1,12 @@
 -- =========================================================
--- AGREGAR COLUMNA
+-- AGREGAR COLUMNA.
 -- =========================================================
 
 ALTER TABLE precios
 ADD COLUMN duracion INT NULL;
 
 -- =========================================================
--- ACTUALIZAR DURACIONES
+-- ACTUALIZAR DURACIONES.
 -- =========================================================
 
 UPDATE precios

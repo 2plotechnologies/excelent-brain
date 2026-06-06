@@ -76,7 +76,7 @@
 					</div>
 
 					<div class="card-actions">
-						<a :href="'../api/pdfEvolution/restricted/'+paciente.id+'?token='+$token" target="_blank" class="action-btn" title="Ver Historia">
+						<a v-if="rolUser === 'profesional' || rolUser === 'interno'" :href="'../api/pdfEvolution/restricted/'+paciente.id+'?token='+$token" target="_blank" class="action-btn" title="Ver Historia">
 							<i class="fa-regular fa-eye"></i> Ver perfil
 						</a>
 						<button class="action-btn" title="Nuevo Seguimiento" data-bs-toggle="modal" data-bs-target="#modalNuevo" @click="idSos=paciente.idSos">
@@ -157,6 +157,9 @@
 <script>
 import moment from 'moment';
 export default {
+	props: {
+		rolUser: String
+	},
 	data() {
 		return {
 			pacientes: [],

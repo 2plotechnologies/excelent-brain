@@ -51,7 +51,7 @@
         <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'citas' }" @click="activeTab = 'citas'" type="button" role="tab" >
           <i class="fas fa-calendar-alt me-1"></i> Citas & Paquetes</button>
       </li>
-      <li class="nav-item" role="presentation">
+      <li class="nav-item" role="presentation" v-if="rolUser === 'profesional' || rolUser === 'interno'">
         <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'historial' }" @click="activeTab = 'historial'" type="button" role="tab" >
           <i class="fas fa-history me-1"></i> Historial Clínico <span v-if="paciente.medical_evolutions">({{ paciente.medical_evolutions.length }})</span></button>
       </li>
@@ -587,7 +587,7 @@
       </div>
 
       <!-- HISTORIAL Medico -->
-      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'historial' }" id="historial" role="tabpanel">
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'historial' }" id="historial" role="tabpanel" v-if="rolUser === 'profesional' || rolUser === 'interno'">
         
         <!-- Accordions for Initial Evaluations -->
         <div class="accordion mb-4 bg-white shadow-sm rounded-lg" id="accordionInitialHistories" v-if="paciente.initial_psychological_history || paciente.initial_psychiatric_history">
@@ -2008,6 +2008,10 @@ export default {
     pacienteId: {
       type: Number,
       required: true
+    },
+    rolUser: {
+      type: String,
+      default: ''
     }
   },
   data() {

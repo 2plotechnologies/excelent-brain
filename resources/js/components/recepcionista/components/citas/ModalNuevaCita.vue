@@ -971,7 +971,36 @@ export default {
 				.then(res => {
 					let solos = res.data.solos.filter(h => h.professional_id == this.cita.professional_id);
 					let invalidos = res.data.invalidos;
-					this.horariosDisponibles = solos.filter(h => !invalidos.find(i => i.schedule_id == h.id));
+
+					const timeToMinutes = (t) => {
+						if (!t) return 0;
+						let p = t.split(':').map(Number);
+						return p[0] * 60 + (p[1] || 0);
+					};
+
+					this.horariosDisponibles = solos.filter(h => {
+						return !invalidos.some(i => {
+							if (parseInt(i.professional_id) !== parseInt(this.cita.professional_id)) return false;
+							if (i.status == 3 || i.status == 4 || i.status == 6) return false;
+
+							let appStart = i.hora_inicio ? i.hora_inicio : (i.schedule && i.schedule.check_time ? i.schedule.check_time : '00:00:00');
+							let duracion = 60; // Fallback
+							if (i.duracion && !isNaN(parseInt(i.duracion))) {
+								duracion = parseInt(i.duracion);
+							} else if (i.precio && i.precio.duracion && !isNaN(parseInt(i.precio.duracion))) {
+								duracion = parseInt(i.precio.duracion);
+							} else if (i.membresia && i.membresia.precio && i.membresia.precio.duracion && !isNaN(parseInt(i.membresia.precio.duracion))) {
+								duracion = parseInt(i.membresia.precio.duracion);
+							}
+
+							let sStart = timeToMinutes(h.check_time);
+							let sEnd = timeToMinutes(h.departure_date);
+							let aStart = timeToMinutes(appStart);
+							let aEnd = aStart + duracion;
+
+							return sStart < aEnd && sEnd > aStart;
+						});
+					});
 
 					// Preselect if horaManualId is still valid, else clear
 					if (!this.horariosDisponibles.find(h => h.id == this.horaManualId)) {

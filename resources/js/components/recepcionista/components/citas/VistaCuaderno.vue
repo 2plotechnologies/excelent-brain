@@ -304,15 +304,39 @@
 					});
 
 					// Cruzar con horas malas
-					let ocupado = false;
+					const timeToMinutes = (t) => {
+						if (!t) return 0;
+						let p = t.split(':').map(Number);
+						return p[0] * 60 + (p[1] || 0);
+					};
+
 					this.doctores.forEach(profesional=>{
 						this.$set(profesional, 'horariosOcupados', this.horasMalas.filter( horaMala => parseInt(horaMala.professional_id) == parseInt(profesional.id) ));
 						profesional.horarios.forEach(horario=>{
-							ocupado = this.horasMalas.findIndex(hora => hora.schedule_id == horario.id)
-							if(ocupado>-1){
-								// Ya no agregamos indexOcupado en horario porque iteraremos directamente horasMalas
+							let appOcupada = this.horasMalas.find(hora => {
+								if (parseInt(hora.professional_id) !== parseInt(profesional.id)) return false;
+
+								let appStart = hora.hora_inicio ? hora.hora_inicio : (hora.schedule && hora.schedule.check_time ? hora.schedule.check_time : '00:00:00');
+								let duracion = 60; // Fallback
+								if (hora.duracion && !isNaN(parseInt(hora.duracion))) {
+									duracion = parseInt(hora.duracion);
+								} else if (hora.precio && hora.precio.duracion && !isNaN(parseInt(hora.precio.duracion))) {
+									duracion = parseInt(hora.precio.duracion);
+								} else if (hora.membresia && hora.membresia.precio && hora.membresia.precio.duracion && !isNaN(parseInt(hora.membresia.precio.duracion))) {
+									duracion = parseInt(hora.membresia.precio.duracion);
+								}
+
+								let sStart = timeToMinutes(horario.check_time);
+								let sEnd = timeToMinutes(horario.departure_date);
+								let aStart = timeToMinutes(appStart);
+								let aEnd = aStart + duracion;
+
+								return sStart < aEnd && sEnd > aStart;
+							});
+
+							if(appOcupada){
 								horario.libre=0;
-								horario.indexOcupado=ocupado;
+								horario.indexOcupado=this.horasMalas.indexOf(appOcupada);
 							}
 						})
 					})

@@ -115,13 +115,35 @@ export default {
           let solos = res.data.solos.filter(h => h.professional_id == this.dataCit.professional_id);
           let invalidos = res.data.invalidos;
           
+          const timeToMinutes = (t) => {
+            if (!t) return 0;
+            let p = t.split(':').map(Number);
+            return p[0] * 60 + (p[1] || 0);
+          };
+
           this.horariosDisponibles = solos.filter(h => {
-            // Si el id del slot inválido coincide con el horario, NO lo incluimos.
-            // PERO si el horario inválido es la cita actual que estamos moviendo, SÍ lo incluimos (porque se desocupará).
-            let invalido = invalidos.find(i => i.schedule_id == h.id);
-            if (!invalido) return true;
-            if (invalido.id === this.dataCit.id) return true;
-            return false;
+            return !invalidos.some(i => {
+              if (i.id === this.dataCit.id) return false;
+              if (parseInt(i.professional_id) !== parseInt(this.dataCit.professional_id)) return false;
+              if (i.status == 3 || i.status == 4 || i.status == 6) return false;
+
+              let appStart = i.hora_inicio ? i.hora_inicio : (i.schedule && i.schedule.check_time ? i.schedule.check_time : '00:00:00');
+              let duracion = 60; // Fallback
+              if (i.duracion && !isNaN(parseInt(i.duracion))) {
+                duracion = parseInt(i.duracion);
+              } else if (i.precio && i.precio.duracion && !isNaN(parseInt(i.precio.duracion))) {
+                duracion = parseInt(i.precio.duracion);
+              } else if (i.membresia && i.membresia.precio && i.membresia.precio.duracion && !isNaN(parseInt(i.membresia.precio.duracion))) {
+                duracion = parseInt(i.membresia.precio.duracion);
+              }
+
+              let sStart = timeToMinutes(h.check_time);
+              let sEnd = timeToMinutes(h.departure_date);
+              let aStart = timeToMinutes(appStart);
+              let aEnd = aStart + duracion;
+
+              return sStart < aEnd && sEnd > aStart;
+            });
           });
           
           this.keyHorarios++;

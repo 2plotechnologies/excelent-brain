@@ -7410,15 +7410,31 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   return h.professional_id == _this.dataCit.professional_id;
                 });
                 var invalidos = res.data.invalidos;
+                var timeToMinutes = function timeToMinutes(t) {
+                  if (!t) return 0;
+                  var p = t.split(':').map(Number);
+                  return p[0] * 60 + (p[1] || 0);
+                };
                 _this.horariosDisponibles = solos.filter(function (h) {
-                  // Si el id del slot inválido coincide con el horario, NO lo incluimos.
-                  // PERO si el horario inválido es la cita actual que estamos moviendo, SÍ lo incluimos (porque se desocupará).
-                  var invalido = invalidos.find(function (i) {
-                    return i.schedule_id == h.id;
+                  return !invalidos.some(function (i) {
+                    if (i.id === _this.dataCit.id) return false;
+                    if (parseInt(i.professional_id) !== parseInt(_this.dataCit.professional_id)) return false;
+                    if (i.status == 3 || i.status == 4 || i.status == 6) return false;
+                    var appStart = i.hora_inicio ? i.hora_inicio : i.schedule && i.schedule.check_time ? i.schedule.check_time : '00:00:00';
+                    var duracion = 60; // Fallback
+                    if (i.duracion && !isNaN(parseInt(i.duracion))) {
+                      duracion = parseInt(i.duracion);
+                    } else if (i.precio && i.precio.duracion && !isNaN(parseInt(i.precio.duracion))) {
+                      duracion = parseInt(i.precio.duracion);
+                    } else if (i.membresia && i.membresia.precio && i.membresia.precio.duracion && !isNaN(parseInt(i.membresia.precio.duracion))) {
+                      duracion = parseInt(i.membresia.precio.duracion);
+                    }
+                    var sStart = timeToMinutes(h.check_time);
+                    var sEnd = timeToMinutes(h.departure_date);
+                    var aStart = timeToMinutes(appStart);
+                    var aEnd = aStart + duracion;
+                    return sStart < aEnd && sEnd > aStart;
                   });
-                  if (!invalido) return true;
-                  if (invalido.id === _this.dataCit.id) return true;
-                  return false;
                 });
                 _this.keyHorarios++;
               })["finally"](function () {
@@ -8020,9 +8036,29 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   return h.professional_id == _this5.cita.professional_id;
                 });
                 var invalidos = res.data.invalidos;
+                var timeToMinutes = function timeToMinutes(t) {
+                  if (!t) return 0;
+                  var p = t.split(':').map(Number);
+                  return p[0] * 60 + (p[1] || 0);
+                };
                 _this5.horariosDisponibles = solos.filter(function (h) {
-                  return !invalidos.find(function (i) {
-                    return i.schedule_id == h.id;
+                  return !invalidos.some(function (i) {
+                    if (parseInt(i.professional_id) !== parseInt(_this5.cita.professional_id)) return false;
+                    if (i.status == 3 || i.status == 4 || i.status == 6) return false;
+                    var appStart = i.hora_inicio ? i.hora_inicio : i.schedule && i.schedule.check_time ? i.schedule.check_time : '00:00:00';
+                    var duracion = 60; // Fallback
+                    if (i.duracion && !isNaN(parseInt(i.duracion))) {
+                      duracion = parseInt(i.duracion);
+                    } else if (i.precio && i.precio.duracion && !isNaN(parseInt(i.precio.duracion))) {
+                      duracion = parseInt(i.precio.duracion);
+                    } else if (i.membresia && i.membresia.precio && i.membresia.precio.duracion && !isNaN(parseInt(i.membresia.precio.duracion))) {
+                      duracion = parseInt(i.membresia.precio.duracion);
+                    }
+                    var sStart = timeToMinutes(h.check_time);
+                    var sEnd = timeToMinutes(h.departure_date);
+                    var aStart = timeToMinutes(appStart);
+                    var aEnd = aStart + duracion;
+                    return sStart < aEnd && sEnd > aStart;
                   });
                 });
 
@@ -9643,12 +9679,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       var _this7 = this;
       var info = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.data ? this.data.date : '';
       this.horarios = [];
-      var arraySchedulesInvalid = [];
-      this.hoursProfessional.forEach(function (el) {
-        if (!arraySchedulesInvalid.includes(el.schedule_id)) {
-          arraySchedulesInvalid.push(el.schedule_id);
-        }
-      });
+      var timeToMinutes = function timeToMinutes(t) {
+        if (!t) return 0;
+        var p = t.split(':').map(Number);
+        return p[0] * 60 + (p[1] || 0);
+      };
       var dayIndex = parseInt(moment__WEBPACK_IMPORTED_MODULE_2___default()(info).format('d')) - 1;
       if (dayIndex === -1) dayIndex = 6;
       var targetDay = this.dayWeek(dayIndex);
@@ -9657,19 +9692,26 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           if (el.date && el.date !== info) {
             return;
           }
-          if (arraySchedulesInvalid.includes(el.id)) {
-            // Hay cita
-            //console.log("Hya citas")
-
-            //console.log(el.appointments.forEach(el => console.log(el.date, info, el.status)))
-            if (el.appointments.find(function (el) {
-              return el.date === info && el.status != 3;
-            }) ? true : false) {} else {
-              _this7.horarios.push(el);
+          var hasOverlap = _this7.hoursProfessional.some(function (i) {
+            if (i.id === _this7.dataCit.id) return false;
+            if (i.date !== info) return false;
+            if (i.status == 3 || i.status == 4 || i.status == 6) return false;
+            var appStart = i.hora_inicio ? i.hora_inicio : i.schedule && i.schedule.check_time ? i.schedule.check_time : '00:00:00';
+            var duracion = 60; // Fallback
+            if (i.duracion && !isNaN(parseInt(i.duracion))) {
+              duracion = parseInt(i.duracion);
+            } else if (i.precio && i.precio.duracion && !isNaN(parseInt(i.precio.duracion))) {
+              duracion = parseInt(i.precio.duracion);
+            } else if (i.membresia && i.membresia.precio && i.membresia.precio.duracion && !isNaN(parseInt(i.membresia.precio.duracion))) {
+              duracion = parseInt(i.membresia.precio.duracion);
             }
-          } else {
-            //console.log("No Hya citas")
-            // No hay cita
+            var sStart = timeToMinutes(el.check_time);
+            var sEnd = timeToMinutes(el.departure_date);
+            var aStart = timeToMinutes(appStart);
+            var aEnd = aStart + duracion;
+            return sStart < aEnd && sEnd > aStart;
+          });
+          if (!hasOverlap) {
             _this7.horarios.push(el);
           }
         }
@@ -10607,19 +10649,36 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
                 });
 
                 // Cruzar con horas malas
-                var ocupado = false;
+                var timeToMinutes = function timeToMinutes(t) {
+                  if (!t) return 0;
+                  var p = t.split(':').map(Number);
+                  return p[0] * 60 + (p[1] || 0);
+                };
                 _this3.doctores.forEach(function (profesional) {
                   _this3.$set(profesional, 'horariosOcupados', _this3.horasMalas.filter(function (horaMala) {
                     return parseInt(horaMala.professional_id) == parseInt(profesional.id);
                   }));
                   profesional.horarios.forEach(function (horario) {
-                    ocupado = _this3.horasMalas.findIndex(function (hora) {
-                      return hora.schedule_id == horario.id;
+                    var appOcupada = _this3.horasMalas.find(function (hora) {
+                      if (parseInt(hora.professional_id) !== parseInt(profesional.id)) return false;
+                      var appStart = hora.hora_inicio ? hora.hora_inicio : hora.schedule && hora.schedule.check_time ? hora.schedule.check_time : '00:00:00';
+                      var duracion = 60; // Fallback
+                      if (hora.duracion && !isNaN(parseInt(hora.duracion))) {
+                        duracion = parseInt(hora.duracion);
+                      } else if (hora.precio && hora.precio.duracion && !isNaN(parseInt(hora.precio.duracion))) {
+                        duracion = parseInt(hora.precio.duracion);
+                      } else if (hora.membresia && hora.membresia.precio && hora.membresia.precio.duracion && !isNaN(parseInt(hora.membresia.precio.duracion))) {
+                        duracion = parseInt(hora.membresia.precio.duracion);
+                      }
+                      var sStart = timeToMinutes(horario.check_time);
+                      var sEnd = timeToMinutes(horario.departure_date);
+                      var aStart = timeToMinutes(appStart);
+                      var aEnd = aStart + duracion;
+                      return sStart < aEnd && sEnd > aStart;
                     });
-                    if (ocupado > -1) {
-                      // Ya no agregamos indexOcupado en horario porque iteraremos directamente horasMalas
+                    if (appOcupada) {
                       horario.libre = 0;
-                      horario.indexOcupado = ocupado;
+                      horario.indexOcupado = _this3.horasMalas.indexOf(appOcupada);
                     }
                   });
                 });

@@ -15,6 +15,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_0__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  props: {
+    rolUser: String
+  },
   data: function data() {
     return {
       pacientes: [],
@@ -233,7 +236,7 @@ var render = function render() {
       staticClass: "fa-regular fa-comments"
     }), _vm._v("\n\t\t\t\t\t\t\t" + _vm._s(paciente.seguimientos_count || 0) + " seguimientos\n\t\t\t\t\t\t")])])]), _vm._v(" "), _c("div", {
       staticClass: "card-actions"
-    }, [_c("a", {
+    }, [_vm.rolUser === "profesional" || _vm.rolUser === "interno" ? _c("a", {
       staticClass: "action-btn",
       attrs: {
         href: "../api/pdfEvolution/restricted/" + paciente.id + "?token=" + _vm.$token,
@@ -242,7 +245,7 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fa-regular fa-eye"
-    }), _vm._v(" Ver perfil\n\t\t\t\t\t")]), _vm._v(" "), _c("button", {
+    }), _vm._v(" Ver perfil\n\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _c("button", {
       staticClass: "action-btn",
       attrs: {
         title: "Nuevo Seguimiento",

@@ -212,7 +212,8 @@
                 <div>
                   <p class="title-h5">15. Diagnóstico</p>
                   @php
-                    $diagnosticos = json_decode($historia->initial_psychiatric_history->diagnostic, true) ?? [];
+                    $diagnosticos = json_decode($historia->initial_psychiatric_history->diagnostic, true);
+                    $diagnosticos = is_array($diagnosticos) ? $diagnosticos : [];
                   @endphp
                   @foreach($diagnosticos as $diagId)
                     @php $cie = \App\Models\Cie::find($diagId); @endphp
@@ -378,9 +379,11 @@
                     <p class="py-0"><span class="title-h6">Profesional:</span> <span class="text-justify">{{ $evolution->professional->name ?? '' }}</span></p>
                     <p class="py-0"><span class="title-h6">Evolución:</span> <span class="text-justify">{{ $evolution->content }}</span></p>
                     <p class="py-0"><span class="title-h6">Diagnóstico:</span></p>
-										@foreach($evolution->diagnostic as $diag)
-										<p>{{$diag['code']}} - {{$diag['description']}}</p>
-										@endforeach
+										@if(is_array($evolution->diagnostic) || is_object($evolution->diagnostic))
+											@foreach($evolution->diagnostic as $diag)
+												<p>{{$diag['code'] ?? ''}} - {{$diag['description'] ?? ''}}</p>
+											@endforeach
+										@endif
                     <p class="py-0"><span class="title-h6">Tratamiento:</span> <span class="text-justify">{{ $evolution->treatment }}</span></p>
 										@if($evolution->professional && $evolution->professional->signing && $evolution->professional->signing !== '-' && $evolution->professional->signing !== '')
 										<div style="text-align: right;">
@@ -408,7 +411,7 @@
 			/* outline: 1px solid red !important; */
     }
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Helvetica', 'Arial', sans-serif;
       margin: auto;
       background: #2F4A99;
     }
@@ -418,7 +421,7 @@
     }
 
     .d-block { display: block }
-    p {font-size: 11px; font-family:'Montserrat-Light'; color: #495057}
+    p {font-size: 11px; font-family: 'Helvetica', 'Arial', sans-serif; font-weight: 300; color: #495057}
 
     .position-absolute {position: absolute;}
     .position-relative {position: relative;}
@@ -431,12 +434,12 @@
     .lh-25 { line-height: 25px }
     .lh-15 { line-height: 15px } */
 
-    .title-h1 {font-size: 20px; font-family:'Montserrat-Bold'; color: #6b61a6; padding-bottom: 0px; margin-bottom: 0px;}
-    .title-h2 {font-size: 18px; font-family:'Montserrat-Bold'; color: #6b61a6; padding-bottom: 0px; margin-bottom: 0px;}
-    .title-h3 {font-size: 17px; font-family:'Montserrat-Bold'; color: #6b61a6; padding-bottom: 0px; margin-bottom: 0px;}
-    .title-h4 {font-size: 16px; font-family:'Montserrat-Bold'; color: #6b61a6; padding-bottom: 0px; margin-bottom: 0px;}
-    .title-h5 {font-size: 13px; font-family:'Montserrat-Bold'; color: #6b61a6; padding-bottom: 0px; margin-bottom: 0px;}
-    .title-h6 {font-size: 12px; font-family:'Montserrat-Bold'; color: #6b61a6; padding-bottom: 0px; margin-bottom: 0px;}
+    .title-h1 {font-size: 20px; font-family: 'Helvetica', 'Arial', sans-serif; font-weight: bold; color: #6b61a6; padding-bottom: 0px; margin-bottom: 0px;}
+    .title-h2 {font-size: 18px; font-family: 'Helvetica', 'Arial', sans-serif; font-weight: bold; color: #6b61a6; padding-bottom: 0px; margin-bottom: 0px;}
+    .title-h3 {font-size: 17px; font-family: 'Helvetica', 'Arial', sans-serif; font-weight: bold; color: #6b61a6; padding-bottom: 0px; margin-bottom: 0px;}
+    .title-h4 {font-size: 16px; font-family: 'Helvetica', 'Arial', sans-serif; font-weight: bold; color: #6b61a6; padding-bottom: 0px; margin-bottom: 0px;}
+    .title-h5 {font-size: 13px; font-family: 'Helvetica', 'Arial', sans-serif; font-weight: bold; color: #6b61a6; padding-bottom: 0px; margin-bottom: 0px;}
+    .title-h6 {font-size: 12px; font-family: 'Helvetica', 'Arial', sans-serif; font-weight: bold; color: #6b61a6; padding-bottom: 0px; margin-bottom: 0px;}
 
     .purple-color { color: #6b61a6; }
     .black-color { color: #495057; }

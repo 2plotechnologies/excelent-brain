@@ -407,6 +407,7 @@
     <DetallePaciente 
       v-else-if="vistaActual === 'detalle'" 
       :pacienteId="dataPaciente.id" 
+      :rolUser="rolUser"
       @volver="vistaActual = 'lista'" 
       @editarPaciente="dataPaciente = $event" 
       @abrirTriaje="dataProps($event)"
@@ -570,7 +571,8 @@ export default {
   components: { Doughnut, Bar, DetallePaciente, ModalEdicionPaciente, ModalRecetas, ModalFaltas, ModalTriaje, ModalVerTriajesViejos, ModalNewPatient, ModalVerEstados, ModalCambiarLike, ModalVerFaltas, ModalVerHobbies, ModalVerReprogramacionesViejos, OffVerMembresias, ModalAcuerdos, ModalChat },
 
   props: {
-    profesionales:null
+    profesionales:null,
+    rolUser: String
   },
 
   methods: {

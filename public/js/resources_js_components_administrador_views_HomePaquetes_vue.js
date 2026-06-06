@@ -385,7 +385,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     cargarHorarios: function cargarHorarios() {
       var _this7 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        var response, schedulesInvalid, schedulesAll, diasSemana, fechaObj, diaNombre;
+        var response, schedulesInvalid, schedulesAll, diasSemana, fechaObj, diaNombre, timeToMinutes;
         return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) switch (_context6.prev = _context6.next) {
             case 0:
@@ -407,31 +407,49 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               schedulesAll = response.data.schedules; // Determinar el día de la semana en español para filtrar
               diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
               fechaObj = new Date(_this7.nuevaSesion.fecha + 'T00:00:00');
-              diaNombre = diasSemana[fechaObj.getDay()]; // Filtrar horarios por el día y que no tengan cita
+              diaNombre = diasSemana[fechaObj.getDay()];
+              timeToMinutes = function timeToMinutes(t) {
+                if (!t) return 0;
+                var p = t.split(':').map(Number);
+                return p[0] * 60 + (p[1] || 0);
+              }; // Filtrar horarios por el día y que no tengan cita solapada
               _this7.horariosDisponibles = schedulesAll.filter(function (h) {
                 if (h.day !== diaNombre) return false;
-
-                // Verificar si ya hay una cita en este horario para esta fecha
                 var ocupado = schedulesInvalid.some(function (inv) {
-                  return inv.schedule_id === h.id && inv.date === _this7.nuevaSesion.fecha && inv.status != 6;
+                  if (inv.date !== _this7.nuevaSesion.fecha) return false;
+                  if (inv.status == 3 || inv.status == 4 || inv.status == 6) return false;
+                  var appStart = inv.hora_inicio ? inv.hora_inicio : inv.schedule && inv.schedule.check_time ? inv.schedule.check_time : '00:00:00';
+                  var duracion = 60; // Fallback
+                  if (inv.duracion && !isNaN(parseInt(inv.duracion))) {
+                    duracion = parseInt(inv.duracion);
+                  } else if (inv.precio && inv.precio.duracion && !isNaN(parseInt(inv.precio.duracion))) {
+                    duracion = parseInt(inv.precio.duracion);
+                  } else if (inv.membresia && inv.membresia.precio && inv.membresia.precio.duracion && !isNaN(parseInt(inv.membresia.precio.duracion))) {
+                    duracion = parseInt(inv.membresia.precio.duracion);
+                  }
+                  var sStart = timeToMinutes(h.check_time);
+                  var sEnd = timeToMinutes(h.departure_date);
+                  var aStart = timeToMinutes(appStart);
+                  var aEnd = aStart + duracion;
+                  return sStart < aEnd && sEnd > aStart;
                 });
                 return !ocupado;
               });
-              _context6.next = 20;
+              _context6.next = 21;
               break;
-            case 17:
-              _context6.prev = 17;
+            case 18:
+              _context6.prev = 18;
               _context6.t0 = _context6["catch"](5);
               console.error("Error cargando horarios:", _context6.t0);
-            case 20:
-              _context6.prev = 20;
+            case 21:
+              _context6.prev = 21;
               _this7.loadingHorarios = false;
-              return _context6.finish(20);
-            case 23:
+              return _context6.finish(21);
+            case 24:
             case "end":
               return _context6.stop();
           }
-        }, _callee6, null, [[5, 17, 20, 23]]);
+        }, _callee6, null, [[5, 18, 21, 24]]);
       }))();
     },
     guardarCitaPaquete: function guardarCitaPaquete() {
