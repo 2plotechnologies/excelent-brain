@@ -16,46 +16,22 @@
 
     <!-- METRICS CARDS -->
     <div class="row g-3 mb-4">
-      <div class="col-md-4">
+      <div class="col-md-2 col-sm-4">
         <div class="card metric-card border-0 shadow-sm rounded-4 h-100 position-relative overflow-hidden">
-          <div class="card-body p-4 d-flex align-items-center justify-content-between">
-            <div>
-              <span class="text-uppercase text-xs text-muted fw-bold tracking-wider">Total Certificados</span>
-              <h3 class="mb-0 fw-extrabold text-dark mt-1">{{ totalCount }}</h3>
-            </div>
-            <div class="icon-circle bg-primary-soft p-3 rounded-circle text-primary">
-              <i class="fas fa-file-signature fs-4"></i>
-            </div>
+          <div class="card-body p-3 text-center d-flex flex-column justify-content-center">
+            <h6 class="text-uppercase text-xs text-muted fw-bold tracking-wider mb-2">Total</h6>
+            <h3 class="mb-0 fw-extrabold text-dark">{{ totalCount }}</h3>
           </div>
           <div class="metric-progress bg-primary"></div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-2 col-sm-4" v-for="(serv, index) in servicios" :key="serv.id">
         <div class="card metric-card border-0 shadow-sm rounded-4 h-100 position-relative overflow-hidden">
-          <div class="card-body p-4 d-flex align-items-center justify-content-between">
-            <div>
-              <span class="text-uppercase text-xs text-muted fw-bold tracking-wider">Certificados Trabajo</span>
-              <h3 class="mb-0 fw-extrabold text-indigo mt-1">{{ trabajoCount }}</h3>
-            </div>
-            <div class="icon-circle bg-indigo-soft p-3 rounded-circle text-indigo">
-              <i class="fas fa-briefcase fs-4"></i>
-            </div>
+          <div class="card-body p-3 text-center d-flex flex-column justify-content-center">
+            <h6 class="text-uppercase text-xs text-muted fw-bold tracking-wider mb-2 text-truncate" :title="serv.descripcion">{{ serv.descripcion }}</h6>
+            <h3 class="mb-0 fw-extrabold" :class="'text-' + getColorName(index)">{{ stats[serv.id] || 0 }}</h3>
           </div>
-          <div class="metric-progress bg-indigo"></div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card metric-card border-0 shadow-sm rounded-4 h-100 position-relative overflow-hidden">
-          <div class="card-body p-4 d-flex align-items-center justify-content-between">
-            <div>
-              <span class="text-uppercase text-xs text-muted fw-bold tracking-wider">Certificados Estudios</span>
-              <h3 class="mb-0 fw-extrabold text-emerald mt-1">{{ estudiosCount }}</h3>
-            </div>
-            <div class="icon-circle bg-emerald-soft p-3 rounded-circle text-emerald">
-              <i class="fas fa-graduation-cap fs-4"></i>
-            </div>
-          </div>
-          <div class="metric-progress bg-emerald"></div>
+          <div class="metric-progress" :class="'bg-' + getColorName(index)"></div>
         </div>
       </div>
     </div>
@@ -147,7 +123,7 @@
                 </span>
               </td>
               <td class="text-center">
-                <select class="form-select form-select-sm d-inline-block w-auto font-weight-bold shadow-sm" style="border-radius: 8px;" v-model="paciente.estado" @change="cambiarEstado(paciente)">
+                <select class="form-select form-select-sm d-inline-block w-auto font-weight-bold shadow-sm" style="border-radius: 8px;" v-model="paciente.estado" @change="cambiarEstado(paciente)" :disabled="paciente.pagos_count === 0">
                   <option value="En proceso">En proceso</option>
                   <option value="Recepcionado">Recepcionado</option>
                   <option value="Entregado">Entregado</option>
@@ -158,8 +134,11 @@
               </td>
               <td class="pe-4 text-end">
                 <div class="d-flex justify-content-end align-items-center gap-2">
-                  <button class="btn btn-icon-edit text-success" @click="openPaymentModal(paciente)" title="Pagar">
+                  <button v-if="paciente.pagos_count === 0" class="btn btn-icon-edit text-danger" @click="openPaymentModal(paciente)" title="Pagar">
                     <i class="fas fa-money-bill-wave"></i>
+                  </button>
+                  <button v-else class="btn btn-icon-edit text-success" disabled title="Pagado">
+                    <i class="fas fa-check-circle"></i>
                   </button>
                   <button class="btn btn-icon-edit" @click="openEditModal(paciente)" title="Editar">
                     <i class="far fa-edit"></i>
@@ -288,6 +267,7 @@
                   <select class="form-select" v-model="pagoForm.tipo_comprobante" required>
                     <option value="1">Boleta</option>
                     <option value="2">Factura</option>
+                    <option value="3">Otros</option>
                   </select>
                 </div>
                 <div class="col-md-6">
@@ -328,8 +308,7 @@ export default {
       isEditMode: false,
       selectedId: null,
       totalCount: 0,
-      trabajoCount: 0,
-      estudiosCount: 0,
+      stats: {},
       
       form: {
         nombres: '',
@@ -459,17 +438,15 @@ export default {
         // Obtenemos los totales consultando todos o calculando de acuerdo a la api.
         // Dado que la api es paginada, podemos tener un endpoint simple o fetch
         // Para no sobrecargar, consultamos sin paginar (o deducimos si la api lo soporta, o hacemos un query rápido).
-        // Haremos una llamada limpia al backend o sumaremos del total del request si se pudiese. 
-        // Como el controlador no tiene una ruta de stats, podemos cargar de una lista completa o mockear basándonos en la BD.
-        // Consultamos sin paginar llamando con un flag o calculamos. Para ser consistentes con la BD,
-        // crearemos una petición simple en background o bien calculamos del total de la lista.
-        // Vamos a calcular sobre lo cargado o simplemente consultamos sin paginar de forma diferida.
-        // Para simplificar y no agregar endpoints, podemos consultar index con un límite alto en background.
         const { data } = await this.axios.get('/api/paciente-certificado', { params: { limit: 1000 } });
         const todos = data.data || [];
         this.totalCount = data.total || todos.length;
-        this.trabajoCount = todos.filter(p => p.tipo_certificado === 'trabajo').length;
-        this.estudiosCount = todos.filter(p => p.tipo_certificado === 'estudios').length;
+        
+        let newStats = {};
+        this.servicios.forEach(s => {
+          newStats[s.id] = todos.filter(p => p.tipo_certificado?.toString() === s.id.toString()).length;
+        });
+        this.stats = newStats;
       } catch (e) {
         console.error('Error calculando métricas:', e);
       }
@@ -650,6 +627,10 @@ export default {
     getNombreServicio(id) {
       const s = this.servicios.find(x => x.id.toString() === id?.toString());
       return s ? s.descripcion : 'Desconocido';
+    },
+    getColorName(index) {
+      const colors = ['primary', 'success', 'info', 'warning', 'danger', 'secondary'];
+      return colors[index % colors.length];
     },
     getInitials(nombres, apellidos) {
       const n = nombres ? nombres.trim().split(' ')[0][0] : '';

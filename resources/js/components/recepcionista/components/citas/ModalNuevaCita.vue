@@ -1485,6 +1485,11 @@ export default {
 		doctoresFiltradosPorCat() {
 			if (!this.doctores) return [];
 			if (!this.cita.clasification) return this.doctores;
+			
+			if (this.cita.clasification == 3) {
+				return this.doctores.filter(d => [1, 2].includes(d.idProfesion) || [1, 2].includes(d.profession_id));
+			}
+			
 			return this.doctores.filter(d => d.idProfesion == this.cita.clasification || d.profession_id == this.cita.clasification);
 		},
 		horaSeleccionada() {

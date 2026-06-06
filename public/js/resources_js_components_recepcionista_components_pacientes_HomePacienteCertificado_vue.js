@@ -34,8 +34,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       isEditMode: false,
       selectedId: null,
       totalCount: 0,
-      trabajoCount: 0,
-      estudiosCount: 0,
+      stats: {},
       form: {
         nombres: '',
         apellidos: '',
@@ -231,7 +230,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     actualizarMetricas: function actualizarMetricas() {
       var _this4 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var _yield$_this4$axios$g, data, todos;
+        var _yield$_this4$axios$g, data, todos, newStats;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
@@ -247,23 +246,25 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               data = _yield$_this4$axios$g.data;
               todos = data.data || [];
               _this4.totalCount = data.total || todos.length;
-              _this4.trabajoCount = todos.filter(function (p) {
-                return p.tipo_certificado === 'trabajo';
-              }).length;
-              _this4.estudiosCount = todos.filter(function (p) {
-                return p.tipo_certificado === 'estudios';
-              }).length;
-              _context4.next = 14;
+              newStats = {};
+              _this4.servicios.forEach(function (s) {
+                newStats[s.id] = todos.filter(function (p) {
+                  var _p$tipo_certificado;
+                  return ((_p$tipo_certificado = p.tipo_certificado) === null || _p$tipo_certificado === void 0 ? void 0 : _p$tipo_certificado.toString()) === s.id.toString();
+                }).length;
+              });
+              _this4.stats = newStats;
+              _context4.next = 15;
               break;
-            case 11:
-              _context4.prev = 11;
+            case 12:
+              _context4.prev = 12;
               _context4.t0 = _context4["catch"](0);
               console.error('Error calculando métricas:', _context4.t0);
-            case 14:
+            case 15:
             case "end":
               return _context4.stop();
           }
-        }, _callee4, null, [[0, 11]]);
+        }, _callee4, null, [[0, 12]]);
       }))();
     },
     buscar: function buscar() {
@@ -551,6 +552,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       });
       return s ? s.descripcion : 'Desconocido';
     },
+    getColorName: function getColorName(index) {
+      var colors = ['primary', 'success', 'info', 'warning', 'danger', 'secondary'];
+      return colors[index % colors.length];
+    },
     getInitials: function getInitials(nombres, apellidos) {
       var n = nombres ? nombres.trim().split(' ')[0][0] : '';
       var a = apellidos ? apellidos.trim().split(' ')[0][0] : '';
@@ -625,42 +630,38 @@ var render = function render() {
   }), _vm._v(" Registrar Paciente\n      ")])])]), _vm._v(" "), _c("div", {
     staticClass: "row g-3 mb-4"
   }, [_c("div", {
-    staticClass: "col-md-4"
+    staticClass: "col-md-2 col-sm-4"
   }, [_c("div", {
     staticClass: "card metric-card border-0 shadow-sm rounded-4 h-100 position-relative overflow-hidden"
   }, [_c("div", {
-    staticClass: "card-body p-4 d-flex align-items-center justify-content-between"
-  }, [_c("div", [_c("span", {
-    staticClass: "text-uppercase text-xs text-muted fw-bold tracking-wider"
-  }, [_vm._v("Total Certificados")]), _vm._v(" "), _c("h3", {
-    staticClass: "mb-0 fw-extrabold text-dark mt-1"
-  }, [_vm._v(_vm._s(_vm.totalCount))])]), _vm._v(" "), _vm._m(1)]), _vm._v(" "), _c("div", {
+    staticClass: "card-body p-3 text-center d-flex flex-column justify-content-center"
+  }, [_c("h6", {
+    staticClass: "text-uppercase text-xs text-muted fw-bold tracking-wider mb-2"
+  }, [_vm._v("Total")]), _vm._v(" "), _c("h3", {
+    staticClass: "mb-0 fw-extrabold text-dark"
+  }, [_vm._v(_vm._s(_vm.totalCount))])]), _vm._v(" "), _c("div", {
     staticClass: "metric-progress bg-primary"
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-4"
-  }, [_c("div", {
-    staticClass: "card metric-card border-0 shadow-sm rounded-4 h-100 position-relative overflow-hidden"
-  }, [_c("div", {
-    staticClass: "card-body p-4 d-flex align-items-center justify-content-between"
-  }, [_c("div", [_c("span", {
-    staticClass: "text-uppercase text-xs text-muted fw-bold tracking-wider"
-  }, [_vm._v("Certificados Trabajo")]), _vm._v(" "), _c("h3", {
-    staticClass: "mb-0 fw-extrabold text-indigo mt-1"
-  }, [_vm._v(_vm._s(_vm.trabajoCount))])]), _vm._v(" "), _vm._m(2)]), _vm._v(" "), _c("div", {
-    staticClass: "metric-progress bg-indigo"
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-4"
-  }, [_c("div", {
-    staticClass: "card metric-card border-0 shadow-sm rounded-4 h-100 position-relative overflow-hidden"
-  }, [_c("div", {
-    staticClass: "card-body p-4 d-flex align-items-center justify-content-between"
-  }, [_c("div", [_c("span", {
-    staticClass: "text-uppercase text-xs text-muted fw-bold tracking-wider"
-  }, [_vm._v("Certificados Estudios")]), _vm._v(" "), _c("h3", {
-    staticClass: "mb-0 fw-extrabold text-emerald mt-1"
-  }, [_vm._v(_vm._s(_vm.estudiosCount))])]), _vm._v(" "), _vm._m(3)]), _vm._v(" "), _c("div", {
-    staticClass: "metric-progress bg-emerald"
-  })])])]), _vm._v(" "), _c("div", {
+  })])]), _vm._v(" "), _vm._l(_vm.servicios, function (serv, index) {
+    return _c("div", {
+      key: serv.id,
+      staticClass: "col-md-2 col-sm-4"
+    }, [_c("div", {
+      staticClass: "card metric-card border-0 shadow-sm rounded-4 h-100 position-relative overflow-hidden"
+    }, [_c("div", {
+      staticClass: "card-body p-3 text-center d-flex flex-column justify-content-center"
+    }, [_c("h6", {
+      staticClass: "text-uppercase text-xs text-muted fw-bold tracking-wider mb-2 text-truncate",
+      attrs: {
+        title: serv.descripcion
+      }
+    }, [_vm._v(_vm._s(serv.descripcion))]), _vm._v(" "), _c("h3", {
+      staticClass: "mb-0 fw-extrabold",
+      "class": "text-" + _vm.getColorName(index)
+    }, [_vm._v(_vm._s(_vm.stats[serv.id] || 0))])]), _vm._v(" "), _c("div", {
+      staticClass: "metric-progress",
+      "class": "bg-" + _vm.getColorName(index)
+    })])]);
+  })], 2), _vm._v(" "), _c("div", {
     staticClass: "card border-0 shadow-sm rounded-4 mb-4"
   }, [_c("div", {
     staticClass: "card-body p-3"
@@ -670,7 +671,7 @@ var render = function render() {
     staticClass: "col-md-8"
   }, [_c("div", {
     staticClass: "input-group"
-  }, [_vm._m(4), _vm._v(" "), _c("input", {
+  }, [_vm._m(1), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -713,7 +714,7 @@ var render = function render() {
     staticClass: "table-responsive"
   }, [_c("table", {
     staticClass: "table table-hover align-middle mb-0"
-  }, [_vm._m(5), _vm._v(" "), _c("tbody", [_vm.loading ? _c("tr", [_vm._m(6)]) : _vm.pacientes.length === 0 ? _c("tr", [_vm._m(7)]) : _vm._l(_vm.pacientes, function (paciente) {
+  }, [_vm._m(2), _vm._v(" "), _c("tbody", [_vm.loading ? _c("tr", [_vm._m(3)]) : _vm.pacientes.length === 0 ? _c("tr", [_vm._m(4)]) : _vm._l(_vm.pacientes, function (paciente) {
     return _c("tr", {
       key: paciente.id,
       staticClass: "patient-row"
@@ -753,6 +754,9 @@ var render = function render() {
       staticStyle: {
         "border-radius": "8px"
       },
+      attrs: {
+        disabled: paciente.pagos_count === 0
+      },
       on: {
         change: [function ($event) {
           var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
@@ -786,8 +790,8 @@ var render = function render() {
       staticClass: "pe-4 text-end"
     }, [_c("div", {
       staticClass: "d-flex justify-content-end align-items-center gap-2"
-    }, [_c("button", {
-      staticClass: "btn btn-icon-edit text-success",
+    }, [paciente.pagos_count === 0 ? _c("button", {
+      staticClass: "btn btn-icon-edit text-danger",
       attrs: {
         title: "Pagar"
       },
@@ -798,6 +802,14 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fas fa-money-bill-wave"
+    })]) : _c("button", {
+      staticClass: "btn btn-icon-edit text-success",
+      attrs: {
+        disabled: "",
+        title: "Pagado"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-check-circle"
     })]), _vm._v(" "), _c("button", {
       staticClass: "btn btn-icon-edit",
       attrs: {
@@ -933,7 +945,7 @@ var render = function render() {
     staticClass: "row g-3"
   }, [_c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(8), _vm._v(" "), _c("input", {
+  }, [_vm._m(5), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -957,7 +969,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(9), _vm._v(" "), _c("input", {
+  }, [_vm._m(6), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -981,7 +993,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(10), _vm._v(" "), _c("div", {
+  }, [_vm._m(7), _vm._v(" "), _c("div", {
     staticClass: "input-group"
   }, [_c("input", {
     directives: [{
@@ -1024,7 +1036,7 @@ var render = function render() {
     staticClass: "fas fa-search"
   })])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(11), _vm._v(" "), _c("input", {
+  }, [_vm._m(8), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -1074,7 +1086,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-12"
-  }, [_vm._m(12), _vm._v(" "), _c("select", {
+  }, [_vm._m(9), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -1147,7 +1159,7 @@ var render = function render() {
     staticClass: "modal-content border-0 shadow-lg rounded-4"
   }, [_c("div", {
     staticClass: "modal-header border-0 pb-0 px-4 pt-4"
-  }, [_vm._m(13), _vm._v(" "), _c("button", {
+  }, [_vm._m(10), _vm._v(" "), _c("button", {
     staticClass: "btn-close",
     attrs: {
       type: "button",
@@ -1170,7 +1182,7 @@ var render = function render() {
     staticClass: "row g-3"
   }, [_c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(14), _vm._v(" "), _c("input", {
+  }, [_vm._m(11), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -1195,7 +1207,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(15), _vm._v(" "), _c("select", {
+  }, [_vm._m(12), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -1231,7 +1243,7 @@ var render = function render() {
     }, [_vm._v(_vm._s(m.tipo))]);
   })], 2)]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(16), _vm._v(" "), _c("select", {
+  }, [_vm._m(13), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -1261,9 +1273,13 @@ var render = function render() {
     attrs: {
       value: "2"
     }
-  }, [_vm._v("Factura")])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Factura")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "3"
+    }
+  }, [_vm._v("Otros")])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_vm._m(17), _vm._v(" "), _c("input", {
+  }, [_vm._m(14), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -1286,7 +1302,7 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-12"
-  }, [_vm._m(18), _vm._v(" "), _c("textarea", {
+  }, [_vm._m(15), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -1344,30 +1360,6 @@ var staticRenderFns = [function () {
   }), _vm._v(" Pacientes de Certificados\n      ")]), _vm._v(" "), _c("p", {
     staticClass: "text-muted mb-0"
   }, [_vm._v("Gestión de personas que únicamente solicitan certificados de trabajo o estudios.")])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "icon-circle bg-primary-soft p-3 rounded-circle text-primary"
-  }, [_c("i", {
-    staticClass: "fas fa-file-signature fs-4"
-  })]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "icon-circle bg-indigo-soft p-3 rounded-circle text-indigo"
-  }, [_c("i", {
-    staticClass: "fas fa-briefcase fs-4"
-  })]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "icon-circle bg-emerald-soft p-3 rounded-circle text-emerald"
-  }, [_c("i", {
-    staticClass: "fas fa-graduation-cap fs-4"
-  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;

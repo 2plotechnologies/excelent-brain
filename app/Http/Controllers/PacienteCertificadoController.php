@@ -12,7 +12,7 @@ class PacienteCertificadoController extends Controller
 {
     public function index(Request $request)
     {
-        $query = PacienteCertificado::query();
+        $query = PacienteCertificado::withCount('pagos');
 
         if ($request->filled('search')) {
 
@@ -36,7 +36,7 @@ class PacienteCertificadoController extends Controller
         $data = $request->validate([
             'nombres' => 'required|string|max:255',
             'apellidos' => 'required|string|max:255',
-            'dni' => 'required|string|max:20|unique:paciente_certificados,dni',
+            'dni' => 'required|string|max:20',
             'telefono' => 'required|string|max:20',
             'correo' => 'nullable|email|max:255',
             'tipo_certificado' => 'required|string'
@@ -59,7 +59,7 @@ class PacienteCertificadoController extends Controller
         $data = $request->validate([
             'nombres' => 'required|string|max:255',
             'apellidos' => 'required|string|max:255',
-            'dni' => 'required|string|max:20|unique:paciente_certificados,dni,' . $id,
+            'dni' => 'required|string|max:20',
             'telefono' => 'required|string|max:20',
             'correo' => 'nullable|email|max:255',
             'tipo_certificado' => 'required|string'

@@ -545,8 +545,8 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         }
       }
 
-      // If there is no patient association
-      if (payment.idMembresia > 0 || payment.type == 5 || payment.type == 8) {
+      // If there is no patient association.
+      if (payment.idMembresia > 0 || payment.type == 5 || payment.type == 8 || payment.type == 0) {
         if (payment.customer) {
           return "".concat(desc, " - ").concat(payment.customer);
         }

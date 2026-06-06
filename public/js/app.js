@@ -8704,6 +8704,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       var _this13 = this;
       if (!this.doctores) return [];
       if (!this.cita.clasification) return this.doctores;
+      if (this.cita.clasification == 3) {
+        return this.doctores.filter(function (d) {
+          return [1, 2].includes(d.idProfesion) || [1, 2].includes(d.profession_id);
+        });
+      }
       return this.doctores.filter(function (d) {
         return d.idProfesion == _this13.cita.clasification || d.profession_id == _this13.cita.clasification;
       });

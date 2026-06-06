@@ -575,8 +575,8 @@ export default{
 					}
 				}
 
-				// If there is no patient association
-				if (payment.idMembresia > 0 || payment.type == 5 || payment.type == 8) {
+				// If there is no patient association.
+				if (payment.idMembresia > 0 || payment.type == 5 || payment.type == 8 || payment.type == 0) {
 					if (payment.customer) {
 						return `${desc} - ${payment.customer}`;
 					}
