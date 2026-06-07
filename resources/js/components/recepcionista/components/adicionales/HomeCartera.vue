@@ -66,7 +66,7 @@
 							<th>N° Reprogramados</th>
 							<th>Actual</th>
 							<!-- Estoy agregando -->
-							<th>Hist.</th>
+							<th v-if="rolUser !== 'recepcionista'">Hist.</th>
 							<!-- Estoy agregando -->
 							<th>@</th>
 						</tr>
@@ -89,7 +89,7 @@
 							<td class="puntero" data-bs-toggle="modal" data-bs-target="#modalCitasPreview" @click="cargarCitas('reprogramados', cita.patient_id)">{{ cita.reprogramados }}</td>
 							<td>{{ cita.actual }}</td>
 							<!-- Estoy agregando -->
-							<td><a :href="'../api/pdfEvolution/restricted/'+cita.patient_id+'?token='+$token" target="_blank" class="btn btn-outline-success" title="Ver Historia"><i class="fa-regular fa-note-sticky"></i></a></td>
+							<td v-if="rolUser !== 'recepcionista'"><a :href="'../api/pdfEvolution/restricted/'+cita.patient_id+'?token='+$token" target="_blank" class="btn btn-outline-success" title="Ver Historia"><i class="fa-regular fa-note-sticky"></i></a></td>
 							<!-- Estoy agregando -->
 							<td v-if="cita.patient?.vivo==1" class="puntero" @click="idGlobal = cita.patient_id; indexGlobal = index" data-bs-toggle="modal" data-bs-target="#modalCambiarSeguimiento">
 								<span v-if="cita.patient?.seguimiento==1" title="Sin acción"><i class="fa-regular fa-circle"></i></span>
@@ -153,6 +153,9 @@ import moment from 'moment'
 
 export default{
 	name: 'HomeCartera',
+	props: {
+		rolUser: String
+	},
 	data(){ return {
 		profesionales:[], años:[], meses:['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
 		filtro: {idProfesional: 10, año: moment().format('YYYY'), mes:-1}, citasResumidas:[], citasCompletas:[], citasMostrar:[], previewCitas:[], titulo:'', idGlobal:-1, indexGlobal:-1,

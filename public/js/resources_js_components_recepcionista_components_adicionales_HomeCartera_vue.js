@@ -30,6 +30,9 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'HomeCartera',
+  props: {
+    rolUser: String
+  },
   data: function data() {
     return {
       profesionales: [],
@@ -600,7 +603,7 @@ var render = function render() {
     staticClass: "fa-solid fa-plus"
   }), _vm._v(" Cargar más (+100)\n\t\t\t\t")]) : _vm._e()]), _vm._v(" "), _c("table", {
     staticClass: "table table-sm table-hover"
-  }, [_vm._m(0), _vm._v(" "), _c("tbody", _vm._l(_vm.citasMostrar, function (cita, index) {
+  }, [_c("thead", [_c("tr", [_c("th", [_vm._v("N°")]), _vm._v(" "), _c("th", [_vm._v("Nombre y Apellidos")]), _vm._v(" "), _c("th", [_vm._v("DNI")]), _vm._v(" "), _c("th", [_vm._v("Celular")]), _vm._v(" "), _c("th", [_vm._v("Ult. Cita")]), _vm._v(" "), _c("th", [_vm._v("Prox. Cita")]), _vm._v(" "), _c("th", [_vm._v("Antigüedad")]), _vm._v(" "), _c("th", [_vm._v("N° Citas")]), _vm._v(" "), _c("th", [_vm._v("N° Conf.")]), _vm._v(" "), _c("th", [_vm._v("No asistieron")]), _vm._v(" "), _c("th", [_vm._v("N° Anulados")]), _vm._v(" "), _c("th", [_vm._v("N° Reprogramados")]), _vm._v(" "), _c("th", [_vm._v("Actual")]), _vm._v(" "), _vm.rolUser !== "recepcionista" ? _c("th", [_vm._v("Hist.")]) : _vm._e(), _vm._v(" "), _c("th", [_vm._v("@")])])]), _vm._v(" "), _c("tbody", _vm._l(_vm.citasMostrar, function (cita, index) {
     var _cita$patient, _cita$patient$name, _cita$patient2, _cita$patient$nombres, _cita$patient3, _cita$patient$dni, _cita$patient4, _cita$patient$phone, _cita$patient5, _cita$patient6, _cita$patient7, _cita$patient8, _cita$patient9;
     return _c("tr", {
       key: index
@@ -663,7 +666,7 @@ var render = function render() {
           return _vm.cargarCitas("reprogramados", cita.patient_id);
         }
       }
-    }, [_vm._v(_vm._s(cita.reprogramados))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(cita.actual))]), _vm._v(" "), _c("td", [_c("a", {
+    }, [_vm._v(_vm._s(cita.reprogramados))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(cita.actual))]), _vm._v(" "), _vm.rolUser !== "recepcionista" ? _c("td", [_c("a", {
       staticClass: "btn btn-outline-success",
       attrs: {
         href: "../api/pdfEvolution/restricted/" + cita.patient_id + "?token=" + _vm.$token,
@@ -672,7 +675,7 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fa-regular fa-note-sticky"
-    })])]), _vm._v(" "), ((_cita$patient6 = cita.patient) === null || _cita$patient6 === void 0 ? void 0 : _cita$patient6.vivo) == 1 ? _c("td", {
+    })])]) : _vm._e(), _vm._v(" "), ((_cita$patient6 = cita.patient) === null || _cita$patient6 === void 0 ? void 0 : _cita$patient6.vivo) == 1 ? _c("td", {
       staticClass: "puntero",
       attrs: {
         "data-bs-toggle": "modal",
@@ -751,7 +754,7 @@ var render = function render() {
     staticClass: "modal-body"
   }, [_c("table", {
     staticClass: "table table-hover table-sm"
-  }, [_vm._m(1), _vm._v(" "), _c("tbody", [_vm._l(_vm.previewCitas, function (preview, index) {
+  }, [_vm._m(0), _vm._v(" "), _c("tbody", [_vm._l(_vm.previewCitas, function (preview, index) {
     return _c("tr", [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.fechaLatam(preview.date)))])]);
   }), _vm._v(" "), _vm.previewCitas.length == 0 ? _c("tr", [_c("td", {
     attrs: {
@@ -779,10 +782,6 @@ var render = function render() {
   })], 1);
 };
 var staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("N°")]), _vm._v(" "), _c("th", [_vm._v("Nombre y Apellidos")]), _vm._v(" "), _c("th", [_vm._v("DNI")]), _vm._v(" "), _c("th", [_vm._v("Celular")]), _vm._v(" "), _c("th", [_vm._v("Ult. Cita")]), _vm._v(" "), _c("th", [_vm._v("Prox. Cita")]), _vm._v(" "), _c("th", [_vm._v("Antigüedad")]), _vm._v(" "), _c("th", [_vm._v("N° Citas")]), _vm._v(" "), _c("th", [_vm._v("N° Conf.")]), _vm._v(" "), _c("th", [_vm._v("No asistieron")]), _vm._v(" "), _c("th", [_vm._v("N° Anulados")]), _vm._v(" "), _c("th", [_vm._v("N° Reprogramados")]), _vm._v(" "), _c("th", [_vm._v("Actual")]), _vm._v(" "), _c("th", [_vm._v("Hist.")]), _vm._v(" "), _c("th", [_vm._v("@")])])]);
-}, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("thead", [_c("tr", [_c("th", [_vm._v("N°")]), _vm._v(" "), _c("th", [_vm._v("Fecha")])])]);
