@@ -14,7 +14,7 @@ class AppointmentSatisfactionController extends Controller
     {
         $appointment = Appointment::with('patient', 'professional', 'precio')->findOrFail($appointmentId);
 
-        if ((int) $appointment->status !== 5 || !$appointment->hora_fin) {
+        if ($appointment->attention_status !== 'atendido' || !$appointment->hora_fin) {
             return response()->json([
                 'message' => 'La cita debe estar marcada como atendida para enviar satisfaccion.',
             ], 422);

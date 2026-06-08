@@ -156,7 +156,7 @@ class AppointmentController extends Controller
 			if ($hora_inicio && $hora_fin) {
 				$existing = Appointment::where('professional_id', $request->get('professional_id'))
 					->where('date', $request->get('date'))
-					->whereIn('status', [1, 2, 5])
+					->whereIn('status', [1, 2])
 					->with(['schedule', 'precio', 'membresia.precio'])
 					->lockForUpdate()
 					->get();
@@ -875,7 +875,7 @@ Medical_evolution::create([
 				->where('date', $cita->date)
 				->where('professional_id', $cita->professional_id)
 				->where('hora_inicio', $cita->hora_fin)
-				->whereIn('status', [1, 2, 5])
+				->whereIn('status', [1, 2])
 				->first();
 			if ($bloqueo) {
 				$bloqueo->update(['status' => 3, 'active_slot' => null]);
@@ -903,7 +903,7 @@ Medical_evolution::create([
 		if ($hora_inicio && $hora_fin) {
 			$existing = Appointment::where('professional_id', $request->get('professional_id'))
 				->where('date', $request->get('date'))
-				->whereIn('status', [1, 2, 5])
+				->whereIn('status', [1, 2])
 				->where('id', '!=', $cita->id)
 				->with(['schedule', 'precio', 'membresia.precio'])
 				->get();
@@ -1020,7 +1020,7 @@ Medical_evolution::create([
 				->where('date', $cita->date)
 				->where('professional_id', $cita->professional_id)
 				->where('hora_inicio', $cita->hora_fin)
-				->whereIn('status', [1, 2, 5])
+				->whereIn('status', [1, 2])
 				->first();
 			if ($bloqueo) {
 				$bloqueo->update(['status' => 3, 'active_slot' => null]);
@@ -1046,7 +1046,7 @@ Medical_evolution::create([
 		if ($hora_inicio && $hora_fin) {
 			$existing = Appointment::where('professional_id', $cita->professional_id)
 				->where('date', $request->get('date'))
-				->whereIn('status', [1, 2, 5])
+				->whereIn('status', [1, 2])
 				->where('id', '!=', $cita->id)
 				->with(['schedule', 'precio', 'membresia.precio'])
 				->get();
@@ -1213,7 +1213,7 @@ Medical_evolution::create([
 				->where('date', $cita->date)
 				->where('professional_id', $cita->professional_id)
 				->where('hora_inicio', $cita->hora_fin)
-				->whereIn('status', [1, 2, 5])
+				->whereIn('status', [1, 2])
 				->first();
 			if ($bloqueo) {
 				$bloqueo->update(['status' => 3, 'active_slot' => null]);
@@ -1630,6 +1630,7 @@ public function getPatientsPerMonth($date,$id){
 
 		if ($request->has('departure') && $request->input('departure')) {
 			$updateData['hora_fin'] = $request->input('departure');
+			$updateData['attention_status'] = 'atendido';
 			
 			// Calcular duración establecida de la cita
 			$duracion = 60; // Fallback
@@ -1659,10 +1660,8 @@ public function getPatientsPerMonth($date,$id){
 			'attention_status' => $status
 		];
 		
-		if ($status == 'atendido') {
-			$updateData['status'] = 5;
-		} else if ($status == 'espera' || $status == 'atencion') {
-			if ($appointment->status == 1 || $appointment->status == 5) {
+		if ($status == 'atendido' || $status == 'espera' || $status == 'atencion') {
+			if ($appointment->status == 1) {
 				$updateData['status'] = 2; // Confirmada
 			}
 		}

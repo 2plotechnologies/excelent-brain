@@ -2449,6 +2449,25 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               district: -1
             };
           }
+          if (!newVal.relative || !Array.isArray(newVal.relative)) {
+            newVal.relative = [{
+              name: '',
+              phone: '',
+              kinship: ''
+            }, {
+              name: '',
+              phone: '',
+              kinship: ''
+            }];
+          } else {
+            while (newVal.relative.length < 2) {
+              newVal.relative.push({
+                name: '',
+                phone: '',
+                kinship: ''
+              });
+            }
+          }
           this.datos = newVal;
           if (this.ubigeo.departamentos.length > 0) {
             this.moverProvincias(false);

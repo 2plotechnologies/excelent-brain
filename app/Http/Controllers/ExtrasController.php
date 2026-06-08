@@ -527,6 +527,7 @@ class ExtrasController extends Controller
         'monto' => $membresia['precio'] - $membresia['descuento'],
 				'estado' => 2,
         'comentarios' => $request->input('comentarios'),
+        'idSede' => $idSede,
     ]);
 
     // Crear citas para las fechas de la membresía
@@ -545,7 +546,8 @@ class ExtrasController extends Controller
             'verAviso' => 1,
             'byDoctor' => 0,
             'idMembresia' => $idMembresia,
-            'active_slot' => 1
+            'active_slot' => 1,
+            'idSede' => $idSede,
         ]);
 
         // Crear el pago extra
@@ -561,7 +563,8 @@ class ExtrasController extends Controller
             'rebaja' => 0,
             'motivoRebaja' => 'Creado por membresía',
             'descuento' => 0,
-            'motivoDescuento' => ''
+            'motivoDescuento' => '',
+            'idSede' => $idSede,
         ]);
     }
 
@@ -1109,7 +1112,10 @@ class ExtrasController extends Controller
 		->where('m.activo', 1)
 		->orderBy('inicio', 'desc')->get();
 		foreach ($membresias as $membresia) {
-			$contador_paquetes = Appointment::where('idMembresia', $membresia->id)->count();
+			$citasMembresia = Appointment::where('idMembresia', $membresia->id)->get();
+			$contador_paquetes = $citasMembresia->filter(function($cita) {
+				return in_array($cita->status, [1, 2]) || $cita->attention_status === 'atendido';
+			})->count();
 			$membresia->contador_paquetes = $contador_paquetes;
 			
 			if($membresia->cuotas>0){

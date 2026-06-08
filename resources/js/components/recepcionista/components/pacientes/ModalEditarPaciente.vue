@@ -310,6 +310,16 @@ export default {
           if (!newVal.address) {
             newVal.address = { address: '', department: -1, province: -1, district: -1 };
           }
+          if (!newVal.relative || !Array.isArray(newVal.relative)) {
+            newVal.relative = [
+              { name: '', phone: '', kinship: '' },
+              { name: '', phone: '', kinship: '' }
+            ];
+          } else {
+            while (newVal.relative.length < 2) {
+              newVal.relative.push({ name: '', phone: '', kinship: '' });
+            }
+          }
           this.datos = newVal;
           if (this.ubigeo.departamentos.length > 0) {
             this.moverProvincias(false);

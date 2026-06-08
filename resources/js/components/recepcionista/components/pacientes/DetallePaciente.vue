@@ -433,15 +433,17 @@
 
                 <div class="d-flex justify-content-between align-items-end mb-2">
                   <span class="text-dark small" style="font-weight: 500;">Sesiones usadas</span>
-                  <span class="text-dark small font-weight-bold">{{ mem.sesiones_usadas || 0 }} / {{ mem.sesiones_totales || 6 }}</span>
+                  <span class="text-dark small font-weight-bold" v-if="mem.sesiones_totales === 0">{{ mem.sesiones_usadas || 0 }} / ∞</span>
+                  <span class="text-dark small font-weight-bold" v-else>{{ mem.sesiones_usadas || 0 }} / {{ mem.sesiones_totales }}</span>
                 </div>
                 
-                <div class="progress mb-2 rounded-pill" style="height: 6px;">
+                <div v-if="mem.sesiones_totales !== 0" class="progress mb-2 rounded-pill" style="height: 6px;">
                   <div class="progress-bar bg-primary" role="progressbar" :style="{ width: (((mem.sesiones_usadas || 0) / (mem.sesiones_totales || 6)) * 100) + '%' }"></div>
                   <div class="progress-bar" role="progressbar" style="background-color: #fd7e14;" :style="{ width: (100 - (((mem.sesiones_usadas || 0) / (mem.sesiones_totales || 6)) * 100)) + '%' }"></div>
                 </div>
                 
-                <small class="text-muted" style="font-size: 0.75rem;">{{ (mem.sesiones_totales || 6) - (mem.sesiones_usadas || 0) }} sesiones restantes</small>
+                <small v-if="mem.sesiones_totales !== 0" class="text-muted" style="font-size: 0.75rem;">{{ (mem.sesiones_totales || 6) - (mem.sesiones_usadas || 0) }} sesiones restantes</small>
+                <small v-else class="text-muted" style="font-size: 0.75rem;">Sesiones infinitas</small>
               </div>
             </div>
           </div>
@@ -486,14 +488,8 @@
                       <a href="#" class="text-primary text-decoration-none">{{ cita.professional ? cita.professional.name : 'N/A' }}</a>
                     </td>
                     <td class="align-middle py-3 border-bottom-0" style="border-bottom: 1px solid #f1f3f5 !important;">
-                      <span v-if="cita.status == 1 || cita.status == 'Confirmada'" class="badge bg-primary bg-opacity-10 rounded-pill fw-normal px-3 py-2" style="font-size: 0.8rem;">
-                        <i class="far fa-calendar-check me-1"></i> Confirmada
-                      </span>
-                      <span v-else-if="cita.status == 2 || cita.status == 'Completada'" class="badge bg-success bg-opacity-10 rounded-pill fw-normal px-3 py-2" style="font-size: 0.8rem;">
-                        <i class="fas fa-check-circle me-1"></i> Completada
-                      </span>
-                      <span v-else class="badge bg-secondary bg-opacity-10 rounded-pill fw-normal px-3 py-2" style="font-size: 0.8rem;">
-                        {{ getStatusName(cita.status) }}
+                      <span class="badge rounded-pill fw-normal px-3 py-2" :class="getStatusBadge(cita) + ' bg-opacity-10'" style="font-size: 0.8rem;">
+                        {{ getStatusName(cita) }}
                       </span>
                     </td>
                     <td class="align-middle py-3 pe-4 text-muted border-bottom-0" style="border-bottom: 1px solid #f1f3f5 !important;">
@@ -2075,7 +2071,7 @@ export default {
   computed: {
     faltasCitas() {
       if (!this.paciente.appointments) return [];
-      return this.paciente.appointments.filter(cita => this.getStatusName(cita.status) === 'Cancelado' || cita.status == 3 || cita.status == 5);
+      return this.paciente.appointments.filter(cita => cita.status == 3 || cita.status == 6);
     },
     reprogramacionesCitas() {
       if (!this.paciente.appointments) return [];
@@ -2343,20 +2339,36 @@ export default {
       return this.formatDate(date) + (time ? ' ' + time : '');
     },
     getStatusName(s) {
-      if(s==1) return 'Pendiente';
-      if(s==2) return 'Confirmado';
-      if(s==3) return 'Atendido';
-      if(s==4) return 'Reprogramado';
-      if(s==5) return 'Cancelado';
+      let status = s;
+      let isAtendido = false;
+      if (s && typeof s === 'object') {
+        status = s.status;
+        isAtendido = s.attention_status === 'atendido';
+      }
+      if (isAtendido) return 'Atendido';
+      if(status==1) return 'Sin confirmar';
+      if(status==2) return 'Confirmado';
+      if(status==3) return 'Anulado';
+      if(status==4) return 'Reprogramado';
+      if(status==5) return 'Eliminado';
+      if(status==6) return 'Limbo';
       return 'Otro';
     },
     getStatusBadge(s) {
-      if(s==1) return 'bg-warning';
-      if(s==2) return 'bg-primary';
-      if(s==3) return 'bg-success';
-      if(s==4) return 'bg-info';
-      if(s==5) return 'bg-danger';
-      return 'bg-secondary';
+      let status = s;
+      let isAtendido = false;
+      if (s && typeof s === 'object') {
+        status = s.status;
+        isAtendido = s.attention_status === 'atendido';
+      }
+      if (isAtendido) return 'bg-success text-success';
+      if(status==1) return 'bg-warning text-warning';
+      if(status==2) return 'bg-primary text-primary';
+      if(status==3) return 'bg-danger text-danger';
+      if(status==4) return 'bg-info text-info';
+      if(status==5) return 'bg-danger text-danger';
+      if(status==6) return 'bg-secondary text-secondary';
+      return 'bg-secondary text-secondary';
     },
     getHobbies(hobbiesStr) {
       if (!hobbiesStr) return [];

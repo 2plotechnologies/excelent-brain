@@ -108,7 +108,9 @@ class PaqueteController extends Controller
                 ->get();
 
             $membresia->historial_citas = $citas;
-            $membresia->sesiones_usadas = $citas->where('status', '<>', 3)->count();
+            $membresia->sesiones_usadas = $citas->filter(function($cita) {
+                return in_array($cita->status, [1, 2]) || $cita->attention_status === 'atendido';
+            })->count();
 
             $pagos = Extra_payment::where('idMembresia', $membresia->id)->where('activo', 1)->get();
             $membresia->pagado = $pagos->sum('price');
@@ -156,7 +158,9 @@ class PaqueteController extends Controller
                     Membresia::where('id', $membresia->id)->update(['estado' => 2]);
                 }
             } elseif ($membresia->estado == 2) { // Activo
-                $sesionesEfectivas = $citas->whereIn('status', [2, 5])->count();
+                $sesionesEfectivas = $citas->filter(function($cita) {
+                    return $cita->status == 2 || $cita->attention_status === 'atendido';
+                })->count();
                 if ($membresia->total_sesiones > 0 && $sesionesEfectivas >= $membresia->total_sesiones && floatval($membresia->pagado) >= floatval($membresia->monto)) {
                     $membresia->estado = 3; // Completado
                     Membresia::where('id', $membresia->id)->update(['estado' => 3]);
@@ -248,7 +252,9 @@ class PaqueteController extends Controller
             ->get();
 
         $membresia->historial_citas = $citas;
-        $membresia->sesiones_usadas = $citas->where('status', '<>', 3)->count();
+        $membresia->sesiones_usadas = $citas->filter(function($cita) {
+            return in_array($cita->status, [1, 2]) || $cita->attention_status === 'atendido';
+        })->count();
 
         $pagos = Extra_payment::where('idMembresia', $membresia->id)->where('activo', 1)->get();
         $membresia->pagado = $pagos->sum('price');
@@ -345,9 +351,12 @@ class PaqueteController extends Controller
             if ($hora_inicio && $hora_fin) {
                 $existing = Appointment::where('professional_id', $request->input('professional_id'))
                     ->where('date', $request->input('date'))
-                    ->whereIn('status', [1, 2, 5])
+                    ->whereIn('status', [1, 2])
                     ->with(['schedule', 'precio', 'membresia.precio'])
-                    ->get();
+                    ->get()
+                    ->filter(function($cita) {
+                        return in_array($cita->status, [1, 2]) || $cita->attention_status === 'atendido';
+                    });
 
                 foreach ($existing as $ext) {
                     $extStart = $ext->hora_inicio ?? ($ext->schedule ? $ext->schedule->check_time : null);
@@ -372,6 +381,15 @@ class PaqueteController extends Controller
                 }
             }
 
+            $user_id = $request->input('user_id');
+            $idSede = $request->input('idSede');
+            if (!$idSede && $user_id) {
+                $idSede = DB::table('users')->where('id', $user_id)->value('IdSede');
+            }
+            if (!$idSede) {
+                $idSede = 1;
+            }
+
             $cita = Appointment::create([
                 'date' => $request->input('date'),
                 'patient_condition' => $request->input('patient_condition', 2),
@@ -386,7 +404,7 @@ class PaqueteController extends Controller
                 'byDoctor' => 0,
                 'num_sesion' => $request->input('num_sesion'),
                 'idMembresia' => $request->input('idMembresia'),
-                'idSede' => $request->input('idSede', 1),
+                'idSede' => $idSede,
                 'hora_inicio' => $hora_inicio,
                 'hora_fin' => $hora_fin,
                 'duracion' => $duracion,
@@ -401,11 +419,12 @@ class PaqueteController extends Controller
                 'price' => 0,
                 'appointment_id' => $cita->id,
                 'continuo' => 2,
-                'user_id' => $request->input('user_id'),
+                'user_id' => $user_id,
                 'rebaja' => 0,
                 'motivoRebaja' => 'Agendado desde paquete',
                 'descuento' => 0,
-                'motivoDescuento' => ''
+                'motivoDescuento' => '',
+                'idSede' => $idSede,
             ]);
 
             return response()->json(['cita' => $cita, 'estado' => 'ok']);
@@ -443,10 +462,11 @@ class PaqueteController extends Controller
                 ->where('estado', 1) // Pendiente
                 ->update(['estado' => 3]);
 
-            // Calcular sesiones efectivas (status 2 = Atendido, status 5 = Atendida)
-            $sesiones_efectivas = Appointment::where('idMembresia', $id)
-                ->whereIn('status', [2, 5])
-                ->count();
+            // Calcular sesiones efectivas
+            $citasMembresia = Appointment::where('idMembresia', $id)->get();
+            $sesiones_efectivas = $citasMembresia->filter(function($cita) {
+                return $cita->status == 2 || $cita->attention_status === 'atendido';
+            })->count();
 
             // El prorrateo se basa en el precio base de la membresía (monto + descuento).
             $precio_base = floatval($membresia->monto) + floatval($membresia->descuento);

@@ -140,7 +140,7 @@
 									</div>
 									<div class="d-flex align-items-center">
 										<!-- Iconos de estado de atención (En espera, En atención, Atendido) -->
-										<svg v-if="horaOcup.attention_status === 'atendido' || (!horaOcup.attention_status && horaOcup.status == 5)" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-success me-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+										<svg v-if="horaOcup.attention_status === 'atendido'" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-success me-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
 										<svg v-else-if="horaOcup.attention_status === 'atencion' || (!horaOcup.attention_status && horaOcup.status == 2)" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-info me-1"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg>
 										<svg v-else-if="horaOcup.attention_status === 'espera' || (!horaOcup.attention_status && horaOcup.status == 1)" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-warning me-1"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
 										
@@ -514,7 +514,12 @@
 					if(cita.status == 2) estado = 'Confirmado';
 					if(cita.status == 3) estado = 'Anulado';
 					if(cita.status == 4) estado = 'Reprogramado';
-					if(cita.status == 5) estado = 'Atendida';
+					if(cita.status == 5) estado = 'Eliminado';
+					if(cita.status == 6) estado = 'Limbo';
+					
+					if(cita.attention_status === 'espera') estado = 'En espera';
+					if(cita.attention_status === 'atencion') estado = 'En atención';
+					if(cita.attention_status === 'atendido') estado = 'Atendido';
 
 					this.tooltipData = {
 						paciente: cita.patient.name.split(' ')[0] + ' ' + cita.patient.nombres.split(' ')[0],

@@ -103,7 +103,7 @@ class ScheduleController extends Controller
 				->whereColumn('appointments.professional_id', 'schedules.professional_id')
 				->whereDate('appointments.date', $fecha)
 				->whereColumn('appointments.schedule_id', 'schedules.id')
-				->whereIn('appointments.status', [1,2,5]);
+				->whereIn('appointments.status', [1,2]);
 			})
 			->get();
             

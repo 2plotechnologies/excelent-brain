@@ -229,8 +229,12 @@ export default {
         if (!this.dataPatient.address || Array.isArray(this.dataPatient.address)) {
           this.dataPatient.address = { department: -1, province: -1, district: -1, address: '' };
         }
-        if (!this.dataPatient.relative || this.dataPatient.relative.length === 0) {
+        if (!this.dataPatient.relative || !Array.isArray(this.dataPatient.relative)) {
           this.dataPatient.relative = [{ name: '', phone: '', kinship: '' }, { name: '', phone: '', kinship: '' }];
+        } else {
+          while (this.dataPatient.relative.length < 2) {
+            this.dataPatient.relative.push({ name: '', phone: '', kinship: '' });
+          }
         }
         this.datos = this.dataPatient;
       },

@@ -1985,9 +1985,9 @@ var render = function render() {
       staticClass: "progress-section mb-3"
     }, [_c("div", {
       staticClass: "d-flex justify-content-between small text-muted mb-1"
-    }, [_c("span", [_vm._v(_vm._s(paquete.sesiones_usadas) + " de " + _vm._s(paquete.total_sesiones) + " sesiones usadas")]), _vm._v(" "), _c("span", {
+    }, [paquete.total_sesiones == 0 ? _c("span", [_vm._v(_vm._s(paquete.sesiones_usadas) + " sesiones usadas (Sesiones infinitas)")]) : _c("span", [_vm._v(_vm._s(paquete.sesiones_usadas) + " de " + _vm._s(paquete.total_sesiones) + " sesiones usadas")]), _vm._v(" "), paquete.total_sesiones > 0 ? _c("span", {
       staticClass: "fw-bold"
-    }, [_vm._v(_vm._s(_vm.calcularProgreso(paquete)) + "%")])]), _vm._v(" "), _c("div", {
+    }, [_vm._v(_vm._s(_vm.calcularProgreso(paquete)) + "%")]) : _vm._e()]), _vm._v(" "), paquete.total_sesiones > 0 ? _c("div", {
       staticClass: "progress",
       staticStyle: {
         height: "6px"
@@ -2004,7 +2004,7 @@ var render = function render() {
         "aria-valuemin": "0",
         "aria-valuemax": "100"
       }
-    })])])])])]), _vm._v(" "), _c("hr", {
+    })]) : _vm._e()])])])]), _vm._v(" "), _c("hr", {
       staticClass: "border-light opacity-50 my-3"
     }), _vm._v(" "), _c("div", {
       staticClass: "d-flex justify-content-between align-items-center package-footer flex-wrap gap-3"
@@ -2036,7 +2036,7 @@ var render = function render() {
       staticClass: "fas fa-exclamation-triangle"
     }), _vm._v(" " + _vm._s(paquete.cuotas_vencidas) + " cuota(s) vencida(s)\n              ")]) : _c("span", {
       staticClass: "text-success ms-2 badge bg-success-subtle text-success p-1 px-2 border border-success-subtle rounded-pill"
-    }, [_vm._v("Cuotas al día")])]), _vm._v(" "), paquete.estado === 2 && paquete.sesiones_usadas < paquete.total_sesiones ? _c("button", {
+    }, [_vm._v("Cuotas al día")])]), _vm._v(" "), paquete.estado === 2 && (paquete.total_sesiones == 0 || paquete.sesiones_usadas < paquete.total_sesiones) ? _c("button", {
       staticClass: "btn btn-sm btn-outline-primary fw-bold rounded-pill px-3 shadow-sm transition-all hover-lift",
       on: {
         click: function click($event) {
@@ -3121,7 +3121,7 @@ var render = function render() {
     staticClass: "text-muted small"
   }, [_vm._v("Sesiones Totales")]), _vm._v(" "), _c("span", {
     staticClass: "fw-bold"
-  }, [_vm._v(_vm._s(_vm.paqueteSeleccionado.total_sesiones))])]), _vm._v(" "), _c("div", {
+  }, [_vm._v(_vm._s(_vm.paqueteSeleccionado.total_sesiones == 0 ? "Sesiones infinitas" : _vm.paqueteSeleccionado.total_sesiones))])]), _vm._v(" "), _c("div", {
     staticClass: "d-flex justify-content-between mb-2"
   }, [_c("span", {
     staticClass: "text-muted small"

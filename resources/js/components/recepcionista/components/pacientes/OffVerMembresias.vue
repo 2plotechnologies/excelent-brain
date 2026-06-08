@@ -95,10 +95,14 @@
 						<div class="row mb-2">
 							<div class="col d-flex d-grid justify-content-between align-items-center">
 								<template v-if="tipoMembresia(membresiaActiva) == 'sesiones'">
-									<span><i class="fa-solid fa-receipt"></i> {{ contarCitasActivas() }} de {{membresiaActiva.sesiones}} Citas</span>
+									<span v-if="parseInt(membresiaActiva.sesiones) === 0"><i class="fa-solid fa-receipt"></i> {{ contarCitasActivas() }} de (Sesiones infinitas)</span>
+									<span v-else><i class="fa-solid fa-receipt"></i> {{ contarCitasActivas() }} de {{membresiaActiva.sesiones}} Citas</span>
 									<template v-if="parseInt(membresiaActiva.sesiones) == 12">
 										<button v-if="contarCitasActivas() < 12 " class="btn btn-outline-primary"  @click="activarFechas=true" data-bs-target="#modalProximaCita" data-bs-toggle="modal"><i class="fa-solid fa-plus"></i> Agregar cita</button>
 										<button v-if="contarCitasActivas() == 12 " class="btn btn-outline-primary"  @click="activarFechas=true" data-bs-target="#modalProximaCita" data-bs-toggle="modal"><i class="fa-solid fa-plus"></i> Agregar lectura</button>
+									</template>
+									<template v-else-if="parseInt(membresiaActiva.sesiones) === 0">
+										<button class="btn btn-outline-primary"  @click="activarFechas=true" data-bs-target="#modalProximaCita" data-bs-toggle="modal"><i class="fa-solid fa-plus"></i> Agregar cita</button>
 									</template>
 									<template v-else>
 										<button v-if="contarCitasActivas() < parseInt(membresiaActiva.sesiones) " class="btn btn-outline-primary"  @click="activarFechas=true" data-bs-target="#modalProximaCita" data-bs-toggle="modal"><i class="fa-solid fa-plus"></i> Agregar cita</button>
@@ -127,11 +131,13 @@
 									<td>{{ cita.professional.nombre }}</td>
 									<td>{{ cita.precio.descripcion }}</td>
 									<td>
-										<span v-if="cita.status==1">Sin Confirmar</span>
-										<span class="text-primary" v-if="cita.status==2">Cita Confirmada </span>
-										<span class="text-danger" v-if="cita.status==3">Cita Anulada </span>
-										<span class="text-danger" v-if="cita.status==4">Cita Reprogramada </span>
-										<span class="text-danger" v-if="cita.status==5">Cita eliminada </span>
+										<span class="text-success" v-if="cita.attention_status == 'atendido'">Cita Atendida</span>
+										<span v-else-if="cita.status==1">Sin Confirmar</span>
+										<span class="text-primary" v-else-if="cita.status==2">Cita Confirmada</span>
+										<span class="text-danger" v-else-if="cita.status==3">Cita Anulada</span>
+										<span class="text-info" v-else-if="cita.status==4">Cita Reprogramada</span>
+										<span class="text-danger" v-else-if="cita.status==5">Cita Eliminada</span>
+										<span class="text-secondary" v-else-if="cita.status==6">Cita en Limbo</span>
 									</td>
 								</tr>
 							</tbody>
@@ -380,12 +386,12 @@ export default{
 
 		},
 		contarCitasActivas(){
-			let contador = this.citas.filter(x=> x.status == '1' || x.status == '2').length
+			let contador = this.citas.filter(x=> x.status == 1 || x.status == 2).length
 			return contador
 		},
 		tipoMembresia(membresia){
 			if(membresia.meses > 0 ) return 'tiempo'
-			if(membresia.sesiones > 0) return 'sesiones'
+			if(membresia.sesiones >= 0) return 'sesiones'
 		},
 		fechaLatam(fecha) { return moment(fecha).format('DD/MM/YYYY'); },
 		horaLatam(horita){ return moment(horita, 'HH:mm:ss').format('hh:mm a') },

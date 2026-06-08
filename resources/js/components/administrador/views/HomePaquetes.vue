@@ -149,10 +149,11 @@
 
                 <div class="progress-section mb-3">
                   <div class="d-flex justify-content-between small text-muted mb-1">
-                    <span>{{ paquete.sesiones_usadas }} de {{ paquete.total_sesiones }} sesiones usadas</span>
-                    <span class="fw-bold">{{ calcularProgreso(paquete) }}%</span>
+                    <span v-if="paquete.total_sesiones == 0">{{ paquete.sesiones_usadas }} sesiones usadas (Sesiones infinitas)</span>
+                    <span v-else>{{ paquete.sesiones_usadas }} de {{ paquete.total_sesiones }} sesiones usadas</span>
+                    <span class="fw-bold" v-if="paquete.total_sesiones > 0">{{ calcularProgreso(paquete) }}%</span>
                   </div>
-                  <div class="progress" style="height: 6px;">
+                  <div class="progress" style="height: 6px;" v-if="paquete.total_sesiones > 0">
                     <div 
                       class="progress-bar" 
                       :class="getProgressBarClass(paquete)"
@@ -201,7 +202,7 @@
                 <span v-else class="text-success ms-2 badge bg-success-subtle text-success p-1 px-2 border border-success-subtle rounded-pill">Cuotas al día</span>
               </div>
               <button 
-                v-if="paquete.estado === 2 && (paquete.sesiones_usadas < paquete.total_sesiones)"
+                v-if="paquete.estado === 2 && (paquete.total_sesiones == 0 || paquete.sesiones_usadas < paquete.total_sesiones)"
                 class="btn btn-sm btn-outline-primary fw-bold rounded-pill px-3 shadow-sm transition-all hover-lift"
                 @click="abrirAgendarCita(paquete)"
               >
@@ -677,7 +678,7 @@
               </div>
               <div class="d-flex justify-content-between mb-2">
                 <span class="text-muted small">Sesiones Totales</span>
-                <span class="fw-bold">{{ paqueteSeleccionado.total_sesiones }}</span>
+                <span class="fw-bold">{{ paqueteSeleccionado.total_sesiones == 0 ? 'Sesiones infinitas' : paqueteSeleccionado.total_sesiones }}</span>
               </div>
               <div class="d-flex justify-content-between mb-2">
                 <span class="text-muted small">Costo por Sesión</span>

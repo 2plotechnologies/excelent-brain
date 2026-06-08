@@ -132,7 +132,7 @@ export default{
 					if(response.data?.mensaje == 'Ok'){
 						if (tipo === 'fin') {
 							this.cita.hora_fin = this.departureTime;
-							this.cita.status = 5; // Atendido
+							this.cita.attention_status = 'atendido'; // Atendido
 						}
 						this.$emit('actualizar', 'sksks')
 						alertify.notify('<i class="fa-regular fa-calendar-check"></i> Datos actualizados' , 'success', 5);

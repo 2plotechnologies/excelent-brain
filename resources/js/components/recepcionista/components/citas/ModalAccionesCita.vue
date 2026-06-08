@@ -11,8 +11,8 @@
             <div>
               <h5 class="modal-title font-weight-bold text-dark mb-1">Detalle de Cita</h5>
               <div class="d-flex gap-2 mt-1 flex-wrap align-items-center">
-                <span class="badge-status" :class="statusClass(cita.status)">
-                  <i class="fas fa-check-circle mr-1"></i> {{ statusLabel(cita.status) }}
+                <span class="badge-status" :class="statusClass(cita.status, cita.attention_status)">
+                  <i class="fas fa-check-circle mr-1"></i> {{ statusLabel(cita.status, cita.attention_status) }}
                 </span>
                 <span class="badge-service" v-if="cita.type">
                   <i class="fas fa-stethoscope mr-1"></i> {{ getServiceLabel(cita) }}
@@ -51,7 +51,7 @@
               </div>
               <div class="status-options mt-2">
                 <div class="status-option" :class="{ active: cita.status == 1 }">No Confirmado</div>
-                <div class="status-option active-success" :class="{ active: cita.status == 2 || cita.status == 5 }">Confirmado</div>
+                <div class="status-option active-success" :class="{ active: cita.status == 2 || cita.attention_status === 'atendido' }">Confirmado</div>
               </div>
             </div>
 
@@ -308,12 +308,8 @@ export default {
         let response = await this.axios.post(`/api/updateAttentionStatus/${this.cita.id}`, { attention_status: estado });
         if (response.data?.mensaje == 'Ok') {
           this.$set(this.cita, 'attention_status', estado);
-          if (estado === 'atendido') {
-            this.$set(this.cita, 'status', 5);
-          } else {
-            if (this.cita.status == 1 || this.cita.status == 5) {
-              this.$set(this.cita, 'status', 2); // Confirmado
-            }
+          if (this.cita.status == 1) {
+            this.$set(this.cita, 'status', 2); // Confirmado
           }
           this.$emit('actualizar');
           if (window.alertify) {
@@ -349,7 +345,6 @@ export default {
       // Fallback a lógica basada en status para datos antiguos (sin depender de tiempos)
       if (tipo === 'espera') return status == 1;
       if (tipo === 'atencion') return status == 2;
-      if (tipo === 'atendido') return status == 5;
       return false;
     },
     calcularEspera() {
@@ -359,20 +354,22 @@ export default {
       let diff = end.diff(start, 'minutes');
       return diff > 0 ? `${diff} min` : '0 min';
     },
-    statusClass(status) {
+    statusClass(status, attentionStatus) {
+      if(attentionStatus === 'atendido') return 'status-badge-success';
       if(status == 1) return 'status-badge-secondary';
       if(status == 2) return 'status-badge-success';
       if(status == 3) return 'status-badge-danger';
       if(status == 4) return 'status-badge-info';
-      if(status == 5) return 'status-badge-success';
+      if(status == 5) return 'status-badge-danger';
       return 'status-badge-light';
     },
-    statusLabel(status) {
+    statusLabel(status, attentionStatus) {
+      if(attentionStatus === 'atendido') return 'Atendida';
       if(status == 1) return 'Pendiente';
       if(status == 2) return 'Confirmada';
       if(status == 3) return 'Anulada';
       if(status == 4) return 'Reprogramada';
-      if(status == 5) return 'Atendida';
+      if(status == 5) return 'Eliminada';
       return 'Estado';
     },
     fechaLatam(fecha){

@@ -173,9 +173,9 @@
 									}'> <!-- @click="modalInfo(qCita)" data-bs-toggle="modal" data-bs-target="#modalEstado" -->
 										<span class="icon text-white-50">
 											<i :class="{
-												'fas fa-exclamation-circle': qCita.status == 1 || qCita.status==5,
+												'fas fa-exclamation-circle': qCita.status == 1,
 												'fas fa-check': qCita.status == 2,
-												'fas fa-minus-circle': qCita.status == 3 || qCita.status==4
+												'fas fa-minus-circle': qCita.status == 3 || qCita.status == 4 || qCita.status == 5
 											}"></i>
 										</span>
 										<span class="text labels" v-if="qCita.status == 1">Sin confirmar</span>
@@ -241,7 +241,7 @@
 											<i class="fa fa-align-justify"></i>
 											</a>
 											<button
-											v-if="qCita.status == 5 && qCita.hora_fin && qCita.patient && qCita.patient.phone"
+											v-if="qCita.attention_status === 'atendido' && qCita.hora_fin && qCita.patient && qCita.patient.phone"
 											@click="enviarSatisfaccion(qCita)"
 											title="Enviar satisfaccion"
 											class="btn btn-primary btn-circle btn-sm"

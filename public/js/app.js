@@ -6402,12 +6402,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               response = _context2.sent;
               if (((_response$data2 = response.data) === null || _response$data2 === void 0 ? void 0 : _response$data2.mensaje) == 'Ok') {
                 _this2.$set(_this2.cita, 'attention_status', estado);
-                if (estado === 'atendido') {
-                  _this2.$set(_this2.cita, 'status', 5);
-                } else {
-                  if (_this2.cita.status == 1 || _this2.cita.status == 5) {
-                    _this2.$set(_this2.cita, 'status', 2); // Confirmado
-                  }
+                if (_this2.cita.status == 1) {
+                  _this2.$set(_this2.cita, 'status', 2); // Confirmado
                 }
                 _this2.$emit('actualizar');
                 if (window.alertify) {
@@ -6459,7 +6455,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       // Fallback a lógica basada en status para datos antiguos (sin depender de tiempos)
       if (tipo === 'espera') return status == 1;
       if (tipo === 'atencion') return status == 2;
-      if (tipo === 'atendido') return status == 5;
       return false;
     },
     calcularEspera: function calcularEspera() {
@@ -6469,20 +6464,22 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       var diff = end.diff(start, 'minutes');
       return diff > 0 ? "".concat(diff, " min") : '0 min';
     },
-    statusClass: function statusClass(status) {
+    statusClass: function statusClass(status, attentionStatus) {
+      if (attentionStatus === 'atendido') return 'status-badge-success';
       if (status == 1) return 'status-badge-secondary';
       if (status == 2) return 'status-badge-success';
       if (status == 3) return 'status-badge-danger';
       if (status == 4) return 'status-badge-info';
-      if (status == 5) return 'status-badge-success';
+      if (status == 5) return 'status-badge-danger';
       return 'status-badge-light';
     },
-    statusLabel: function statusLabel(status) {
+    statusLabel: function statusLabel(status, attentionStatus) {
+      if (attentionStatus === 'atendido') return 'Atendida';
       if (status == 1) return 'Pendiente';
       if (status == 2) return 'Confirmada';
       if (status == 3) return 'Anulada';
       if (status == 4) return 'Reprogramada';
-      if (status == 5) return 'Atendida';
+      if (status == 5) return 'Eliminada';
       return 'Estado';
     },
     fechaLatam: function fechaLatam(fecha) {
@@ -9121,7 +9118,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 if (((_response$data = response.data) === null || _response$data === void 0 ? void 0 : _response$data.mensaje) == 'Ok') {
                   if (tipo === 'fin') {
                     _this.cita.hora_fin = _this.departureTime;
-                    _this.cita.status = 5; // Atendido
+                    _this.cita.attention_status = 'atendido'; // Atendido
                   }
                   _this.$emit('actualizar', 'sksks');
                   alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('<i class="fa-regular fa-calendar-check"></i> Datos actualizados', 'success', 5);
@@ -10870,7 +10867,11 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         if (cita.status == 2) estado = 'Confirmado';
         if (cita.status == 3) estado = 'Anulado';
         if (cita.status == 4) estado = 'Reprogramado';
-        if (cita.status == 5) estado = 'Atendida';
+        if (cita.status == 5) estado = 'Eliminado';
+        if (cita.status == 6) estado = 'Limbo';
+        if (cita.attention_status === 'espera') estado = 'En espera';
+        if (cita.attention_status === 'atencion') estado = 'En atención';
+        if (cita.attention_status === 'atendido') estado = 'Atendido';
         this.tooltipData = {
           paciente: cita.patient.name.split(' ')[0] + ' ' + cita.patient.nombres.split(' ')[0],
           hora: horaRango,
@@ -11848,10 +11849,10 @@ var render = function render() {
     staticClass: "d-flex gap-2 mt-1 flex-wrap align-items-center"
   }, [_c("span", {
     staticClass: "badge-status",
-    "class": _vm.statusClass(_vm.cita.status)
+    "class": _vm.statusClass(_vm.cita.status, _vm.cita.attention_status)
   }, [_c("i", {
     staticClass: "fas fa-check-circle mr-1"
-  }), _vm._v(" " + _vm._s(_vm.statusLabel(_vm.cita.status)) + "\n              ")]), _vm._v(" "), _vm.cita.type ? _c("span", {
+  }), _vm._v(" " + _vm._s(_vm.statusLabel(_vm.cita.status, _vm.cita.attention_status)) + "\n              ")]), _vm._v(" "), _vm.cita.type ? _c("span", {
     staticClass: "badge-service"
   }, [_c("i", {
     staticClass: "fas fa-stethoscope mr-1"
@@ -11912,7 +11913,7 @@ var render = function render() {
   }, [_vm._v("No Confirmado")]), _vm._v(" "), _c("div", {
     staticClass: "status-option active-success",
     "class": {
-      active: _vm.cita.status == 2 || _vm.cita.status == 5
+      active: _vm.cita.status == 2 || _vm.cita.attention_status === "atendido"
     }
   }, [_vm._v("Confirmado")])])]), _vm._v(" "), _c("div", {
     staticClass: "status-card h-100 position-relative",
@@ -19243,9 +19244,9 @@ var render = function render() {
       staticClass: "icon text-white-50"
     }, [_c("i", {
       "class": {
-        "fas fa-exclamation-circle": qCita.status == 1 || qCita.status == 5,
+        "fas fa-exclamation-circle": qCita.status == 1,
         "fas fa-check": qCita.status == 2,
-        "fas fa-minus-circle": qCita.status == 3 || qCita.status == 4
+        "fas fa-minus-circle": qCita.status == 3 || qCita.status == 4 || qCita.status == 5
       }
     })]), _vm._v(" "), qCita.status == 1 ? _c("span", {
       staticClass: "text labels"
@@ -19299,7 +19300,7 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fab fa-whatsapp"
-    })]) : _vm._e(), _vm._v(" "),  false ? 0 : _vm._e(), _vm._v(" "), qCita.status == 5 && qCita.hora_fin && qCita.patient && qCita.patient.phone ? _c("button", {
+    })]) : _vm._e(), _vm._v(" "),  false ? 0 : _vm._e(), _vm._v(" "), qCita.attention_status === "atendido" && qCita.hora_fin && qCita.patient && qCita.patient.phone ? _c("button", {
       staticClass: "btn btn-primary btn-circle btn-sm",
       attrs: {
         title: "Enviar satisfaccion",
@@ -19965,7 +19966,7 @@ var render = function render() {
         "class": horaOcup.mode == 1 ? "far fa-user" : "fas fa-desktop"
       }), _vm._v(" \n\t\t\t\t\t\t\t\t\t\t" + _vm._s(horaOcup.patient.name.split(" ")[0]) + " " + _vm._s(horaOcup.patient.nombres.split(" ")[0]) + "\n\t\t\t\t\t\t\t\t\t")]), _vm._v(" "), _c("div", {
         staticClass: "d-flex align-items-center"
-      }, [horaOcup.attention_status === "atendido" || !horaOcup.attention_status && horaOcup.status == 5 ? _c("svg", {
+      }, [horaOcup.attention_status === "atendido" ? _c("svg", {
         staticClass: "text-success me-1",
         attrs: {
           xmlns: "http://www.w3.org/2000/svg",

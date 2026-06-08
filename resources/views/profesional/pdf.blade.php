@@ -197,7 +197,7 @@
     }
 
     body {
-        font-family: 'Roboto', sans-serif;
+        font-family: 'Helvetica', 'Arial', sans-serif;
         margin: auto;
         background: #2F4A99;
     }
@@ -210,14 +210,16 @@
     .header__name {
         font-size: 30px;
         color: #0069b3;
-        font-family:'Montserrat-Bold';
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        font-weight: bold;
         text-transform: uppercase;
     }
 
     .header__sub{
         color:#484554;
         font-size: 15px;
-        font-family:'Montserrat-Bold';
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        font-weight: bold;
     }
     .logotipo {
         width: 90%;
@@ -230,7 +232,8 @@
     
     .light-signature{
         font-size:15px;
-        font-family:'Montserrat-Light';
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        font-weight: 300;
     }
 
     #container{
@@ -291,7 +294,8 @@
     .paciente__title {
         color: #484554;
         text-align: center;
-        font-family:'Montserrat-Bold';
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        font-weight: bold;
         font-size: 15px;
         margin-left: 15px;
     }
@@ -299,7 +303,8 @@
     .paciente__name {
         background: #fafafa;
         width: 100%;
-        font-family: 'Montserrat-Light';
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        font-weight: 300;
         font-size: 25px;
         padding: 0 0 10px 0;
         border: 1px solid;
@@ -309,7 +314,8 @@
     .body-receta {
         color: #484554;
         text-align: center;
-        font-family:'Montserrat-Bold';
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        font-weight: bold;
         font-size: 25px
     }
 
@@ -340,7 +346,8 @@
     .table__head td {
         padding: 5px;
         height: 25px !important;
-        font-family: 'Montserrat-Bold' !important;
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        font-weight: bold !important;
         text-align: center;
         color: #484554;
         font-size:13px;

@@ -341,12 +341,21 @@ class PatientController extends Controller
 		//     'kinship' => $request->input('relative.kinship'),
 		// ]);
 
-		$patient->address->update([
-			'district' => $request->input('address.district'),
-			'address' => $request->input('address.address'),
-			'province' => $request->input('address.province'),
-			'department' => $request->input('address.department'),
-		]);
+		if ($patient->address) {
+			$patient->address->update([
+				'district' => $request->input('address.district'),
+				'address' => $request->input('address.address'),
+				'province' => $request->input('address.province'),
+				'department' => $request->input('address.department'),
+			]);
+		} else {
+			$patient->address()->create([
+				'district' => $request->input('address.district'),
+				'address' => $request->input('address.address'),
+				'province' => $request->input('address.province'),
+				'department' => $request->input('address.department'),
+			]);
+		}
 
 		Relative::where('patient_id',$patient->id)->delete();
 
@@ -1191,6 +1200,14 @@ class PatientController extends Controller
 			$patient->membresias = Membresia::where('patient_id', $id)
 				->with('precio')
 				->orderBy('id', 'desc')->get();
+
+			foreach ($patient->membresias as $membresia) {
+				$citas = Appointment::where('idMembresia', $membresia->id)->get();
+				$membresia->sesiones_usadas = $citas->filter(function($cita) {
+					return in_array($cita->status, [1, 2]) || $cita->attention_status === 'atendido';
+				})->count();
+				$membresia->sesiones_totales = $membresia->precio ? $membresia->precio->sesiones : 0;
+			}
 
 			$patient->sos_estado = DB::table('sos')->where('idPaciente', $id)->orderBy('id', 'desc')->get();
 

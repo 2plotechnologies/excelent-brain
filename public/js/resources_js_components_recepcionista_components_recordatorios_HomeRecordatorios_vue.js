@@ -201,7 +201,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             address: ''
           };
         }
-        if (!this.dataPatient.relative || this.dataPatient.relative.length === 0) {
+        if (!this.dataPatient.relative || !Array.isArray(this.dataPatient.relative)) {
           this.dataPatient.relative = [{
             name: '',
             phone: '',
@@ -211,6 +211,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             phone: '',
             kinship: ''
           }];
+        } else {
+          while (this.dataPatient.relative.length < 2) {
+            this.dataPatient.relative.push({
+              name: '',
+              phone: '',
+              kinship: ''
+            });
+          }
         }
         this.datos = this.dataPatient;
       },
