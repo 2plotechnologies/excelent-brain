@@ -151,7 +151,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         return 1;
       } else if (esp === 'psicologica' || esp === 'psicológica' || nombre.includes('psicolog')) {
         return 2;
-      } else if (esp === 'nutricional' || nombre.includes('nutricion') || nombre.includes('nutrición')) {
+      } else if (esp === 'nutricional' || nombre.includes('nutricion') || nombre.includes('nutricion')) {
         return 6;
       }
       return this.paqueteSeleccionado.idClasificacion == 5 ? 2 : this.paqueteSeleccionado.idClasificacion;
@@ -168,7 +168,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     preciosFiltrados: function preciosFiltrados() {
       if (!this.paqueteSeleccionado || !this.precios || !this.precios.length) return [];
-      var nombre = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
+      var nombreRaw = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
+      var nombre = nombreRaw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       if (this.paqueteSeleccionado.idClasificacion == 9 || nombre.includes('sucamec')) {
         return this.precios.filter(function (precio) {
           return (precio.id == 13 || precio.id == 14 || precio.descripcion.toLowerCase().includes('sucamec')) && precio.servicio == '1' && precio.activo == '1';

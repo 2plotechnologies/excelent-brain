@@ -1140,7 +1140,7 @@ Medical_evolution::create([
 			$pago = Payment::where('appointment_id', $request->input('dataCit.id') )->get();
 			//print_r('pago es ');
 			//var_dump($pago[0]->pay_status); die();
-			if($pago[0]->pay_status  == 2){ //estado = pagado Debe estar pagado y confirmado para que saque la cita con el doctor
+			if($pago[0]->pay_status  == 2){ //estado = pagado Debe estar pagado y confirmado para que saque la cita con el doctor.
 
 				$medicalEvolutionExistents = Medical_evolution::where('patient_id', $request->input('dataCit.patient.id'))
 				->where('activo', 1)
@@ -1169,15 +1169,18 @@ Medical_evolution::create([
 			
 			updateFieldStatus($appointment, $valueStatus);
 			
-			// Si la cita pertenece a un paquete/membresia, auto-completar si cumple las sesiones indicadas
+			// Si la cita pertenece a un paquete/membresia, auto-completar si cumple las sesiones indicadas.
 			if ($appointment->idMembresia && $appointment->idMembresia > 0) {
 				$membresia = Membresia::find($appointment->idMembresia);
 				if ($membresia && $membresia->estado == 2) {
 					$precio = Precio::find($membresia->tipo);
 					if ($precio) {
-						$realizadas = Appointment::where('idMembresia', $membresia->id)->where('status', 2)->count();
-						if ($realizadas >= $precio->sesiones) {
-							$membresia->estado = 3; // 3 = Completado
+						$citas = Appointment::where('idMembresia', $membresia->id)->get();
+						$realizadas = $citas->filter(function($cita) {
+							return $cita->status == 2 || $cita->attention_status === 'atendido';
+						})->count();
+						if ($precio->sesiones > 0 && $realizadas >= $precio->sesiones) {
+							$membresia->estado = 3; // 3 = Completado.
 							$membresia->save();
 						}
 					}

@@ -10523,13 +10523,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       pixelsPorMinuto: 1.5,
       filtroActual: 'Todos',
       filtroSede: null,
-      sedes: [{
-        id: 1,
-        nombre: 'El Tambo'
-      }, {
-        id: 2,
-        nombre: 'San Carlos'
-      }],
+      sedes: [],
       tooltipData: null,
       tooltipStyle: {
         top: '0px',
@@ -10582,8 +10576,46 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
   },
   created: function created() {
     this.filtroSede = parseInt(this.idSede || 1);
+    this.cargarSedes();
   },
   methods: {
+    cargarSedes: function cargarSedes() {
+      var _this2 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              _context.prev = 0;
+              _context.next = 3;
+              return _this2.axios.get('/api/sedes');
+            case 3:
+              res = _context.sent;
+              _this2.sedes = res.data;
+              _context.next = 11;
+              break;
+            case 7:
+              _context.prev = 7;
+              _context.t0 = _context["catch"](0);
+              console.error("Error cargando sedes:", _context.t0);
+              // Fallback in case of error
+              _this2.sedes = [{
+                id: 1,
+                nombre: 'El Tambo'
+              }, {
+                id: 2,
+                nombre: 'San Carlos'
+              }, {
+                id: 3,
+                nombre: 'Lima Norte'
+              }];
+            case 11:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, null, [[0, 7]]);
+      }))();
+    },
     dayWeek: function dayWeek(day) {
       switch (day) {
         case 0:
@@ -10610,46 +10642,46 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       }
     },
     listarProfesionales: function listarProfesionales() {
-      var _this2 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
-            case 0:
-              _context.next = 2;
-              return _this2.axios.get('/api/profesional').then(function (response) {
-                _this2.doctores = response.data;
-                _this2.obtenerHorarios();
-              });
-            case 2:
-            case "end":
-              return _context.stop();
-          }
-        }, _callee);
-      }))();
-    },
-    obtenerHorarios: function obtenerHorarios() {
       var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var dia;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              _this3.cargando = true;
-              dia = _this3.dayWeek(moment__WEBPACK_IMPORTED_MODULE_0___default()(_this3.fecha).format('d') - 1);
-              _context2.next = 4;
-              return _this3.axios.get("/api/horarioCuadernoOcupado/".concat(_this3.fecha, "/").concat(dia), {
+              _context2.next = 2;
+              return _this3.axios.get('/api/profesional').then(function (response) {
+                _this3.doctores = response.data;
+                _this3.obtenerHorarios();
+              });
+            case 2:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2);
+      }))();
+    },
+    obtenerHorarios: function obtenerHorarios() {
+      var _this4 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var dia;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
+            case 0:
+              _this4.cargando = true;
+              dia = _this4.dayWeek(moment__WEBPACK_IMPORTED_MODULE_0___default()(_this4.fecha).format('d') - 1);
+              _context3.next = 4;
+              return _this4.axios.get("/api/horarioCuadernoOcupado/".concat(_this4.fecha, "/").concat(dia), {
                 params: {
-                  idSede: _this3.filtroSede
+                  idSede: _this4.filtroSede
                 }
               }).then(function (res) {
                 moment__WEBPACK_IMPORTED_MODULE_0___default().locale('es');
-                alertifyjs__WEBPACK_IMPORTED_MODULE_13___default().notify('<i class="fa-regular fa-calendar-check"></i> Datos del ' + moment__WEBPACK_IMPORTED_MODULE_0___default()(_this3.fecha).format('DD [de] MMMM'), 'success', 5);
-                _this3.horasSolas = res.data.solos;
-                _this3.horasMalas = res.data.invalidos;
+                alertifyjs__WEBPACK_IMPORTED_MODULE_13___default().notify('<i class="fa-regular fa-calendar-check"></i> Datos del ' + moment__WEBPACK_IMPORTED_MODULE_0___default()(_this4.fecha).format('DD [de] MMMM'), 'success', 5);
+                _this4.horasSolas = res.data.solos;
+                _this4.horasMalas = res.data.invalidos;
 
                 // Filtrar horas solas por doctor
-                _this3.doctores.forEach(function (profesional) {
-                  profesional.horarios = _this3.horasSolas.filter(function (horaSola) {
+                _this4.doctores.forEach(function (profesional) {
+                  profesional.horarios = _this4.horasSolas.filter(function (horaSola) {
                     return parseInt(horaSola.professional_id) == parseInt(profesional.id);
                   }).map(function (horaSola) {
                     return _objectSpread(_objectSpread({}, horaSola), {}, {
@@ -10665,12 +10697,12 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
                   var p = t.split(':').map(Number);
                   return p[0] * 60 + (p[1] || 0);
                 };
-                _this3.doctores.forEach(function (profesional) {
-                  _this3.$set(profesional, 'horariosOcupados', _this3.horasMalas.filter(function (horaMala) {
+                _this4.doctores.forEach(function (profesional) {
+                  _this4.$set(profesional, 'horariosOcupados', _this4.horasMalas.filter(function (horaMala) {
                     return parseInt(horaMala.professional_id) == parseInt(profesional.id);
                   }));
                   profesional.horarios.forEach(function (horario) {
-                    var appOcupada = _this3.horasMalas.find(function (hora) {
+                    var appOcupada = _this4.horasMalas.find(function (hora) {
                       if (parseInt(hora.professional_id) !== parseInt(profesional.id)) return false;
                       var appStart = hora.hora_inicio ? hora.hora_inicio : hora.schedule && hora.schedule.check_time ? hora.schedule.check_time : '00:00:00';
                       var duracion = 60; // Fallback
@@ -10689,7 +10721,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
                     });
                     if (appOcupada) {
                       horario.libre = 0;
-                      horario.indexOcupado = _this3.horasMalas.indexOf(appOcupada);
+                      horario.indexOcupado = _this4.horasMalas.indexOf(appOcupada);
                     }
                   });
                 });
@@ -10697,11 +10729,11 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
                 // Calcular horas max y min para el Grid
                 var minHora = 8;
                 var maxHora = 21;
-                if (_this3.horasSolas.length > 0) {
-                  var horasInicio = _this3.horasSolas.map(function (h) {
+                if (_this4.horasSolas.length > 0) {
+                  var horasInicio = _this4.horasSolas.map(function (h) {
                     return parseInt(h.check_time.split(':')[0]);
                   });
-                  var horasFin = _this3.horasSolas.map(function (h) {
+                  var horasFin = _this4.horasSolas.map(function (h) {
                     return parseInt(h.departure_date.split(':')[0]) + (parseInt(h.departure_date.split(':')[1]) > 0 ? 1 : 0);
                   });
                   minHora = Math.min.apply(Math, _toConsumableArray(horasInicio));
@@ -10710,21 +10742,21 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
                   if (minHora < 0 || isNaN(minHora)) minHora = 8;
                   if (maxHora > 24 || isNaN(maxHora)) maxHora = 21;
                 }
-                _this3.horaInicioGrid = minHora;
-                _this3.horasGrid = [];
+                _this4.horaInicioGrid = minHora;
+                _this4.horasGrid = [];
                 for (var i = minHora; i <= maxHora; i++) {
-                  _this3.horasGrid.push(i);
+                  _this4.horasGrid.push(i);
                 }
               })["finally"](function () {
-                _this3.cargando = false;
+                _this4.cargando = false;
               })["catch"](function () {
-                _this3.cargando = false;
+                _this4.cargando = false;
               });
             case 4:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
           }
-        }, _callee2);
+        }, _callee3);
       }))();
     },
     // ----- METODOS CALENDARIO -----
@@ -10966,7 +10998,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       }
     },
     validarYEliminar: function validarYEliminar(id) {
-      var _this4 = this;
+      var _this5 = this;
       this.$swal({
         title: '¿Quieres eliminar esta cita?',
         html: 'Ingrese un motivo para eliminar la cita. <br> <small>No se generará falta</small>',
@@ -10976,12 +11008,12 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         cancelButtonText: "No"
       }).then(function (result) {
         if (result.value == '') alertifyjs__WEBPACK_IMPORTED_MODULE_13___default().notify('No eliminado, falta rellenar un motivo', 'danger', 5);else if (result.isConfirmed) {
-          _this4.axios.post('/api/eliminarCita/' + id, {
+          _this5.axios.post('/api/eliminarCita/' + id, {
             razon: result.value,
-            usuario: _this4.nombreUser
+            usuario: _this5.nombreUser
           }).then(function (res) {
-            _this4.$swal('Cita eliminada con exito');
-            _this4.obtenerHorarios();
+            _this5.$swal('Cita eliminada con exito');
+            _this5.obtenerHorarios();
           });
         }
       });
@@ -10997,34 +11029,34 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       this.$emit('limpiarDescuentos');
     },
     listarPrecios: function listarPrecios() {
-      var _this5 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) switch (_context3.prev = _context3.next) {
+      var _this6 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
             case 0:
-              _context3.next = 2;
-              return _this5.axios.get('/api/listarPreciosTodos').then(function (response) {
-                return _this5.precios = response.data;
+              _context4.next = 2;
+              return _this6.axios.get('/api/listarPreciosTodos').then(function (response) {
+                return _this6.precios = response.data;
               });
             case 2:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
-        }, _callee3);
+        }, _callee4);
       }))();
     },
     actualizarListadoCitas: function actualizarListadoCitas(paymentInfo) {
-      var _this6 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+      var _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var aplicarPago;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
             case 0:
               // Función auxiliar: reemplaza horasMalas con nuevo array donde la cita pagada
               // tiene un nuevo objeto payment. Nueva referencia = Vue 2 detecta el cambio garantizadamente.
               aplicarPago = function aplicarPago() {
                 if (paymentInfo && _typeof(paymentInfo) === 'object' && paymentInfo.id && paymentInfo.payStatus !== undefined) {
-                  _this6.horasMalas = _this6.horasMalas.map(function (h) {
+                  _this7.horasMalas = _this7.horasMalas.map(function (h) {
                     if (h.id == paymentInfo.id && h.payment) {
                       return Object.assign({}, h, {
                         payment: Object.assign({}, h.payment, {
@@ -11039,17 +11071,17 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
               aplicarPago();
 
               // 2. Recarga completa del servidor
-              _context4.next = 4;
-              return _this6.obtenerHorarios();
+              _context5.next = 4;
+              return _this7.obtenerHorarios();
             case 4:
               // 3. Re-aplicar después del request (por si el servidor devuelve datos desactualizados)
               aplicarPago();
-              _this6.$emit('actualizarListadoCitas');
+              _this7.$emit('actualizarListadoCitas');
             case 6:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
-        }, _callee4);
+        }, _callee5);
       }))();
     },
     verHorariosAyer: function verHorariosAyer() {
@@ -11068,7 +11100,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       this.obtenerHorarios();
     },
     changeMode: function changeMode(id, indiceP) {
-      var _this7 = this;
+      var _this8 = this;
       var targetIndex = this.indexElegido > -1 ? this.indexElegido : indiceP;
       this.$swal.fire({
         title: 'Actualizar',
@@ -11081,26 +11113,26 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         cancelButtonText: 'No'
       }).then(function (result) {
         if (result.isConfirmed) {
-          _this7.axios.get("/api/updateModeAppoinment/".concat(id)).then(function (res) {
+          _this8.axios.get("/api/updateModeAppoinment/".concat(id)).then(function (res) {
             //this.horasMalas[targetIndex].mode==1? this.horasMalas[targetIndex].mode=0: this.horasMalas[targetIndex].mode=1
-            _this7.obtenerHorarios();
+            _this8.obtenerHorarios();
           });
         }
       });
     },
     buscarRecetas: function buscarRecetas(id) {
-      var _this8 = this;
+      var _this9 = this;
       this.axios("/api/verRecetaPorId/".concat(id)).then(function (res) {
-        _this8.recetas = res.data;
-        _this8.$parent.recetas = _this8.recetas;
+        _this9.recetas = res.data;
+        _this9.$parent.recetas = _this9.recetas;
       });
     },
     intercambiarHorario: function intercambiarHorario(laCita) {
-      var _this9 = this;
+      var _this10 = this;
       var idProf = laCita.professional_id;
       this.primero = laCita;
       this.posibles = this.horasMalas.filter(function (posible) {
-        return posible.professional_id == idProf && posible.date == _this9.fecha && laCita.id != posible.id;
+        return posible.professional_id == idProf && posible.date == _this10.fecha && laCita.id != posible.id;
       });
     },
     abrirTiemposEspera: function abrirTiemposEspera(cita) {
@@ -11127,15 +11159,15 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     }
   },
   mounted: function mounted() {
-    var _this10 = this;
+    var _this11 = this;
     this.axios.get('/api/user').then(function (res) {
-      _this10.idUsuario = parseInt(res.data.user.id);
+      _this11.idUsuario = parseInt(res.data.user.id);
     });
     this.listarProfesionales();
     this.listarPrecios();
     this.$nextTick(function () {
-      if (_this10.$refs.bodyScroll && _this10.$refs.headerScroll) {
-        _this10.$refs.headerScroll.scrollLeft = _this10.$refs.bodyScroll.scrollLeft;
+      if (_this11.$refs.bodyScroll && _this11.$refs.headerScroll) {
+        _this11.$refs.headerScroll.scrollLeft = _this11.$refs.bodyScroll.scrollLeft;
       }
     });
     window.addEventListener('keydown', this.handleKeyDown);

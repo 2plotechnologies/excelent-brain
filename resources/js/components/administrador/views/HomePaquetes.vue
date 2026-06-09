@@ -863,7 +863,7 @@ export default {
         return 1;
       } else if (esp === 'psicologica' || esp === 'psicológica' || nombre.includes('psicolog')) {
         return 2;
-      } else if (esp === 'nutricional' || nombre.includes('nutricion') || nombre.includes('nutrición')) {
+      } else if (esp === 'nutricional' || nombre.includes('nutricion') || nombre.includes('nutricion')) {
         return 6;
       }
       return this.paqueteSeleccionado.idClasificacion == 5 ? 2 : this.paqueteSeleccionado.idClasificacion;
@@ -878,7 +878,8 @@ export default {
     },
     preciosFiltrados() {
       if (!this.paqueteSeleccionado || !this.precios || !this.precios.length) return [];
-      const nombre = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
+      const nombreRaw = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
+      const nombre = nombreRaw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       if (this.paqueteSeleccionado.idClasificacion == 9 || nombre.includes('sucamec')) {
         return this.precios.filter(precio => 
           (precio.id == 13 || precio.id == 14 || precio.descripcion.toLowerCase().includes('sucamec')) && 

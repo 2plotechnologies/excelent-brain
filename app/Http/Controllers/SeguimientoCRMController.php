@@ -28,7 +28,7 @@ class SeguimientoCRMController extends Controller
             });
             $patients = $query->orderBy("created_at", "desc")->get();
         } else {
-            //Pacientes con citas (Obtener los ultimos 10)
+            //Pacientes con citas (Obtener los ultimos 10).
             $patients = $query->orderBy("created_at", "desc")->limit(10)->get();
         }
         

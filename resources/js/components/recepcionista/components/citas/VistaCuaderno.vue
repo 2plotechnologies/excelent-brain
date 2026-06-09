@@ -260,7 +260,7 @@
 			pixelsPorMinuto: 1.5,
 			filtroActual: 'Todos',
 			filtroSede: null,
-			sedes: [{id: 1, nombre: 'El Tambo'}, {id: 2, nombre: 'San Carlos'}],
+			sedes: [],
 			tooltipData: null,
 			tooltipStyle: { top: '0px', left: '0px', position: 'fixed', zIndex: 1055, pointerEvents: 'none', minWidth: '150px', maxWidth: '250px' },
 		}},
@@ -282,8 +282,19 @@
 		},
 		created() {
 			this.filtroSede = parseInt(this.idSede || 1);
+			this.cargarSedes();
 		},
 		methods:{
+			async cargarSedes() {
+				try {
+					const res = await this.axios.get('/api/sedes');
+					this.sedes = res.data;
+				} catch (error) {
+					console.error("Error cargando sedes:", error);
+					// Fallback in case of error
+					this.sedes = [{id: 1, nombre: 'El Tambo'}, {id: 2, nombre: 'San Carlos'}, {id: 3, nombre: 'Lima Norte'}];
+				}
+			},
 			dayWeek (day) {
 				switch (day) {
 					case 0: return "Lunes"; break;

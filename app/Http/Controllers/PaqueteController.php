@@ -44,6 +44,7 @@ class PaqueteController extends Controller
                 'p.sesiones as total_sesiones',
                 'p.servicio as tipo_servicio',
                 'p.idClasificacion',
+                'p.paquete_especialidad',
                 'u.nombre as registrado_por'
             );
 
