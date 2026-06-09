@@ -418,6 +418,9 @@
                         <small class="text-danger" v-if="cuota.estado == 1 && esCuotaVencida(cuota.fecha)">
                           <i class="fas fa-exclamation-circle"></i> Cuota Vencida
                         </small>
+                        <small class="text-success" v-if="cuota.estado == 2 && cuota.fechaActualiza">
+                          <i class="fas fa-check-circle"></i> Pagado el: {{ formatFecha(cuota.fechaActualiza.split(' ')[0]) }}
+                        </small>
                       </div>
                       <div v-else>
                         <input type="date" class="form-control form-control-sm mb-1" v-model="formEditDeuda.fecha">
@@ -461,6 +464,9 @@
                         </button>
                         <button v-if="cuota.estado == 2" class="btn btn-sm btn-light text-success" disabled>
                           <i class="fas fa-check"></i>
+                        </button>
+                        <button v-if="cuota.estado == 2 && cuota.extra_payment_id" class="btn btn-sm btn-outline-secondary shadow-sm" @click="verTicket(cuota)" title="Ver Ticket">
+                          <i class="fas fa-ticket-alt"></i>
                         </button>
                       </div>
                     </td>
@@ -767,6 +773,7 @@ export default {
       activeHistories: [],
       idUsuario: -1,
       paqueteSeleccionado: null,
+      idSede: null,
       mostrarModalPago: false,
       procesandoPago: false,
       guardandoReporte: false,
@@ -900,6 +907,7 @@ export default {
       try {
         const res = await this.axios.get('/api/user');
         this.idUsuario = parseInt(res.data.user.id);
+        this.idSede = parseInt(res.data.user.IdSede || res.data.user.idSede || 1);
       } catch (error) {
         console.warn("No se pudo obtener el usuario", error);
       }
@@ -1018,6 +1026,7 @@ export default {
 
         // Filtrar horarios por el día y que no tengan cita solapada
         this.horariosDisponibles = schedulesAll.filter(h => {
+          if (h.idSede != this.idSede) return false;
           if (h.day !== diaNombre) return false;
           
           const ocupado = schedulesInvalid.some(inv => {
@@ -1405,6 +1414,11 @@ export default {
           this.$set(cuota, 'canPay', false);
         }
       });
+    },
+    verTicket(cuota) {
+      if (!cuota.extra_payment_id) return;
+      const url = `/api/pdfExtraCupon/${cuota.extra_payment_id}?token=${localStorage.getItem('token')}`;
+      window.open(url, '_blank');
     },
     abrirModalReporte(paquete, editar = false) {
       this.paqueteSeleccionado = paquete;

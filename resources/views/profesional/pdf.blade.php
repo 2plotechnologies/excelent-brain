@@ -65,7 +65,7 @@
                         <span class="paciente__title">Edad:</span>
                         <small class="font-size-small">@php
                             $fecha_nacimiento = Carbon::parse($receta->patient->birth_date ?? Carbon::now());
-                            $edad = $fecha_nacimiento->diffInYears(Carbon::now());
+                            $edad = (int) $fecha_nacimiento->diffInYears(Carbon::now());
                             echo "$edad años";
                         @endphp</small>
 

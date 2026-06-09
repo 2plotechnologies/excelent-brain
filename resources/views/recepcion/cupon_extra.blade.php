@@ -117,7 +117,7 @@
 								@if($extra_payment->voucher_issued <>'' && $extra_payment->voucher_issued <> null )
 								<tr><td><strong>Serie-Correlativo:</strong> {{strtoupper($extra_payment->voucher_issued)}}</td></tr>
 								@endif
-								@if($extra_payment->type == 8 )
+								@if($extra_payment->type == 8 && is_object($cita))
 								<tr><td><strong>Día de adelanto:</strong> {{$cita->date}}</td></tr>
 								@endif
 						</tbody>

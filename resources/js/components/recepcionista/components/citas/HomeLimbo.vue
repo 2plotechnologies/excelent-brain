@@ -55,10 +55,11 @@
 			<div class="limbo-list">
 				<transition-group name="list">
 					<div v-for="(cita, index) in filteredCitas" :key="cita.id" class="limbo-item">
-						<!-- Date & Time -->
+						<!-- Date & Time. -->
 						<div class="item-datetime">
 							<div class="date">{{ fechaISO(cita.appointment.date) }}</div>
-							<div class="time">{{ horaLatamRange(cita.appointment.schedule.check_time, cita.appointment.schedule.departure_date) }}</div>
+							<div class="time" v-if="cita.appointment.schedule">{{ horaLatamRange(cita.appointment.schedule.check_time, cita.appointment.schedule.departure_date) }}</div>
+							<div class="time" v-else>Sin horario</div>
 						</div>
 
 						<!-- Service Badge -->
@@ -66,7 +67,7 @@
 							<span class="service-badge">{{ getServiceInitials(cita.appointment.precio.descripcion) }}</span>
 						</div>
 
-						<!-- Patient & Professional Info -->
+						<!-- Patient & Professional Info. -->
 						<div class="item-info">
 							<div class="patient-row">
 								<i class="fa-regular fa-user"></i>

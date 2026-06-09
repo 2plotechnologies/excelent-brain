@@ -3,6 +3,11 @@
 		<!-- Controles superiores -->
 		<div class="row mb-3 gx-3 align-items-center">
 			<div class="col-auto"><input type="date" class="form-control shadow-sm font-weight-bold" v-model="fecha" @change="obtenerHorarios()"></div>
+			<div class="col-auto">
+				<select class="form-select shadow-sm font-weight-bold" v-model="filtroSede" @change="obtenerHorarios()">
+					<option v-for="sede in sedes" :value="sede.id" :key="sede.id">{{ sede.nombre }}</option>
+				</select>
+			</div>
 			<div class="col-auto"><button class="btn btn-outline-primary mx-1 border-0 font-weight-bold" @click="verHorariosAyer()"><i class="fas fa-chevron-left"></i> Ayer</button></div>
 			<div class="col-auto"><button class="btn btn-outline-primary mx-1 border-0 font-weight-bold" @click="verHorariosHoy()"><i class="fa-regular fa-clock"></i> Hoy</button></div>
 			<div class="col-auto"><button class="btn btn-outline-primary mx-1 border-0 font-weight-bold" @click="verHorariosMañana()">Mañana <i class="fas fa-chevron-right"></i></button></div>
@@ -24,7 +29,8 @@
 						Atendido
 					</span>
 				</div>
-				<button class="btn btn-primary font-weight-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevaCita" @click="prepararNuevaCitaManual()"><i class="fas fa-plus"></i> Nueva Cita</button>
+				<span v-if="esSoloVista" class="badge bg-warning text-dark font-weight-bold px-3 py-2 shadow-sm"><i class="fas fa-eye me-1"></i> Modo Solo Lectura</span>
+				<button v-if="!esSoloVista" class="btn btn-primary font-weight-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevaCita" @click="prepararNuevaCitaManual()"><i class="fas fa-plus"></i> Nueva Cita</button>
 				<router-link to="/recepcionista/paquetes" class="btn btn-primary font-weight-bold shadow-sm"><i class="fas fa-box-open"></i> Paquetes</router-link>
 			</div>
 		</div>
@@ -98,8 +104,8 @@
 						<div v-for="(horaFree, hIndex) in getHorasLibres(doctor.id)" :key="'free-'+horaFree.id" 
 								class="free-slot" 
 								:style="slotStyle(horaFree.check_time, horaFree.departure_date)"
-								@click="crearCitaEnSlot(doctor, horaFree)" 
-								data-bs-toggle="modal" data-bs-target="#modalNuevaCita"
+								@click="!esSoloVista && crearCitaEnSlot(doctor, horaFree)" 
+								:data-bs-toggle="!esSoloVista ? 'modal' : ''" :data-bs-target="!esSoloVista ? '#modalNuevaCita' : ''"
 								:title="'Nueva cita: ' + formatHora(horaFree.check_time) + ' - ' + formatHora(horaFree.departure_date)"
 								@mouseover="mostrarTooltip($event, horaFree, doctor, true)"
 								@mouseleave="ocultarTooltip"
@@ -110,7 +116,7 @@
 						<div v-for="(horaOcup, hIndex) in getHorasOcupadas(doctor.id)" :key="'ocup-'+horaOcup.id+'-pay-'+(horaOcup.payment ? horaOcup.payment.pay_status : 0)" 
 								class="booked-slot shadow-sm p-1" 
 								:style="[slotStyle(horaOcup._computed_start, horaOcup._computed_end, horaOcup), { borderLeft: isBlocked(horaOcup) ? '4px solid #dc3545' : '4px solid ' + stringToColor(doctor.name) }]"
-								@click="abrirDetallesCita(horaOcup)"
+								@click="!esSoloVista && abrirDetallesCita(horaOcup)"
 								@mouseover="mostrarTooltip($event, horaOcup, doctor)"
 								@mouseleave="ocultarTooltip"
 								@mousemove="moverTooltip($event)">
@@ -163,11 +169,14 @@
 		</div>
 
 		<!-- Tooltip Flotante -->
-		<div v-show="tooltipData" class="custom-tooltip shadow-lg p-2 rounded bg-white text-dark border border-secondary" :style="tooltipStyle">
-			<div class="font-weight-bold text-uppercase border-bottom pb-1 mb-1" style="font-size: 0.85rem;">{{ tooltipData ? tooltipData.paciente : '' }}</div>
-			<div class="small"><i class="far fa-clock"></i> {{ tooltipData ? tooltipData.hora : '' }}</div>
-			<div class="small"><i class="fas fa-user-md"></i> {{ tooltipData ? tooltipData.doctor : '' }}</div>
-			<div class="small mt-1 px-1 bg-light rounded text-center border font-weight-bold" style="font-size: 0.75rem;">{{ tooltipData ? tooltipData.estado : '' }}</div>
+		<div v-if="tooltipData" class="custom-tooltip shadow border rounded bg-white p-2" :style="tooltipStyle">
+			<div class="fw-bold mb-1 border-bottom pb-1" style="font-size: 0.85rem;"><i class="fas fa-user-circle me-1"></i> {{ tooltipData.paciente }}</div>
+			<div class="small text-muted mb-1"><i class="far fa-clock me-1"></i> {{ tooltipData.hora }}</div>
+			<div class="small text-muted mb-1"><i class="fas fa-user-md me-1"></i> {{ tooltipData.doctor }}</div>
+			<div v-if="tooltipData.modalidad" class="small text-muted mb-1"><i class="fas fa-laptop-medical me-1"></i> Modalidad: <span class="fw-bold">{{ tooltipData.modalidad }}</span></div>
+			<div v-if="tooltipData.servicio" class="small text-muted mb-1"><i class="fas fa-stethoscope me-1"></i> Servicio: <span class="fw-bold text-truncate d-inline-block" style="max-width: 140px; vertical-align: bottom;" :title="tooltipData.servicio">{{ tooltipData.servicio }}</span></div>
+			<div v-if="tooltipData.paquete" class="small text-muted mb-1"><i class="fas fa-box-open me-1"></i> Paquete: <span class="fw-bold">{{ tooltipData.paquete }}</span></div>
+			<div class="small"><span class="badge" :class="'bg-light text-dark border'">{{ tooltipData.estado }}</span></div>
 		</div>
 
 		<!-- Modales -->
@@ -250,6 +259,8 @@
 			horaInicioGrid: 8,
 			pixelsPorMinuto: 1.5,
 			filtroActual: 'Todos',
+			filtroSede: null,
+			sedes: [{id: 1, nombre: 'El Tambo'}, {id: 2, nombre: 'San Carlos'}],
 			tooltipData: null,
 			tooltipStyle: { top: '0px', left: '0px', position: 'fixed', zIndex: 1055, pointerEvents: 'none', minWidth: '150px', maxWidth: '250px' },
 		}},
@@ -264,7 +275,13 @@
 				let filtrados = this.doctores;
 				if(this.filtroActual !== 'Todos') filtrados = this.doctores.filter(d => d.profession === this.filtroActual);
 				return filtrados.filter(d => d.horarios && d.horarios.length > 0);
+			},
+			esSoloVista() {
+				return this.filtroSede != parseInt(this.idSede || 1);
 			}
+		},
+		created() {
+			this.filtroSede = parseInt(this.idSede || 1);
 		},
 		methods:{
 			dayWeek (day) {
@@ -289,7 +306,7 @@
 				this.cargando = true;
 				let dia = this.dayWeek(moment(this.fecha).format('d')-1)
 				
-				await this.axios.get(`/api/horarioCuadernoOcupado/${this.fecha}/${dia}`, { params: { idSede: this.idSede } })
+				await this.axios.get(`/api/horarioCuadernoOcupado/${this.fecha}/${dia}`, { params: { idSede: this.filtroSede } })
 				.then(res => { 
 					moment.locale('es')
 					alertify.notify('<i class="fa-regular fa-calendar-check"></i> Datos del ' + moment(this.fecha).format('DD [de] MMMM') , 'success', 5);
@@ -525,7 +542,10 @@
 						paciente: cita.patient.name.split(' ')[0] + ' ' + cita.patient.nombres.split(' ')[0],
 						hora: horaRango,
 						doctor: doctor.name,
-						estado: estado
+						estado: estado,
+						modalidad: cita.mode == 1 ? 'Presencial' : (cita.mode == 2 ? 'Virtual' : 'Otro'),
+						servicio: cita.precio ? cita.precio.descripcion : 'Consulta',
+						paquete: cita.idMembresia ? 'Sí' : 'No'
 					};
 				}
 				this.moverTooltip(e);

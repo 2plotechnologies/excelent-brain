@@ -51,6 +51,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       activeHistories: [],
       idUsuario: -1,
       paqueteSeleccionado: null,
+      idSede: null,
       mostrarModalPago: false,
       procesandoPago: false,
       guardandoReporte: false,
@@ -199,19 +200,20 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 3:
               res = _context.sent;
               _this2.idUsuario = parseInt(res.data.user.id);
-              _context.next = 10;
+              _this2.idSede = parseInt(res.data.user.IdSede || res.data.user.idSede || 1);
+              _context.next = 11;
               break;
-            case 7:
-              _context.prev = 7;
+            case 8:
+              _context.prev = 8;
               _context.t0 = _context["catch"](0);
               console.warn("No se pudo obtener el usuario", _context.t0);
-            case 10:
-              _this2.cargarPaquetes();
             case 11:
+              _this2.cargarPaquetes();
+            case 12:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[0, 7]]);
+        }, _callee, null, [[0, 8]]);
       }))();
     },
     cargarPaquetes: function cargarPaquetes() {
@@ -414,6 +416,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 return p[0] * 60 + (p[1] || 0);
               }; // Filtrar horarios por el día y que no tengan cita solapada
               _this7.horariosDisponibles = schedulesAll.filter(function (h) {
+                if (h.idSede != _this7.idSede) return false;
                 if (h.day !== diaNombre) return false;
                 var ocupado = schedulesInvalid.some(function (inv) {
                   if (inv.date !== _this7.nuevaSesion.fecha) return false;
@@ -923,6 +926,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           _this13.$set(cuota, 'canPay', false);
         }
       });
+    },
+    verTicket: function verTicket(cuota) {
+      if (!cuota.extra_payment_id) return;
+      var url = "/api/pdfExtraCupon/".concat(cuota.extra_payment_id, "?token=").concat(localStorage.getItem('token'));
+      window.open(url, '_blank');
     },
     abrirModalReporte: function abrirModalReporte(paquete) {
       var editar = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -2447,7 +2455,11 @@ var render = function render() {
       staticClass: "text-danger"
     }, [_c("i", {
       staticClass: "fas fa-exclamation-circle"
-    }), _vm._v(" Cuota Vencida\n                      ")]) : _vm._e()]) : _c("div", [_c("input", {
+    }), _vm._v(" Cuota Vencida\n                      ")]) : _vm._e(), _vm._v(" "), cuota.estado == 2 && cuota.fechaActualiza ? _c("small", {
+      staticClass: "text-success"
+    }, [_c("i", {
+      staticClass: "fas fa-check-circle"
+    }), _vm._v(" Pagado el: " + _vm._s(_vm.formatFecha(cuota.fechaActualiza.split(" ")[0])) + "\n                      ")]) : _vm._e()]) : _c("div", [_c("input", {
       directives: [{
         name: "model",
         rawName: "v-model",
@@ -2594,6 +2606,18 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fas fa-check"
+    })]) : _vm._e(), _vm._v(" "), cuota.estado == 2 && cuota.extra_payment_id ? _c("button", {
+      staticClass: "btn btn-sm btn-outline-secondary shadow-sm",
+      attrs: {
+        title: "Ver Ticket"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.verTicket(cuota);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-ticket-alt"
     })]) : _vm._e()])])]);
   }), _vm._v(" "), !_vm.paqueteSeleccionado.deudas || _vm.paqueteSeleccionado.deudas.length === 0 ? _c("tr", [_c("td", {
     staticClass: "text-center py-4 text-muted fst-italic",

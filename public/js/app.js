@@ -10522,6 +10522,14 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       horaInicioGrid: 8,
       pixelsPorMinuto: 1.5,
       filtroActual: 'Todos',
+      filtroSede: null,
+      sedes: [{
+        id: 1,
+        nombre: 'El Tambo'
+      }, {
+        id: 2,
+        nombre: 'San Carlos'
+      }],
       tooltipData: null,
       tooltipStyle: {
         top: '0px',
@@ -10567,7 +10575,13 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       return filtrados.filter(function (d) {
         return d.horarios && d.horarios.length > 0;
       });
+    },
+    esSoloVista: function esSoloVista() {
+      return this.filtroSede != parseInt(this.idSede || 1);
     }
+  },
+  created: function created() {
+    this.filtroSede = parseInt(this.idSede || 1);
   },
   methods: {
     dayWeek: function dayWeek(day) {
@@ -10625,7 +10639,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
               _context2.next = 4;
               return _this3.axios.get("/api/horarioCuadernoOcupado/".concat(_this3.fecha, "/").concat(dia), {
                 params: {
-                  idSede: _this3.idSede
+                  idSede: _this3.filtroSede
                 }
               }).then(function (res) {
                 moment__WEBPACK_IMPORTED_MODULE_0___default().locale('es');
@@ -10876,7 +10890,10 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
           paciente: cita.patient.name.split(' ')[0] + ' ' + cita.patient.nombres.split(' ')[0],
           hora: horaRango,
           doctor: doctor.name,
-          estado: estado
+          estado: estado,
+          modalidad: cita.mode == 1 ? 'Presencial' : cita.mode == 2 ? 'Virtual' : 'Otro',
+          servicio: cita.precio ? cita.precio.descripcion : 'Consulta',
+          paquete: cita.idMembresia ? 'Sí' : 'No'
         };
       }
       this.moverTooltip(e);
@@ -19626,6 +19643,36 @@ var render = function render() {
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "col-auto"
+  }, [_c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.filtroSede,
+      expression: "filtroSede"
+    }],
+    staticClass: "form-select shadow-sm font-weight-bold",
+    on: {
+      change: [function ($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.filtroSede = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
+      }, function ($event) {
+        return _vm.obtenerHorarios();
+      }]
+    }
+  }, _vm._l(_vm.sedes, function (sede) {
+    return _c("option", {
+      key: sede.id,
+      domProps: {
+        value: sede.id
+      }
+    }, [_vm._v(_vm._s(sede.nombre))]);
+  }), 0)]), _vm._v(" "), _c("div", {
+    staticClass: "col-auto"
   }, [_c("button", {
     staticClass: "btn btn-outline-primary mx-1 border-0 font-weight-bold",
     on: {
@@ -19742,7 +19789,11 @@ var render = function render() {
     attrs: {
       points: "22 4 12 14.01 9 11.01"
     }
-  })]), _vm._v("\n\t\t\t\t\t\tAtendido\n\t\t\t\t\t")])]), _vm._v(" "), _c("button", {
+  })]), _vm._v("\n\t\t\t\t\t\tAtendido\n\t\t\t\t\t")])]), _vm._v(" "), _vm.esSoloVista ? _c("span", {
+    staticClass: "badge bg-warning text-dark font-weight-bold px-3 py-2 shadow-sm"
+  }, [_c("i", {
+    staticClass: "fas fa-eye me-1"
+  }), _vm._v(" Modo Solo Lectura")]) : _vm._e(), _vm._v(" "), !_vm.esSoloVista ? _c("button", {
     staticClass: "btn btn-primary font-weight-bold shadow-sm",
     attrs: {
       "data-bs-toggle": "modal",
@@ -19755,7 +19806,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-plus"
-  }), _vm._v(" Nueva Cita")]), _vm._v(" "), _c("router-link", {
+  }), _vm._v(" Nueva Cita")]) : _vm._e(), _vm._v(" "), _c("router-link", {
     staticClass: "btn btn-primary font-weight-bold shadow-sm",
     attrs: {
       to: "/recepcionista/paquetes"
@@ -19899,13 +19950,13 @@ var render = function render() {
         staticClass: "free-slot",
         style: _vm.slotStyle(horaFree.check_time, horaFree.departure_date),
         attrs: {
-          "data-bs-toggle": "modal",
-          "data-bs-target": "#modalNuevaCita",
+          "data-bs-toggle": !_vm.esSoloVista ? "modal" : "",
+          "data-bs-target": !_vm.esSoloVista ? "#modalNuevaCita" : "",
           title: "Nueva cita: " + _vm.formatHora(horaFree.check_time) + " - " + _vm.formatHora(horaFree.departure_date)
         },
         on: {
           click: function click($event) {
-            return _vm.crearCitaEnSlot(doctor, horaFree);
+            !_vm.esSoloVista && _vm.crearCitaEnSlot(doctor, horaFree);
           },
           mouseover: function mouseover($event) {
             return _vm.mostrarTooltip($event, horaFree, doctor, true);
@@ -19925,7 +19976,7 @@ var render = function render() {
         }],
         on: {
           click: function click($event) {
-            return _vm.abrirDetallesCita(horaOcup);
+            !_vm.esSoloVista && _vm.abrirDetallesCita(horaOcup);
           },
           mouseover: function mouseover($event) {
             return _vm.mostrarTooltip($event, horaOcup, doctor);
@@ -20041,34 +20092,55 @@ var render = function render() {
         }
       }, [_vm._v("\n\t\t\t\t\t\t\t\t\t" + _vm._s(_vm.formatHora(horaOcup._computed_start)) + " - " + _vm._s(_vm.formatHora(horaOcup._computed_end)) + "\n\t\t\t\t\t\t\t\t")])])]);
     })], 2);
-  })], 2)])]), _vm._v(" "), _c("div", {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: _vm.tooltipData,
-      expression: "tooltipData"
-    }],
-    staticClass: "custom-tooltip shadow-lg p-2 rounded bg-white text-dark border border-secondary",
+  })], 2)])]), _vm._v(" "), _vm.tooltipData ? _c("div", {
+    staticClass: "custom-tooltip shadow border rounded bg-white p-2",
     style: _vm.tooltipStyle
   }, [_c("div", {
-    staticClass: "font-weight-bold text-uppercase border-bottom pb-1 mb-1",
+    staticClass: "fw-bold mb-1 border-bottom pb-1",
     staticStyle: {
       "font-size": "0.85rem"
     }
-  }, [_vm._v(_vm._s(_vm.tooltipData ? _vm.tooltipData.paciente : ""))]), _vm._v(" "), _c("div", {
-    staticClass: "small"
   }, [_c("i", {
-    staticClass: "far fa-clock"
-  }), _vm._v(" " + _vm._s(_vm.tooltipData ? _vm.tooltipData.hora : ""))]), _vm._v(" "), _c("div", {
-    staticClass: "small"
+    staticClass: "fas fa-user-circle me-1"
+  }), _vm._v(" " + _vm._s(_vm.tooltipData.paciente))]), _vm._v(" "), _c("div", {
+    staticClass: "small text-muted mb-1"
   }, [_c("i", {
-    staticClass: "fas fa-user-md"
-  }), _vm._v(" " + _vm._s(_vm.tooltipData ? _vm.tooltipData.doctor : ""))]), _vm._v(" "), _c("div", {
-    staticClass: "small mt-1 px-1 bg-light rounded text-center border font-weight-bold",
+    staticClass: "far fa-clock me-1"
+  }), _vm._v(" " + _vm._s(_vm.tooltipData.hora))]), _vm._v(" "), _c("div", {
+    staticClass: "small text-muted mb-1"
+  }, [_c("i", {
+    staticClass: "fas fa-user-md me-1"
+  }), _vm._v(" " + _vm._s(_vm.tooltipData.doctor))]), _vm._v(" "), _vm.tooltipData.modalidad ? _c("div", {
+    staticClass: "small text-muted mb-1"
+  }, [_c("i", {
+    staticClass: "fas fa-laptop-medical me-1"
+  }), _vm._v(" Modalidad: "), _c("span", {
+    staticClass: "fw-bold"
+  }, [_vm._v(_vm._s(_vm.tooltipData.modalidad))])]) : _vm._e(), _vm._v(" "), _vm.tooltipData.servicio ? _c("div", {
+    staticClass: "small text-muted mb-1"
+  }, [_c("i", {
+    staticClass: "fas fa-stethoscope me-1"
+  }), _vm._v(" Servicio: "), _c("span", {
+    staticClass: "fw-bold text-truncate d-inline-block",
     staticStyle: {
-      "font-size": "0.75rem"
+      "max-width": "140px",
+      "vertical-align": "bottom"
+    },
+    attrs: {
+      title: _vm.tooltipData.servicio
     }
-  }, [_vm._v(_vm._s(_vm.tooltipData ? _vm.tooltipData.estado : ""))])]), _vm._v(" "), _c("ModalNuevaCita", {
+  }, [_vm._v(_vm._s(_vm.tooltipData.servicio))])]) : _vm._e(), _vm._v(" "), _vm.tooltipData.paquete ? _c("div", {
+    staticClass: "small text-muted mb-1"
+  }, [_c("i", {
+    staticClass: "fas fa-box-open me-1"
+  }), _vm._v(" Paquete: "), _c("span", {
+    staticClass: "fw-bold"
+  }, [_vm._v(_vm._s(_vm.tooltipData.paquete))])]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "small"
+  }, [_c("span", {
+    staticClass: "badge",
+    "class": "bg-light text-dark border"
+  }, [_vm._v(_vm._s(_vm.tooltipData.estado))])])]) : _vm._e(), _vm._v(" "), _c("ModalNuevaCita", {
     attrs: {
       doctores: _vm.doctores,
       profesionalElegido: _vm.profesionalElegido,

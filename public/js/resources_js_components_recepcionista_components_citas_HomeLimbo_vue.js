@@ -278,9 +278,11 @@ var render = function render() {
       staticClass: "item-datetime"
     }, [_c("div", {
       staticClass: "date"
-    }, [_vm._v(_vm._s(_vm.fechaISO(cita.appointment.date)))]), _vm._v(" "), _c("div", {
+    }, [_vm._v(_vm._s(_vm.fechaISO(cita.appointment.date)))]), _vm._v(" "), cita.appointment.schedule ? _c("div", {
       staticClass: "time"
-    }, [_vm._v(_vm._s(_vm.horaLatamRange(cita.appointment.schedule.check_time, cita.appointment.schedule.departure_date)))])]), _vm._v(" "), _c("div", {
+    }, [_vm._v(_vm._s(_vm.horaLatamRange(cita.appointment.schedule.check_time, cita.appointment.schedule.departure_date)))]) : _c("div", {
+      staticClass: "time"
+    }, [_vm._v("Sin horario")])]), _vm._v(" "), _c("div", {
       staticClass: "item-service"
     }, [_c("span", {
       staticClass: "service-badge"
