@@ -145,8 +145,12 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     especialidadResuelta: function especialidadResuelta() {
       if (!this.paqueteSeleccionado) return 2; // Por defecto Psicológica
+
+      var nombreRaw = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
+      var nombre = nombreRaw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       var esp = (this.paqueteSeleccionado.paquete_especialidad || '').toLowerCase();
-      var nombre = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
+
+      // Caso 1: Paquetes Sucamec (idClasificacion 9 o nombre contiene sucamec)
       if (esp === 'psiquiatrica' || esp === 'psiquíatrica' || nombre.includes('psiquiatr')) {
         return 1;
       } else if (esp === 'psicologica' || esp === 'psicológica' || nombre.includes('psicolog')) {
@@ -167,12 +171,31 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       return filtrados.length > 0 ? filtrados : this.doctores;
     },
     preciosFiltrados: function preciosFiltrados() {
+      var _this2 = this;
       if (!this.paqueteSeleccionado || !this.precios || !this.precios.length) return [];
       var nombreRaw = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
       var nombre = nombreRaw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       if (this.paqueteSeleccionado.idClasificacion == 9 || nombre.includes('sucamec')) {
         return this.precios.filter(function (precio) {
-          return (precio.id == 13 || precio.id == 14 || precio.descripcion.toLowerCase().includes('sucamec')) && precio.servicio == '1' && precio.activo == '1';
+          return (precio.id == 13 || precio.id == 14) && precio.activo == '1';
+        });
+      }
+
+      // Caso 2: Paquetes Híbridos (que no sean Sucamec)
+      if (esp === 'hibrida' || nombre.includes('hibrid')) {
+        if (this.nuevaSesion.idProfesional) {
+          var doc = this.doctores.find(function (d) {
+            return d.id == _this2.nuevaSesion.idProfesional;
+          });
+          if (doc) {
+            return this.precios.filter(function (precio) {
+              return precio.idClasificacion == doc.idProfesion && precio.servicio == '1' && precio.id != 48 && precio.id != 49 && precio.activo == '1';
+            });
+          }
+        }
+        // Si no hay doctor seleccionado, mostrar ambos (psicología y psiquiatría)
+        return this.precios.filter(function (precio) {
+          return (precio.idClasificacion == 1 || precio.idClasificacion == 2) && precio.servicio == '1' && precio.id != 48 && precio.id != 49 && precio.activo == '1';
         });
       }
       var clasificacion = this.especialidadResuelta;
@@ -189,7 +212,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   methods: {
     obtenerUsuarioYPaquetes: function obtenerUsuarioYPaquetes() {
-      var _this2 = this;
+      var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         var res;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
@@ -197,11 +220,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 0:
               _context.prev = 0;
               _context.next = 3;
-              return _this2.axios.get('/api/user');
+              return _this3.axios.get('/api/user');
             case 3:
               res = _context.sent;
-              _this2.idUsuario = parseInt(res.data.user.id);
-              _this2.idSede = parseInt(res.data.user.IdSede || res.data.user.idSede || 1);
+              _this3.idUsuario = parseInt(res.data.user.id);
+              _this3.idSede = parseInt(res.data.user.IdSede || res.data.user.idSede || 1);
               _context.next = 11;
               break;
             case 8:
@@ -209,7 +232,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context.t0 = _context["catch"](0);
               console.warn("No se pudo obtener el usuario", _context.t0);
             case 11:
-              _this2.cargarPaquetes();
+              _this3.cargarPaquetes();
             case 12:
             case "end":
               return _context.stop();
@@ -219,59 +242,59 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     cargarPaquetes: function cargarPaquetes() {
       var _arguments = arguments,
-        _this3 = this;
+        _this4 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var page, isDeudas, response, updatedPaquete, metodosPrevios;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
               page = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : 1;
-              if (!_this3.loading) {
+              if (!_this4.loading) {
                 _context2.next = 3;
                 break;
               }
               return _context2.abrupt("return");
             case 3:
-              _this3.loading = true;
+              _this4.loading = true;
               _context2.prev = 4;
-              isDeudas = _this3.vistaActiva === 'deudas';
+              isDeudas = _this4.vistaActiva === 'deudas';
               _context2.next = 8;
-              return _this3.axios.get("/api/listarPaquetes", {
+              return _this4.axios.get("/api/listarPaquetes", {
                 params: {
                   page: page,
-                  busqueda: isDeudas ? '' : _this3.busqueda,
-                  estado: isDeudas ? 0 : _this3.filtroEstado,
-                  tipo: isDeudas ? -1 : _this3.filtroTipo,
+                  busqueda: isDeudas ? '' : _this4.busqueda,
+                  estado: isDeudas ? 0 : _this4.filtroEstado,
+                  tipo: isDeudas ? -1 : _this4.filtroTipo,
                   all: isDeudas ? 1 : 0
                 }
               });
             case 8:
               response = _context2.sent;
-              _this3.paquetesFiltrados = response.data.paquetes.data;
-              _this3.metricas = response.data.metricas;
+              _this4.paquetesFiltrados = response.data.paquetes.data;
+              _this4.metricas = response.data.metricas;
 
               // Si hay un paquete seleccionado, actualizar su referencia.
-              if (_this3.paqueteSeleccionado) {
-                updatedPaquete = _this3.paquetesFiltrados.find(function (p) {
-                  return p.id === _this3.paqueteSeleccionado.id;
+              if (_this4.paqueteSeleccionado) {
+                updatedPaquete = _this4.paquetesFiltrados.find(function (p) {
+                  return p.id === _this4.paqueteSeleccionado.id;
                 });
                 if (updatedPaquete) {
                   // Preservar métodos de pago seleccionados antes de actualizar
                   metodosPrevios = {};
-                  if (_this3.paqueteSeleccionado.deudas) {
-                    _this3.paqueteSeleccionado.deudas.forEach(function (d) {
+                  if (_this4.paqueteSeleccionado.deudas) {
+                    _this4.paqueteSeleccionado.deudas.forEach(function (d) {
                       if (d.metodo_pago_id) metodosPrevios[d.id] = d.metodo_pago_id;
                     });
                   }
-                  _this3.paqueteSeleccionado = updatedPaquete;
+                  _this4.paqueteSeleccionado = updatedPaquete;
 
                   // Reasignar o inicializar métodos de pago
-                  if (_this3.paqueteSeleccionado.deudas) {
-                    _this3.actualizarPermisosPago(metodosPrevios);
+                  if (_this4.paqueteSeleccionado.deudas) {
+                    _this4.actualizarPermisosPago(metodosPrevios);
                   }
                 }
               }
-              _this3.pagination = {
+              _this4.pagination = {
                 current_page: response.data.paquetes.current_page,
                 last_page: response.data.paquetes.last_page,
                 from: response.data.paquetes.from,
@@ -285,7 +308,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               console.error("Error cargando paquetes:", _context2.t0);
             case 18:
               _context2.prev = 18;
-              _this3.loading = false;
+              _this4.loading = false;
               return _context2.finish(18);
             case 21:
             case "end":
@@ -295,7 +318,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }))();
     },
     cargarMonedas: function cargarMonedas() {
-      var _this4 = this;
+      var _this5 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var response;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
@@ -303,10 +326,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 0:
               _context3.prev = 0;
               _context3.next = 3;
-              return _this4.axios.get("/api/listarMonedas");
+              return _this5.axios.get("/api/listarMonedas");
             case 3:
               response = _context3.sent;
-              _this4.monedas = response.data;
+              _this5.monedas = response.data;
               _context3.next = 10;
               break;
             case 7:
@@ -321,7 +344,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }))();
     },
     cargarProfesionales: function cargarProfesionales() {
-      var _this5 = this;
+      var _this6 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var response;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
@@ -329,10 +352,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 0:
               _context4.prev = 0;
               _context4.next = 3;
-              return _this5.axios.get('/api/profesional');
+              return _this6.axios.get('/api/profesional');
             case 3:
               response = _context4.sent;
-              _this5.doctores = response.data;
+              _this6.doctores = response.data;
               _context4.next = 10;
               break;
             case 7:
@@ -347,7 +370,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }))();
     },
     listarPrecios: function listarPrecios() {
-      var _this6 = this;
+      var _this7 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var response;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
@@ -355,10 +378,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 0:
               _context5.prev = 0;
               _context5.next = 3;
-              return _this6.axios.get('/api/listarPreciosTodos');
+              return _this7.axios.get('/api/listarPreciosTodos');
             case 3:
               response = _context5.sent;
-              _this6.precios = response.data;
+              _this7.precios = response.data;
               _context5.next = 10;
               break;
             case 7:
@@ -386,41 +409,41 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       modal.show();
     },
     cargarHorarios: function cargarHorarios() {
-      var _this7 = this;
+      var _this8 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         var response, schedulesInvalid, schedulesAll, diasSemana, fechaObj, diaNombre, timeToMinutes;
         return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) switch (_context6.prev = _context6.next) {
             case 0:
-              if (!(!_this7.nuevaSesion.idProfesional || !_this7.nuevaSesion.fecha)) {
+              if (!(!_this8.nuevaSesion.idProfesional || !_this8.nuevaSesion.fecha)) {
                 _context6.next = 2;
                 break;
               }
               return _context6.abrupt("return");
             case 2:
-              _this7.loadingHorarios = true;
-              _this7.horariosDisponibles = [];
-              _this7.nuevaSesion.idHorario = '';
+              _this8.loadingHorarios = true;
+              _this8.horariosDisponibles = [];
+              _this8.nuevaSesion.idHorario = '';
               _context6.prev = 5;
               _context6.next = 8;
-              return _this7.axios.get("/api/horario/".concat(_this7.nuevaSesion.idProfesional));
+              return _this8.axios.get("/api/horario/".concat(_this8.nuevaSesion.idProfesional));
             case 8:
               response = _context6.sent;
               schedulesInvalid = response.data.schedulesInvalid;
               schedulesAll = response.data.schedules; // Determinar el día de la semana en español para filtrar
               diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
-              fechaObj = new Date(_this7.nuevaSesion.fecha + 'T00:00:00');
+              fechaObj = new Date(_this8.nuevaSesion.fecha + 'T00:00:00');
               diaNombre = diasSemana[fechaObj.getDay()];
               timeToMinutes = function timeToMinutes(t) {
                 if (!t) return 0;
                 var p = t.split(':').map(Number);
                 return p[0] * 60 + (p[1] || 0);
               }; // Filtrar horarios por el día y que no tengan cita solapada
-              _this7.horariosDisponibles = schedulesAll.filter(function (h) {
-                if (h.idSede != _this7.idSede) return false;
+              _this8.horariosDisponibles = schedulesAll.filter(function (h) {
+                if (h.idSede != _this8.idSede) return false;
                 if (h.day !== diaNombre) return false;
                 var ocupado = schedulesInvalid.some(function (inv) {
-                  if (inv.date !== _this7.nuevaSesion.fecha) return false;
+                  if (inv.date !== _this8.nuevaSesion.fecha) return false;
                   if (inv.status == 3 || inv.status == 4 || inv.status == 6) return false;
                   var appStart = inv.hora_inicio ? inv.hora_inicio : inv.schedule && inv.schedule.check_time ? inv.schedule.check_time : '00:00:00';
                   var duracion = 60; // Fallback
@@ -447,7 +470,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               console.error("Error cargando horarios:", _context6.t0);
             case 21:
               _context6.prev = 21;
-              _this7.loadingHorarios = false;
+              _this8.loadingHorarios = false;
               return _context6.finish(21);
             case 24:
             case "end":
@@ -457,47 +480,47 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }))();
     },
     guardarCitaPaquete: function guardarCitaPaquete() {
-      var _this8 = this;
+      var _this9 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         var payload, response, modalElement, modal;
         return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              if (!(!_this8.nuevaSesion.tipo || !_this8.nuevaSesion.idHorario)) {
+              if (!(!_this9.nuevaSesion.tipo || !_this9.nuevaSesion.idHorario)) {
                 _context7.next = 2;
                 break;
               }
               return _context7.abrupt("return");
             case 2:
-              _this8.guardandoCita = true;
+              _this9.guardandoCita = true;
               _context7.prev = 3;
               payload = {
-                professional_id: _this8.nuevaSesion.idProfesional,
-                date: _this8.nuevaSesion.fecha,
-                schedule_id: _this8.nuevaSesion.idHorario,
-                clasification: _this8.paqueteSeleccionado.idClasificacion,
-                type: _this8.nuevaSesion.tipo,
+                professional_id: _this9.nuevaSesion.idProfesional,
+                date: _this9.nuevaSesion.fecha,
+                schedule_id: _this9.nuevaSesion.idHorario,
+                clasification: _this9.paqueteSeleccionado.idClasificacion,
+                type: _this9.nuevaSesion.tipo,
                 patient_condition: 2,
                 // Continuante
-                mode: _this8.nuevaSesion.modalidad,
+                mode: _this9.nuevaSesion.modalidad,
                 status: 1,
                 // Pendiente
-                patient_id: _this8.paqueteSeleccionado.patient_id,
-                idMembresia: _this8.paqueteSeleccionado.id,
+                patient_id: _this9.paqueteSeleccionado.patient_id,
+                idMembresia: _this9.paqueteSeleccionado.id,
                 price: 0,
-                user_id: _this8.idUsuario,
+                user_id: _this9.idUsuario,
                 formato_nuevo: 1,
-                num_sesion: (_this8.paqueteSeleccionado.sesiones_usadas || 0) + 1
+                num_sesion: (_this9.paqueteSeleccionado.sesiones_usadas || 0) + 1
               };
               _context7.next = 7;
-              return _this8.axios.post('/api/agendarCitaPaquete', payload);
+              return _this9.axios.post('/api/agendarCitaPaquete', payload);
             case 7:
               response = _context7.sent;
               if (!response.data.cita) {
                 _context7.next = 15;
                 break;
               }
-              _this8.$swal({
+              _this9.$swal({
                 title: 'Cita agendada',
                 text: 'La sesión se ha programado correctamente.',
                 icon: 'success',
@@ -512,7 +535,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 
               // Recargar paquetes para actualizar contadores
               _context7.next = 15;
-              return _this8.cargarPaquetes(_this8.pagination.current_page);
+              return _this9.cargarPaquetes(_this9.pagination.current_page);
             case 15:
               _context7.next = 21;
               break;
@@ -523,7 +546,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               alertify.error('Hubo un error al agendar la cita.');
             case 21:
               _context7.prev = 21;
-              _this8.guardandoCita = false;
+              _this9.guardandoCita = false;
               return _context7.finish(21);
             case 24:
             case "end":
@@ -542,11 +565,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }
     },
     filtrarPaquetes: function filtrarPaquetes() {
-      var _this9 = this;
+      var _this10 = this;
       // Debounce the search
       if (this.searchTimeout) clearTimeout(this.searchTimeout);
       this.searchTimeout = setTimeout(function () {
-        _this9.cargarPaquetes(1);
+        _this10.cargarPaquetes(1);
       }, 500);
     },
     setFiltroEstado: function setFiltroEstado(state) {
@@ -633,8 +656,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           };
         case 5:
           return {
-            text: 'Atendido / Confirmado',
-            "class": 'bg-success text-white'
+            text: 'Cancelada',
+            "class": 'bg-danger text-white'
           };
         default:
           return {
@@ -681,17 +704,17 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       };
     },
     confirmarProrrateo: function confirmarProrrateo() {
-      var _this10 = this;
+      var _this11 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
         var res, modal, msg, _error$response;
         return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) switch (_context8.prev = _context8.next) {
             case 0:
-              _this10.procesandoEstado = true;
+              _this11.procesandoEstado = true;
               _context8.prev = 1;
               _context8.next = 4;
-              return _this10.axios.post("/api/prorratearPaquete/".concat(_this10.paqueteSeleccionado.id), {
-                observaciones: _this10.formProrrateo.observacion
+              return _this11.axios.post("/api/prorratearPaquete/".concat(_this11.paqueteSeleccionado.id), {
+                observaciones: _this11.formProrrateo.observacion
               });
             case 4:
               res = _context8.sent;
@@ -705,23 +728,23 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               } else {
                 msg = 'No hubo saldo a favor ni saldo deudor. El paquete quedó balanceado.';
               }
-              _this10.$swal({
+              _this11.$swal({
                 icon: 'success',
                 title: 'Paquete prorrateado',
                 text: msg
               });
               _context8.next = 12;
-              return _this10.cargarPaquetes(_this10.pagination.current_page);
+              return _this11.cargarPaquetes(_this11.pagination.current_page);
             case 12:
               _context8.next = 17;
               break;
             case 14:
               _context8.prev = 14;
               _context8.t0 = _context8["catch"](1);
-              _this10.$swal('Error', ((_error$response = _context8.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.error) || 'No se pudo prorratear', 'error');
+              _this11.$swal('Error', ((_error$response = _context8.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.error) || 'No se pudo prorratear', 'error');
             case 17:
               _context8.prev = 17;
-              _this10.procesandoEstado = false;
+              _this11.procesandoEstado = false;
               return _context8.finish(17);
             case 20:
             case "end":
@@ -731,14 +754,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }))();
     },
     cambiarEstado: function cambiarEstado(paquete, accion) {
-      var _this11 = this;
+      var _this12 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
         var confirmacion, _error$response2;
         return _regeneratorRuntime().wrap(function _callee9$(_context9) {
           while (1) switch (_context9.prev = _context9.next) {
             case 0:
               _context9.next = 2;
-              return _this11.$swal({
+              return _this12.$swal({
                 title: "\xBFSeguro que deseas ".concat(accion, " el paquete?"),
                 icon: 'warning',
                 showCancelButton: true,
@@ -753,27 +776,27 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               }
               return _context9.abrupt("return");
             case 5:
-              _this11.procesandoEstado = true;
+              _this12.procesandoEstado = true;
               _context9.prev = 6;
               _context9.next = 9;
-              return _this11.axios.post("/api/".concat(accion, "Paquete/").concat(paquete.id));
+              return _this12.axios.post("/api/".concat(accion, "Paquete/").concat(paquete.id));
             case 9:
               // Actualización optimista local
               if (accion === 'cancelar') paquete.estado = 6;
               if (accion === 'congelar') paquete.estado = 4;
-              _this11.$swal('Éxito', "Paquete actualizado a ".concat(accion), 'success');
+              _this12.$swal('Éxito', "Paquete actualizado a ".concat(accion), 'success');
               _context9.next = 14;
-              return _this11.cargarPaquetes(_this11.pagination.current_page);
+              return _this12.cargarPaquetes(_this12.pagination.current_page);
             case 14:
               _context9.next = 19;
               break;
             case 16:
               _context9.prev = 16;
               _context9.t0 = _context9["catch"](6);
-              _this11.$swal('Error', ((_error$response2 = _context9.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.error) || 'Error en la operación', 'error');
+              _this12.$swal('Error', ((_error$response2 = _context9.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.error) || 'Error en la operación', 'error');
             case 19:
               _context9.prev = 19;
-              _this11.procesandoEstado = false;
+              _this12.procesandoEstado = false;
               return _context9.finish(19);
             case 22:
             case "end":
@@ -804,20 +827,20 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       return deuda / cuotas;
     },
     procesarPago: function procesarPago(cuota) {
-      var _this12 = this;
+      var _this13 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
-        var opcionesMetodos, _yield$_this12$$swal, formValues, _this12$monedas$find, payload, _error$response3;
+        var opcionesMetodos, _yield$_this13$$swal, formValues, _this13$monedas$find, payload, _error$response3;
         return _regeneratorRuntime().wrap(function _callee10$(_context10) {
           while (1) switch (_context10.prev = _context10.next) {
             case 0:
               // Opciones para el select de métodos de pago
               opcionesMetodos = '';
-              _this12.monedas.forEach(function (m) {
+              _this13.monedas.forEach(function (m) {
                 var selectedAttr = cuota.metodo_pago_id == m.id || !cuota.metodo_pago_id && m.id == 1 ? 'selected' : '';
                 opcionesMetodos += "<option value=\"".concat(m.id, "\" ").concat(selectedAttr, ">").concat(m.tipo, "</option>");
               });
               _context10.next = 4;
-              return _this12.$swal({
+              return _this13.$swal({
                 title: 'Registrar Pago de Cuota',
                 html: "<div class=\"text-start mb-3\">" + "  <p class=\"mb-2\">Cuota: <strong>#".concat(cuota.numero_cuota || '', "</strong></p>") + "  <p class=\"mb-3\">Monto a pagar: <strong class=\"text-success fs-5\">S/ ".concat(parseFloat(cuota.monto).toFixed(2), "</strong></p>") + "  <div class=\"mb-3\">" + "    <label class=\"form-label small fw-bold text-muted text-uppercase mb-1\">M\xE9todo de Pago <span class=\"text-danger\">*</span></label>" + "    <select id=\"swal-pago-metodo\" class=\"form-select\">".concat(opcionesMetodos, "</select>") + "  </div>" + "  <div class=\"mb-3\">" + "    <label class=\"form-label small fw-bold text-muted text-uppercase mb-1\">Motivo / Concepto <span class=\"text-danger\">*</span></label>" + "    <input id=\"swal-pago-motivo\" class=\"form-control\" type=\"text\" value=\"Pago de cuota ".concat(cuota.numero_cuota ? '#' + cuota.numero_cuota : '', "\">") + "  </div>" + "  <div class=\"mb-3\">" + "    <label class=\"form-label small fw-bold text-muted text-uppercase mb-1\">N\xFAmero de Operaci\xF3n <span class=\"text-muted\">(Yape, Plin, Transferencia, etc.)</span></label>" + "    <input id=\"swal-pago-voucher\" class=\"form-control\" type=\"text\" placeholder=\"Ej: 123456\">" + "  </div>" + "</div>",
                 focusConfirm: false,
@@ -829,11 +852,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   var motivo = document.getElementById('swal-pago-motivo').value;
                   var voucher = document.getElementById('swal-pago-voucher').value;
                   if (!metodoId) {
-                    _this12.$swal.showValidationMessage('Debe seleccionar un método de pago');
+                    _this13.$swal.showValidationMessage('Debe seleccionar un método de pago');
                     return false;
                   }
                   if (!motivo) {
-                    _this12.$swal.showValidationMessage('Debe ingresar un motivo/concepto');
+                    _this13.$swal.showValidationMessage('Debe ingresar un motivo/concepto');
                     return false;
                   }
                   return {
@@ -844,36 +867,36 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 }
               });
             case 4:
-              _yield$_this12$$swal = _context10.sent;
-              formValues = _yield$_this12$$swal.value;
+              _yield$_this13$$swal = _context10.sent;
+              formValues = _yield$_this13$$swal.value;
               if (!formValues) {
                 _context10.next = 26;
                 break;
               }
-              _this12.procesandoPago = true;
+              _this13.procesandoPago = true;
               _context10.prev = 8;
               payload = {
                 idDeuda: cuota.id,
-                user_id: _this12.idUsuario,
+                user_id: _this13.idUsuario,
                 estado: 2,
                 observacion: formValues.motivo,
-                nombre: _this12.paqueteSeleccionado.patient_name + ' ' + (_this12.paqueteSeleccionado.patient_nombres || ''),
+                nombre: _this13.paqueteSeleccionado.patient_name + ' ' + (_this13.paqueteSeleccionado.patient_nombres || ''),
                 precio: cuota.monto,
                 tipo: 8,
-                idMembresia: _this12.paqueteSeleccionado.id,
+                idMembresia: _this13.paqueteSeleccionado.id,
                 idMoneda: formValues.metodoId,
                 voucher: formValues.voucher
               };
               _context10.next = 12;
-              return _this12.axios.post('/api/pagarDeudaMembresia', payload);
+              return _this13.axios.post('/api/pagarDeudaMembresia', payload);
             case 12:
               cuota.estado = 2;
-              cuota.metodo_pago_nombre = (_this12$monedas$find = _this12.monedas.find(function (m) {
+              cuota.metodo_pago_nombre = (_this13$monedas$find = _this13.monedas.find(function (m) {
                 return m.id == formValues.metodoId;
-              })) === null || _this12$monedas$find === void 0 ? void 0 : _this12$monedas$find.tipo;
-              _this12.actualizarPermisosPago();
-              _this12.cargarPaquetes(_this12.pagination.current_page);
-              _this12.$swal({
+              })) === null || _this13$monedas$find === void 0 ? void 0 : _this13$monedas$find.tipo;
+              _this13.actualizarPermisosPago();
+              _this13.cargarPaquetes(_this13.pagination.current_page);
+              _this13.$swal({
                 icon: 'success',
                 title: 'Pago registrado',
                 text: 'El pago de la cuota se registró correctamente.',
@@ -886,10 +909,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context10.prev = 19;
               _context10.t0 = _context10["catch"](8);
               console.error(_context10.t0);
-              _this12.$swal('Error', ((_error$response3 = _context10.t0.response) === null || _error$response3 === void 0 || (_error$response3 = _error$response3.data) === null || _error$response3 === void 0 ? void 0 : _error$response3.error) || 'Ocurrió un error al procesar el pago.', 'error');
+              _this13.$swal('Error', ((_error$response3 = _context10.t0.response) === null || _error$response3 === void 0 || (_error$response3 = _error$response3.data) === null || _error$response3 === void 0 ? void 0 : _error$response3.error) || 'Ocurrió un error al procesar el pago.', 'error');
             case 23:
               _context10.prev = 23;
-              _this12.procesandoPago = false;
+              _this13.procesandoPago = false;
               return _context10.finish(23);
             case 26:
             case "end":
@@ -908,23 +931,23 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.mostrarModalPago = true;
     },
     actualizarPermisosPago: function actualizarPermisosPago() {
-      var _this13 = this;
+      var _this14 = this;
       var metodosPrevios = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       var firstPendingFound = false;
       this.paqueteSeleccionado.deudas.forEach(function (cuota) {
         if (cuota.estado == 1) {
           // Pendiente
           if (!cuota.metodo_pago_id) {
-            _this13.$set(cuota, 'metodo_pago_id', metodosPrevios[cuota.id] || 1); // Por defecto Efectivo
+            _this14.$set(cuota, 'metodo_pago_id', metodosPrevios[cuota.id] || 1); // Por defecto Efectivo
           }
           if (!firstPendingFound) {
             firstPendingFound = true;
-            _this13.$set(cuota, 'canPay', true);
+            _this14.$set(cuota, 'canPay', true);
           } else {
-            _this13.$set(cuota, 'canPay', false);
+            _this14.$set(cuota, 'canPay', false);
           }
         } else {
-          _this13.$set(cuota, 'canPay', false);
+          _this14.$set(cuota, 'canPay', false);
         }
       });
     },
@@ -956,32 +979,32 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       modal.show();
     },
     guardarReporteExtra: function guardarReporteExtra() {
-      var _this14 = this;
+      var _this15 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
         var payload, modalElement, modal;
         return _regeneratorRuntime().wrap(function _callee11$(_context11) {
           while (1) switch (_context11.prev = _context11.next) {
             case 0:
-              if (!(!_this14.formReporte.resumen || !_this14.formReporte.logros)) {
+              if (!(!_this15.formReporte.resumen || !_this15.formReporte.logros)) {
                 _context11.next = 3;
                 break;
               }
               alert('Por favor complete al menos el resumen y los logros.');
               return _context11.abrupt("return");
             case 3:
-              _this14.guardandoReporte = true;
+              _this15.guardandoReporte = true;
               _context11.prev = 4;
-              payload = _objectSpread(_objectSpread({}, _this14.formReporte), {}, {
-                membresia_id: _this14.paqueteSeleccionado.id
+              payload = _objectSpread(_objectSpread({}, _this15.formReporte), {}, {
+                membresia_id: _this15.paqueteSeleccionado.id
               });
               _context11.next = 8;
-              return _this14.axios.post('/api/reporte-paquete-extra', payload);
+              return _this15.axios.post('/api/reporte-paquete-extra', payload);
             case 8:
               // Cerrar modal y recargar
               modalElement = document.getElementById('modalReporteExtra');
               modal = bootstrap.Modal.getInstance(modalElement);
               modal.hide();
-              _this14.cargarPaquetes(_this14.pagination.current_page);
+              _this15.cargarPaquetes(_this15.pagination.current_page);
               alert('Reporte guardado exitosamente.');
               _context11.next = 19;
               break;
@@ -992,7 +1015,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               alert('Ocurrió un error al guardar el reporte.');
             case 19:
               _context11.prev = 19;
-              _this14.guardandoReporte = false;
+              _this15.guardandoReporte = false;
               return _context11.finish(19);
             case 22:
             case "end":
@@ -1010,7 +1033,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       this.editandoDeudaId = null;
     },
     guardarEdicionDeuda: function guardarEdicionDeuda(cuota) {
-      var _this15 = this;
+      var _this16 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
         var datos, response;
         return _regeneratorRuntime().wrap(function _callee12$(_context12) {
@@ -1019,23 +1042,23 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context12.prev = 0;
               datos = {
                 idDeuda: cuota.id,
-                fecha: _this15.formEditDeuda.fecha,
-                motivo: _this15.formEditDeuda.motivo,
-                user_id: _this15.idUsuario
+                fecha: _this16.formEditDeuda.fecha,
+                motivo: _this16.formEditDeuda.motivo,
+                user_id: _this16.idUsuario
               };
               _context12.next = 4;
-              return _this15.axios.post('/api/actualizarDeuda', datos);
+              return _this16.axios.post('/api/actualizarDeuda', datos);
             case 4:
               response = _context12.sent;
-              _this15.$swal('Éxito', response.data.message, 'success');
-              _this15.editandoDeudaId = null;
-              _this15.cargarPaquetes(_this15.pagination.current_page);
+              _this16.$swal('Éxito', response.data.message, 'success');
+              _this16.editandoDeudaId = null;
+              _this16.cargarPaquetes(_this16.pagination.current_page);
               _context12.next = 13;
               break;
             case 10:
               _context12.prev = 10;
               _context12.t0 = _context12["catch"](0);
-              _this15.$swal('Error', 'No se pudo actualizar la cuota', 'error');
+              _this16.$swal('Error', 'No se pudo actualizar la cuota', 'error');
             case 13:
             case "end":
               return _context12.stop();
@@ -1044,12 +1067,12 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }))();
     },
     abrirModalFraccionar: function abrirModalFraccionar(cuota) {
-      var _this16 = this;
+      var _this17 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee14() {
         return _regeneratorRuntime().wrap(function _callee14$(_context14) {
           while (1) switch (_context14.prev = _context14.next) {
             case 0:
-              _this16.$swal({
+              _this17.$swal({
                 title: 'Fraccionar Cuota',
                 html: "<p class=\"text-muted\">Cuota actual: <strong>S/ ".concat(parseFloat(cuota.monto).toFixed(2), "</strong></p>") + "<label class=\"form-label text-start d-block small fw-bold\">Monto a separar:</label>" + '<input id="swal-input1" class="form-control mb-3" type="number" step="0.01" min="0.01" max="' + (cuota.monto - 0.01) + '">' + "<label class=\"form-label text-start d-block small fw-bold\">Fecha de la nueva cuota (fracci\xF3n):</label>" + '<input id="swal-input2" class="form-control" type="date">',
                 focusConfirm: false,
@@ -1069,7 +1092,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                             _context13.next = 5;
                             break;
                           }
-                          _this16.$swal.showValidationMessage('Ingresa un monto válido y una fecha');
+                          _this17.$swal.showValidationMessage('Ingresa un monto válido y una fecha');
                           return _context13.abrupt("return", false);
                         case 5:
                           _context13.prev = 5;
@@ -1077,17 +1100,17 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                             idDeuda: cuota.id,
                             monto_fraccion: parseFloat(monto),
                             nueva_fecha: fecha,
-                            user_id: _this16.idUsuario
+                            user_id: _this17.idUsuario
                           };
                           _context13.next = 9;
-                          return _this16.axios.post('/api/fraccionarDeuda', datos);
+                          return _this17.axios.post('/api/fraccionarDeuda', datos);
                         case 9:
                           response = _context13.sent;
                           return _context13.abrupt("return", response.data);
                         case 13:
                           _context13.prev = 13;
                           _context13.t0 = _context13["catch"](5);
-                          _this16.$swal.showValidationMessage(((_error$response4 = _context13.t0.response) === null || _error$response4 === void 0 || (_error$response4 = _error$response4.data) === null || _error$response4 === void 0 ? void 0 : _error$response4.error) || 'No se pudo fraccionar la cuota');
+                          _this17.$swal.showValidationMessage(((_error$response4 = _context13.t0.response) === null || _error$response4 === void 0 || (_error$response4 = _error$response4.data) === null || _error$response4 === void 0 ? void 0 : _error$response4.error) || 'No se pudo fraccionar la cuota');
                           return _context13.abrupt("return", false);
                         case 17:
                         case "end":
@@ -1101,12 +1124,12 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   return preConfirm;
                 }(),
                 allowOutsideClick: function allowOutsideClick() {
-                  return !_this16.$swal.isLoading();
+                  return !_this17.$swal.isLoading();
                 }
               }).then(function (result) {
                 if (result.isConfirmed) {
-                  _this16.$swal('Éxito', result.value.message, 'success');
-                  _this16.cargarPaquetes(_this16.pagination.current_page);
+                  _this17.$swal('Éxito', result.value.message, 'success');
+                  _this17.cargarPaquetes(_this17.pagination.current_page);
                 }
               });
             case 1:
@@ -1131,6 +1154,31 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         this.filtroEstado = 0;
         this.filtroTipo = -1;
         this.cargarPaquetes(1);
+      }
+    },
+    'nuevaSesion.idProfesional': function nuevaSesionIdProfesional(newVal) {
+      var _this18 = this;
+      if (this.paqueteSeleccionado && newVal) {
+        var _esp = (this.paqueteSeleccionado.paquete_especialidad || '').toLowerCase();
+        var nombreRaw = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
+        var nombre = nombreRaw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        var esSucamec = this.paqueteSeleccionado.idClasificacion == 9 || nombre.includes('sucamec');
+
+        // Para híbridos no Sucamec, si cambia de doctor, verificar si el servicio seleccionado
+        // sigue siendo válido para la especialidad del doctor. Si no, limpiarlo.
+        if ((_esp === 'hibrida' || nombre.includes('hibrid')) && !esSucamec) {
+          var doc = this.doctores.find(function (d) {
+            return d.id == newVal;
+          });
+          if (doc) {
+            var precioActual = this.precios.find(function (p) {
+              return p.id == _this18.nuevaSesion.tipo;
+            });
+            if (precioActual && precioActual.idClasificacion != doc.idProfesion) {
+              this.nuevaSesion.tipo = '';
+            }
+          }
+        }
       }
     }
   }

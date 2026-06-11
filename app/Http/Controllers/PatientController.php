@@ -460,7 +460,7 @@ class PatientController extends Controller
 	public function showEvolution ($idPaciente, $idUsuario=-1) {
 		if($idUsuario==10){
 			$evoluciones = Patient::where('id',$idPaciente)
-			->with('cies', 'initial_psychiatric_history', 'initial_psychological_history', 'relative', 'appointments', 'prescriptions')
+			->with('cies', 'initial_psychiatric_history', 'initial_psychological_history', 'relative', 'appointments.medical_exams', 'prescriptions')
 			->with('medical_evolutions.professional','medical_evolutions.comentarios', 'medical_evolutions.typeEvolution')
 			->with(['medical_evolutions'=> function($query) {
 				$query->where('activo','=', 1);
@@ -471,7 +471,7 @@ class PatientController extends Controller
 			$threeMonthsAgo = now()->subMonths(6);
 	
 			$evoluciones = Patient::where('id',$idPaciente)
-			->with('cies', 'initial_psychiatric_history', 'initial_psychological_history', 'relative', 'appointments', 'prescriptions')
+			->with('cies', 'initial_psychiatric_history', 'initial_psychological_history', 'relative', 'appointments.medical_exams', 'prescriptions')
 			->with('medical_evolutions.professional','medical_evolutions.comentarios', 'medical_evolutions.typeEvolution')
 			->with(['medical_evolutions'=> function($query) use($threeMonthsAgo) {
 				$query->where('activo','=', 1)

@@ -1,616 +1,715 @@
 <template>
-	<div @click="clickOutside">
-		<div class="row">
-			<div class="col-12">
-				<h4>Historia clínica del paciente</h4>
-			</div>
-			<div class="col-12 col-lg-auto" style="background-color: white; border-radius: 5px;">
-				<div class="card">
-					<div class="card-body">
-						<button data-bs-toggle="modal" data-bs-target="#modalProximaCita" class="btn btn-outline-warning my-1 d-none">
-							<i class="fa-solid fa-person-walking-arrow-right"></i> Próxima cita
-						</button>
-						<button data-bs-toggle="modal" data-bs-target="#modalAgendarCita" class="btn btn-outline-secondary my-1" >
-							<i class="fa-solid fa-person-walking-arrow-right"></i> Agendar cita
-						</button>
-						<router-link v-if="dataUser.profession!='Psicólogo'" :to="{ path: `/profesional/recetas/${datosConsulta.id}` }" class="btn btn-outline-secondary"
-							title="Generar receta"><i class="fa-solid fa-vial"></i> Nueva receta
-						</router-link>
-						<button data-bs-toggle="modal" data-bs-target="#recetasModal" class="btn btn-outline-secondary my-1">
-							<i class="fa-solid fa-vial"></i> Ver recetas
-						</button>
-						<button v-if="(dataUser.profession === 'Psiquiatra' && datosConsulta.alta_psiquiatrica != 1) || (dataUser.profession !== 'Psiquiatra' && datosConsulta.alta_psicologica != 1)" class="btn btn-outline-success my-1" @click="toDischarge">
-							<i class="fa-solid fa-circle-check"></i> Dar de alta
-						</button>
-						<button v-else class="btn btn-outline-success my-1" disabled>
-							<i class="fa-solid fa-circle-check"></i> Dado de alta
-						</button>
-						<button data-bs-toggle="modal" data-bs-target="#modalVerTriajesViejos" class="btn btn-outline-info   my-1">
-							<i class="fa-solid fa-scale-unbalanced-flip"></i> Ver triajes ({{ datosConsulta.triajes.length }})
-						</button>
-						<button data-bs-toggle="modal" data-bs-target="#examenModal" class="btn btn-outline-info  my-1">
-							<i class="fa-solid fa-note-sticky"></i> Ver exámenes ({{ contarExamenes()  }})
-						</button>
-						<button v-if="datosConsulta.sos=='0'" class="btn btn-outline-danger" @click="crearSOS()"><i class="fa-solid fa-bomb"></i> SOS</button>
-						<button v-else class="btn btn-outline-secondary" @click="quitarSOS()"><i class="fa-solid fa-bomb"></i> Eliminar SOS</button>
-					</div>
-				</div>
-		
-			</div>
-		</div>
+  <div class="patient-detail-container" @click="clickOutside">
+    <!-- Header similar to DetallePaciente -->
+    <div class="card shadow-sm mb-4 border-0 rounded-lg" style="background-color: #fcfcfc;">
+      <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
+        <div class="d-flex align-items-center mb-3 mb-md-0">
+          <div class="rounded-circle text-primary bg-light border d-flex justify-content-center align-items-center me-3 shadow-sm font-weight-bold" style="width: 60px; height: 60px; font-size: 20px;">
+            <i class="fas fa-user"></i>
+          </div>
+          <div>
+            <h4 class="mb-1 font-weight-bold d-flex align-items-center gap-2">
+              {{ datosConsulta ? lowerCase(datosConsulta.name) +' '+lowerCase(datosConsulta.nombres) : '...' }}
+            </h4>
+            <div class="text-muted small">
+              <span class="me-3">DNI: {{ datosConsulta ? datosConsulta.dni : '...' }}</span>
+              <span class="me-3" v-if="datosConsulta.birth_date">{{ calculateAge(datosConsulta.birth_date) }} años</span>
+              <span class="me-3" v-if="datosConsulta.phone"><i class="fas fa-phone"></i> {{ datosConsulta.phone }}</span>
+            </div>
+          </div>
+        </div>
 
-		<div class=" my-3" v-if="datosConsulta.alta_psicologica == 1 || datosConsulta.alta_psiquiatrica == 1">
-			<div class="alert alert-success" role="alert">
-				<i class="fa-solid fa-thumbs-up"></i> <strong>Excelente!</strong> 
-				<span v-if="datosConsulta.alta_psicologica == 1 && datosConsulta.alta_psiquiatrica == 1">Paciente con Alta Psicológica y Psiquiátrica</span>
-				<span v-else-if="datosConsulta.alta_psicologica == 1">Paciente con Alta Psicológica</span>
-				<span v-else-if="datosConsulta.alta_psiquiatrica == 1">Paciente con Alta Psiquiátrica</span>
-			</div>
-		</div>
-		<div class=" my-3" v-if="datosConsulta.sos=='1'">
-			<div class="alert alert-danger" role="alert">
-				<i class="fa-solid fa-skull-crossbones"></i> <i class="fa-solid fa-skull-crossbones"></i> <i class="fa-solid fa-skull-crossbones"></i> <strong>Alerta!</strong> Paciente con riesgo de suicidio <i class="fa-solid fa-skull-crossbones"></i> <i class="fa-solid fa-skull-crossbones"></i> <i class="fa-solid fa-skull-crossbones"></i>
-			</div>
-		</div>
+        <div class="d-flex gap-2 flex-wrap">
+          <button data-bs-toggle="modal" data-bs-target="#modalAgendarCita" class="btn btn-outline-primary btn-sm bg-white shadow-sm" >
+            <i class="fa-solid fa-calendar-plus"></i> Agendar
+          </button>
+          <router-link v-if="dataUser.profession!='Psicólogo'" :to="{ path: `/profesional/recetas/${datosConsulta.id}` }" class="btn btn-outline-primary btn-sm bg-white shadow-sm" title="Generar receta">
+            <i class="fa-solid fa-file-prescription"></i> N. Receta
+          </router-link>
+          <button data-bs-toggle="modal" data-bs-target="#recetasModal" class="btn btn-outline-secondary btn-sm bg-white shadow-sm">
+            <i class="fa-solid fa-list"></i> Ver recetas
+          </button>
+          <button v-if="(dataUser.profession === 'Psiquiatra' && datosConsulta.alta_psiquiatrica != 1) || (dataUser.profession !== 'Psiquiatra' && datosConsulta.alta_psicologica != 1)" class="btn btn-outline-success btn-sm bg-white shadow-sm" @click="toDischarge">
+            <i class="fa-solid fa-check"></i> Dar de alta
+          </button>
+          <button data-bs-toggle="modal" data-bs-target="#modalVerTriajesViejos" class="btn btn-outline-info btn-sm bg-white shadow-sm">
+            <i class="fa-solid fa-heartbeat"></i> Triajes ({{ datosConsulta.triajes ? datosConsulta.triajes.length : 0 }})
+          </button>
+          <button data-bs-toggle="modal" data-bs-target="#examenModal" class="btn btn-outline-warning btn-sm bg-white shadow-sm text-dark">
+            <i class="fa-solid fa-file-medical"></i> Exámenes ({{ contarExamenes() }})
+          </button>
+          <button v-if="datosConsulta.sos=='0'" class="btn btn-danger btn-sm shadow-sm" @click="crearSOS()">
+            <i class="fa-solid fa-bell"></i> SOS
+          </button>
+          <button v-else class="btn btn-secondary btn-sm shadow-sm" @click="quitarSOS()">
+            <i class="fa-solid fa-bell-slash"></i> Quitar SOS
+          </button>
+        </div>
+      </div>
+    </div>
 
-		<div class="row mt-3">
-			<div class="col-md-6">
-				<div class="card shadow mb-4">
-					<!-- Card Header - Dropdown -->
-					<div class="card-header bg-primary py-3 d-flex flex-row align-items-center justify-content-between">
-						<h6 class="m-0 font-weight-bold text-white"><i class="fas fa-user"></i> Datos personales del paciente</h6>
-						<button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#modalEdicionPaciente" @click="datos1Paciente()" ><i class="fa-regular fa-pen-to-square"></i></button>
-					</div>
-					<!-- Card Body -->
-					<div class="card-body">
-						<div class="historia-info">
-							<p class="text-capitalize"><b>Nombre:</b> {{ datosConsulta ? lowerCase(datosConsulta.name) +' '+lowerCase(datosConsulta.nombres) : '...' }}</p>
-							<p><b>DNI:</b> {{ datosConsulta ? datosConsulta.dni : '...' }}</p>
-							<p><b>Número de celular:</b> {{ datosConsulta.phone ? datosConsulta.phone : '...' }}</p>
-							<p><b>Correo electrónico:</b> {{ datosConsulta.email ? datosConsulta.email : '...' }}</p>
-							<p><b>Ocupación:</b> {{ datosConsulta ? datosConsulta.occupation : '...' }}</p>
-							<p><b>Grado de instrucción:</b>
-								<span v-if="datosConsulta.instruction_degree == 1">Inicial</span>
-								<span v-else-if="datosConsulta.instruction_degree == 2">Primaria</span>
-								<span v-else-if="datosConsulta.instruction_degree == 3">Secundaria</span>
-								<span v-else-if="datosConsulta.instruction_degree == 4">Superior</span>
-								<span v-else-if="datosConsulta.instruction_degree == 5">Técnico</span>
-								<span v-else-if="datosConsulta.instruction_degree == 6">Sin Instrucción</span>
-							</p>
-							<p><b>Fecha de cumpleaños:</b> {{ datosConsulta ? fechaLatam(datosConsulta.birth_date) : '...' }} ({{
-								datosConsulta ? calculateAge(datosConsulta.birth_date) + ' años' : '...' }})</p>
-							<p><b>Estado civil:</b>
-								<span v-if="datosConsulta.marital_status == 1">Soltero</span>
-								<span v-else-if="datosConsulta.marital_status == 2">Casado</span>
-								<span v-else-if="datosConsulta.marital_status == 3">Viudo</span>
-								<span v-else-if="datosConsulta.marital_status == 4">Divorciado</span>
-								<span v-else-if="datosConsulta.marital_status == 5">Conviviente</span>
-							</p>
-							<hr>
-							<div v-if="datosConsulta.triajes.length>0">
-								<p><strong>Triaje</strong></p>
-								<div class="row row-cols-4" >
-									<div class="col"><p><strong>TR:</strong> {{ datosConsulta.triajes[0].fc }}</p></div>
-									<div class="col"><p><strong>FR:</strong> {{ datosConsulta.triajes[0].fr }}</p></div>
-									<div class="col"><p><strong>PA:</strong> {{ datosConsulta.triajes[0].pa }}</p></div>
-									<div class="col"><p><strong>T:</strong> {{ datosConsulta.triajes[0].t }}</p></div>
-								</div>
-								<p> <strong>Fecha de Triaje:</strong> <span>{{ fechaLatam(datosConsulta.triajes[0].fecha) }}</span> </p>
-								<p> <strong>Motivo:</strong> <span>{{ datosConsulta.triajes[0].motivo }}</span> </p>
-								<p> <strong>Sintomatologia:</strong> <span>{{ datosConsulta.triajes[0].sintomatologia }}</span> </p>
-								<p> <strong>Antecedentes:</strong> <span>{{ datosConsulta.triajes[0].antecedentes }}</span> </p>
-								<p> <strong>Pruebas aplicadas</strong>: <span>{{ datosConsulta.triajes[0].pruebas }}</span> </p>
-							</div>
-							<div v-else>
-								<p>No existen datos de triaje</p>
-							</div>
-						</div>
+    <!-- Alertas -->
+    <div class="my-3" v-if="datosConsulta.alta_psicologica == 1 || datosConsulta.alta_psiquiatrica == 1">
+      <div class="alert alert-success border-0 shadow-sm rounded" role="alert">
+        <i class="fa-solid fa-thumbs-up me-2"></i> <strong>Excelente!</strong> 
+        <span v-if="datosConsulta.alta_psicologica == 1 && datosConsulta.alta_psiquiatrica == 1">Paciente con Alta Psicológica y Psiquiátrica</span>
+        <span v-else-if="datosConsulta.alta_psicologica == 1">Paciente con Alta Psicológica</span>
+        <span v-else-if="datosConsulta.alta_psiquiatrica == 1">Paciente con Alta Psiquiátrica</span>
+      </div>
+    </div>
+    <div class="my-3" v-if="datosConsulta.sos=='1'">
+      <div class="alert alert-danger border-0 shadow-sm rounded" role="alert">
+        <i class="fa-solid fa-skull-crossbones me-2"></i> <strong>Alerta!</strong> Paciente con riesgo de suicidio (S.O.S Activo)
+      </div>
+    </div>
 
-					</div>
-				</div>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs mb-4 px-2" id="patientTabs" role="tablist" style="border-bottom: 0;">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'datos' }" @click="activeTab = 'datos'" type="button" role="tab" >
+          <i class="fas fa-user me-1"></i> Datos Personales
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'historial' }" @click="activeTab = 'historial'" type="button" role="tab" >
+          <i class="fas fa-history me-1"></i> Historial Clínico
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'linea' }" @click="activeTab = 'linea'" type="button" role="tab" >
+          <i class="fas fa-sort-amount-up-alt me-1"></i> Línea de Vida
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'nutricion' }" @click="activeTab = 'nutricion'" type="button" role="tab" >
+          <i class="fas fa-apple-alt me-1"></i> Nutrición
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'recetas' }" @click="activeTab = 'recetas'" type="button" role="tab" >
+          <i class="fas fa-prescription me-1"></i> Recetas & Órdenes
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'pruebas' }" @click="activeTab = 'pruebas'" type="button" role="tab" >
+          <i class="fas fa-flask me-1"></i> Pruebas Psicológicas
+        </button>
+      </li>
+    </ul>
 
-				<div class="card shadow mb-4">
-					<div class="card-header bg-primary py-3 d-flex flex-row align-items-center justify-content-between">
-						<h6 class="m-0 font-weight-bold text-white"><i class="fa-regular fa-lightbulb"></i> Recomendaciones entre profesionales</h6>
-						<button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#modalComentarios"><i class="fa-regular fa-pen-to-square"></i></button>
-					</div>
-					<div class="card-body">
-						<ul >
-							<li v-for="comentario in comentarios"> <i class="fa-regular fa-comment"></i> {{ comentario.nombre }}: {{ comentario.comment }}</li>
-							<li v-if="comentarios.length==0">No hay recomendaciones previas</li>
-						</ul>
-					</div>
-				</div>
-				<div class="card shadow mb-4">
-					<div class="card-header bg-primary py-3 d-flex flex-row align-items-center justify-content-between">
-						<h6 class="m-0 font-weight-bold text-white"><i class="fa-solid fa-paperclip"></i> Archivos adjuntos</h6>
-						<button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#modalArchivos"><i class="fa-solid fa-upload"></i></button>
-					</div>
-					<div class="card-body">
-						<ul >
-							<span data-bs-toggle="modal" data-bs-target="#modalArchivos" style="cursor:pointer;" ><i class="fa-regular fa-file-lines"></i> Vea y adjunte archivos a la Historia Clínica</span>
-						</ul>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-6 ">
-				<div class="card shadow mb-4">
-					<!-- Card Header - Dropdown -->
-					<div class="card-header bg-primary py-3 d-flex flex-row align-items-center justify-content-between">
-						<h6 class="m-0 font-weight-bold text-white"><i class="fas fa-users"></i> Persona de contacto en caso de emergencias</h6>
-						<button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#modalEditarPariente"><i class="fa-regular fa-pen-to-square"></i></button>
-					</div>
-					<!-- Card Body -->
-					<div class="card-body">
-						<div class="historia-info">
-							<p>Datos del pariente N° 1</p>
-							<div v-if="datosConsulta.relative[0]">
-								<p class="text-capitalize"><b>Nombre:</b> {{ datosConsulta.relative[0].name && datosConsulta.relative[0].name!='null' ?
-									lowerCase(datosConsulta.relative[0].name) : '...' }}</p>
-								<p><b>Número de celular:</b> {{ datosConsulta.relative[0].phone && datosConsulta.relative[0].phone!='null' ? datosConsulta.relative[0].phone : '...' }}</p>
-								<p><b>Parentesco:</b> {{ datosConsulta.relative[0].kinship && datosConsulta.relative[0].kinship!='null' ? datosConsulta.relative[0].kinship : '...' }}</p>
-							</div>
-							<div v-else>
-								<p>No existe registro de pariente</p>
-							</div>
-							<hr>
-							<p>Datos del pariente N° 2</p>
-							<div v-if="datosConsulta.relative[1]">
-								<p class="text-capitalize"><b>Nombre:</b> {{ datosConsulta.relative[1].name && datosConsulta.relative[1].name!='null' ?
-									lowerCase(datosConsulta.relative[1].name) : '...' }}</p>
-								<p><b>Número de celular:</b> {{ datosConsulta.relative[1].phone && datosConsulta.relative[1].phone!='null' ? datosConsulta.relative[1].phone : '...' }}</p>
-								<p><b>Parentesco:</b> {{ datosConsulta.relative[1].kinship && datosConsulta.relative[1].kinship!='null' ? datosConsulta.relative[1].kinship : '...' }}</p>
-							</div>
-							<div v-else>
-								<p>No existe registro de pariente</p>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="card shadow mb-4" id="cardPerfil">
-					<div class="card-header bg-primary py-3 d-flex flex-row align-items-center justify-content-between">
-						<h6 class="m-0 font-weight-bold text-white"><i class="fas fa-user"></i> Otros datos</h6>
-					</div>
-					<div class="card-body">
-						<p v-if="datosPaciente.semaforo.length>0">Perfil del paciente: 
-							<a class="text-capitalize" href="#!" data-bs-toggle="modal" data-bs-target="#modalVerEstados">{{queEstado(datosPaciente.semaforo[0].codigo)}}</a>
-							<span v-if="datosPaciente.semaforo[0].observaciones!=''">({{ datosPaciente.semaforo[0].observaciones }})</span>
-						</p>
-						<p v-if="datosPaciente.semaforo.length==0">Perfil del paciente: 
-							<a class="text-capitalize" href="#!" data-bs-toggle="modal" data-bs-target="#modalVerEstados">Sin asignar</a>
-						</p>
-						<p>Hobbies:</p>
-						<div>
-							<span v-for="hobbie in misHobbies" class="badge text-capitalize rounded-pill text-bg-primary mx-2 px-2 py-1" data-bs-toggle="modal" data-bs-target="#modalVerHobbies" >{{ hobbies[hobbie] }}</span>
-						</div>
-						<div v-if="misHobbies.length==0">
-							<span class="badge rounded-pill text-bg-secondary px-2 py-1" data-bs-toggle="modal" data-bs-target="#modalVerHobbies" >Ninguno</span>
-						</div>
-						<p class="mt-2 mb-0">Visitas:</p>
+    <!-- Tab panes -->
+    <div class="tab-content px-2" id="patientTabsContent">
+      
+      <!-- DATOS PERSONALES -->
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'datos' }" id="datos" role="tabpanel">
+        <div class="row">
+          <!-- Columna 1 -->
+          <div class="col-md-6 mb-3">
+            <div class="card shadow-sm mb-4 h-100 border-0 rounded-lg">
+              <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between border-bottom-0">
+                <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-user text-primary me-2"></i> Información Básica</h6>
+                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEdicionPaciente" @click="datos1Paciente()" ><i class="fa-regular fa-pen-to-square"></i></button>
+              </div>
+              <div class="card-body bg-light rounded m-3 p-4 pt-3">
+                <p class="text-capitalize mb-2"><b>Nombre:</b> {{ datosConsulta ? lowerCase(datosConsulta.name) +' '+lowerCase(datosConsulta.nombres) : '...' }}</p>
+                <p class="mb-2"><b>DNI:</b> {{ datosConsulta ? datosConsulta.dni : '...' }}</p>
+                <p class="mb-2"><b>Ocupación:</b> {{ datosConsulta ? datosConsulta.occupation : '...' }}</p>
+                <p class="mb-2"><b>Grado de instrucción:</b>
+                  <span v-if="datosConsulta.instruction_degree == 1">Inicial</span>
+                  <span v-else-if="datosConsulta.instruction_degree == 2">Primaria</span>
+                  <span v-else-if="datosConsulta.instruction_degree == 3">Secundaria</span>
+                  <span v-else-if="datosConsulta.instruction_degree == 4">Superior</span>
+                  <span v-else-if="datosConsulta.instruction_degree == 5">Técnico</span>
+                  <span v-else-if="datosConsulta.instruction_degree == 6">Sin Instrucción</span>
+                </p>
+                <p class="mb-2"><b>Fecha de cumpleaños:</b> {{ datosConsulta ? fechaLatam(datosConsulta.birth_date) : '...' }} ({{ datosConsulta ? calculateAge(datosConsulta.birth_date) + ' años' : '...' }})</p>
+                <p class="mb-2"><b>Estado civil:</b>
+                  <span v-if="datosConsulta.marital_status == 1">Soltero</span>
+                  <span v-else-if="datosConsulta.marital_status == 2">Casado</span>
+                  <span v-else-if="datosConsulta.marital_status == 3">Viudo</span>
+                  <span v-else-if="datosConsulta.marital_status == 4">Divorciado</span>
+                  <span v-else-if="datosConsulta.marital_status == 5">Conviviente</span>
+                </p>
+              </div>
+            </div>
+          </div>
 
-						<BarChart v-if="datosConsulta.medical_evolutions" :medical_evolutions="datosConsulta.medical_evolutions" :evolucionPsiquiatria="evolucionPsiquiatria" :evolucionPsicologia="evolucionPsicologia" ></BarChart>
+          <!-- Columna 2 -->
+          <div class="col-md-6 mb-3">
+            <div class="card shadow-sm mb-4 border-0 rounded-lg">
+              <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between border-bottom-0">
+                <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-users text-warning me-2"></i> Persona de contacto de emergencia</h6>
+                <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modalEditarPariente"><i class="fa-regular fa-pen-to-square"></i></button>
+              </div>
+              <div class="card-body bg-light rounded m-3 p-4 pt-3">
+                <div v-if="datosConsulta.relative && datosConsulta.relative[0]">
+                  <p class="text-capitalize mb-1"><b>Nombre:</b> {{ datosConsulta.relative[0].name && datosConsulta.relative[0].name!='null' ? lowerCase(datosConsulta.relative[0].name) : '...' }}</p>
+                  <p class="mb-1"><b>Teléfono:</b> {{ datosConsulta.relative[0].phone && datosConsulta.relative[0].phone!='null' ? datosConsulta.relative[0].phone : '...' }}</p>
+                  <p class="mb-1"><b>Parentesco:</b> {{ datosConsulta.relative[0].kinship && datosConsulta.relative[0].kinship!='null' ? datosConsulta.relative[0].kinship : '...' }}</p>
+                </div>
+                <div v-else><p class="text-muted small">No existe registro de pariente 1</p></div>
+                <hr>
+                <div v-if="datosConsulta.relative && datosConsulta.relative[1]">
+                  <p class="text-capitalize mb-1"><b>Nombre:</b> {{ datosConsulta.relative[1].name && datosConsulta.relative[1].name!='null' ? lowerCase(datosConsulta.relative[1].name) : '...' }}</p>
+                  <p class="mb-1"><b>Teléfono:</b> {{ datosConsulta.relative[1].phone && datosConsulta.relative[1].phone!='null' ? datosConsulta.relative[1].phone : '...' }}</p>
+                  <p class="mb-1"><b>Parentesco:</b> {{ datosConsulta.relative[1].kinship && datosConsulta.relative[1].kinship!='null' ? datosConsulta.relative[1].kinship : '...' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
-					</div>
+          <!-- Recomendaciones y Archivos -->
+          <div class="col-md-6 mb-3">
+            <div class="card shadow-sm mb-4 border-0 rounded-lg">
+              <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between border-bottom-0">
+                <h6 class="m-0 font-weight-bold text-dark"><i class="fa-regular fa-lightbulb text-info me-2"></i> Recomendaciones Profesionales</h6>
+                <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#modalComentarios"><i class="fa-regular fa-pen-to-square"></i></button>
+              </div>
+              <div class="card-body">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item border-0 px-0 py-2 small" v-for="comentario in comentarios"> 
+                    <i class="fa-regular fa-comment text-muted me-2"></i> <strong>{{ comentario.nombre }}:</strong> {{ comentario.comment }}
+                  </li>
+                  <li class="list-group-item border-0 px-0 py-2 text-muted small" v-if="comentarios.length==0">No hay recomendaciones previas</li>
+                </ul>
+              </div>
+            </div>
+          </div>
 
-				</div>
-			
+          <div class="col-md-6 mb-3">
+            <div class="card shadow-sm mb-4 border-0 rounded-lg">
+              <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between border-bottom-0">
+                <h6 class="m-0 font-weight-bold text-dark"><i class="fa-solid fa-paperclip text-secondary me-2"></i> Archivos adjuntos</h6>
+                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalArchivos"><i class="fa-solid fa-upload"></i></button>
+              </div>
+              <div class="card-body d-flex align-items-center justify-content-center p-5 bg-light m-3 rounded pointer" data-bs-toggle="modal" data-bs-target="#modalArchivos">
+                <div class="text-center text-muted">
+                  <i class="fa-regular fa-file-lines fa-2x mb-2 d-block"></i> 
+                  <span class="small">Vea y adjunte archivos a la Historia Clínica</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-			</div>
+          <!-- Etiquetas y Hobbies -->
+          <div class="col-md-12 mb-3">
+            <div class="card shadow-sm mb-4 border-0 rounded-lg">
+              <div class="card-header bg-white py-3 border-bottom-0">
+                <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-tags text-success me-2"></i> Perfil y Hobbies</h6>
+              </div>
+              <div class="card-body">
+                <p class="mb-2" v-if="datosPaciente.semaforo && datosPaciente.semaforo.length>0">Perfil del paciente: 
+                  <a class="text-capitalize badge bg-warning text-dark" href="#!" data-bs-toggle="modal" data-bs-target="#modalVerEstados">{{queEstado(datosPaciente.semaforo[0].codigo)}}</a>
+                  <span class="ms-2 small text-muted" v-if="datosPaciente.semaforo[0].observaciones!=''">({{ datosPaciente.semaforo[0].observaciones }})</span>
+                </p>
+                <p class="mb-2" v-else>Perfil del paciente: 
+                  <a class="text-capitalize badge bg-secondary" href="#!" data-bs-toggle="modal" data-bs-target="#modalVerEstados">Sin asignar</a>
+                </p>
+                <div class="mb-3 mt-3">
+                  <strong class="d-block mb-2 small text-muted">Hobbies:</strong>
+                  <span v-for="hobbie in misHobbies" class="badge text-capitalize rounded-pill bg-info text-dark mx-1 px-3 py-2 pointer" data-bs-toggle="modal" data-bs-target="#modalVerHobbies" >{{ hobbies[hobbie] }}</span>
+                  <span v-if="misHobbies.length==0" class="badge rounded-pill bg-secondary px-3 py-2 pointer" data-bs-toggle="modal" data-bs-target="#modalVerHobbies" >Ninguno</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-			 <div class="col-md-12" > <!-- v-if="rol === 'Psiquiatra'" -->
-				<div class="card shadow mb-4">
-					<!-- Card Header - Dropdown -->
-					<div class="card-header bg-warning py-3 d-flex flex-row align-items-center justify-content-between">
-						<h6 class="m-0 font-weight-bold text-white">Diagnóstico Psiquíatrico Inicial - {{
-							inicialPsiquiatria.created_at ? inicialPsiquiatria.created_at.substring(0, 10) : 'Anterior de 2022' }}</h6>
-					</div>
-					<!-- Card Body -->
-					<div class="card-body" v-if="!tienePsiquiatria">
-						<button v-if="dataUser.profession == 'Psiquiatra'" class="btn btn-outline-secondary" @click="evolucionModal()" data-bs-toggle="modal" data-bs-target="#evolutionModal"><i class="fas fa-stethoscope"></i> Crear la primera historia Psiquiátrica</button>
-						<p v-else>No se aperturó historia aún</p>
-					</div>
-					<form v-else class="card-body" @submit.prevent>
-						<div class="historia-info">
-							<div class="row row-cols-md-2">
-								<!-- Inicio de Primera Columna -->
-								<div class="col">
-									<div class="">
-										<p class="mb-0"><b>Antecedente General</b></p>
-										<p class="collapse__paragraph" id="general_antecedent" :data-rol="rol === 'Psiquiatra'"
-											@click="convertir('general_antecedent')" v-if="!inicialInputPsiquiatria.general_antecedent">
-											{{ inicialPsiquiatria ? inicialPsiquiatria.general_antecedent : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="anteceGeneFami" id="" cols="10" rows="3" class="form-control"
-												v-model="inicialPsiquiatria.general_antecedent"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Principales signos y síntomas</b></p>
-										<p class="collapse__paragraph" id="main_signs_symptoms" :data-rol="rol === 'Psiquiatra'"
-											@click="convertir('main_signs_symptoms')" v-if="!inicialInputPsiquiatria.main_signs_symptoms">
-											{{ inicialPsiquiatria ? inicialPsiquiatria.main_signs_symptoms : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="sigSinPrin" id="" cols="10" rows="3" class="form-control"
-												v-model="inicialPsiquiatria.main_signs_symptoms"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Problema actual</b></p>
-										<p class="collapse__paragraph" id="psiquiatria_Illness" :data-rol="rol === 'Psiquiatra'"
-											@click="convertir('psiquiatria_illness')" v-if="!inicialInputPsiquiatria.illness">
-											{{ inicialPsiquiatria ? inicialPsiquiatria.illness : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="efermeAct" id="" cols="10" rows="3" class="form-control"
-												v-model="inicialPsiquiatria.illness"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>APC</b></p>
-										<p class="collapse__paragraph" id="apc" :data-rol="rol === 'Psiquiatra'" @click="convertir('apc')"
-											v-if="!inicialInputPsiquiatria.apc">
-											{{ inicialPsiquiatria ? inicialPsiquiatria.apc : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="apcPsiqui" id="" cols="10" rows="3" class="form-control"
-												v-model="inicialPsiquiatria.apc"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Lenguaje</b></p>
-										<p class="collapse__paragraph" id="languaje" :data-rol="rol === 'Psiquiatra'"
-											@click="convertir('languaje')" v-if="!inicialInputPsiquiatria.languaje">
-											{{ inicialPsiquiatria ? inicialPsiquiatria.languaje : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="lenguaje" id="" cols="10" rows="3" class="form-control"
-												v-model="inicialPsiquiatria.languaje"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Pensamiento</b></p>
-										<p class="collapse__paragraph" id="thought" :data-rol="rol === 'Psiquiatra'" @click="convertir('thought')"
-											v-if="!inicialInputPsiquiatria.thought">
-											{{ inicialPsiquiatria ? inicialPsiquiatria.thought : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="pensamiento" id="" cols="10" rows="3" class="form-control"
-												v-model="inicialPsiquiatria.thought"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Afecto</b></p>
-										<p class="collapse__paragraph" id="affect" :data-rol="rol === 'Psiquiatra'" @click="convertir('affect')"
-											v-if="!inicialInputPsiquiatria.affect">
-											{{ inicialPsiquiatria ? inicialPsiquiatria.affect : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="afecto" id="" cols="10" rows="3" class="form-control"
-												v-model="inicialPsiquiatria.affect"></textarea>
-										</div>
-									</div>
-								</div>
-								<!-- Fin de Primera Columna -->
-								<!-- Inicio de Segunda columna -->
-								<div class="col">
-									<div>
-										<p class="mb-0"><b>Percepción</b></p>
-										<p class="collapse__paragraph" id="percetion" :data-rol="rol === 'Psiquiatra'"
-											@click="convertir('percetion')" v-if="!inicialInputPsiquiatria.percetion">
-											{{ inicialPsiquiatria ? inicialPsiquiatria.percetion : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="percepcion" id="" cols="10" rows="3" class="form-control"
-												v-model="inicialPsiquiatria.percetion"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Función superior</b></p>
-										<p class="collapse__paragraph" id="superior_function" :data-rol="rol === 'Psiquiatra'"
-											@click="convertir('superior_function')" v-if="!inicialInputPsiquiatria.superior_function">
-											{{ inicialPsiquiatria ? inicialPsiquiatria.superior_function : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="funciones" id="" cols="10" rows="3" class="form-control"
-												v-model="inicialPsiquiatria.superior_function"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Abstracción</b></p>
-										<p class="collapse__paragraph" id="abstraction" :data-rol="rol === 'Psiquiatra'"
-											@click="convertir('abstraction')" v-if="!inicialInputPsiquiatria.abstraction">
-											{{ inicialPsiquiatria ? inicialPsiquiatria.abstraction : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="abstraccion" id="" cols="10" rows="3" class="form-control"
-												v-model="inicialPsiquiatria.abstraction"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Conciencia</b></p>
-										<p class="collapse__paragraph" id="conscience" :data-rol="rol === 'Psiquiatra'"
-											@click="convertir('conscience')" v-if="!inicialInputPsiquiatria.conscience">
-											{{ inicialPsiquiatria ? inicialPsiquiatria.conscience : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="conciencia" id="" cols="10" rows="3" class="form-control"
-												v-model="inicialPsiquiatria.conscience"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Insight</b></p>
-										<p class="collapse__paragraph" id="insight" :data-rol="rol === 'Psiquiatra'" @click="convertir('insight')"
-											v-if="!inicialInputPsiquiatria.insight">
-											{{ inicialPsiquiatria ? inicialPsiquiatria.insight : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="insight" id="" cols="10" rows="3" class="form-control"
-												v-model="inicialPsiquiatria.insight"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Problemas Diagnóstico</b></p>
-										<p class="collapse__paragraph" id="diagnostic_problems" :data-rol="rol === 'Psiquiatra'"
-											@click="convertir('diagnostic_problems')" v-if="!inicialInputPsiquiatria.diagnostic_problems">
-											{{ inicialPsiquiatria ? inicialPsiquiatria.diagnostic_problems : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="problemsDiag" id="" cols="10" rows="3" class="form-control"
-												v-model="inicialPsiquiatria.diagnostic_problems"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Diagnóstico</b></p>
-										<div class="form-group position-relative diagnostico-input" style="min-height: 100px;">
-											<div class="position-relative">
-												<input type="text" class="form-control" autocomplete="off" name="diagnostico" id="diagnostico"
-													v-model="searchCie" @keyup="getDiagnostico">
-												<button class="btn btn-warning position-absolute update-diagnostic" @click="updateDiag">
-													<i class="fas fa-save" title="Guardar cambios"></i>
-												</button>
-												<!-- v-model="inicialPsiquiatria.diagnostic" -->
-												<div class="cie-content rounded overflow-auto" v-if="searchCie.length>0">
-													<div v-for="(cie, index) in dataCies" :key="index">
-														<span class="w-100 px-2 py-2 cie--hover d-inline-block pointer cie-item"
-															:class="{ 'cie-danger': inicialPsiquiatria.diagnostic.find(el => el == cie.id) }"
-															:data-id="cie.id" @click="addCie">
-															{{ cie.id }} - {{ cie.code }} - {{ cie.description }}
-														</span>
-													</div>
-												</div>
-											</div>
-											<div class="d-flex flex-gap flex-wrap mt-3 overflow-auto">
-												<div v-if="cieAdd" v-for="(cieAgregado, index) in datosConsulta.cies" :key="`cie${index}`"
-													class="bg-warning rounded text-light p-2">
-													{{ typeof cieAgregado == 'object' ? `${cieAgregado.id} - ${cieAgregado.code} -
-																								${cieAgregado.description}` : cieAgregado }}
-													<span :data-cie="index" class="cie-item ml-2 pointer" @click="deleteCie"><i
-															class="fas fa-times"></i></span>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Plan</b></p>
-										<p class="collapse__paragraph" id="psiquiatria_plan" :data-rol="rol === 'Psiquiatra'"
-											@click="convertir('psiquiatria_plan')" v-if="!inicialInputPsiquiatria.plan">
-											{{ inicialPsiquiatria ? inicialPsiquiatria.plan : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="plan" id="" cols="10" rows="3" class="form-control"
-												v-model="inicialPsiquiatria.plan"></textarea>
-										</div>
-									</div>
-								</div>
-								<!-- Fin de Segunda columna -->
-							</div>
-							
-							
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
+      <!-- HISTORIAL CLÍNICO -->
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'historial' }" id="historial" role="tabpanel">
+        
+        <!-- Accordion for Initial Evaluation (Psiquiatria) -->
+        <div class="accordion mb-4 bg-white shadow-sm rounded-lg border-0" id="accordionInitialPsyq" v-if="dataUser.profession === 'Psiquiatra' || tienePsiquiatria">
+          <div class="accordion-item border-0 rounded">
+            <h2 class="accordion-header" id="headingPsyq">
+              <button class="accordion-button bg-light font-weight-bold text-dark" :class="{'collapsed': !tienePsiquiatria}" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePsyq" aria-expanded="true" aria-controls="collapsePsyq">
+                <i class="fas fa-brain text-primary me-2"></i> Diagnóstico Psiquiátrico Inicial
+                <span class="ms-3 text-muted small" style="font-weight: normal" v-if="inicialPsiquiatria.created_at">
+                  - {{ inicialPsiquiatria.created_at.substring(0, 10) }}
+                </span>
+              </button>
+            </h2>
+            <div id="collapsePsyq" class="accordion-collapse collapse" :class="{'show': tienePsiquiatria}" aria-labelledby="headingPsyq" data-bs-parent="#accordionInitialPsyq">
+              <div class="accordion-body">
+                <div v-if="!tienePsiquiatria" class="text-center py-4">
+                  <button v-if="dataUser.profession == 'Psiquiatra'" class="btn btn-outline-primary" @click="evolucionModal()" data-bs-toggle="modal" data-bs-target="#evolutionModal">
+                    <i class="fas fa-plus"></i> Crear la primera historia Psiquiátrica
+                  </button>
+                  <p v-else class="text-muted mb-0">No se aperturó historia aún</p>
+                </div>
+                <form v-else class="row g-4" @submit.prevent>
+                  <div class="col-md-6">
+                    <!-- Column 1 Fields -->
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted"><i class="fas fa-history text-primary me-1"></i>Antecedente General</label>
+                      <p class="collapse__paragraph form-control bg-light" id="general_antecedent" :data-rol="rol === 'Psiquiatra'" @click="convertir('general_antecedent')" v-if="!inicialInputPsiquiatria.general_antecedent">
+                        {{ inicialPsiquiatria ? inicialPsiquiatria.general_antecedent : '...' }}
+                      </p>
+                      <div class="collpase__textarea" v-else>
+                        <textarea rows="3" class="form-control" v-model="inicialPsiquiatria.general_antecedent"></textarea>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted"><i class="fas fa-stethoscope text-primary me-1"></i>Principales signos y síntomas</label>
+                      <p class="collapse__paragraph form-control bg-light" id="main_signs_symptoms" :data-rol="rol === 'Psiquiatra'" @click="convertir('main_signs_symptoms')" v-if="!inicialInputPsiquiatria.main_signs_symptoms">
+                        {{ inicialPsiquiatria ? inicialPsiquiatria.main_signs_symptoms : '...' }}
+                      </p>
+                      <div class="collpase__textarea" v-else>
+                        <textarea rows="3" class="form-control" v-model="inicialPsiquiatria.main_signs_symptoms"></textarea>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted"><i class="fas fa-notes-medical text-primary me-1"></i>Problema actual</label>
+                      <p class="collapse__paragraph form-control bg-light" id="psiquiatria_Illness" :data-rol="rol === 'Psiquiatra'" @click="convertir('psiquiatria_illness')" v-if="!inicialInputPsiquiatria.illness">
+                        {{ inicialPsiquiatria ? inicialPsiquiatria.illness : '...' }}
+                      </p>
+                      <div class="collpase__textarea" v-else>
+                        <textarea rows="3" class="form-control" v-model="inicialPsiquiatria.illness"></textarea>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted"><i class="fas fa-clipboard-list text-primary me-1"></i>APC</label>
+                      <p class="collapse__paragraph form-control bg-light" id="apc" :data-rol="rol === 'Psiquiatra'" @click="convertir('apc')" v-if="!inicialInputPsiquiatria.apc">
+                        {{ inicialPsiquiatria ? inicialPsiquiatria.apc : '...' }}
+                      </p>
+                      <div class="collpase__textarea" v-else>
+                        <textarea rows="3" class="form-control" v-model="inicialPsiquiatria.apc"></textarea>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-6 mb-3">
+                        <label class="form-label font-weight-bold small text-muted"><i class="fas fa-comments text-primary me-1"></i>Lenguaje</label>
+                        <p class="collapse__paragraph form-control bg-light" id="languaje" :data-rol="rol === 'Psiquiatra'" @click="convertir('languaje')" v-if="!inicialInputPsiquiatria.languaje">
+                          {{ inicialPsiquiatria ? inicialPsiquiatria.languaje : '...' }}
+                        </p>
+                        <div class="collpase__textarea" v-else>
+                          <textarea rows="3" class="form-control" v-model="inicialPsiquiatria.languaje"></textarea>
+                        </div>
+                      </div>
+                      <div class="col-6 mb-3">
+                        <label class="form-label font-weight-bold small text-muted"><i class="fas fa-brain text-primary me-1"></i>Pensamiento</label>
+                        <p class="collapse__paragraph form-control bg-light" id="thought" :data-rol="rol === 'Psiquiatra'" @click="convertir('thought')" v-if="!inicialInputPsiquiatria.thought">
+                          {{ inicialPsiquiatria ? inicialPsiquiatria.thought : '...' }}
+                        </p>
+                        <div class="collpase__textarea" v-else>
+                          <textarea rows="3" class="form-control" v-model="inicialPsiquiatria.thought"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted"><i class="fas fa-heartbeat text-primary me-1"></i>Afecto</label>
+                      <p class="collapse__paragraph form-control bg-light" id="affect" :data-rol="rol === 'Psiquiatra'" @click="convertir('affect')" v-if="!inicialInputPsiquiatria.affect">
+                        {{ inicialPsiquiatria ? inicialPsiquiatria.affect : '...' }}
+                      </p>
+                      <div class="collpase__textarea" v-else>
+                        <textarea rows="3" class="form-control" v-model="inicialPsiquiatria.affect"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- Column 2 Fields -->
+                    <div class="row">
+                      <div class="col-6 mb-3">
+                        <label class="form-label font-weight-bold small text-muted"><i class="fas fa-eye text-primary me-1"></i>Percepción</label>
+                        <p class="collapse__paragraph form-control bg-light" id="percetion" :data-rol="rol === 'Psiquiatra'" @click="convertir('percetion')" v-if="!inicialInputPsiquiatria.percetion">
+                          {{ inicialPsiquiatria ? inicialPsiquiatria.percetion : '...' }}
+                        </p>
+                        <div class="collpase__textarea" v-else>
+                          <textarea rows="3" class="form-control" v-model="inicialPsiquiatria.percetion"></textarea>
+                        </div>
+                      </div>
+                      <div class="col-6 mb-3">
+                        <label class="form-label font-weight-bold small text-muted"><i class="fas fa-cogs text-primary me-1"></i>Función superior</label>
+                        <p class="collapse__paragraph form-control bg-light" id="superior_function" :data-rol="rol === 'Psiquiatra'" @click="convertir('superior_function')" v-if="!inicialInputPsiquiatria.superior_function">
+                          {{ inicialPsiquiatria ? inicialPsiquiatria.superior_function : '...' }}
+                        </p>
+                        <div class="collpase__textarea" v-else>
+                          <textarea rows="3" class="form-control" v-model="inicialPsiquiatria.superior_function"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-6 mb-3">
+                        <label class="form-label font-weight-bold small text-muted"><i class="fas fa-puzzle-piece text-primary me-1"></i>Abstracción</label>
+                        <p class="collapse__paragraph form-control bg-light" id="abstraction" :data-rol="rol === 'Psiquiatra'" @click="convertir('abstraction')" v-if="!inicialInputPsiquiatria.abstraction">
+                          {{ inicialPsiquiatria ? inicialPsiquiatria.abstraction : '...' }}
+                        </p>
+                        <div class="collpase__textarea" v-else>
+                          <textarea rows="3" class="form-control" v-model="inicialPsiquiatria.abstraction"></textarea>
+                        </div>
+                      </div>
+                      <div class="col-6 mb-3">
+                        <label class="form-label font-weight-bold small text-muted"><i class="fas fa-user-clock text-primary me-1"></i>Conciencia</label>
+                        <p class="collapse__paragraph form-control bg-light" id="conscience" :data-rol="rol === 'Psiquiatra'" @click="convertir('conscience')" v-if="!inicialInputPsiquiatria.conscience">
+                          {{ inicialPsiquiatria ? inicialPsiquiatria.conscience : '...' }}
+                        </p>
+                        <div class="collpase__textarea" v-else>
+                          <textarea rows="3" class="form-control" v-model="inicialPsiquiatria.conscience"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted"><i class="fas fa-lightbulb text-primary me-1"></i>Insight</label>
+                      <p class="collapse__paragraph form-control bg-light" id="insight" :data-rol="rol === 'Psiquiatra'" @click="convertir('insight')" v-if="!inicialInputPsiquiatria.insight">
+                        {{ inicialPsiquiatria ? inicialPsiquiatria.insight : '...' }}
+                      </p>
+                      <div class="collpase__textarea" v-else>
+                        <textarea rows="3" class="form-control" v-model="inicialPsiquiatria.insight"></textarea>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted"><i class="fas fa-exclamation-triangle text-primary me-1"></i>Problemas Diagnóstico</label>
+                      <p class="collapse__paragraph form-control bg-light" id="diagnostic_problems" :data-rol="rol === 'Psiquiatra'" @click="convertir('diagnostic_problems')" v-if="!inicialInputPsiquiatria.diagnostic_problems">
+                        {{ inicialPsiquiatria ? inicialPsiquiatria.diagnostic_problems : '...' }}
+                      </p>
+                      <div class="collpase__textarea" v-else>
+                        <textarea rows="3" class="form-control" v-model="inicialPsiquiatria.diagnostic_problems"></textarea>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted">Diagnóstico CIE-10</label>
+                      <div class="form-group position-relative diagnostico-input" style="min-height: 100px;">
+                        <div class="position-relative d-flex gap-2">
+                          <input type="text" class="form-control" autocomplete="off" name="diagnostico" id="diagnostico" v-model="searchCie" @keyup="getDiagnostico" placeholder="Buscar CIE-10...">
+                          <button class="btn btn-warning" @click="updateDiag">
+                            <i class="fas fa-save" title="Guardar cambios"></i>
+                          </button>
+                        </div>
+                        <div class="cie-content rounded overflow-auto mt-2 bg-white shadow-sm border" v-if="searchCie.length>0" style="max-height: 200px; position: absolute; z-index: 100; width: 100%;">
+                          <div v-for="(cie, index) in dataCies" :key="index">
+                            <span class="w-100 px-3 py-2 cie--hover d-block border-bottom pointer cie-item"
+                              :class="{ 'bg-primary text-white': inicialPsiquiatria.diagnostic.find(el => el == cie.id) }"
+                              :data-id="cie.id" @click="addCie">
+                              {{ cie.id }} - {{ cie.code }} - {{ cie.description }}
+                            </span>
+                          </div>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mt-3 overflow-auto">
+                          <div v-if="cieAdd" v-for="(cieAgregado, index) in datosConsulta.cies" :key="`cie${index}`"
+                            class="badge bg-warning text-dark p-2 d-flex align-items-center rounded-pill">
+                            {{ typeof cieAgregado == 'object' ? `${cieAgregado.code} - ${cieAgregado.description}` : cieAgregado }}
+                            <span :data-cie="index" class="cie-item ms-2 pointer text-danger" @click="deleteCie"><i class="fas fa-times"></i></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted">Plan</label>
+                      <p class="collapse__paragraph form-control bg-light" id="psiquiatria_plan" :data-rol="rol === 'Psiquiatra'" @click="convertir('psiquiatria_plan')" v-if="!inicialInputPsiquiatria.plan">
+                        {{ inicialPsiquiatria ? inicialPsiquiatria.plan : '...' }}
+                      </p>
+                      <div class="collpase__textarea" v-else>
+                        <textarea rows="3" class="form-control" v-model="inicialPsiquiatria.plan"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
 
-		<div class="row mt-3 ">
-			<div class="col-md-12"> <!-- v-if="rol === 'Psicólogo'" -->
-				<div class="card shadow mb-4">
-					<!-- Card Header - Dropdown -->
-					<div class="card-header bg-warning py-3 d-flex flex-row align-items-center justify-content-between">
-						<h6 class="m-0 font-weight-bold text-white">Diagnostico Psicológico Inicial - {{
-							initialPsychological.created_at ? initialPsychological.created_at.substring(0, 10) : 'Anterior de 2022' }}
-						</h6>
-					</div>
-					<!-- Card Body -->
-					<div class="card-body" v-if="!tienePsicologia ">
-						<button v-if="dataUser.profession == 'Psicólogo'" class="btn btn-outline-secondary" @click="evolucionModal()" data-bs-toggle="modal" data-bs-target="#evolutionModal"><i class="fas fa-stethoscope"></i> Crear la primera historia Psicológica</button>
-						<p v-else>No se aperturó historia aún</p>
-					</div>
-					<form v-else class="card-body" @submit.prevent>
-						<div class="historia-info">
-							<div class="row row-cols-md-2">
-								<div class="col">
-									<div>
-										<p class="mb-0"><b>Problema actual</b></p>
-										<p class="collapse__paragraph" id="Psicologia_illness" :data-rol="rol === 'Psicólogo'"
-											@click="convertir('Psicologia_illness')" v-if="!inicialInputPsychological.illness">
-											{{ initialPsychological.illness ? initialPsychological.illness : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="" id="" cols="10" rows="3" class="form-control"
-												v-model="initialPsychological.illness"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Antecedentes</b></p>
-										<p class="collapse__paragraph" id="antecedent" :data-rol="rol === 'Psicólogo'"
-											@click="convertir('antecedent')" v-if="!inicialInputPsychological.antecedent">
-											{{ initialPsychological.antecedent ? initialPsychological.antecedent : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="" id="" cols="10" rows="3" class="form-control"
-												v-model="initialPsychological.antecedent"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Dinámica</b></p>
-										<p class="collapse__paragraph" id="dynamic" :data-rol="rol === 'Psicólogo'" @click="convertir('dynamic')"
-											v-if="!inicialInputPsychological.dynamic">
-											{{ initialPsychological.dynamic ? initialPsychological.dynamic : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="" id="" cols="10" rows="3" class="form-control"
-												v-model="initialPsychological.dynamic"></textarea>
-										</div>
-									</div>
-								</div>
-								<div class="col">
-									<div>
-										<p class="mb-0"><b>Actitud actual</b></p>
-										<p class="collapse__paragraph" id="attitude" :data-rol="rol === 'Psicólogo'"
-											@click="convertir('attitude')" v-if="!inicialInputPsychological.attitude">
-											{{ initialPsychological.attitude ? initialPsychological.attitude : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="" id="" cols="10" rows="3" class="form-control"
-												v-model="initialPsychological.attitude"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>DX</b></p>
-										<p class="collapse__paragraph" id="dx" :data-rol="rol === 'Psicólogo'" @click="convertir('dx')"
-											v-if="!inicialInputPsychological.dx">
-											{{ initialPsychological.dx ? initialPsychological.dx : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="" id="" cols="10" rows="3" class="form-control"
-												v-model="initialPsychological.dx"></textarea>
-										</div>
-									</div>
-									<div>
-										<p class="mb-0"><b>Plan</b></p>
-										<p class="collapse__paragraph" id="Psicologia_plan" :data-rol="rol === 'Psicólogo'"
-											@click="convertir('Psicologia_plan')" v-if="!inicialInputPsychological.plan">
-											{{ initialPsychological.plan ? initialPsychological.plan : '...' }}
-										</p>
-										<div class="collpase__textarea" v-else>
-											<textarea name="" id="" cols="10" rows="3" class="form-control"
-												v-model="initialPsychological.plan"></textarea>
-										</div>
-									</div>
-								</div>
-							</div>
-							
-							
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
+        <!-- Accordion for Initial Evaluation (Psicologia) -->
+        <div class="accordion mb-4 bg-white shadow-sm rounded-lg border-0" id="accordionInitialPsycho" v-if="dataUser.profession === 'Psicólogo' || tienePsicologia">
+          <div class="accordion-item border-0 rounded">
+            <h2 class="accordion-header" id="headingPsycho">
+              <button class="accordion-button bg-light font-weight-bold text-dark" :class="{'collapsed': !tienePsicologia}" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePsycho" aria-expanded="true" aria-controls="collapsePsycho">
+                <i class="fas fa-user-md text-primary me-2"></i> Diagnóstico Psicológico Inicial
+                <span class="ms-3 text-muted small" style="font-weight: normal" v-if="initialPsychological.created_at">
+                  - {{ initialPsychological.created_at.substring(0, 10) }}
+                </span>
+              </button>
+            </h2>
+            <div id="collapsePsycho" class="accordion-collapse collapse" :class="{'show': tienePsicologia}" aria-labelledby="headingPsycho" data-bs-parent="#accordionInitialPsycho">
+              <div class="accordion-body">
+                <div v-if="!tienePsicologia" class="text-center py-4">
+                  <button v-if="dataUser.profession == 'Psicólogo'" class="btn btn-outline-primary" @click="evolucionModal()" data-bs-toggle="modal" data-bs-target="#evolutionModal">
+                    <i class="fas fa-plus"></i> Crear la primera historia Psicológica
+                  </button>
+                  <p v-else class="text-muted mb-0">No se aperturó historia aún</p>
+                </div>
+                <form v-else class="row g-4" @submit.prevent>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted">Problema actual</label>
+                      <p class="collapse__paragraph form-control bg-light" id="Psicologia_illness" :data-rol="rol === 'Psicólogo'" @click="convertir('Psicologia_illness')" v-if="!inicialInputPsychological.illness">
+                        {{ initialPsychological.illness ? initialPsychological.illness : '...' }}
+                      </p>
+                      <div class="collpase__textarea" v-else>
+                        <textarea rows="3" class="form-control" v-model="initialPsychological.illness"></textarea>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted">Antecedentes</label>
+                      <p class="collapse__paragraph form-control bg-light" id="antecedent" :data-rol="rol === 'Psicólogo'" @click="convertir('antecedent')" v-if="!inicialInputPsychological.antecedent">
+                        {{ initialPsychological.antecedent ? initialPsychological.antecedent : '...' }}
+                      </p>
+                      <div class="collpase__textarea" v-else>
+                        <textarea rows="3" class="form-control" v-model="initialPsychological.antecedent"></textarea>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted">Dinámica</label>
+                      <p class="collapse__paragraph form-control bg-light" id="dynamic" :data-rol="rol === 'Psicólogo'" @click="convertir('dynamic')" v-if="!inicialInputPsychological.dynamic">
+                        {{ initialPsychological.dynamic ? initialPsychological.dynamic : '...' }}
+                      </p>
+                      <div class="collpase__textarea" v-else>
+                        <textarea rows="3" class="form-control" v-model="initialPsychological.dynamic"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted">Actitud actual</label>
+                      <p class="collapse__paragraph form-control bg-light" id="attitude" :data-rol="rol === 'Psicólogo'" @click="convertir('attitude')" v-if="!inicialInputPsychological.attitude">
+                        {{ initialPsychological.attitude ? initialPsychological.attitude : '...' }}
+                      </p>
+                      <div class="collpase__textarea" v-else>
+                        <textarea rows="3" class="form-control" v-model="initialPsychological.attitude"></textarea>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted">DX</label>
+                      <p class="collapse__paragraph form-control bg-light" id="dx" :data-rol="rol === 'Psicólogo'" @click="convertir('dx')" v-if="!inicialInputPsychological.dx">
+                        {{ initialPsychological.dx ? initialPsychological.dx : '...' }}
+                      </p>
+                      <div class="collpase__textarea" v-else>
+                        <textarea rows="3" class="form-control" v-model="initialPsychological.dx"></textarea>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label font-weight-bold small text-muted">Plan</label>
+                      <p class="collapse__paragraph form-control bg-light" id="Psicologia_plan" :data-rol="rol === 'Psicólogo'" @click="convertir('Psicologia_plan')" v-if="!inicialInputPsychological.plan">
+                        {{ initialPsychological.plan ? initialPsychological.plan : '...' }}
+                      </p>
+                      <div class="collpase__textarea" v-else>
+                        <textarea rows="3" class="form-control" v-model="initialPsychological.plan"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
 
-		<ul class="nav nav-tabs" id="myTab" role="tablist">
-			<li class="nav-item" role="presentation">
-				<button class="nav-link active" id="evoluciones-tab" data-bs-toggle="tab" data-bs-target="#evoluciones-tab-pane" type="button" role="tab" aria-controls="evoluciones-tab-pane" aria-selected="true"><i class="fas fa-tv"></i> Evoluciones del paciente</button>
-			</li>
-			<li class="nav-item" role="presentation">
-				<button class="nav-link" id="linea-tab" data-bs-toggle="tab" data-bs-target="#linea-tab-pane" type="button" role="tab" aria-controls="linea-tab-pane" aria-selected="false"><i class="fas fa-sort-amount-up-alt"></i> Línea de vida</button>
-			</li>
-			<li class="nav-item" role="presentation">
-				<button class="nav-link" id="nutricion-tab" data-bs-toggle="tab" data-bs-target="#nutricion-tab-pane" type="button" role="tab" aria-controls="nutricion-tab-pane" aria-selected="false"><i class="fas fa-apple-alt"></i> Nutrición</button>
-			</li>
-		</ul>
+        <!-- Evoluciones List -->
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-4">
+          <h6 class="font-weight-bold mb-0 text-dark d-flex align-items-center">
+            <i class="fas fa-file-medical-alt text-success me-2"></i> Evoluciones de Seguimiento
+          </h6>
+          <p class="small mb-0" :class="{'text-success': datosConsulta.maximo==0, 'text-danger' : datosConsulta.maximo>0}">
+            <i class="far fa-bell me-1"></i>
+            <span v-if="datosConsulta.maximo==0">Mostrando <strong>todos</strong> los registros.</span>
+            <span v-if="datosConsulta.maximo>0">Mostrando últimos 6 meses (<strong>+{{ datosConsulta.maximo }}</strong> previas).</span>
+          </p>
+        </div>
 
-		<div class="tab-content mb-5" id="myTabContent">
-			<div class="tab-pane fade show active p-3 bg-light-subtle border border-top-0" id="evoluciones-tab-pane" role="tabpanel" aria-labelledby="evoluciones-tab" tabindex="0">
-				<!-- Titulo -->
-				<div class="d-flex justify-content-between">
-					<p :class="{'text-success': datosConsulta.maximo==0, 'text-danger' : datosConsulta.maximo>0}"><i class="far fa-bell"></i>
-						<span v-if="datosConsulta.maximo==0">Está apreciando <strong>todos</strong> los registros de evoluciones.</span>
-						<span v-if="datosConsulta.maximo>0">Los registros están limitados a 6 meses, están <strong>pendientes {{ datosConsulta.maximo }}</strong> evoluciones más.</span>
-					</p>
-					<!-- <h4>Evoluciones del paciente</h4> -->
-					<!-- <button
-					data-toggle="modal"
-					data-target="#evolutionModal"
-					@click="evoluciones"
-					class="bg-warning px-4 py-2 rounded border-0 text-light btn--iteration"
-					v-if="consultaHoy"
-					>
-					Nueva evolución
-					</button> -->
-				</div>
+        <div class="row">
+          <div class="col-md-4 mb-4" v-for="(evolution, index) in datosConsulta.medical_evolutions" :key="index">
+            <div class="card h-100 border-0 shadow-sm rounded-lg" :class="dondeEsta(evolution.type)" @mouseover="colorear(index)" @mouseleave="descolorear(index)">
+              <div class="card-header border-bottom-0 py-3 d-flex align-items-center justify-content-between pointer" @click="mostrarCard(index)" data-bs-toggle="modal" data-bs-target="#modalVerDetalle">
+                <h6 class="m-0 font-weight-bold text-white"><i class="fas fa-calendar-day me-2"></i> {{ fechaLectura(evolution.date) }}</h6>
+                <span class="badge bg-white text-dark small rounded-pill">#{{ evolution.id }}</span>
+              </div>
+              <div class="card-body d-flex flex-column bg-white">
+                <div class="mb-3">
+                  <span class="badge bg-light text-dark border px-2 py-1 mb-2">{{ evolution.clasificacion_combinada || (evolution.type_evolution ? evolution.type_evolution.clasificacion : 'Sin asignar') }}</span>
+                  <p class="small text-muted mb-1"><i class="fas fa-user-md me-1"></i> {{ evolution.professional ? evolution.professional.name : 'Sin asignar' }}</p>
+                  <p class="small text-dark mb-0 mt-2 line-clamp-3" style="font-size: 0.85rem;">"{{ evolution ? maxStringCharacter(evolution.content, 80) : '...' }}"</p>
+                </div>
+                
+                <div class="mt-auto pt-3 border-top d-flex gap-2 flex-wrap">
+                  <button @click="updateModal(evolution)" data-bs-toggle="modal" data-bs-target="#updatedModal" class="btn btn-outline-primary btn-sm flex-fill" v-if="evolution.professional_id == dataUser.id && (calcularDias(evolution.date)<=2 || evolution.auth == 1)">
+                    <i class="fas fa-edit"></i> Editar
+                  </button>
+                  <button class="btn btn-outline-secondary btn-sm flex-fill" data-bs-toggle="modal" data-bs-target="#modalNuevoSeguimiento" @click="idEvolucion = evolution.id; indexGlobal = index" v-if="evolution.professional_id == dataUser.id">
+                    <i class="fas fa-plus"></i> Seguimiento
+                  </button>
+                  <!-- Compatibility for editModal -->
+                  <button @click="editEvolution(evolution)" class="btn btn-success d-none"
+                    v-if="evolution.professional_id == dataUser.id" data-bs-toggle="modal" data-bs-target="#editModal">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-if="!datosConsulta.medical_evolutions || datosConsulta.medical_evolutions.length === 0" class="col-12">
+            <div class="alert alert-light text-center border text-muted py-5">
+              <i class="fas fa-folder-open fa-3x mb-3 text-secondary opacity-50"></i>
+              <p class="mb-0">No hay evoluciones de seguimiento registradas para este paciente.</p>
+            </div>
+          </div>
+        </div>
 
-				<!-- Card -->
-				<div class="row mb-5">
-					<div class="col-md-4 mb-3" v-for="(evolution, index) in datosConsulta.medical_evolutions" :key="index">
-						<div class="card mb-4 tarjeta" @mouseover="colorear(index)" @mouseleave="descolorear(index)" :class="dondeEsta(evolution.type)">
-							<!-- Card Header - Dropdown -->
-							<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between" @click="mostrarCard(index)" data-bs-toggle="modal" data-bs-target="#modalVerDetalle" >
-								<h6 class="m-0 font-weight-bold text-white text-capitalize">{{ fechaLectura(evolution.date) }} <small>(#{{ evolution.id }})</small></h6>
-							</div>
-							<!-- Card Body -->
-							<div class="card-body">
-								<div class="card-evolution">
-									<div class="historia-info">
-										<p><b>Clase:</b> {{ evolution.clasificacion_combinada || (evolution.type_evolution ? evolution.type_evolution.clasificacion : 'Sin asignar') }}</p>
-										<p><b>Profesional:</b> {{ evolution.professional ? evolution.professional.name : 'Sin asignar' }} </p>
-										<p><b>Diagnóstico: </b> {{ evolution ? maxStringCharacter(evolution.content, 50) : '...' }} </p>
-									</div>
-									<div class="card-evolution__image d-none">
-										<img :src="`/storage/${evolution.professional ? evolution.professional.signing : null}`"
-											class="card-evolution-image"
-											:alt="evolution.professional ? evolution.professional.signing : null ? 'Firma del doctor' : 'Sin firma'">
-									</div>
-								</div>
-								<div class="d-flex flex-gap">
-									<button @click="updateModal(evolution)" data-bs-toggle="modal" data-bs-target="#updatedModal" class="btn btn-outline-secondary" v-if="evolution.professional_id == dataUser.id && 
-                      calcularDias(evolution.date)<=2 || evolution.auth == 1">
-										<i class="fas fa-edit"></i> Redactar evolución
-									</button>
-									<button @click="editEvolution(evolution)" class="btn btn-success d-none"
-										v-if="evolution.professional_id == dataUser.id" data-bs-toggle="modal" data-bs-target="#editModal">
-										<i class="fas fa-edit"></i>
-									</button>
-									<button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalNuevoSeguimiento" @click="idEvolucion = evolution.id; indexGlobal = index" v-if="evolution.professional_id == dataUser.id"><i class="far fa-plus-square"></i> Agregar seguimiento</button>
-									<!-- <div v-if="evolution.professional_id == dataUser.id &&
-										evolution.date === getDateNow()" class="btn-group">
-										<button v-if="autoSaveInfo != null" @click="refreshInfo(evolution.id)"
-											class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenuClickableInside"
-											data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-											<i class="fas fa-save"></i>
-										</button>
-										<ul class="dropdown-menu px-2 py-2" aria-labelledby="dropdownMenuClickableInside">
-											<span>{{ autoSaveInfo }}</span>
-										</ul>
-									</div> -->
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="tab-pane fade py-5 px-3 bg-light-subtle border border-top-0" id="linea-tab-pane" role="tabpanel" aria-labelledby="linea-tab" tabindex="0">				
-				<button class="btn btn-outline-success" data-bs-target="#nuevoAcontecimiento" data-bs-toggle="modal"><i class="far fa-comment-alt"></i> Agregar nuevo acontecimiento</button>
-				<lineaTiempo :id="$route.params.idPaciente"  ></lineaTiempo> <!-- @ordenarLineas="ordenarLineas" -->
-			</div>
-			<div class="tab-pane fade py-5 px-3 bg-light-subtle border border-top-0" id="nutricion-tab-pane" role="tabpanel" aria-labelledby="nutricion-tab" tabindex="0">
-				<nutricionHome :dataCies="dataCies" :id="$route.params.idPaciente" ></nutricionHome>
-			</div>
-			
-		</div>
+      </div>
 
-		
+      <!-- LÍNEA DE VIDA -->
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'linea' }" id="linea" role="tabpanel">
+        <div class="card shadow-sm border-0 rounded-lg">
+          <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-stream text-primary me-2"></i> Línea de Vida Clínica</h6>
+            <button class="btn btn-outline-success btn-sm" data-bs-target="#nuevoAcontecimiento" data-bs-toggle="modal">
+              <i class="far fa-comment-alt me-1"></i> Nuevo Acontecimiento
+            </button>
+          </div>
+          <div class="card-body p-0">
+            <lineaTiempo :id="$route.params.idPaciente"></lineaTiempo>
+          </div>
+        </div>
+      </div>
+
+      <!-- NUTRICIÓN -->
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'nutricion' }" id="nutricion" role="tabpanel">
+        <nutricionHome :dataCies="dataCies" :id="$route.params.idPaciente" ></nutricionHome>
+      </div>
+
+      <!-- RECETAS Y ÓRDENES -->
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'recetas' }" id="recetas" role="tabpanel">
+        <!-- Replicaremos el diseño para Recetas y construiremos la parte de Órdenes aquí -->
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 rounded-lg h-100">
+              <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+                <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-prescription text-primary me-2"></i> Recetas Médicas</h6>
+                <router-link v-if="dataUser.profession!='Psicólogo'" :to="{ path: `/profesional/recetas/${datosConsulta.id}` }" class="btn btn-outline-primary btn-sm">
+                  <i class="fas fa-plus"></i> Nueva Receta
+                </router-link>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0">
+                    <thead class="bg-light text-muted small">
+                      <tr>
+                        <th class="ps-4 py-3">Fecha</th>
+                        <th class="py-3 text-end pe-4">Acción</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(prescription, index) in datosConsulta.prescriptions" :key="index">
+                        <td class="align-middle ps-4 py-3 fw-bold">{{ prescription ? prescription.attention_date : '...' }}</td>
+                        <td class="align-middle text-end pe-4 py-3">
+                          <a v-if="prescription" class="btn btn-sm btn-outline-danger" :href="`/api/pdf/${prescription.id}?token=${$token}`" target="_blank">
+                            <i class="fas fa-file-pdf"></i> PDF
+                          </a>
+                        </td>
+                      </tr>
+                      <tr v-if="!datosConsulta.prescriptions || datosConsulta.prescriptions.length === 0">
+                        <td colspan="2" class="text-center text-muted py-4">No hay recetas emitidas.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 rounded-lg h-100">
+              <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+                <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-notes-medical text-success me-2"></i> Órdenes Médicas</h6>
+                <button class="btn btn-outline-success btn-sm" @click="crearNuevaOrden">
+                  <i class="fas fa-plus"></i> Nueva Orden
+                </button>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0">
+                    <thead class="bg-light text-muted small">
+                      <tr>
+                        <th class="ps-4 py-3">Fecha</th>
+                        <th class="py-3">Tipo/Examen</th>
+                        <th class="py-3 text-end pe-4">Acción</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(orden, index) in ordenesMedicas" :key="index">
+                        <td class="align-middle ps-4 py-3 fw-bold">{{ formatOnlyDate(orden.created_at) }}</td>
+                        <td class="align-middle py-3 text-muted">{{ orden.descripcion || 'Orden Médica' }}</td>
+                        <td class="align-middle text-end pe-4 py-3">
+                          <button class="btn btn-sm btn-outline-primary" @click="verDetalleOrden(orden)">
+                            <i class="fas fa-eye"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr v-if="!ordenesMedicas || ordenesMedicas.length === 0">
+                        <td colspan="3" class="text-center text-muted py-4">No hay órdenes médicas registradas.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRUEBAS PSICOLÓGICAS -->
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'pruebas' }" id="pruebas" role="tabpanel">
+        <div class="card shadow-sm border-0 rounded-lg">
+          <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-brain text-info me-2"></i> Pruebas Psicológicas</h6>
+            <div class="dropdown">
+              <button class="btn btn-info text-white btn-sm dropdown-toggle" type="button" id="dropdownPruebas" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-plus me-1"></i> Aplicar Prueba
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownPruebas">
+                <li><a class="dropdown-item py-2" href="#" @click.prevent="irAPrueba('phq-9')">PHQ-9 (Depresión)</a></li>
+                <li><a class="dropdown-item py-2" href="#" @click.prevent="irAPrueba('gad-7')">GAD-7 (Ansiedad)</a></li>
+                <li><a class="dropdown-item py-2" href="#" @click.prevent="irAPrueba('phq-15')">PHQ-15 (Somatización)</a></li>
+                <li><a class="dropdown-item py-2" href="#" @click.prevent="irAPrueba('mdq')">MDQ (Bipolaridad)</a></li>
+                <li><a class="dropdown-item py-2" href="#" @click.prevent="irAPrueba('srq')">SRQ-18 (General)</a></li>
+                <li><a class="dropdown-item py-2" href="#" @click.prevent="irAPrueba('burns')">Ansiedad de Burns</a></li>
+                <li><a class="dropdown-item py-2" href="#" @click.prevent="irAPrueba('anszung')">Ansiedad de Zung</a></li>
+                <li><a class="dropdown-item py-2" href="#" @click.prevent="irAPrueba('depzung')">Depresión de Zung</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="card-body bg-light p-4">
+            
+            <div class="row" v-if="Object.values(allExams).some(exam => exam.value && exam.value.length > 0)">
+              <div class="col-md-4 mb-4" v-for="(examData, examKey) in allExams" :key="examKey" v-show="examData.value && examData.value.length > 0">
+                <div class="card border-0 shadow-sm rounded-lg h-100">
+                  <div class="card-header bg-white border-bottom-0 py-3">
+                    <h6 class="mb-0 font-weight-bold text-primary">{{ examData.name }}</h6>
+                  </div>
+                  <div class="card-body p-0">
+                    <div class="list-group list-group-flush rounded-bottom">
+                      <div class="list-group-item d-flex justify-content-between align-items-center py-3" v-for="(resultado, idx) in examData.value" :key="idx">
+                        <div>
+                          <p class="mb-0 font-weight-bold small">{{ formatDate(resultado.created_at) }}</p>
+                          <p class="mb-0 text-muted small mt-1" v-if="resultado.diagnostico || resultado.resultado">Diag: {{ resultado.diagnostico || resultado.resultado }}</p>
+                        </div>
+                        <button class="btn btn-outline-info btn-sm rounded-circle" @click="verDetallePrueba(resultado, examData.name)" title="Ver detalles">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="text-center py-5" v-else>
+              <i class="fas fa-clipboard-list fa-3x text-muted opacity-50 mb-3"></i>
+              <h6 class="text-muted">No se han realizado pruebas psicológicas</h6>
+              <p class="text-muted small mb-0">Seleccione "Aplicar Prueba" para comenzar una nueva evaluación.</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div> <!-- End Tab Content -->
 
 		<!-- Modal de examenes -->
 		<div class="modal fade" id="examenModal" tabindex="-1" aria-labelledby="modalEvolution" aria-hidden="true">
 			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
-					<div class="modal-header bg-warning text-white">
-						<h5 class="modal-title" id="infoModalLabel">Exámenes</h5>
-						<button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close"><i
-								class="fas fa-times"></i></button>
+					<div class="modal-header bg-warning text-dark">
+						<h5 class="modal-title font-weight-bold" id="infoModalLabel"><i class="fas fa-file-medical me-2"></i> Exámenes</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 
 					<keep-alive>
@@ -622,33 +721,31 @@
 			</div>
 		</div>
 
-
 		<!-- Modal de recetas -->
 		<div class="modal fade" id="recetasModal" tabindex="-1" aria-labelledby="modalEvolution" aria-hidden="true">
 			<div class="modal-dialog modal-lg">
-				<div class="modal-content">
-					<div class="modal-header bg-primary text-white">
-						<h5 class="modal-title" id="infoModalLabel">Ver recetas</h5>
-						<button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close"><i
-								class="fas fa-times"></i></button>
+				<div class="modal-content border-0 shadow-lg">
+					<div class="modal-header bg-primary text-white border-0">
+						<h5 class="modal-title font-weight-bold" id="infoModalLabel"><i class="fas fa-prescription me-2"></i> Ver recetas</h5>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 
-					<div class="modal-body">
-						<table class="table table-striped">
-							<thead>
+					<div class="modal-body p-0">
+						<table class="table table-hover mb-0">
+							<thead class="bg-light">
 								<tr>
-									<th>#</th>
+									<th class="ps-4">#</th>
 									<th>Fecha</th>
-									<th>Ver Receta</th>
+									<th class="text-end pe-4">Acción</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr v-if="datosConsulta" v-for="(prescription, index) in datosConsulta.prescriptions" :key="index">
-									<td>{{ index + 1 }}</td>
+									<td class="ps-4 fw-bold">{{ index + 1 }}</td>
 									<td>{{ prescription ? prescription.attention_date : '...' }}</td>
-									<td>
-										<a v-if="prescription" class="btn btn-success" :href="`/api/pdf/${prescription.id}?token=${$token}`"
-											target="_blank">Ver PDF</a>
+									<td class="text-end pe-4">
+										<a v-if="prescription" class="btn btn-sm btn-outline-danger" :href="`/api/pdf/${prescription.id}?token=${$token}`"
+											target="_blank"><i class="fas fa-file-pdf me-1"></i> Ver PDF</a>
 									</td>
 								</tr>
 							</tbody>
@@ -658,13 +755,37 @@
 			</div>
 		</div>
 
-		<!-- Modal de actualizar -->
-		<updated-modal :datosModal="dataModal" @evolutionUpdated="refreshEvoluciones"></updated-modal>
+    <!-- Modal Detalles de Prueba (Agregado para nueva funcionalidad) -->
+    <div class="modal fade" id="modalDetallePrueba" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header border-bottom-0 bg-light">
+            <h5 class="modal-title fw-bold text-dark"><i class="fas fa-brain text-info me-2"></i> Detalle de Prueba</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body" v-if="pruebaSeleccionada">
+            <h6 class="fw-bold mb-3">{{ pruebaSeleccionada.nombreExamen }}</h6>
+            <div class="p-3 bg-light rounded border mb-3">
+              <p class="mb-1 small text-muted">Fecha Aplicación:</p>
+              <p class="fw-bold mb-2">{{ formatDate(pruebaSeleccionada.created_at) }}</p>
+              <p class="mb-1 small text-muted">Puntaje / Resultado:</p>
+              <p class="fw-bold mb-2 text-primary fs-5">{{ pruebaSeleccionada.score || pruebaSeleccionada.resultado || pruebaSeleccionada.suma || 'N/A' }}</p>
+              <p class="mb-1 small text-muted">Diagnóstico:</p>
+              <p class="fw-bold mb-0 text-dark">{{ pruebaSeleccionada.diagnostico || 'N/A' }}</p>
+            </div>
+          </div>
+          <div class="modal-footer border-top-0 pt-0">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-		<!-- Modal editar -->
+		<!-- Componentes y Modales originales -->
+		<updated-modal :datosModal="dataModal" @evolutionUpdated="refreshEvoluciones"></updated-modal>
 		<edit-modal :datosModal="dataModal" @evolutionUpdated="refreshEvoluciones"></edit-modal>
 		<modalVerDetalle :miniRespuesta="miniRespuesta"></modalVerDetalle>
-		<modal-ver-triajes-viejos :triajes = "datosConsulta.triajes"></modal-ver-triajes-viejos>
+		<modal-ver-triajes-viejos :triajes="datosConsulta.triajes"></modal-ver-triajes-viejos>
 		<modal-editar-paciente :dataPatient="dato1" ></modal-editar-paciente>
 		<ModalEditarPariente v-if="datosConsulta.relative" :id="datosExamPaciente.id" :relative="datosConsulta.relative" @updatePariente="updatePariente"></ModalEditarPariente>
 		<ModalVerEstados :dataPatient="datosPaciente" :estados="estados"></ModalVerEstados>
@@ -677,11 +798,11 @@
 		<modalNuevoSeguimiento :idProfesional="dataUser.id"  :idEvolucion="idEvolucion" @agregarComentario="agregarComentario"></modalNuevoSeguimiento>
 		<ModalAgendarCita :profesional="dataUser" :paciente="datosPaciente"></ModalAgendarCita>
 		
-
 	</div>
 </template>
 
 <script>
+
 import editModal from './editEvolution.vue'
 import updatedModal from './updatedEvolutionModal.vue';
 import ExamResult from './ExamResult.vue';
@@ -712,6 +833,26 @@ export default {
 
 	data() {
 		return {
+            ordenesMedicas: [],
+            pruebaSeleccionada: null,
+            allExams: {
+				scr: { name: 'SCL90R', value: [] },
+				burns: { name: 'ANSIEDAD DE BURNS', value: [] },
+				millon: { name: 'MILLON', value: [] },
+				zungdep: { name: 'DEPRESIÓN DE ZUNG', value: [] },
+				zunganxie: { name: 'ANSIEDAD DE ZUNG', value: [] },
+				phq: { name: 'PHQ-9', value: [] },
+				gad: { name: 'GAD-7', value: [] },
+				bdi: { name: 'BDI-2', value: [] },
+				mcmi: { name: 'MCMI-II', value: [] },
+				baron: { name: 'BARON', value: [] },
+				eysencka: { name: 'EYSENCK-A', value: [] },
+				eysenckb: { name: 'EYSENCK-B', value: [] },
+                phq15: { name: 'PHQ-15', value: [] },
+                mdq: { name: 'MDQ', value: [] },
+                srq: { name: 'SRQ-18', value: [] },
+			},
+			activeTab: 'historial',
 			autoSaveInfo: '', profesionalesTodos:[],
 			datosConsulta: { triajes:[], examenes_basicos:[], examenes_personalizados:{burns:[], gads:[], scrs:[], zung_anxieties :[], zung_depressions :[]} },
 			evolucionPsiquiatria: [1,2,3,4,5,6,16,17], //Ver tabla de precios, son los IDs
@@ -833,6 +974,61 @@ export default {
 	},
 
 	methods: {
+
+    // Add these methods inside methods: block
+    formatDate(dateStr) {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    },
+    formatOnlyDate(dateStr) {
+      return this.formatDate(dateStr);
+    },
+    irAPrueba(ruta) {
+      // Abre en nueva pestana o usa router
+      window.open(`/profesional/${ruta}/${this.datosConsulta.id}`, '_blank');
+    },
+    verDetallePrueba(resultado, nombreExamen) {
+      this.pruebaSeleccionada = { ...resultado, nombreExamen };
+      var myModal = new bootstrap.Modal(document.getElementById('modalDetallePrueba'));
+      myModal.show();
+    },
+    crearNuevaOrden() {
+      if (this.datosConsulta && this.datosConsulta.appointments && this.datosConsulta.appointments.length > 0) {
+        const sortedAppointments = [...this.datosConsulta.appointments].sort((a,b) => new Date(b.date) - new Date(a.date));
+        const latestApp = sortedAppointments[0];
+        window.open(`/profesional/examenes/${latestApp.id}`, '_blank');
+      } else {
+        this.$swal({
+          icon: 'error',
+          title: 'Sin Citas',
+          text: 'El paciente no tiene citas registradas para asignar una orden médica.'
+        });
+      }
+    },
+
+		getExamPromise() {
+			Promise.all([
+				this.axios(`/api/zungDep/${this.$route.params.idPaciente}`),
+				this.axios(`/api/zungAns/${this.$route.params.idPaciente}`),
+				this.axios(`/api/millon/${this.$route.params.idPaciente}`),
+				this.axios(`/api/burns/${this.$route.params.idPaciente}`),
+				this.axios(`/api/src/${this.$route.params.idPaciente}`),
+				this.axios(`/api/exam/${this.$route.params.idPaciente}`),
+			])
+			.then(res => {
+					const [ zungDep, zungAns, millon, burn, src, exam ] = res;
+					this.allExams.scr.value = src.data;
+					this.allExams.burns.value = burn.data;
+					this.allExams.millon.value = millon.data;
+					this.allExams.zunganxie.value = zungAns.data;
+					this.allExams.zungdep.value = zungDep.data;
+                    
+                    // Filter exams correctly based on exam.data if needed
+			})
+			.catch(err => console.error(err))
+		},
+
 		evolucionModal () {
 			console.log('que');
 			this.datosIdEvolucion.professional.id = this.dataUser.id
@@ -931,6 +1127,24 @@ export default {
 
 					this.tienePsiquiatria = res.data.initial_psychiatric_history != null
 					this.tienePsicologia = res.data.initial_psychological_history != null
+
+                    // Extract ordenesMedicas
+                    let ordenes = [];
+                    if (res.data.appointments) {
+                        res.data.appointments.forEach(app => {
+                            if (app.medical_exams && app.medical_exams.length > 0) {
+                                app.medical_exams.forEach(exam => {
+                                    ordenes.push({
+                                        ...exam,
+                                        created_at: app.date || exam.pivot.attention_date || exam.created_at,
+                                        descripcion: exam.name
+                                    });
+                                });
+                            }
+                        });
+                    }
+                    // Sort descending by date
+                    this.ordenesMedicas = ordenes.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
 				})
 				.catch(err => {
@@ -1108,18 +1322,16 @@ export default {
 		},
 
 		convertir(prop) {
-			console.log(event)
 			if (event.target.dataset.rol == "true") {
 				if (this.dobleClick == false) {
-					this.dobleClick = "hola";
+					this.dobleClick = event.target.id;
+					setTimeout(() => { this.dobleClick = false; }, 600); // 600ms double click window
 					return;
 				}
 
 				if (this.dobleClick === event.target.id) {
 					this.inputActive = prop;
 					this.inputSwitchActive(prop, true);
-					//this.collapseActive(event);
-
 					this.dobleClick = false;
 				} else {
 					this.dobleClick = false;
@@ -1143,6 +1355,7 @@ export default {
 
 		refreshEvoluciones() {
 			this.getHistories();
+		this.getExamPromise();
 		},
 
 		addCie() {
@@ -1391,9 +1604,11 @@ export default {
 		this.evolutionToday
 	}
 }
+
 </script>
 
 <style scoped>
+
 .evolucionPsiquiatria .card-header, .evolucionTipo1 .card-header{ background: #e74a3b }
 .evolucionPsicologia .card-header, .evolucionTipo2 .card-header{ background: #4e73df }
 .evolucionTerapista .card-header, .evolucionTipo7 .card-header{ background: #9b59b6 }
@@ -1444,6 +1659,8 @@ h4 {
 	padding: 10px;
 	cursor: pointer;
 	user-select: none;
+	height: auto !important;
+	min-height: 38px;
 }
 
 .collpase__textarea {
@@ -1544,4 +1761,5 @@ h4 {
 	.card-evolution__image {
 		display: none;
 	}
-}</style>
+}
+</style>
