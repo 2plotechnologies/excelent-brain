@@ -857,8 +857,12 @@ export default {
     },
     especialidadResuelta() {
       if (!this.paqueteSeleccionado) return 2; // Por defecto Psicológica
+      
+      const nombreRaw = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
+      const nombre = nombreRaw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       const esp = (this.paqueteSeleccionado.paquete_especialidad || '').toLowerCase();
-      const nombre = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
+
+      // Caso 1: Paquetes Sucamec (idClasificacion 9 o nombre contiene sucamec)
       if (esp === 'psiquiatrica' || esp === 'psiquíatrica' || nombre.includes('psiquiatr')) {
         return 1;
       } else if (esp === 'psicologica' || esp === 'psicológica' || nombre.includes('psicolog')) {
@@ -882,8 +886,31 @@ export default {
       const nombre = nombreRaw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       if (this.paqueteSeleccionado.idClasificacion == 9 || nombre.includes('sucamec')) {
         return this.precios.filter(precio => 
-          (precio.id == 13 || precio.id == 14 || precio.descripcion.toLowerCase().includes('sucamec')) && 
+           (precio.id == 13 || precio.id == 14) && 
+          precio.activo == '1'
+        );
+      }
+
+      // Caso 2: Paquetes Híbridos (que no sean Sucamec)
+      if (esp === 'hibrida' || nombre.includes('hibrid')) {
+        if (this.nuevaSesion.idProfesional) {
+          const doc = this.doctores.find(d => d.id == this.nuevaSesion.idProfesional);
+          if (doc) {
+            return this.precios.filter(precio => 
+              precio.idClasificacion == doc.idProfesion && 
+              precio.servicio == '1' && 
+              precio.id != 48 && 
+              precio.id != 49 && 
+              precio.activo == '1'
+            );
+          }
+        }
+        // Si no hay doctor seleccionado, mostrar ambos (psicología y psiquiatría)
+        return this.precios.filter(precio => 
+          (precio.idClasificacion == 1 || precio.idClasificacion == 2) && 
           precio.servicio == '1' && 
+          precio.id != 48 && 
+          precio.id != 49 &&
           precio.activo == '1'
         );
       }
@@ -1181,7 +1208,7 @@ export default {
         case 2: return { text: 'Atendido / Confirmado', class: 'bg-success text-white' };
         case 3: return { text: 'Anulado', class: 'bg-danger text-white' };
         case 4: return { text: 'Reprogramado', class: 'bg-info text-dark' };
-        case 5: return { text: 'Atendido / Confirmado', class: 'bg-success text-white' };
+        case 5: return { text: 'Cancelada', class: 'bg-danger text-white' };
         default: return { text: 'Otro', class: 'bg-secondary text-white' };
       }
     },
@@ -1555,6 +1582,26 @@ export default {
         this.filtroEstado = 0;
         this.filtroTipo = -1;
         this.cargarPaquetes(1);
+      }
+    },
+    'nuevaSesion.idProfesional'(newVal) {
+      if (this.paqueteSeleccionado && newVal) {
+        const esp = (this.paqueteSeleccionado.paquete_especialidad || '').toLowerCase();
+        const nombreRaw = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
+        const nombre = nombreRaw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const esSucamec = this.paqueteSeleccionado.idClasificacion == 9 || nombre.includes('sucamec');
+        
+        // Para híbridos no Sucamec, si cambia de doctor, verificar si el servicio seleccionado
+        // sigue siendo válido para la especialidad del doctor. Si no, limpiarlo.
+        if ((esp === 'hibrida' || nombre.includes('hibrid')) && !esSucamec) {
+          const doc = this.doctores.find(d => d.id == newVal);
+          if (doc) {
+            const precioActual = this.precios.find(p => p.id == this.nuevaSesion.tipo);
+            if (precioActual && precioActual.idClasificacion != doc.idProfesion) {
+              this.nuevaSesion.tipo = '';
+            }
+          }
+        }
       }
     }
   }

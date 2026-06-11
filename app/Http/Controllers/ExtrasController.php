@@ -661,8 +661,13 @@ class ExtrasController extends Controller
 				return response()->json(['error' => 'El horario ya fue reservado por otro usuario'], 409);
 			}
 
-		$num_citas = Appointment::where('idMembresia', '=', $request->get('idMembresia') )->count();
-			$request->merge(['num_sesion' => $num_citas+1 ]);
+			$num_citas = Appointment::where('idMembresia', '=', $request->get('idMembresia') )
+				->where(function($q) {
+					$q->whereIn('status', [1, 2])
+					->orWhere('attention_status', 'atendido');
+				})
+				->count();
+				$request->merge(['num_sesion' => $num_citas+1 ]);
 
 			$appointment->fill($request->all());
 			$appointment->active_slot = 1;
