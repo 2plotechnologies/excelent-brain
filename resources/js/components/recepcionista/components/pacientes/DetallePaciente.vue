@@ -1035,6 +1035,31 @@
                   </div>
                 </div>
               </div>
+              
+              <!-- NUEVOS PLANES DE INTERVENCIÓN -->
+              <div class="col-md-6">
+                <div class="card h-100 border rounded-lg hover-shadow transition" style="cursor: pointer; background-color: #f0f8ff;" @click="abrirPlanAnsiedad">
+                  <div class="card-body text-center p-5">
+                    <div class="rounded-circle bg-primary text-white shadow-sm d-flex justify-content-center align-items-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                      <i class="fas fa-brain fs-4"></i>
+                    </div>
+                    <h5 class="font-weight-bold text-primary mb-2">Plan de intervención: Ansiedad</h5>
+                    <p class="text-muted small mb-0">Basado en autotriaje y escalas (GAD-7)</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="card h-100 border rounded-lg hover-shadow transition" style="cursor: pointer; background-color: #fdf5e6;" @click="abrirPlanDepresion">
+                  <div class="card-body text-center p-5">
+                    <div class="rounded-circle bg-warning text-white shadow-sm d-flex justify-content-center align-items-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                      <i class="fas fa-sad-tear fs-4"></i>
+                    </div>
+                    <h5 class="font-weight-bold text-warning mb-2" style="color: #d39e00 !important;">Plan de intervención: Depresión</h5>
+                    <p class="text-muted small mb-0">Basado en autotriaje y escalas (PHQ-9)</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1240,6 +1265,239 @@
           <div v-else class="alert alert-light border text-center p-5 rounded-lg">
             <i class="fas fa-file-alt text-muted mb-3 fs-1"></i>
             <h6 class="text-muted">No hay fichas históricas registradas para este paciente.</h6>
+          </div>
+        </div>
+
+        <div v-if="fichaView === 'ansiedad'">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="font-weight-bold mb-0 text-primary"><i class="fas fa-brain me-2"></i> Plan de Intervención: Ansiedad</h5>
+            <button class="btn btn-light btn-sm rounded shadow-sm border" @click="fichaView = 'botones'">
+              Volver
+            </button>
+          </div>
+
+          <!-- Card for Patient Data and Autotriaje -->
+          <div class="card border-0 shadow-sm rounded-lg mb-4" style="background-color: #fcfcfc;">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                 <h6 class="font-weight-bold"><i class="fas fa-user me-2"></i> Datos del Paciente</h6>
+                 <button class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm" @click="cargarAutotriaje" :disabled="loadingAutotriaje">
+                   <i class="fas fa-sync-alt me-1" :class="{'fa-spin': loadingAutotriaje}"></i> Cargar Datos de Autotriaje
+                 </button>
+              </div>
+              <div class="row small mb-3">
+                 <div class="col-md-6 mb-2"><strong>Paciente:</strong> {{ paciente.name }} {{ paciente.nombres }}</div>
+                 <div class="col-md-3 mb-2"><strong>DNI:</strong> {{ paciente.dni }}</div>
+                 <div class="col-md-3 mb-2"><strong>Edad:</strong> <span v-if="paciente.birth_date">{{ getAge(paciente.birth_date) }} años</span></div>
+                 <div class="col-md-6 mb-2"><strong>Teléfono:</strong> {{ paciente.phone }}</div>
+              </div>
+
+              <!-- Puntajes Autotriaje -->
+              <div v-if="respuestasAutotriaje" class="alert alert-info border-0 shadow-sm mt-3 mb-0">
+                <h6 class="font-weight-bold text-info border-bottom border-info pb-2 mb-2"><i class="fas fa-chart-line me-2"></i> Resultados de Autotriaje</h6>
+                <div class="row">
+                   <div class="col-md-3"><strong>GAD-7 (Ansiedad):</strong> {{ sumarArray(respuestasAutotriaje.gad7) }} pts</div>
+                   <div class="col-md-3"><strong>PHQ-9 (Depresión):</strong> {{ sumarArray(respuestasAutotriaje.phq9) }} pts</div>
+                   <div class="col-md-3"><strong>Y-BOCS (TOC):</strong> {{ sumarArray(respuestasAutotriaje.ybocs) }} pts</div>
+                   <div class="col-md-3"><strong>Riesgo Suicida:</strong> {{ tieneRiesgoSuicida(respuestasAutotriaje.seguridad) ? 'Sí' : 'No' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form to Select Diagnosis -->
+          <div class="card border-0 shadow-sm rounded-lg mb-4" style="background-color: #fcfcfc;">
+            <div class="card-body p-4">
+              <h6 class="font-weight-bold mb-3 text-dark"><i class="fas fa-stethoscope me-2"></i> 1. Diagnóstico de Ansiedad</h6>
+              <div class="mb-3">
+                <select class="form-select" v-model="planAnsiedad.diagnostico">
+                   <option value="" disabled>Seleccione el diagnóstico...</option>
+                   <option value="TAG">Trastorno de Ansiedad Generalizada (TAG) [F41.1]</option>
+                   <option value="Fobica">Ansiedad Fóbica (Fobia Específica / Social / Agorafobia) [F40.x]</option>
+                   <option value="Panico">Trastorno de Pánico (con o sin Agorafobia) [F41.0]</option>
+                   <option value="TEPT">Trastorno de Estrés Postraumático (TEPT) [F43.1]</option>
+                   <option value="Mixto">Trastorno Mixto Ansioso-Depresivo [F41.2]</option>
+                </select>
+              </div>
+              <div class="mb-3" v-if="planAnsiedad.diagnostico">
+                <label class="form-label small font-weight-bold text-muted">Nivel de Severidad</label>
+                <select class="form-select form-select-sm w-auto" v-model="planAnsiedad.severidad">
+                   <option value="Leve">Leve</option>
+                   <option value="Moderado">Moderado</option>
+                   <option value="Grave">Grave</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Flow / Document Preview -->
+          <div class="card border-0 shadow-sm rounded-lg mb-4" v-if="planAnsiedad.diagnostico">
+             <div class="card-body p-4">
+                <h6 class="font-weight-bold mb-3 text-dark"><i class="fas fa-file-invoice me-2"></i> Resumen del Plan de Tratamiento</h6>
+                <div class="table-responsive">
+                   <table class="table table-bordered small">
+                     <thead class="bg-light">
+                       <tr>
+                         <th>Componente</th>
+                         <th>Psiquiatría</th>
+                         <th>Psicología / Psicoterapia</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       <tr>
+                         <td class="font-weight-bold">Evaluación Inicial</td>
+                         <td>{{ getPlanAnsiedadContent(planAnsiedad.diagnostico).psiquiatria.evaluacion }}</td>
+                         <td>{{ getPlanAnsiedadContent(planAnsiedad.diagnostico).psicologia.evaluacion }}</td>
+                       </tr>
+                       <tr>
+                         <td class="font-weight-bold">Medicación</td>
+                         <td>{{ getPlanAnsiedadContent(planAnsiedad.diagnostico).psiquiatria.medicacion }}</td>
+                         <td>{{ getPlanAnsiedadContent(planAnsiedad.diagnostico).psicologia.medicacion }}</td>
+                       </tr>
+                       <tr>
+                         <td class="font-weight-bold">Tipo de terapia</td>
+                         <td>{{ getPlanAnsiedadContent(planAnsiedad.diagnostico).psiquiatria.terapia }}</td>
+                         <td>{{ getPlanAnsiedadContent(planAnsiedad.diagnostico).psicologia.terapia }}</td>
+                       </tr>
+                       <tr>
+                         <td class="font-weight-bold">Número de sesiones y duración</td>
+                         <td>{{ getPlanAnsiedadContent(planAnsiedad.diagnostico).psiquiatria.sesiones }}</td>
+                         <td>{{ getPlanAnsiedadContent(planAnsiedad.diagnostico).psicologia.sesiones }}</td>
+                       </tr>
+                       <tr>
+                         <td class="font-weight-bold">¿Qué aprenderás?</td>
+                         <td>{{ getPlanAnsiedadContent(planAnsiedad.diagnostico).psiquiatria.aprendizaje }}</td>
+                         <td>{{ getPlanAnsiedadContent(planAnsiedad.diagnostico).psicologia.aprendizaje }}</td>
+                       </tr>
+                       <tr>
+                         <td class="font-weight-bold">Meta del tratamiento</td>
+                         <td colspan="2" class="text-center">{{ getPlanAnsiedadContent(planAnsiedad.diagnostico).meta }}</td>
+                       </tr>
+                     </tbody>
+                   </table>
+                </div>
+             </div>
+          </div>
+
+          <div class="d-flex justify-content-end mb-4" v-if="planAnsiedad.diagnostico">
+             <button class="btn btn-success rounded-pill px-4" @click="enviarPlanAnsiedadWhatsapp">
+                <i class="fab fa-whatsapp me-2"></i> Enviar Hoja Informativa por WhatsApp
+             </button>
+          </div>
+        </div>
+
+        <div v-if="fichaView === 'depresion'">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="font-weight-bold mb-0 text-warning" style="color: #d39e00 !important;"><i class="fas fa-sad-tear me-2"></i> Plan de Intervención: Depresión</h5>
+            <button class="btn btn-light btn-sm rounded shadow-sm border" @click="fichaView = 'botones'">
+              Volver
+            </button>
+          </div>
+
+          <!-- Card for Patient Data and Autotriaje -->
+          <div class="card border-0 shadow-sm rounded-lg mb-4" style="background-color: #fcfcfc;">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                 <h6 class="font-weight-bold"><i class="fas fa-user me-2"></i> Datos del Paciente</h6>
+                 <button class="btn btn-warning text-white btn-sm rounded-pill px-3 shadow-sm" style="background-color: #d39e00; border-color: #d39e00;" @click="cargarAutotriajeDepresion" :disabled="loadingAutotriaje">
+                   <i class="fas fa-sync-alt me-1" :class="{'fa-spin': loadingAutotriaje}"></i> Cargar Datos de Autotriaje
+                 </button>
+              </div>
+              <div class="row small mb-3">
+                 <div class="col-md-6 mb-2"><strong>Paciente:</strong> {{ paciente.name }} {{ paciente.nombres }}</div>
+                 <div class="col-md-3 mb-2"><strong>DNI:</strong> {{ paciente.dni }}</div>
+                 <div class="col-md-3 mb-2"><strong>Edad:</strong> <span v-if="paciente.birth_date">{{ getAge(paciente.birth_date) }} años</span></div>
+                 <div class="col-md-6 mb-2"><strong>Teléfono:</strong> {{ paciente.phone }}</div>
+              </div>
+
+              <!-- Puntajes Autotriaje -->
+              <div v-if="respuestasAutotriaje" class="alert alert-warning border-0 shadow-sm mt-3 mb-0" style="background-color: #fff3cd; color: #856404;">
+                <h6 class="font-weight-bold border-bottom pb-2 mb-2" style="border-color: #ffeeba !important;"><i class="fas fa-chart-line me-2"></i> Resultados de Autotriaje</h6>
+                <div class="row">
+                   <div class="col-md-3"><strong>PHQ-9 (Depresión):</strong> {{ sumarArray(respuestasAutotriaje.phq9) }} pts</div>
+                   <div class="col-md-3"><strong>GAD-7 (Ansiedad):</strong> {{ sumarArray(respuestasAutotriaje.gad7) }} pts</div>
+                   <div class="col-md-3"><strong>Y-BOCS (TOC):</strong> {{ sumarArray(respuestasAutotriaje.ybocs) }} pts</div>
+                   <div class="col-md-3"><strong>Riesgo Suicida:</strong> <span :class="{'text-danger font-weight-bold': tieneRiesgoSuicida(respuestasAutotriaje.seguridad)}">{{ tieneRiesgoSuicida(respuestasAutotriaje.seguridad) ? 'Sí' : 'No' }}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form to Select Diagnosis & Severity -->
+          <div class="card border-0 shadow-sm rounded-lg mb-4" style="background-color: #fcfcfc;">
+            <div class="card-body p-4">
+              <h6 class="font-weight-bold mb-3 text-dark"><i class="fas fa-stethoscope me-2"></i> 1. Diagnóstico y Nivel de Severidad</h6>
+              <div class="mb-3">
+                <label class="form-label small font-weight-bold text-muted">Diagnóstico</label>
+                <select class="form-select" v-model="planDepresion.diagnostico" disabled>
+                   <option value="Episodio Depresivo">Episodio Depresivo (CIE-10: F32._)</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small font-weight-bold text-muted">Nivel de Severidad</label>
+                <select class="form-select form-select-sm w-auto" v-model="planDepresion.severidad">
+                   <option value="Leve">LEVE (PHQ-9: 5 - 9)</option>
+                   <option value="Moderado">MODERADA (PHQ-9: 10 - 14)</option>
+                   <option value="Grave">GRAVE (PHQ-9: ≥ 15)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Flow / Document Preview -->
+          <div class="card border-0 shadow-sm rounded-lg mb-4" v-if="planDepresion.severidad">
+             <div class="card-body p-4">
+                <h6 class="font-weight-bold mb-3 text-dark"><i class="fas fa-file-invoice me-2"></i> Resumen del Plan de Tratamiento</h6>
+                <div class="table-responsive">
+                   <table class="table table-bordered small">
+                     <thead class="bg-light">
+                       <tr>
+                         <th>Componente</th>
+                         <th>Psiquiatría</th>
+                         <th>Psicología / Psicoterapia</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       <tr>
+                         <td class="font-weight-bold">Evaluación Inicial / Tipo de terapia principal</td>
+                         <td>{{ getPlanDepresionContent(planDepresion.severidad).psiquiatria.primera_consulta }}</td>
+                         <td>{{ getPlanDepresionContent(planDepresion.severidad).psicologia.tipo_terapia }}</td>
+                       </tr>
+                       <tr>
+                         <td class="font-weight-bold">Medicación / Número de sesiones</td>
+                         <td>{{ getPlanDepresionContent(planDepresion.severidad).psiquiatria.medicacion }}</td>
+                         <td>{{ getPlanDepresionContent(planDepresion.severidad).psicologia.sesiones }}</td>
+                       </tr>
+                       <tr>
+                         <td class="font-weight-bold">Frecuencia de controles / Duración total</td>
+                         <td>{{ getPlanDepresionContent(planDepresion.severidad).psiquiatria.controles }}</td>
+                         <td>{{ getPlanDepresionContent(planDepresion.severidad).psicologia.duracion }}</td>
+                       </tr>
+                       <tr>
+                         <td class="font-weight-bold">Duración del tratamiento / Formato de sesiones</td>
+                         <td>{{ getPlanDepresionContent(planDepresion.severidad).psiquiatria.duracion_tratamiento }}</td>
+                         <td>{{ getPlanDepresionContent(planDepresion.severidad).psicologia.formato }}</td>
+                       </tr>
+                       <tr>
+                         <td class="font-weight-bold">Criterio de respuesta / ¿Qué aprenderás?</td>
+                         <td>{{ getPlanDepresionContent(planDepresion.severidad).psiquiatria.respuesta }}</td>
+                         <td>{{ getPlanDepresionContent(planDepresion.severidad).psicologia.aprendizaje }}</td>
+                       </tr>
+                       <tr>
+                         <td class="font-weight-bold">Derivación / Evaluación de resultados</td>
+                         <td>{{ getPlanDepresionContent(planDepresion.severidad).psiquiatria.derivacion }}</td>
+                         <td>{{ getPlanDepresionContent(planDepresion.severidad).psicologia.evaluacion }}</td>
+                       </tr>
+                     </tbody>
+                   </table>
+                </div>
+             </div>
+          </div>
+
+          <div class="d-flex justify-content-end mb-4" v-if="planDepresion.severidad">
+             <button class="btn btn-warning text-white rounded-pill px-4" style="background-color: #d39e00; border-color: #d39e00;" @click="enviarPlanDepresionWhatsapp">
+                <i class="fab fa-whatsapp me-2"></i> Enviar Hoja Informativa por WhatsApp
+             </button>
           </div>
         </div>
       </div>
@@ -2051,6 +2309,16 @@ export default {
       filtroDocumento: 'Todos',
       nuevoDocumentoTipo: '',
       subiendoDocumento: false,
+      loadingAutotriaje: false,
+      respuestasAutotriaje: null,
+      planAnsiedad: {
+         diagnostico: '',
+         severidad: 'Leve'
+      },
+      planDepresion: {
+         diagnostico: 'Episodio Depresivo',
+         severidad: 'Leve'
+      },
       queId: null,
       misHobbies: [],
       hobbies: ['pintura','dibujo', 'fotografía', 'tejido', 'costura', 'joyería', 'senderismo', 'acampar', 'jardinería', 'pesca', 'ciclismo', 'deportes', 'fútbol', 'basket', 'tenis', 'ajedrez', 'juegos de mesa', 'billar', 'música', 'tocar un instrumento', 'canto', 'composición musical', 'producción musical', 'gastronomía', 'cocina', 'recetas', 'horneado', 'postres', 'manualidades', 'origami', 'modelodo en arcilla', 'creación', 'natación', 'surf', 'kayac', 'buceo', 'esquí', 'tecnología', 'programación', 'robótica', 'computación', 'edición de videos', 'diseño gráfico', 'coleccionismo', 'monedas', 'vinilos', 'baile', 'danzas', 'escritura', 'periodismo', 'poesía', 'libros', 'lectura', 'cuentos', 'idiomas', 'viajes', 'exploración de lugares', 'fitnes', 'gym', 'yoga', 'pilates', 'entrenamiento', 'meditación', 'voluntariado', 'mascotas', 'animalista', 'astronomía', 'jardinería', 'plantas', 'huertos', 'paisajes', 'cine', 'series', 'novelas'],
@@ -2188,6 +2456,254 @@ export default {
     previewItems(text) {
       if (!text) return [];
       return text.split('\n').filter(line => line.trim() !== '').slice(0, 3);
+    },
+    abrirPlanAnsiedad() {
+      this.fichaView = 'ansiedad';
+    },
+    abrirPlanDepresion() {
+      this.fichaView = 'depresion';
+    },
+    async cargarAutotriajeDepresion() {
+      this.loadingAutotriaje = true;
+      try {
+        const response = await this.axios.get(`/api/pacientes/${this.paciente.id}/ultimo-autotriaje`);
+        this.respuestasAutotriaje = response.data.data;
+        
+        // Pre-select based on PHQ-9 score
+        const phq9Score = this.sumarArray(this.respuestasAutotriaje.phq9);
+        if(phq9Score >= 15) {
+           this.planDepresion.severidad = 'Grave';
+        } else if(phq9Score >= 10) {
+           this.planDepresion.severidad = 'Moderado';
+        } else {
+           this.planDepresion.severidad = 'Leve';
+        }
+      } catch (e) {
+        if (e.response && e.response.status === 404) {
+          alert('El paciente aún no ha completado el autotriaje.');
+        } else {
+          alert('Error al cargar datos del autotriaje.');
+        }
+      } finally {
+        this.loadingAutotriaje = false;
+      }
+    },
+    async cargarAutotriaje() {
+      this.loadingAutotriaje = true;
+      try {
+        const response = await this.axios.get(`/api/pacientes/${this.paciente.id}/ultimo-autotriaje`);
+        this.respuestasAutotriaje = response.data.data;
+        
+        // Pre-select based on GAD-7 score
+        const gad7Score = this.sumarArray(this.respuestasAutotriaje.gad7);
+        if(gad7Score >= 5) {
+           this.planAnsiedad.diagnostico = 'TAG';
+           if(gad7Score >= 15) this.planAnsiedad.severidad = 'Grave';
+           else if(gad7Score >= 10) this.planAnsiedad.severidad = 'Moderado';
+           else this.planAnsiedad.severidad = 'Leve';
+        }
+        
+      } catch (e) {
+        if (e.response && e.response.status === 404) {
+          alert('El paciente aún no ha completado el autotriaje.');
+        } else {
+          alert('Error al cargar datos del autotriaje.');
+        }
+      } finally {
+        this.loadingAutotriaje = false;
+      }
+    },
+    sumarArray(arr) {
+      if (!arr) return 0;
+      const values = Object.values(arr);
+      return values.reduce((sum, val) => sum + parseInt(val || 0, 10), 0);
+    },
+    tieneRiesgoSuicida(seguridad) {
+      if(!seguridad) return false;
+      return Object.values(seguridad).some(val => val === 'Sí' || val === 'si' || val === 'SI');
+    },
+    getPlanAnsiedadContent(diag) {
+       const planes = {
+          'TAG': {
+             nombre: 'Trastorno de Ansiedad Generalizada (TAG)',
+             psiquiatria: {
+                evaluacion: 'Evaluación clínica, GAD-7, BAI. Diagnóstico diferencial (tiroides, cardiovascular).',
+                medicacion: 'ISRS: Escitalopram 10-20 mg/día o Sertralina 50-150 mg/día. Alternativa: Venlafaxina 75-225 mg/día. Buspirona 15-60 mg/día como coadyuvante.',
+                terapia: 'Control médico a las 2-4 semanas del inicio. Evaluar efectos adversos y respuesta.',
+                sesiones: 'Seguimiento mensual. Duración: 6-12 meses post remisión.',
+                aprendizaje: 'A reconocer los síntomas físicos de la ansiedad y cómo responder a ellos.'
+             },
+             psicologia: {
+                evaluacion: 'Evaluación psicológica, encuadre terapéutico y psicoeducación sobre el ciclo de ansiedad.',
+                medicacion: 'No aplica. La psicoterapia es tratamiento de primera línea.',
+                terapia: 'TCC: reestructuración cognitiva, tolerancia a la incertidumbre, resolución de problemas. ACT / Mindfulness Based Stress Reduction (MBSR).',
+                sesiones: '12 a 20 sesiones individuales. Duración: 4-6 meses (sesiones semanales de 50 min).',
+                aprendizaje: 'Identificar y cuestionar pensamientos catastrofistas. Aceptar la incertidumbre sin evitar. Técnicas de relajación muscular progresiva. Mindfulness aplicado a la preocupación.'
+             },
+             meta: 'GAD-7 < 5 (remisión) mantenida 3+ meses. Reducción ≥ 50% en GAD-7. Retomar actividades evitadas. Mejora en calidad de vida.'
+          },
+          'Fobica': {
+             nombre: 'Ansiedad Fóbica (Fobia Específica / Social / Agorafobia)',
+             psiquiatria: {
+                evaluacion: 'Evaluación clínica, tipo de fobia, impacto funcional. BAI/SPIN/LSAS. Descartar causas médicas.',
+                medicacion: 'Fobia social: ISRS (Paroxetina 20-60 mg, Sertralina 50-150 mg) o Venlafaxina. Fobia específica: generalmente sin medicación crónica. Beta-bloqueadores situacionales (propranolol) si procede. Benzodiacepinas: máximo a corto plazo.',
+                terapia: 'Seguimiento mensual. Fobia social: 6-12 meses. Fobia específica: generalmente más breve.',
+                sesiones: 'Controles a las 4 y 8 semanas, luego mensual.',
+                aprendizaje: 'A comprender la base neurológica del miedo y cómo el cerebro puede aprender a no temerlo.'
+             },
+             psicologia: {
+                evaluacion: 'Jerarquía de situaciones temidas. Encuadre de exposición gradual. Psicoeducación.',
+                medicacion: 'No aplica como tratamiento principal. La exposición es el tratamiento de elección.',
+                terapia: 'TCC con Exposición Graduada (ERP): exposición sistemática y progresiva a la situación temida. EMDR si hay componente traumático. Entrenamiento en habilidades sociales (fobia social).',
+                sesiones: 'Fobia específica: 6-10 sesiones (8-12 semanas). Fobia social: 12-16 sesiones (4-5 meses).',
+                aprendizaje: 'Construcción de jerarquía de exposición. Enfrentar progresivamente las situaciones temidas. Habilidades de manejo de ansiedad. Reducción de conductas de seguridad. Reestructuración de creencias sobre el peligro.'
+             },
+             meta: 'Reducción de síntomas ≥ 50%. SPIN < 20 (fobia social). Exposición completa a la jerarquía sin evitación. Retornar vida normal.'
+          },
+          'Panico': {
+             nombre: 'Trastorno de Pánico (con o sin Agorafobia)',
+             psiquiatria: {
+                evaluacion: 'Evaluación cardiológica para descartar causas orgánicas. PDSS, BAI. Identificar agorafobia asociada.',
+                medicacion: 'ISRS: Escitalopram 10-20 mg, Paroxetina 20-60 mg o Sertralina 50-150 mg. Alternativa: Venlafaxina 75-225 mg. Clonazepam 0.5-1 mg solo en fase aguda inicial (máximo 4-6 semanas).',
+                terapia: 'Control a los 14 días, luego mensual. Evaluación de efectos adversos. Ajuste de dosis a las 4-6 semanas.',
+                sesiones: 'Medicación por 6-12 meses tras remisión. Retirada gradual.',
+                aprendizaje: 'A entender que las sensaciones físicas del pánico son incómodas pero no peligrosas.'
+             },
+             psicologia: {
+                evaluacion: 'Historia detallada de los ataques. Psicoeducación del ciclo del pánico. Encuadre de tratamiento.',
+                medicacion: 'No aplica como tratamiento principal.',
+                terapia: 'TCC con Exposición Interoceptiva: exposición sistemática a las sensaciones físicas temidas. Técnicas de respiración diafragmática. Reestructuración de interpretaciones catastróficas.',
+                sesiones: '10 a 15 sesiones individuales. Duración: 3-4 meses (sesiones semanales de 50 min).',
+                aprendizaje: 'El ciclo del pánico y cómo romperlo. Exposición a sensaciones físicas temidas sin catastrofizar. Respiración diafragmática y técnicas de regulación. Reducción de conductas de seguridad. Retomar actividades y lugares evitados.'
+             },
+             meta: 'Reducción ≥ 90% en frecuencia de ataques. PDSS < 5 mantenido 3+ meses. Ausencia de ataques. Eliminar evitación agorafóbica. Retomar vida plena sin restricciones.'
+          },
+          'TEPT': {
+             nombre: 'Trastorno de Estrés Postraumático (TEPT)',
+             psiquiatria: {
+                evaluacion: 'PCL-5, evaluación de riesgo (conductas autolesivas, abuso de sustancias). Médico + psicólogo en conjunto. Estabilización como primera fase.',
+                medicacion: 'ISRS de primera línea (aprobados para TEPT): Sertralina 50-200 mg o Paroxetina 20-60 mg. Prazosina (pesadillas severas). Venlafaxina como alternativa. EVITAR benzodiacepinas a largo plazo.',
+                terapia: 'Controles mensuales. Mínimo 12 meses de medicación tras remisión. Reevaluación continua del riesgo.',
+                sesiones: 'Seguimiento estrecho los primeros 3 meses. Luego mensual.',
+                aprendizaje: 'La medicación reduce la intensidad de los síntomas para que la terapia sea más efectiva.'
+             },
+             psicologia: {
+                evaluacion: 'Evaluación del trauma (tipo, intensidad, impacto). Psicoeducación del TEPT. Fase de estabilización y construcción de recursos.',
+                medicacion: 'No aplica como tratamiento principal. La psicoterapia especializada en trauma es el tratamiento de elección.',
+                terapia: 'EMDR (Eye Movement Desensitization and Reprocessing) - estándar de oro. Exposición Prolongada (EP) - Foa et al. Terapia de Procesamiento Cognitivo (TPC). TCC centrada en trauma.',
+                sesiones: 'EMDR: 8-12 sesiones (2-3 meses). EP / TPC: 12-16 sesiones (3-4 meses). Fase de estabilización previa si es necesario.',
+                aprendizaje: 'Psicoeducación sobre el trauma y el TEPT. Técnicas de regulación y estabilización emocional. Procesamiento del recuerdo traumático (sin revivirlo constantemente). Reconexión con el presente. Reconstrucción de la visión de uno mismo y del mundo.'
+             },
+             meta: 'PCL-5 < 33 mantenido. Ausencia de síntomas disociativos. Funcionamiento recuperado. Procesamiento completo del trauma. Retomar relaciones y actividades significativas.'
+          },
+          'Mixto': {
+             nombre: 'Trastorno Mixto Ansioso-Depresivo',
+             psiquiatria: {
+                evaluacion: 'PHQ-4, HADS, GAD-7, PHQ-9. Evaluar predominio (¿más ansioso o más depresivo?). Descartar causas médicas.',
+                medicacion: 'ISRS/IRSN de elección: Escitalopram 10-20 mg, Sertralina 50-150 mg o Venlafaxina 75-225 mg. Monitorear evolución del componente predominante. Revisar dosis a las 4-6 semanas.',
+                terapia: 'Control a las 2-4 semanas. Luego mensual. Ajuste según componente predominante. Duración: 6-12 meses.',
+                sesiones: 'Seguimiento continuo; reevaluar diagnóstico si los síntomas progresan hacia un cuadro puro.',
+                aprendizaje: 'Cómo la ansiedad y la depresión se retroalimentan y cómo el tratamiento las aborda de forma conjunta.'
+             },
+             psicologia: {
+                evaluacion: 'Evaluación integral. Psicoeducación del trastorno mixto. Encuadre terapéutico integrativo.',
+                medicacion: 'No aplica como tratamiento principal.',
+                terapia: 'TCC integrativa para ansiedad y depresión. Activación Conductual + Técnicas cognitivas. ACT (Terapia de Aceptación y Compromiso). MBCT (Terapia Cognitiva Basada en Mindfulness).',
+                sesiones: '12 a 16 sesiones individuales. Duración: 4-5 meses (sesiones semanales de 50 min).',
+                aprendizaje: 'Identificar el círculo vicioso ansiedad-depresión. Activación conductual y retoma de actividades. Reestructuración de pensamientos negativos. Mindfulness para desactivar la rumiación. Habilidades de regulación emocional.'
+             },
+             meta: 'PHQ-4 < 3. Remisión de ambos componentes. Funcionamiento pleno recuperado. GAD-7 < 5 y PHQ-9 < 5. Retoma plena de vida laboral, social y familiar.'
+          }
+       };
+       return planes[diag] || planes['TAG'];
+    },
+    enviarPlanAnsiedadWhatsapp() {
+       const plan = this.getPlanAnsiedadContent(this.planAnsiedad.diagnostico);
+       let texto = `Hola ${this.paciente.nombres}, desde el Centro Psicológico Excelentemente te compartimos la hoja informativa sobre tu Plan de Intervención para Ansiedad.\n\n`;
+       texto += `*Diagnóstico:* ${plan.nombre}\n`;
+       texto += `*Nivel de Severidad:* ${this.planAnsiedad.severidad}\n\n`;
+       texto += `*Resumen de tu tratamiento:*\n`;
+       texto += `*Psiquiatría:* ${plan.psiquiatria.medicacion}\n`;
+       texto += `*Psicología:* ${plan.psicologia.terapia}\n`;
+       texto += `*Sesiones:* ${plan.psicologia.sesiones}\n\n`;
+       texto += `*Tu Meta:* ${plan.meta}\n\n`;
+       texto += `Si tienes alguna consulta, no dudes en comunicarte con nosotros.`;
+       
+       const url = 'https://api.whatsapp.com/send?phone=51' + this.paciente.phone + '&text=' + encodeURIComponent(texto);
+       window.open(url, '_blank');
+    },
+    getPlanDepresionContent(severidad) {
+       const planes = {
+          'Leve': {
+             psiquiatria: {
+                primera_consulta: 'Evaluación clínica integral, PHQ-9, psicoeducación y plan de vigilancia activa.',
+                medicacion: 'Generalmente NO se indica medicación. Se ofrece como alternativa si la psicoterapia no es accesible o si hay recaída previa.',
+                controles: 'Control a las 2 semanas, luego mensual. PHQ-9 cada 4 semanas.',
+                respuesta: 'No aplica en la mayoría de casos.',
+                duracion_tratamiento: '3 a 6 meses de seguimiento.',
+                derivacion: 'Centro Excelentemente (ambulatorio).'
+             },
+             psicologia: {
+                tipo_terapia: 'Terapia Cognitivo-Conductual (TCC) breve, Activación Conductual, Psicoeducación individual.',
+                sesiones: '6 a 8 sesiones individuales (+ psicoeducación grupal si disponible).',
+                duracion: '10 a 12 semanas (sesiones semanales o quincenales).',
+                formato: 'Individual, 45-50 min. Puede ser presencial o teleconsulta.',
+                aprendizaje: '- Identificar pensamientos negativos. - Retomar actividades placenteras. - Mejorar sueño e higiene. - Habilidades básicas de relajación.',
+                evaluacion: 'PHQ-9 cada 4 sesiones. Meta: reducción ≥ 50% a sesión 6.'
+             }
+          },
+          'Moderado': {
+             psiquiatria: {
+                primera_consulta: 'Evaluación integral, PHQ-9. Inicio urgente de antidepresivo (ISRS/IRSN) + psicoeducación.',
+                medicacion: 'Se recomienda: Sertralina 50 mg/día o Escitalopram 10 mg/día. Inicio progresivo (mitad de dosis 1era semana).',
+                controles: 'Control a los 14 días (semana 2 y 4), luego mensual. PHQ-9 en semana 2, 6 y 12.',
+                respuesta: 'Respuesta: reducción ≥ 50% en PHQ-9 a las 6-8 semanas. Sin respuesta (<30%), ajuste de dosis o cambio.',
+                duracion_tratamiento: '6 a 12 meses (incluyendo fase de mantenimiento). Primer episodio: mínimo 6 meses tras remisión.',
+                derivacion: 'Centro Excelentemente (ambulatorio). Clínica de Día si hay deterioro funcional marcado.'
+             },
+             psicologia: {
+                tipo_terapia: 'Terapia Cognitivo-Conductual (TCC) o Terapia Interpersonal (TIP) (basadas en evidencia).',
+                sesiones: '12 a 16 sesiones individuales (+ sesiones familiares si se requiere).',
+                duracion: '4 a 5 meses (sesiones semanales).',
+                formato: 'Individual, 50 min. + sesiones con familiar (30 min. si aplica).',
+                aprendizaje: '- Reestructuración cognitiva. - Resolución de problemas. - Habilidades interpersonales. - Manejo de emociones. - Prevención de recaídas.',
+                evaluacion: 'PHQ-9 cada 4 semanas. Meta: PHQ-9 < 5 (remisión) al mes 4.'
+             }
+          },
+          'Grave': {
+             psiquiatria: {
+                primera_consulta: 'Evaluación de riesgo suicida, PHQ-9. Inicio urgente de medicación + plan de seguridad personal.',
+                medicacion: 'Se recomienda: medicación antidepresiva obligatoria. Se evalúa combinación o aumentación si hay síntomas psicóticos o riesgo alto.',
+                controles: 'Control semanal las primeras 4 semanas, luego quincenal. PHQ-9 semanal en fase aguda.',
+                respuesta: 'Respuesta esperada en 4-6 semanas. Sin mejoría, aumento de dosis, cambio de fármaco o derivación a HNRPP.',
+                duracion_tratamiento: '12 a 24 meses o más. Seguimiento intensivo. Se evalúa Clínica de Día si riesgo moderado-grave.',
+                derivacion: 'Centro Excelentemente + Clínica de Día. Derivación a HNRPP (EsSalud) o CSMC si requiere hospitalización.'
+             },
+             psicologia: {
+                tipo_terapia: 'TCC intensiva + Activación Conductual, Terapia Dialéctica Conductual (DBT) si hay riesgo, TIP o ACT según evaluación.',
+                sesiones: '16 a 20 sesiones individuales (+ sesiones familiares y grupales).',
+                duracion: '5 a 6 meses o más (sesiones semanales o más frecuentes).',
+                formato: 'Individual (50-60 min.) + grupal + familiar. Teleconsulta disponible para mantenimiento.',
+                aprendizaje: '- Tolerancia al malestar (DBT). - Regulación emocional avanzada. - Plan de seguridad personal. - Mindfulness aplicado. - Reconstrucción de red de apoyo.',
+                evaluacion: 'PHQ-9 semanal en fase aguda. Meta: estabilización y ausencia de riesgo.'
+             }
+          }
+       };
+       return planes[severidad] || planes['Leve'];
+    },
+    enviarPlanDepresionWhatsapp() {
+       const plan = this.getPlanDepresionContent(this.planDepresion.severidad);
+       let texto = `Hola ${this.paciente.nombres}, desde el Centro Psicológico Excelentemente te compartimos la hoja informativa sobre tu Plan de Intervención para Depresión.\n\n`;
+       texto += `*Diagnóstico:* Episodio Depresivo\n`;
+       texto += `*Nivel de Severidad:* ${this.planDepresion.severidad}\n\n`;
+       texto += `*Resumen de tu tratamiento:*\n`;
+       texto += `*Psiquiatría:* ${plan.psiquiatria.medicacion}\n`;
+       texto += `*Psicología:* ${plan.psicologia.tipo_terapia}\n`;
+       texto += `*Sesiones:* ${plan.psicologia.sesiones}\n\n`;
+       texto += `Si tienes alguna consulta, no dudes en comunicarte con nosotros.`;
+       
+       const url = 'https://api.whatsapp.com/send?phone=51' + this.paciente.phone + '&text=' + encodeURIComponent(texto);
+       window.open(url, '_blank');
     },
     abrirNuevoPlan() {
       this.nuevoPlanSeguridad = {
