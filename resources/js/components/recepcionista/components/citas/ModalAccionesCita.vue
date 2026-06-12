@@ -170,11 +170,10 @@
               <i class="fas fa-sync-alt mr-2"></i> Reprogramar
             </button>
 
-            <button @click="$emit('eliminar', cita.id)" class="btn btn-action btn-outline-danger" data-bs-dismiss="modal">
+            <button @click="$emit('eliminar', cita.id)" class="btn btn-action btn-outline-danger" data-bs-dismiss="modal" :disabled="tienePago" :title="tienePago ? 'No se puede cancelar una cita con pago o adelanto' : ''">
               <i class="fas fa-times-circle mr-2"></i> Cancelar
             </button>
-
-            <button v-if="cita.status != 3" @click="$emit('openModal', cita, targetEstado, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetEstado" class="btn btn-action btn-outline-secondary">
+            <button v-if="cita.status != 3" @click="$emit('openModal', cita, targetEstado, indiceElegido)" data-bs-toggle="modal" :data-bs-target="targetEstado" class="btn btn-action btn-outline-secondary" :disabled="tienePago" :title="tienePago ? 'No se puede anular una cita con pago o adelanto' : ''">
               <i class="fas fa-ban mr-2"></i> Anular
             </button>
 
@@ -253,6 +252,12 @@ export default {
       },
       immediate: true,
       deep: true
+    }
+  },
+  computed: {
+    tienePago() {
+      if (!this.cita || !this.cita.payment) return false;
+      return this.cita.payment.pay_status === 2 || parseFloat(this.cita.payment.adelanto) > 0;
     }
   },
   methods: {

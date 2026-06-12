@@ -28,7 +28,7 @@
 							<select class="form-select custom-select status-appointment" name="status" id="status" v-model="dataCit.status">
 								<option value="1">Sin Confirmar</option>
 								<option value="2">Confirmar cita</option>
-								<option value="3">Anular cita</option>
+								<option value="3" :disabled="tienePago">Anular cita</option>
 							</select>
             </div>
             
@@ -67,6 +67,15 @@ import alertify from 'alertifyjs';
     methods:{
       update(){
 				const statusDropdown = this.$el.querySelector(".status-appointment");
+				if (statusDropdown && statusDropdown.value == 3 && this.tienePago) {
+					this.$swal.fire({
+						title: 'Acción bloqueada',
+						text: 'No se puede anular una cita que tiene adelanto o pago completo.',
+						icon: 'error',
+						confirmButtonText: 'Aceptar'
+					});
+					return;
+				}
 				if(statusDropdown && statusDropdown.value == 3 && this.motivo==''){
 					alertify.notify('<i class="fa-solid fa-skull-crossbones"></i> Debe ingresar un motivo para anular la cita' , 'danger', 10);
 				}else{
@@ -125,6 +134,10 @@ import alertify from 'alertifyjs';
     computed: {
       updateStatu () {
         return this.data = this.dataCit
+      },
+      tienePago() {
+        if (!this.dataCit || !this.dataCit.payment) return false;
+        return this.dataCit.payment.pay_status === 2 || parseFloat(this.dataCit.payment.adelanto) > 0;
       }
     },
 

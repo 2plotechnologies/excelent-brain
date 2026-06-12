@@ -35,15 +35,45 @@
 			</div>
 		</div>
 
-		<!-- Filtros por profesión (Opcional, si existen en los datos) -->
-		<div class="d-flex mb-3 gap-2 flex-wrap align-items-center">
-			<span class="text-muted small font-weight-bold me-1">Filtrar:</span>
-			<button class="btn btn-sm rounded-pill font-weight-bold" 
-							:class="filtroActual == 'Todos' ? 'btn-primary' : 'btn-light text-muted border'" 
-							@click="filtroActual = 'Todos'">Todos</button>
-			<button v-for="prof in profesionesUnicas" :key="prof" class="btn btn-sm rounded-pill font-weight-bold" 
-							:class="filtroActual == prof ? 'btn-primary' : 'btn-light text-muted border'" 
-							@click="filtroActual = prof">{{ prof }}</button>
+		<!-- Filtros por profesión (Opcional, si existen en los datos) y buscador. -->
+		<div class="d-flex mb-3 gap-3 flex-wrap align-items-center justify-content-between">
+			<div class="d-flex gap-2 flex-wrap align-items-center">
+				<span class="text-muted small font-weight-bold me-1">Filtrar:</span>
+				<button class="btn btn-sm rounded-pill font-weight-bold shadow-sm" 
+								:class="filtroActual == 'Todos' ? 'btn-primary' : 'btn-light text-muted border'" 
+								@click="filtroActual = 'Todos'">Todos</button>
+				<button v-for="prof in profesionesUnicas" :key="prof" class="btn btn-sm rounded-pill font-weight-bold shadow-sm" 
+								:class="filtroActual == prof ? 'btn-primary' : 'btn-light text-muted border'" 
+								@click="filtroActual = prof">{{ prof }}</button>
+				
+				<!-- Buscador de profesionales -->
+				<div class="position-relative ms-2" style="width: 250px;">
+					<input type="text" class="form-control form-control-sm rounded-pill ps-4 shadow-sm border" 
+						placeholder="Buscar profesional por nombre..." 
+						v-model="busquedaDoctor">
+					<i class="fas fa-search position-absolute text-muted" style="left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.85rem;"></i>
+					<button v-if="busquedaDoctor" @click="busquedaDoctor = ''" class="btn btn-sm position-absolute text-muted border-0 p-0 px-2" style="right: 8px; top: 50%; transform: translateY(-50%); height: 100%;">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+			</div>
+
+			<!-- Botones de navegación de columnas (cuadro en cuadro). -->
+			<div class="d-flex gap-2 align-items-center">
+				<span class="text-muted small font-weight-bold me-1">Desplazar:</span>
+				<button class="btn btn-sm btn-outline-primary rounded-circle border shadow-sm d-flex align-items-center justify-content-center" 
+					style="width: 30px; height: 30px;"
+					@click="scrollColumnas(-1)" 
+					title="Columna anterior">
+					<i class="fas fa-chevron-left" style="font-size: 0.8rem;"></i>
+				</button>
+				<button class="btn btn-sm btn-outline-primary rounded-circle border shadow-sm d-flex align-items-center justify-content-center" 
+					style="width: 30px; height: 30px;"
+					@click="scrollColumnas(1)" 
+					title="Siguiente columna">
+					<i class="fas fa-chevron-right" style="font-size: 0.8rem;"></i>
+				</button>
+			</div>
 		</div>
 
 		<!-- Contenedor del Calendario Grid -->
@@ -263,6 +293,7 @@
 			sedes: [],
 			tooltipData: null,
 			tooltipStyle: { top: '0px', left: '0px', position: 'fixed', zIndex: 1055, pointerEvents: 'none', minWidth: '150px', maxWidth: '250px' },
+			busquedaDoctor: '',
 		}},
 		props:[ 'nombreUser', 'idSede'],
 		components: { PagoModal, ModalEstadoCita, ModalNuevaCita, ModalPatient, InfoModal, ReprogModal, ModalSearchPatient, ModalIntercambio, modalVerRecetas, modalTiemposEspera, ModalAccionesCita, ModalMoverVacio },
@@ -274,6 +305,10 @@
 			doctoresFiltrados() {
 				let filtrados = this.doctores;
 				if(this.filtroActual !== 'Todos') filtrados = this.doctores.filter(d => d.profession === this.filtroActual);
+				if(this.busquedaDoctor && this.busquedaDoctor.trim() !== '') {
+					const query = this.busquedaDoctor.toLowerCase();
+					filtrados = filtrados.filter(d => (d.name || '').toLowerCase().includes(query) || (d.profession && d.profession.toLowerCase().includes(query)));
+				}
 				return filtrados.filter(d => d.horarios && d.horarios.length > 0);
 			},
 			esSoloVista() {
@@ -621,6 +656,16 @@
 				}
 			},
 			validarYEliminar(id){
+				const laCita = this.horasMalas.find(h => h.id === id);
+				if (laCita && laCita.payment && (laCita.payment.pay_status === 2 || parseFloat(laCita.payment.adelanto) > 0)) {
+					this.$swal.fire({
+						title: 'Acción bloqueada',
+						text: 'No se puede cancelar una cita que tiene adelanto o pago completo.',
+						icon: 'error',
+						confirmButtonText: 'Aceptar'
+					});
+					return;
+				}
 				this.$swal({
 						title: '¿Quieres eliminar esta cita?',
 						html: 'Ingrese un motivo para eliminar la cita. <br> <small>No se generará falta</small>',
@@ -729,15 +774,24 @@
 				if (e.key === 'ArrowLeft') {
 					const body = this.$refs.bodyScroll;
 					if (body) {
-						body.scrollLeft -= 150;
+						body.scrollLeft -= 250;
 						e.preventDefault();
 					}
 				} else if (e.key === 'ArrowRight') {
 					const body = this.$refs.bodyScroll;
 					if (body) {
-						body.scrollLeft += 150;
+						body.scrollLeft += 250;
 						e.preventDefault();
 					}
+				}
+			},
+			scrollColumnas(direction) {
+				const body = this.$refs.bodyScroll;
+				if (body) {
+					body.scrollBy({
+						left: direction * 250,
+						behavior: 'smooth'
+					});
 				}
 			}
 		},

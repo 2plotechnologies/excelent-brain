@@ -6026,6 +6026,18 @@ chart_js__WEBPACK_IMPORTED_MODULE_1__.Chart.register(chart_js__WEBPACK_IMPORTED_
     },
     validarYEliminar: function validarYEliminar(id) {
       var _this6 = this;
+      var laCita = this.dashData.citasHoy.find(function (x) {
+        return x.id === id;
+      });
+      if (laCita && laCita.payment && (laCita.payment.pay_status === 2 || parseFloat(laCita.payment.adelanto) > 0)) {
+        this.$swal.fire({
+          title: 'Acción bloqueada',
+          text: 'No se puede cancelar una cita que tiene adelanto o pago completo.',
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        });
+        return;
+      }
       this.$swal({
         title: '¿Quieres eliminar esta cita?',
         html: 'Ingrese un motivo para eliminar la cita. <br> <small>No se generará falta</small>',
@@ -6298,6 +6310,12 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       },
       immediate: true,
       deep: true
+    }
+  },
+  computed: {
+    tienePago: function tienePago() {
+      if (!this.cita || !this.cita.payment) return false;
+      return this.cita.payment.pay_status === 2 || parseFloat(this.cita.payment.adelanto) > 0;
     }
   },
   methods: {
@@ -7147,6 +7165,15 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   methods: {
     update: function update() {
       var statusDropdown = this.$el.querySelector(".status-appointment");
+      if (statusDropdown && statusDropdown.value == 3 && this.tienePago) {
+        this.$swal.fire({
+          title: 'Acción bloqueada',
+          text: 'No se puede anular una cita que tiene adelanto o pago completo.',
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        });
+        return;
+      }
       if (statusDropdown && statusDropdown.value == 3 && this.motivo == '') {
         alertifyjs__WEBPACK_IMPORTED_MODULE_0___default().notify('<i class="fa-solid fa-skull-crossbones"></i> Debe ingresar un motivo para anular la cita', 'danger', 10);
       } else {
@@ -7217,6 +7244,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   computed: {
     updateStatu: function updateStatu() {
       return this.data = this.dataCit;
+    },
+    tienePago: function tienePago() {
+      if (!this.dataCit || !this.dataCit.payment) return false;
+      return this.dataCit.payment.pay_status === 2 || parseFloat(this.dataCit.payment.adelanto) > 0;
     }
   },
   created: function created() {
@@ -9407,6 +9438,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         this.dataCita.payment.price = this.neto;
         this.caso.motivoRebaja = '';
       }
+    },
+    formatFecha: function formatFecha(fecha) {
+      if (!fecha) return '';
+      return moment__WEBPACK_IMPORTED_MODULE_0___default()(fecha).format('DD/MM/YYYY hh:mm a');
     }
   },
   computed: {
@@ -9967,9 +10002,25 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     eliminar: function eliminar(id) {
       var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var laCita;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
+              laCita = _this3.citas.find(function (x) {
+                return x.id === id;
+              });
+              if (!(laCita && laCita.payment && (laCita.payment.pay_status === 2 || parseFloat(laCita.payment.adelanto) > 0))) {
+                _context2.next = 4;
+                break;
+              }
+              _this3.$swal.fire({
+                title: 'Acción bloqueada',
+                text: 'No se puede eliminar una cita que tiene adelanto o pago completo.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+              });
+              return _context2.abrupt("return");
+            case 4:
               _this3.$swal({
                 title: 'Quieres eliminar esta cita?',
                 showDenyButton: true,
@@ -9984,7 +10035,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                   _this3.listar();
                 }
               });
-            case 1:
+            case 5:
             case "end":
               return _context2.stop();
           }
@@ -10533,7 +10584,8 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         pointerEvents: 'none',
         minWidth: '150px',
         maxWidth: '250px'
-      }
+      },
+      busquedaDoctor: ''
     };
   },
   props: ['nombreUser', 'idSede'],
@@ -10566,6 +10618,12 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       if (this.filtroActual !== 'Todos') filtrados = this.doctores.filter(function (d) {
         return d.profession === _this.filtroActual;
       });
+      if (this.busquedaDoctor && this.busquedaDoctor.trim() !== '') {
+        var query = this.busquedaDoctor.toLowerCase();
+        filtrados = filtrados.filter(function (d) {
+          return (d.name || '').toLowerCase().includes(query) || d.profession && d.profession.toLowerCase().includes(query);
+        });
+      }
       return filtrados.filter(function (d) {
         return d.horarios && d.horarios.length > 0;
       });
@@ -10999,6 +11057,18 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     },
     validarYEliminar: function validarYEliminar(id) {
       var _this5 = this;
+      var laCita = this.horasMalas.find(function (h) {
+        return h.id === id;
+      });
+      if (laCita && laCita.payment && (laCita.payment.pay_status === 2 || parseFloat(laCita.payment.adelanto) > 0)) {
+        this.$swal.fire({
+          title: 'Acción bloqueada',
+          text: 'No se puede cancelar una cita que tiene adelanto o pago completo.',
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        });
+        return;
+      }
       this.$swal({
         title: '¿Quieres eliminar esta cita?',
         html: 'Ingrese un motivo para eliminar la cita. <br> <small>No se generará falta</small>',
@@ -11146,15 +11216,24 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       if (e.key === 'ArrowLeft') {
         var body = this.$refs.bodyScroll;
         if (body) {
-          body.scrollLeft -= 150;
+          body.scrollLeft -= 250;
           e.preventDefault();
         }
       } else if (e.key === 'ArrowRight') {
         var _body = this.$refs.bodyScroll;
         if (_body) {
-          _body.scrollLeft += 150;
+          _body.scrollLeft += 250;
           e.preventDefault();
         }
+      }
+    },
+    scrollColumnas: function scrollColumnas(direction) {
+      var body = this.$refs.bodyScroll;
+      if (body) {
+        body.scrollBy({
+          left: direction * 250,
+          behavior: 'smooth'
+        });
       }
     }
   },
@@ -12155,7 +12234,9 @@ var render = function render() {
   }), _vm._v(" Reprogramar\n          ")]) : _vm._e(), _vm._v(" "), _c("button", {
     staticClass: "btn btn-action btn-outline-danger",
     attrs: {
-      "data-bs-dismiss": "modal"
+      "data-bs-dismiss": "modal",
+      disabled: _vm.tienePago,
+      title: _vm.tienePago ? "No se puede cancelar una cita con pago o adelanto" : ""
     },
     on: {
       click: function click($event) {
@@ -12168,7 +12249,9 @@ var render = function render() {
     staticClass: "btn btn-action btn-outline-secondary",
     attrs: {
       "data-bs-toggle": "modal",
-      "data-bs-target": _vm.targetEstado
+      "data-bs-target": _vm.targetEstado,
+      disabled: _vm.tienePago,
+      title: _vm.tienePago ? "No se puede anular una cita con pago o adelanto" : ""
     },
     on: {
       click: function click($event) {
@@ -13612,7 +13695,8 @@ var render = function render() {
     }
   }, [_vm._v("Confirmar cita")]), _vm._v(" "), _c("option", {
     attrs: {
-      value: "3"
+      value: "3",
+      disabled: _vm.tienePago
     }
   }, [_vm._v("Anular cita")])])]), _vm._v(" "), _vm.dataCit.status == 3 ? _c("div", {
     staticClass: "form-group mb-3"
@@ -18295,7 +18379,13 @@ var render = function render() {
     staticClass: "text-muted small font-weight-bold text-uppercase"
   }, [_vm._v("Adelanto")]), _vm._v(" "), _c("span", {
     staticClass: "font-weight-bold text-warning"
-  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.dataCita.payment.adelanto).toFixed(2)))])]) : _vm._e(), _vm._v(" "), _vm.dataCita.payment.razonAdelanto ? _c("div", {
+  }, [_vm._v("S/ " + _vm._s(parseFloat(_vm.dataCita.payment.adelanto).toFixed(2)))])]) : _vm._e(), _vm._v(" "), _vm.dataCita.payment.adelanto > 0 && _vm.dataCita.payment.updated_at ? _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mt-1"
+  }, [_c("span", {
+    staticClass: "text-muted small font-weight-bold text-uppercase"
+  }, [_vm._v("Fecha de Adelanto")]), _vm._v(" "), _c("span", {
+    staticClass: "font-weight-bold text-muted small"
+  }, [_vm._v(_vm._s(_vm.formatFecha(_vm.dataCita.payment.updated_at)))])]) : _vm._e(), _vm._v(" "), _vm.dataCita.payment.razonAdelanto ? _c("div", {
     staticClass: "text-muted small mt-2"
   }, [_c("i", {
     staticClass: "fas fa-info-circle mr-1"
@@ -19846,11 +19936,13 @@ var render = function render() {
   }, [_c("i", {
     staticClass: "fas fa-box-open"
   }), _vm._v(" Paquetes")])], 1)]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex mb-3 gap-2 flex-wrap align-items-center"
+    staticClass: "d-flex mb-3 gap-3 flex-wrap align-items-center justify-content-between"
+  }, [_c("div", {
+    staticClass: "d-flex gap-2 flex-wrap align-items-center"
   }, [_c("span", {
     staticClass: "text-muted small font-weight-bold me-1"
   }, [_vm._v("Filtrar:")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-sm rounded-pill font-weight-bold",
+    staticClass: "btn btn-sm rounded-pill font-weight-bold shadow-sm",
     "class": _vm.filtroActual == "Todos" ? "btn-primary" : "btn-light text-muted border",
     on: {
       click: function click($event) {
@@ -19860,7 +19952,7 @@ var render = function render() {
   }, [_vm._v("Todos")]), _vm._v(" "), _vm._l(_vm.profesionesUnicas, function (prof) {
     return _c("button", {
       key: prof,
-      staticClass: "btn btn-sm rounded-pill font-weight-bold",
+      staticClass: "btn btn-sm rounded-pill font-weight-bold shadow-sm",
       "class": _vm.filtroActual == prof ? "btn-primary" : "btn-light text-muted border",
       on: {
         click: function click($event) {
@@ -19868,7 +19960,98 @@ var render = function render() {
         }
       }
     }, [_vm._v(_vm._s(prof))]);
-  })], 2), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _c("div", {
+    staticClass: "position-relative ms-2",
+    staticStyle: {
+      width: "250px"
+    }
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.busquedaDoctor,
+      expression: "busquedaDoctor"
+    }],
+    staticClass: "form-control form-control-sm rounded-pill ps-4 shadow-sm border",
+    attrs: {
+      type: "text",
+      placeholder: "Buscar profesional por nombre..."
+    },
+    domProps: {
+      value: _vm.busquedaDoctor
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.busquedaDoctor = $event.target.value;
+      }
+    }
+  }), _vm._v(" "), _c("i", {
+    staticClass: "fas fa-search position-absolute text-muted",
+    staticStyle: {
+      left: "12px",
+      top: "50%",
+      transform: "translateY(-50%)",
+      "font-size": "0.85rem"
+    }
+  }), _vm._v(" "), _vm.busquedaDoctor ? _c("button", {
+    staticClass: "btn btn-sm position-absolute text-muted border-0 p-0 px-2",
+    staticStyle: {
+      right: "8px",
+      top: "50%",
+      transform: "translateY(-50%)",
+      height: "100%"
+    },
+    on: {
+      click: function click($event) {
+        _vm.busquedaDoctor = "";
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times"
+  })]) : _vm._e()])], 2), _vm._v(" "), _c("div", {
+    staticClass: "d-flex gap-2 align-items-center"
+  }, [_c("span", {
+    staticClass: "text-muted small font-weight-bold me-1"
+  }, [_vm._v("Desplazar:")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm btn-outline-primary rounded-circle border shadow-sm d-flex align-items-center justify-content-center",
+    staticStyle: {
+      width: "30px",
+      height: "30px"
+    },
+    attrs: {
+      title: "Columna anterior"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.scrollColumnas(-1);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-chevron-left",
+    staticStyle: {
+      "font-size": "0.8rem"
+    }
+  })]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm btn-outline-primary rounded-circle border shadow-sm d-flex align-items-center justify-content-center",
+    staticStyle: {
+      width: "30px",
+      height: "30px"
+    },
+    attrs: {
+      title: "Siguiente columna"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.scrollColumnas(1);
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-chevron-right",
+    staticStyle: {
+      "font-size": "0.8rem"
+    }
+  })])])]), _vm._v(" "), _c("div", {
     staticClass: "calendar-wrapper bg-white shadow-sm border",
     staticStyle: {
       "border-radius": "8px",

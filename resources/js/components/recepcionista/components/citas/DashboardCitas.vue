@@ -401,6 +401,16 @@ export default {
           this.posibles = this.dashData.citasHoy.filter(posible => posible.professional_id == idProf && posible.id != laCita.id);
       },
       validarYEliminar(id) {
+          const laCita = this.dashData.citasHoy.find(x => x.id === id);
+          if (laCita && laCita.payment && (laCita.payment.pay_status === 2 || parseFloat(laCita.payment.adelanto) > 0)) {
+              this.$swal.fire({
+                  title: 'Acción bloqueada',
+                  text: 'No se puede cancelar una cita que tiene adelanto o pago completo.',
+                  icon: 'error',
+                  confirmButtonText: 'Aceptar'
+              });
+              return;
+          }
           this.$swal({
               title: '¿Quieres eliminar esta cita?',
               html: 'Ingrese un motivo para eliminar la cita. <br> <small>No se generará falta</small>',

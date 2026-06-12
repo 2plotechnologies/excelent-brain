@@ -175,6 +175,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       if (!this.paqueteSeleccionado || !this.precios || !this.precios.length) return [];
       var nombreRaw = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
       var nombre = nombreRaw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      var esp = (this.paqueteSeleccionado.paquete_especialidad || '').toLowerCase();
       if (this.paqueteSeleccionado.idClasificacion == 9 || nombre.includes('sucamec')) {
         return this.precios.filter(function (precio) {
           return (precio.id == 13 || precio.id == 14) && precio.activo == '1';
@@ -1159,14 +1160,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     'nuevaSesion.idProfesional': function nuevaSesionIdProfesional(newVal) {
       var _this18 = this;
       if (this.paqueteSeleccionado && newVal) {
-        var _esp = (this.paqueteSeleccionado.paquete_especialidad || '').toLowerCase();
+        var esp = (this.paqueteSeleccionado.paquete_especialidad || '').toLowerCase();
         var nombreRaw = (this.paqueteSeleccionado.paquete_nombre || '').toLowerCase();
         var nombre = nombreRaw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         var esSucamec = this.paqueteSeleccionado.idClasificacion == 9 || nombre.includes('sucamec');
 
         // Para híbridos no Sucamec, si cambia de doctor, verificar si el servicio seleccionado
         // sigue siendo válido para la especialidad del doctor. Si no, limpiarlo.
-        if ((_esp === 'hibrida' || nombre.includes('hibrid')) && !esSucamec) {
+        if ((esp === 'hibrida' || nombre.includes('hibrid')) && !esSucamec) {
           var doc = this.doctores.find(function (d) {
             return d.id == newVal;
           });

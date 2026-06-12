@@ -384,7 +384,17 @@ export default {
 			});
 		},
 
-    async eliminar(id){
+     async eliminar(id){
+      const laCita = this.citas.find(x => x.id === id);
+      if (laCita && laCita.payment && (laCita.payment.pay_status === 2 || parseFloat(laCita.payment.adelanto) > 0)) {
+        this.$swal.fire({
+          title: 'Acción bloqueada',
+          text: 'No se puede eliminar una cita que tiene adelanto o pago completo.',
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        });
+        return;
+      }
       this.$swal({
           title: 'Quieres eliminar esta cita?',
           showDenyButton: true,

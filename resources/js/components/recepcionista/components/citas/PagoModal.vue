@@ -51,6 +51,10 @@
                 <span class="text-muted small font-weight-bold text-uppercase">Adelanto</span>
                 <span class="font-weight-bold text-warning">S/ {{ parseFloat(dataCita.payment.adelanto).toFixed(2) }}</span>
               </div>
+              <div v-if="dataCita.payment.adelanto>0 && dataCita.payment.updated_at" class="d-flex justify-content-between align-items-center mt-1">
+                <span class="text-muted small font-weight-bold text-uppercase">Fecha de Adelanto</span>
+                <span class="font-weight-bold text-muted small">{{ formatFecha(dataCita.payment.updated_at) }}</span>
+              </div>
               <div v-if="dataCita.payment.razonAdelanto" class="text-muted small mt-2">
                 <i class="fas fa-info-circle mr-1"></i> Obs. o Fecha: {{ dataCita.payment.razonAdelanto }}
               </div>
@@ -238,6 +242,10 @@ import moment from 'moment'
 					this.dataCita.payment.price = this.neto
 					this.caso.motivoRebaja=''
 				}
+			},
+			formatFecha(fecha) {
+				if (!fecha) return '';
+				return moment(fecha).format('DD/MM/YYYY hh:mm a');
 			}
 		},
 		computed:{

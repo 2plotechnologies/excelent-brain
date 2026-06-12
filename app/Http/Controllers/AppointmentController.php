@@ -1087,7 +1087,12 @@ Medical_evolution::create([
 	}
 
 	public function updateStatus($idAppointment,$valueStatus, Request $request){
-		$appointment = Appointment::find($idAppointment);
+		$appointment = Appointment::with('payment')->find($idAppointment);
+		if ($valueStatus == 3) {
+			if ($appointment && $appointment->payment && ($appointment->payment->pay_status == 2 || floatval($appointment->payment->adelanto) > 0)) {
+				return response()->json(['error' => 'No se puede anular una cita que tiene adelanto o pago completo.'], 400);
+			}
+		}
 		//print_r( $request->all() ); die();
 
 
@@ -1200,15 +1205,22 @@ Medical_evolution::create([
 	 * @param  int  $id
 	 * @return \Illuminate\Http\Response
 	 */
+	
 	public function destroy(Request $request, Appointment $appointment )
 	{
+		if ($appointment->payment && ($appointment->payment->pay_status == 2 || floatval($appointment->payment->adelanto) > 0)) {
+			return response()->json(['error' => 'No se puede eliminar una cita que tiene adelanto o pago completo.'], 400);
+		}
 		$appointment->delete();
 	}
 
 	public function eliminarCita($id, Request $request){
 		//var_dump($request->all()); die();
 		try {
-			$cita = Appointment::find($id);
+			$cita = Appointment::with('payment')->find($id);
+			if ($cita && $cita->payment && ($cita->payment->pay_status == 2 || floatval($cita->payment->adelanto) > 0)) {
+				return response()->json(['error' => 'No se puede eliminar una cita que tiene adelanto o pago completo.'], 400);
+			}
 
 		$pacienteBloqueo = \App\Models\Patient::where('dni', 'BLOQUEO')->first();
 		if ($pacienteBloqueo && $cita->hora_fin) {
