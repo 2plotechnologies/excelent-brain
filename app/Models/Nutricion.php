@@ -11,9 +11,20 @@ class Nutricion extends Model
 	protected $table = 'nutriciones';
 
 	use HasFactory;
-	protected $fillable=['idPaciente', 'peso', 'talla', 
-	'imc', 'perimetro', 'grasa', 'comidas', 'intolerancia', 'alergias',
-	 'fuma', 'bebe', 'signos', 'diagnostico', 'dieta', 'suplemento'];
+	protected $fillable=['idPaciente', 
+	'peso', 'talla', 
+	'imc', 'perimetro', 
+	'grasa', 
+	'comidas', 
+	'intolerancia', 'alergias',
+	 'fuma', 
+	 'bebe', 
+	 'signos', 
+	 'diagnostico', 
+	 'dieta', 
+	 'suplemento'
+	];
+
 	public function patient() {
 		return $this->belongsTo("App\Models\Patient", 'idPaciente');
 	}

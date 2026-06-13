@@ -1,37 +1,50 @@
 <template>
-	<div>
-		<h1>Resumen de visita por pacientes</h1>
-		<h3><small>Del Profesional: Dr. {{ dataUser.nombre }}</small></h3>
-		<div class="card">
-			<div class="card-body ">
-				<div class="row row-cols-auto g-3  align-items-center">
-					<div class="col-3">
-						<label for=""><i class="fas fa-filter"></i> Filtro</label>
-						<input type="text" class="form-control" v-model="filtro.texto" placeholder="DNI o Nombres">
+	<div class="p-4" style="background-color: #f8f9fc; min-height: 100vh;">
+		<div class="d-sm-flex align-items-center justify-content-between mb-4">
+			<div>
+				<h4 class="m-0 font-weight-bold text-dark"><i class="fas fa-users text-primary mr-2"></i> Resumen de Visitas por Paciente</h4>
+				<small class="text-muted">Gestión de cartera de pacientes del Dr. {{ dataUser.nombre }}</small>
+			</div>
+		</div>
+		
+		<div class="card border-0 shadow-sm mb-4" style="border-radius: 10px; border-top: 4px solid #4e73df !important;">
+			<div class="card-body p-4">
+				<h6 class="font-weight-bold text-primary mb-3 text-uppercase small"><i class="fas fa-filter mr-1"></i> Filtros de Búsqueda</h6>
+				<div class="row g-3 align-items-end">
+					<div class="col-md-4">
+						<label class="small fw-bold text-muted text-uppercase">Buscar paciente</label>
+						<div class="input-group shadow-sm" style="border-radius: 8px; overflow: hidden;">
+							<span class="input-group-text bg-light border-0 text-muted"><i class="fas fa-search"></i></span>
+							<input type="text" class="form-control bg-light border-0" v-model="filtro.texto" placeholder="DNI o Nombres">
+						</div>
 					</div>
-					<div class="col-3">
-						<label for="">Año</label>
-						<select class="form-select" v-model="filtro.año">
+					<div class="col-md-3">
+						<label class="small fw-bold text-muted text-uppercase">Año</label>
+						<select class="form-select bg-light border-0 shadow-sm" style="border-radius: 8px;" v-model="filtro.año">
 							<option v-for="año in años" :value="año">{{año}}</option>
 						</select>
 					</div>
-					<div class="col-3">
-						<label for="">Mes</label>
-						<select class="form-select text-capitalize" v-model="filtro.mes">
+					<div class="col-md-3">
+						<label class="small fw-bold text-muted text-uppercase">Mes</label>
+						<select class="form-select bg-light border-0 shadow-sm text-capitalize" style="border-radius: 8px;" v-model="filtro.mes">
 							<option value="-1">Todo el año</option>
 							<option class="text-capitalize" v-for="(mes, index) in meses" :value="index+1">{{ capitalizar(mes) }}</option>
 						</select>
 					</div>
-					<div class="col-3 d-flex align-items-end">
-						<button class="btn btn-outline-primary" @click="buscarCartera()"><i class="fa-solid fa-magnifying-glass"></i> Filtrar cartera</button>
+					<div class="col-md-2">
+						<button class="btn btn-primary w-100 shadow-sm font-weight-bold" style="border-radius: 8px; padding-top: 10px; padding-bottom: 10px;" @click="buscarCartera()">
+							<i class="fa-solid fa-magnifying-glass mr-1"></i> Filtrar
+						</button>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="card mt-3">
-			<div class="card-body">
-				<table class="table table-sm table-hover">
-					<thead>
+
+		<div class="card border-0 shadow-sm" style="border-radius: 10px;">
+			<div class="card-body p-0">
+				<div class="table-responsive">
+				<table class="table table-hover align-middle mb-0">
+					<thead class="table-light text-muted text-uppercase small" style="font-size: 0.75rem;">
 						<tr>
 							<th>N°</th>
 							<th>Nombre y Apellidos</th>
@@ -64,23 +77,26 @@
 							<td class="puntero d-none" @click="idGlobal = cita.patient_id; indexGlobal = index" data-bs-toggle="modal" data-bs-target="#modalCambiarSeguimiento">
 								<span v-if="cita.patient.seguimiento==1" title="Sin acción"><i class="fa-regular fa-circle"></i></span>
 								<span v-else :class=" queColor(cita.patient.seguimiento)" :title="queSeguimiento(cita.patient.seguimiento)"><i class="fas fa-circle"></i></span>
-								<button class="btn btn-sm btn-circle btn-outline-primary" title="Enviar a seguimiento" data-bs-target="#modalSeguimiento" data-bs-toggle="modal" @click="elegido = cita.patient"><i class="far fa-paper-plane"></i></button>
 							</td>
 						</tr>
 					</tbody>
 				</table>
+				</div>
 			</div>
 		</div>
 		<!-- Modal -->
 	<div class="modal fade" id="modalCitasPreview" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h1 class="modal-title fs-5" id="exampleModalLabel">{{titulo}}</h1>
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+				<div class="modal-header border-0 pb-0 px-4 pt-4">
+					<h5 class="modal-title font-weight-bold text-primary" id="exampleModalLabel">
+						<i class="fas fa-calendar-check mr-2"></i>{{titulo}}
+					</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<div class="modal-body">
-					<table class="table table-hover table-sm">
+				<div class="modal-body p-4">
+					<div class="table-responsive border rounded-4 shadow-sm">
+					<table class="table table-hover align-middle mb-0">
 						<thead>
 							<tr>
 								<th>N°</th>
@@ -97,7 +113,7 @@
 							</tr>
 						</tbody>
 					</table>
-					
+					</div>
 				</div>
 			</div>
 		</div>

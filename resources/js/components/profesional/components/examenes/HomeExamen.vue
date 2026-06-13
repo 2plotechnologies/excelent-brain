@@ -1,34 +1,44 @@
 <template>
-<div class="row">
-    <div class="col-xl-12 col-lg-12">
-        <div class="card shadow mb-4">
-            <!-- Card Header - Dropdown -->
-            <div class="card-header bg-warning py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-white">Examen</h6>
-            </div>
-            <!-- Card Body -->
-            <div class="card-body">
+<div class="p-4" style="background-color: #f8f9fc; min-height: 100vh;">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h4 class="m-0 font-weight-bold text-dark"><i class="fas fa-microscope text-primary mr-2"></i> Exámenes Médicos</h4>
+            <small class="text-muted">Registro y órdenes de exámenes</small>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 10px;">
+                <div class="card-body p-4">
                 <div>
                     <div class="form-row">
-                        <div class="form-group col">
-                            <label for="">Paciente</label>
-                            <input type="text" class="form-control" v-model="exam.name_patient" placeholder="Nombre del Paciente">
+                        <div class="form-group col-md-6">
+                            <label class="small fw-bold text-muted text-uppercase">Paciente</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 text-muted"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control bg-light border-0" v-model="exam.name_patient" placeholder="Nombre del Paciente">
+                            </div>
                         </div>
 
-                        <div class="form-group col">
-                            <label for="">Fecha Actual</label>
-                            <input type="date" class="form-control" v-model="exam.attention_date">
+                        <div class="form-group col-md-6">
+                            <label class="small fw-bold text-muted text-uppercase">Fecha Actual</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 text-muted"><i class="far fa-calendar-alt"></i></span>
+                                <input type="date" class="form-control bg-light border-0" v-model="exam.attention_date">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group col">
-                            <label for="">Tipo de examen
-															<button type="button" class="btn btn-outline-primary btn-sm position-relative" data-bs-target="#modalAddExamen" data-bs-toggle="modal"> <i class="fa-solid fa-plus"></i> Agregar nuevo elemento
-																<span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle"> </span>
-															</button>
-														</label>
-                            <select name="" id="typeExam" @change="typeExamenSelect" class="form-select">
+                    <div class="form-row mt-3">
+                        <div class="form-group col-12">
+                            <label class="small fw-bold text-muted text-uppercase d-flex justify-content-between align-items-center">
+                                <span>Tipo de examen</span>
+                                <button type="button" class="btn btn-light btn-sm shadow-sm rounded-pill text-primary fw-bold px-3" data-bs-target="#modalAddExamen" data-bs-toggle="modal"> 
+                                    <i class="fa-solid fa-plus mr-1"></i> Nuevo Elemento
+                                </button>
+                            </label>
+                            <select name="" id="typeExam" @change="typeExamenSelect" class="form-select bg-light border-0" style="height: 45px;">
                                 <option value="1">Laboratorio</option>
                                 <option value="2">Imagenología</option>
                                 <option value="3">Otros</option>
@@ -36,14 +46,16 @@
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group w-100 position-relative">
-													<label for="">Examen</label>
-													<input 
-													autocomplete="off" 
-													type="text" 
-													class="form-control w-100" 
-													placeholder="Nombre del estudio" 
+                    <div class="form-row mt-3">
+                        <div class="form-group col-12 position-relative">
+                            <label class="small fw-bold text-muted text-uppercase">Buscar Examen</label>
+                            <div class="input-group shadow-sm" style="border-radius: 8px; overflow: hidden;">
+                                <span class="input-group-text bg-white border-0 text-primary"><i class="fas fa-search"></i></span>
+                                <input 
+                                autocomplete="off" 
+                                type="text" 
+                                class="form-control border-0 py-2" 
+                                placeholder="Escribe el nombre del estudio..." 
 													name="" 
 													id="diagnostico" 
 													@keyup="searchExam"
@@ -65,36 +77,50 @@
                     </div>
                 </div>
 
-                <div class="form-row mt-2">
+                <div class="form-row mt-4">
                     <div class="col-md-12">
-                        <table class="table">
-                            <thead class="bg-warning text-white">
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Tipo de examen</th>
-                                    <th scope="col">Examen</th>
-                                    <th scope="col">Operaciones</th>
-                                </tr>
-                            </thead>
+                        <div class="table-responsive border rounded-4 shadow-sm">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light text-muted text-uppercase small" style="font-size: 0.75rem;">
+                                    <tr>
+                                        <th scope="col" class="ps-4 py-3">#</th>
+                                        <th scope="col">Tipo de examen</th>
+                                        <th scope="col">Examen</th>
+                                        <th scope="col" class="text-end pe-4">Operaciones</th>
+                                    </tr>
+                                </thead>
 
-                            <tbody>
-                                <tr v-for="(select,key) in selected" :key="select.id">
-                                    <th scope="row">{{ key + 1 }}</th>
-                                    <td scope="row">{{ (select.type === 1) ? 'Laboratorio' : (select.type === 2) ? 'Imagenología' : (select.type === 3) ? 'Otro' : 'Sin tipo de examen' }}</td>
-                                    <td>{{ select.name }}</td>
-                                    <td>
-                                        <button @click="deleteSelected(key)" class="btn btn-danger"><i class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                <tbody>
+                                    <tr v-if="selected.length === 0">
+                                        <td colspan="4" class="text-center py-4 text-muted">No hay exámenes seleccionados</td>
+                                    </tr>
+                                    <tr v-for="(select,key) in selected" :key="select.id">
+                                        <th scope="row" class="ps-4">{{ key + 1 }}</th>
+                                        <td scope="row">
+                                            <span class="badge bg-light text-dark border px-2 py-1">
+                                                {{ (select.type === 1) ? 'Laboratorio' : (select.type === 2) ? 'Imagenología' : (select.type === 3) ? 'Otro' : 'Sin tipo de examen' }}
+                                            </span>
+                                        </td>
+                                        <td class="font-weight-bold text-dark">{{ select.name }}</td>
+                                        <td class="text-end pe-4">
+                                            <button @click="deleteSelected(key)" class="btn btn-sm text-danger btn-light rounded-circle shadow-sm" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <!-- <button @click="storeExam" class="btn btn-success">Registrar</button> -->
-                    <button @click="print" id="printBtn" class="btn btn-success ml-1">Imprimir PDF</button>
+                    <div class="col-12 mt-4 text-right">
+                        <!-- <button @click="storeExam" class="btn btn-success">Registrar</button> -->
+                        <button @click="print" id="printBtn" class="btn btn-primary rounded-pill px-4 shadow-sm font-weight-bold">
+                            <i class="fas fa-print mr-2"></i>Imprimir PDF
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 		<!-- Modal -->
 <div class="modal fade" id="modalAddExamen" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-sm modal-dialog-centered">
@@ -120,6 +146,8 @@
   </div>
 </div>
 </div>
+</div>
+
 </template>
 
 <script>

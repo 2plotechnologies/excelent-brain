@@ -118,9 +118,12 @@
                 <span class="text-xs text-muted fst-italic" v-else>-</span>
               </td>
               <td class="text-center">
-                <span class="badge bg-light text-dark px-3 py-2 rounded-pill font-weight-bold border">
+                <span class="badge bg-light text-dark px-3 py-2 rounded-pill font-weight-bold border mb-1 d-inline-block">
                   {{ getNombreServicio(paciente.tipo_certificado) }}
                 </span>
+                <div v-if="paciente.professional" class="text-xs text-muted mt-1" style="font-size: 0.75rem;">
+                  <i class="fas fa-signature text-primary mr-1"></i> Firma: <span class="font-weight-bold">{{ paciente.professional.name }}</span>
+                </div>
               </td>
               <td class="text-center">
                 <select class="form-select form-select-sm d-inline-block w-auto font-weight-bold shadow-sm" style="border-radius: 8px;" v-model="paciente.estado" @change="cambiarEstado(paciente)" :disabled="paciente.pagos_count === 0">
@@ -139,6 +142,9 @@
                   </button>
                   <button v-else class="btn btn-icon-edit text-success" disabled title="Pagado">
                     <i class="fas fa-check-circle"></i>
+                  </button>
+                  <button class="btn btn-icon-history" @click="openHistoryModal(paciente)" title="Historia">
+                    <i class="fas fa-file-medical"></i>
                   </button>
                   <button class="btn btn-icon-edit" @click="openEditModal(paciente)" title="Editar">
                     <i class="far fa-edit"></i>
@@ -291,6 +297,50 @@
         </div>
       </div>
     </div>
+
+    <!-- MODAL HISTORIA CLINICA -->
+    <div class="modal fade" id="modalHistoriaCertificado" tabindex="-1" aria-labelledby="modalHistoriaCertificadoLabel" aria-hidden="true" ref="modalHistoryForm">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+          <div class="modal-header border-0 pb-0 px-4 pt-4">
+            <h5 class="modal-title font-weight-bold text-dark" id="modalHistoriaCertificadoLabel">
+              <i class="fas fa-file-medical text-indigo mr-2"></i> Historia Clínica & Firma
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closeHistoryModal"></button>
+          </div>
+          <form @submit.prevent="submitHistoria">
+            <div class="modal-body p-4">
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label small fw-bold text-muted text-uppercase">Paciente</label>
+                  <input type="text" class="form-control bg-light" :value="formHistoria.paciente_nombre" readonly />
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-bold text-muted text-uppercase">Profesional que Firma <span class="text-danger">*</span></label>
+                  <select class="form-select" v-model="formHistoria.professional_id" required>
+                    <option value="" disabled>Seleccione el profesional</option>
+                    <option v-for="prof in activeProfessionals" :key="prof.id" :value="prof.id">
+                      {{ prof.name }} ({{ prof.profession }})
+                    </option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-bold text-muted text-uppercase">Historia / Observaciones <span class="text-danger">*</span></label>
+                  <textarea class="form-control" v-model="formHistoria.historia" rows="6" required placeholder="Escriba el detalle de la historia o informe aquí..."></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+              <button type="button" class="btn btn-light rounded-pill px-4 text-muted font-weight-bold" data-bs-dismiss="modal" @click="closeHistoryModal">Cancelar</button>
+              <button type="submit" class="btn btn-indigo text-white rounded-pill px-4 shadow font-weight-bold" :disabled="savingHistory">
+                <span v-if="savingHistory" class="spinner-border spinner-border-sm mr-2" role="status"></span>
+                <i class="fas fa-save mr-1" v-else></i> Guardar Historia
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </main>
 </template>
 
@@ -321,6 +371,7 @@ export default {
       
       servicios: [],
       monedas: [],
+      professionals: [],
       modalPayment: null,
       savingPago: false,
       pagoForm: {
@@ -330,6 +381,15 @@ export default {
         tipo_comprobante: '1',
         voucher: '',
         motivo: ''
+      },
+
+      modalHistory: null,
+      savingHistory: false,
+      formHistoria: {
+        id: null,
+        paciente_nombre: '',
+        historia: '',
+        professional_id: ''
       },
 
       pagination: {
@@ -356,23 +416,31 @@ export default {
         pagesArray.push(page);
       }
       return pagesArray;
+    },
+    activeProfessionals() {
+      return this.professionals.filter(p => p.activo == 1 || p.activo == '1');
     }
   },
   methods: {
     async cargarListas() {
       try {
-        const [monedasRes, preciosRes] = await Promise.all([
+        const [monedasRes, preciosRes, professionalsRes] = await Promise.all([
           this.axios.get('/api/listarMonedas'),
-          this.axios.get('/api/listarPreciosTodos')
+          this.axios.get('/api/listarPreciosTodos'),
+          this.axios.get('/api/professional')
         ]);
         this.monedas = monedasRes.data;
+        this.professionals = professionalsRes.data;
         
         const permitidos = [
           'Rotación de servicio',
           'Prácticas pre profesionales',
           'Serum',
           'Nombramiento',
-          'Certificado de trabajo simple'
+          'Certificado de trabajo simple',
+          'Informe Psicológico',
+          'Informe Psiquiátrico',
+          'Hoja membretada'
         ];
         
         this.servicios = preciosRes.data.filter(p => 
@@ -624,6 +692,48 @@ export default {
         }
       });
     },
+    openHistoryModal(paciente) {
+      this.formHistoria = {
+        id: paciente.id,
+        paciente_nombre: `${paciente.nombres} ${paciente.apellidos}`,
+        historia: paciente.historia || '',
+        professional_id: paciente.professional_id || ''
+      };
+      if (!this.modalHistory) {
+        this.modalHistory = new window.bootstrap.Modal(this.$refs.modalHistoryForm);
+      }
+      this.modalHistory.show();
+    },
+    closeHistoryModal() {
+      if (this.modalHistory) this.modalHistory.hide();
+    },
+    async submitHistoria() {
+      this.savingHistory = true;
+      try {
+        await this.axios.put(`/api/paciente-certificado/${this.formHistoria.id}/historia`, {
+          historia: this.formHistoria.historia,
+          professional_id: this.formHistoria.professional_id
+        });
+        this.$swal({
+          icon: 'success',
+          title: 'Historia Guardada',
+          text: 'Se registraron los datos de la historia y firma.',
+          showConfirmButton: false,
+          timer: 1500
+        });
+        this.closeHistoryModal();
+        this.cargarPacientes(this.pagination.current_page);
+      } catch (error) {
+        console.error('Error guardando historia:', error);
+        this.$swal({
+          icon: 'error',
+          title: 'Error',
+          text: error.response?.data?.message || 'No se pudo guardar la historia clínica.'
+        });
+      } finally {
+        this.savingHistory = false;
+      }
+    },
     getNombreServicio(id) {
       const s = this.servicios.find(x => x.id.toString() === id?.toString());
       return s ? s.descripcion : 'Desconocido';
@@ -654,6 +764,7 @@ export default {
   beforeDestroy() {
     if (this.modal) this.modal.dispose();
     if (this.modalPayment) this.modalPayment.dispose();
+    if (this.modalHistory) this.modalHistory.dispose();
   }
 };
 </script>
@@ -742,7 +853,7 @@ export default {
 }
 
 /* Action Buttons */
-.btn-icon-edit, .btn-icon-delete {
+.btn-icon-edit, .btn-icon-delete, .btn-icon-history {
   background: transparent;
   border: none;
   border-radius: 50%;
@@ -766,6 +877,21 @@ export default {
 .btn-icon-delete:hover {
   background-color: #fee2e2;
   color: #b91c1c;
+}
+.btn-icon-history {
+  color: #6366f1;
+}
+.btn-icon-history:hover {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+}
+.btn-indigo {
+  background-color: #6366f1;
+  border-color: #6366f1;
+}
+.btn-indigo:hover {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
 }
 
 /* Custom styles for modern input fields */

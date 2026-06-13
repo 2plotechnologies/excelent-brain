@@ -11,7 +11,7 @@
         <!-- HEADER -->
         <div class="modal-header border-0">
           <h5 class="modal-title">
-            💬 Recomendaciones - {{ patient.nombres }}
+            💬 Recomendaciones - {{ patient?.nombres }}
           </h5>
           <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>

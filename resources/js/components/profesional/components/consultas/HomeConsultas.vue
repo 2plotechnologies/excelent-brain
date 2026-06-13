@@ -1,17 +1,26 @@
 <template>
-	<main>
+	<main class="p-4" style="background-color: #f8f9fc; min-height: 100vh;">
 		<div class="d-sm-flex main-header align-items-center justify-content-between mb-4">
-			<h1 class="h3 mb-0 text-gray-800">Mis Consultas</h1>
-			<div class="d-flex consultas-btn-top align-content-stretch my-3" style="gap: 5px">
+			<div>
+				<h4 class="m-0 font-weight-bold text-dark"><i class="fas fa-calendar-check text-primary mr-2"></i> Mis Consultas</h4>
+				<small class="text-muted">Gestión de tus citas médicas y pacientes</small>
+			</div>
+			<div class="d-flex consultas-btn-top align-content-stretch my-3" style="gap: 10px">
 				<div class="d-flex gap fecha-restablecer">
-					<input @change="calendarActive" type="date" class="form-control" name="" id="calendar" >
-					<a @click="now" class="btn btn-sm btn-primary d-flex align-items-center">Restablecer</a>
+					<div class="input-group input-group-sm shadow-sm" style="border-radius: 8px; overflow: hidden; max-width: 150px;">
+						<span class="input-group-text bg-white border-0 text-primary"><i class="far fa-calendar-alt"></i></span>
+						<input @change="calendarActive" type="date" class="form-control border-0 bg-white" name="" id="calendar" >
+					</div>
+					<button @click="now" class="btn btn-sm btn-light border-0 shadow-sm px-3 d-flex align-items-center font-weight-bold text-primary" style="border-radius: 8px;">
+						<i class="fas fa-undo-alt mr-1"></i> Restablecer
+					</button>
 				</div>
 				
-				<ul class="d-flex justify-content-start align-content-stretch nav nav-pills" id="pills-tab" role="tablist" v-if="dayActive">
+				<ul class="d-flex justify-content-start align-content-stretch nav nav-pills bg-white shadow-sm p-1" id="pills-tab" role="tablist" v-if="dayActive" style="border-radius: 8px;">
 					<li class="nav-item" role="presentation">
 						<button 
-							class="btnConsultas h-100 btn btn-sm btn-primary btnConsultasActive active btn-hover" 
+							class="btnConsultas h-100 btn btn-sm btn-primary btnConsultasActive active btn-hover px-3 font-weight-bold" 
+							style="border-radius: 6px;"
 							id="pills-home-tab" 
 							data-bs-toggle="pill" 
 							data-bs-target="#pills-home" 
@@ -20,13 +29,14 @@
 							aria-controls="pills-home" 
 							aria-selected="true"
 							@click="consultaActiva(false, true)">
-						Todas las consultas
+						Todas
 						</button>
 					</li>
 
 					<li class="nav-item" role="presentation">
 						<button 
-							class="btnConsultas h-100 btn btn-sm btn-hover" 
+							class="btnConsultas h-100 btn btn-sm btn-hover px-3 text-muted font-weight-bold" 
+							style="border-radius: 6px; background-color: transparent;"
 							id="pills-profile-tab" 
 							data-bs-toggle="pill" 
 							data-bs-target="#pills-profile" 
@@ -35,18 +45,19 @@
 							aria-controls="pills-profile" 
 							aria-selected="false"
 							@click="consultaActiva(true, true)">
-						Consultas pendientes
+						Pendientes
 						</button>
 					</li>
 				</ul>
 			</div>
 		</div>
 
-		<div class="card pb-4">
-					<div class="row px-1 shadow consult-content pb-3">
-						<div class="col-12 mt-3">
-							<button class="btn btn-outline-secondary" @click="showConsult()"><i class="fas fa-redo-alt"></i> Actualizar listado</button>
-						</div>
+		<div class="card border-0 shadow-sm mb-4" style="border-radius: 10px; background-color: #fff;">
+			<div class="card-body p-4">
+				<div class="row">
+					<div class="col-12 mb-3">
+						<button class="btn btn-light shadow-sm text-primary font-weight-bold rounded-pill px-4" @click="showConsult()"><i class="fas fa-redo-alt mr-1"></i> Actualizar listado</button>
+					</div>
 
 				<!-- Ayer -->
 				<div class="col-md-4 dayCalendar before">
@@ -173,10 +184,11 @@
 						></consult-card>
 					</div>
 
-					<div v-else class="text-center"> <span v-if="dayActive">No hay Citas</span> </div>
+					<div v-else class="text-center text-muted small py-3"> <span v-if="dayActive">No hay Citas</span> </div>
 				</div>
 
 
+				</div>
 			</div>
 		</div>
 

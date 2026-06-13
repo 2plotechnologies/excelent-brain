@@ -3642,10 +3642,12 @@ var render = function render() {
   }, [_vm._m(0), _vm._v(" "), _c("div", {
     staticClass: "modal-body bg-light p-4"
   }, [_vm.loading ? _c("div", {
+    key: "loading",
     staticClass: "text-center py-5"
   }, [_vm._m(1), _vm._v(" "), _c("p", {
     staticClass: "mt-2 text-muted"
   }, [_vm._v("Obteniendo respuestas...")])]) : _vm.error ? _c("div", {
+    key: "error",
     staticClass: "alert alert-warning shadow-sm border-0 d-flex align-items-center p-4 rounded-lg"
   }, [_c("i", {
     staticClass: "fas fa-exclamation-triangle fa-2x me-3 text-warning"
@@ -3653,7 +3655,9 @@ var render = function render() {
     staticClass: "mb-1 text-warning font-weight-bold"
   }, [_vm._v("Aviso")]), _vm._v(" "), _c("p", {
     staticClass: "mb-0"
-  }, [_vm._v(_vm._s(_vm.error))])])]) : _vm.respuestas ? _c("div", [_c("div", {
+  }, [_vm._v(_vm._s(_vm.error))])])]) : _vm.respuestas ? _c("div", {
+    key: "respuestas"
+  }, [_c("div", {
     staticClass: "card border-0 shadow-sm mb-3 rounded-lg"
   }, [_c("div", {
     staticClass: "card-body"
@@ -5658,6 +5662,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
 /* harmony export */ });
 var render = function render() {
+  var _vm$patient;
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
@@ -5678,7 +5683,7 @@ var render = function render() {
     staticClass: "modal-header border-0"
   }, [_c("h5", {
     staticClass: "modal-title"
-  }, [_vm._v("\n          💬 Recomendaciones - " + _vm._s(_vm.patient.nombres) + "\n        ")]), _vm._v(" "), _c("button", {
+  }, [_vm._v("\n          💬 Recomendaciones - " + _vm._s((_vm$patient = _vm.patient) === null || _vm$patient === void 0 ? void 0 : _vm$patient.nombres) + "\n        ")]), _vm._v(" "), _c("button", {
     staticClass: "btn-close",
     attrs: {
       "data-bs-dismiss": "modal",

@@ -12,7 +12,7 @@ class PacienteCertificadoController extends Controller
 {
     public function index(Request $request)
     {
-        $query = PacienteCertificado::withCount('pagos');
+        $query = PacienteCertificado::withCount('pagos')->with('professional');
 
         if ($request->filled('search')) {
 
@@ -153,5 +153,19 @@ class PacienteCertificadoController extends Controller
             'pago' => $pagoExtra,
             'paciente' => $paciente
         ]);
+    }
+
+    public function guardarHistoria(Request $request, $id)
+    {
+        $paciente = PacienteCertificado::findOrFail($id);
+        
+        $data = $request->validate([
+            'historia' => 'nullable|string',
+            'professional_id' => 'nullable|exists:professionals,id'
+        ]);
+        
+        $paciente->update($data);
+        
+        return response()->json($paciente->load('professional'));
     }
 }

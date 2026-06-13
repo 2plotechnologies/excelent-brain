@@ -1,119 +1,106 @@
 <template>
-	<main>
-		<div class="d-sm-flex align-items-center justify-content-between mb-1">
-			<h1 class="h3 mb-0 text-gray-800">Historias Clínicas</h1>
-		</div>
-		<div class="d-sm-flex align-items-center justify-content-between flex-wrap mt-2 gap-10">
-			<form class="d-sm-inline-block form-inline form-search-historia" @submit.prevent>
-				<div class="input-group">
-					<input type="text" id="searchHistoriaProfesional" class="form-control bg-white shadow-sm border-0 small"
-						placeholder="Buscar..." aria-label="Search" aria-describedby="basic-addon2" @keyup.enter="searchHistoria()">
-					<div class="input-group-append">
-						<button class="btn btn-primary" type="button" @click="searchHistoria()">
-							<i class="fas fa-search fa-sm"></i>
-						</button>
-					</div>
-				</div>
-			</form>
-			<div class="d-flex align-items-center ms-5">
-				<ul class="nav nav-pills" id="pills-tab" role="tablist">
-					<li class="nav-item" role="presentation">
-						<button class="btn btn-sm btn-outline-secondary order-active" id="pills-home-tab" data-bs-toggle="pill"
-							@click="getPatient()">
-							<i class="fa-solid fa-eraser"></i> Limpiar búsqueda
-						</button>
-					</li>
-					<!-- <li class="nav-item" role="presentation">
-						<button class="btn btn-sm btn-warning order-active" id="pills-home-tab" data-bs-toggle="pill"
-							data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true"
-							data-orden="true" @click="ordenarAsc()">
-							Ascendente
-						</button>
-					</li>
-					<li class="nav-item" role="presentation">
-						<button class="btn btn-sm btn-light" id="pills-profile-tab" data-bs-toggle="pill"
-							data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false"
-							data-orden="false" @click="ordenarDesc()">
-							Descendente
-						</button>
-					</li> -->
-				</ul>
+	<main class="p-4" style="background-color: #f8f9fc; min-height: 100vh;">
+		<div class="d-sm-flex align-items-center justify-content-between mb-4">
+			<div>
+				<h4 class="m-0 font-weight-bold text-dark"><i class="fas fa-file-medical text-primary mr-2"></i> Historias Clínicas</h4>
+				<small class="text-muted">Gestión de pacientes e historiales</small>
 			</div>
 		</div>
-
-		<h4 class="mt-3">Mis pacientes asignados</h4>
-
-		<div class="row historia-card">
-			<div class="" v-for="(historia, index) in busqueda" :key="index">
-				<div class="card h-100 shadow">
-					<!-- Card Header - Dropdown -->
-					<div v-if="historia.discharge != 1"
-						class="card-header bg-warning py-3 d-flex flex-row align-items-center justify-content-between">
-						<h6 class="m-0 font-weight-bold text-white">Código de Paciente: {{ historia.id }}</h6>
-					</div>
-					<div v-else class="card-header bg-success py-3 d-flex flex-row align-items-center justify-content-between">
-						<h6 class="m-0 font-weight-bold text-white">Código de Paciente: {{ historia.id }}</h6>
-					</div>
-					<!-- Card Body -->
-					<div class="card-body">
-						<div class="historia-info">
-							<p class="text-capitalize">Paciente: <span class="fst-italic">{{ historia.name ? lowerCase(historia.name) +', '+ lowerCase(historia.nombres) : '...' }}</span></p>
-							<p v-if="historia.alta_psicologica == 1 && historia.alta_psiquiatrica == 1" class="text-success fw-bold">Paciente con Alta Psicológica y Psiquiátrica</p>
-							<p v-else-if="historia.alta_psicologica == 1" class="text-info fw-bold">Paciente con Alta Psicológica</p>
-							<p v-else-if="historia.alta_psiquiatrica == 1" class="text-success fw-bold">Paciente con Alta Psiquiátrica</p>
-							<p v-if="!historia.initial_psychological_history
-								&& dataUser.profession === 'Psicólogo'" class="text-danger">
-								Sin historia inicial de psicología
-							</p>
-
-							<p v-if="!historia.initial_psychiatric_history
-								&& dataUser.profession === 'Psiquiatra'" class="text-danger">Sin historia inicial de
-								psiquiatra</p>
-
-							<div class="w-100 d-flex align-items-center gap-10">
-								<a class="btn btn-secondary btn-circle opacity-50 cursor-disabled"
-									title="Sin historia inicial de psicologia" v-if="!historia.initial_psychological_history
-										&& dataUser.profession === 'Psicólogo'">
-									<i class="fa-solid fa-user-slash"></i>
-								</a>
-								<a class="btn btn-secondary btn-circle opacity-50 cursor-disabled"
-									title="Sin historia inicial de psiquiatra" v-else-if="!historia.initial_psychiatric_history
-										&& dataUser.profession === 'Psiquiatra'">
-									<i class="fa-solid fa-user-slash"></i>
-								</a>
-								<router-link class="btn btn-primary btn-circle" :to="`evoluciones/${historia.id}`" title="Ver evoluciones"
-									v-else>
-									<i class="fa-solid fa-user-doctor"></i>
-								</router-link>
-								
-								<router-link class="btn btn-success btn-circle" :to="`evoluciones/${historia.id}`" title="Ver evoluciones"
-									v-if="dataUser.id==5 || dataUser.id==18">
-									<i class="fa-solid fa-user-doctor"></i>
-								</router-link>
-
-								<a v-if="dataUser.id==5 || dataUser.id==18" :href="`/api/pdfEvolution/thorough/${historia.id}?token=${$token}`" class="btn btn-primary btn-circle" title="Generar PDF para evoluciones" target="_blank"> <i class="fas fa-file-pdf"></i> </a>
-								<a v-else :href="`/api/pdfEvolution/restricted/${historia.id}?token=${$token}`" class="btn btn-primary btn-circle" title="Generar PDF para evoluciones" target="_blank"> <i class="fas fa-file-pdf"></i> </a>
-								<a v-if="dataUser.profession!='Psicólogo'" :href="`/profesional/recetas/${historia.id}`" class="btn btn-primary btn-circle" title="Generar receta"><i class="fa-solid fa-vial"></i></a>
-								<button 
-									@click="prepararPaciente(historia)" class="btn btn-info btn-circle text-white" title="Agregar triaje" >
-									<i class="fa-solid fa-shield-heart"></i>
+		
+		<div class="card border-0 shadow-sm mb-4" style="border-radius: 10px;">
+			<div class="card-body p-4">
+				<div class="d-sm-flex align-items-center justify-content-between flex-wrap mb-4 gap-10">
+					<form class="d-sm-inline-block form-inline form-search-historia w-100" style="max-width: 400px;" @submit.prevent>
+						<div class="input-group shadow-sm" style="border-radius: 8px; overflow: hidden;">
+							<span class="input-group-text bg-white border-0 text-primary"><i class="fas fa-search"></i></span>
+							<input type="text" id="searchHistoriaProfesional" class="form-control border-0 py-2"
+								placeholder="Buscar paciente por nombre..." aria-label="Search" aria-describedby="basic-addon2" @keyup.enter="searchHistoria()">
+							<button class="btn btn-primary px-3 font-weight-bold" type="button" @click="searchHistoria()">
+								Buscar
+							</button>
+						</div>
+					</form>
+					<div class="d-flex align-items-center mt-3 mt-sm-0">
+						<ul class="nav nav-pills" id="pills-tab" role="tablist">
+							<li class="nav-item" role="presentation">
+								<button class="btn btn-sm btn-light shadow-sm text-muted font-weight-bold rounded-pill px-3 order-active" id="pills-home-tab" data-bs-toggle="pill"
+									@click="getPatient()">
+									<i class="fa-solid fa-eraser mr-1"></i> Limpiar búsqueda
 								</button>
-								<button 
-									@click="datosPaciente = historia" class="btn btn-secondary btn-circle" title="Ver autotriaje" data-bs-toggle="modal" data-bs-target="#modalVerAutoTriaje">
-									<i class="fa-solid fa-clipboard-list"></i>
-								</button>
-								<!--Cargar mensajes del chat de recepcionista a profesional.-->
-								<a 
-									class="btn btn-success btn-circle"
-									title="Ver chat"
-									@click="abrirChat(historia)"
-									>
-									<i class="fa-solid fa-comment-dots"></i>
-								</a>
-							</div>
+							</li>
+							<!-- Botones de orden ocultos -->
+						</ul>
+					</div>
+				</div>
+
+				<h6 class="font-weight-bold text-dark mb-3 text-uppercase small">Mis pacientes asignados</h6>
+
+		<div class="historia-card mt-2">
+			<div class="card h-100 border-0 shadow-sm" v-for="(historia, index) in busqueda" :key="index" style="border-radius: 10px; overflow: hidden;" :style="historia.discharge != 1 ? 'border-top: 4px solid #f6c23e !important;' : 'border-top: 4px solid #1cc88a !important;'">
+				<div class="card-body p-4 d-flex flex-column">
+					<div class="d-flex justify-content-between align-items-start mb-3">
+						<h6 class="m-0 font-weight-bold text-dark text-capitalize" style="line-height: 1.4;">{{ historia.name ? lowerCase(historia.name) +', '+ lowerCase(historia.nombres) : '...' }}</h6>
+						<span class="badge" :class="historia.discharge != 1 ? 'bg-warning-light text-dark' : 'bg-success-light text-success'">ID: {{ historia.id }}</span>
+					</div>
+					
+					<div class="historia-info">
+						<div class="mb-3">
+							<p v-if="historia.alta_psicologica == 1 && historia.alta_psiquiatrica == 1" class="text-success small fw-bold mb-1"><i class="fas fa-check-circle mr-1"></i> Alta Psicológica y Psiquiátrica</p>
+							<p v-else-if="historia.alta_psicologica == 1" class="text-info small fw-bold mb-1"><i class="fas fa-check-circle mr-1"></i> Alta Psicológica</p>
+							<p v-else-if="historia.alta_psiquiatrica == 1" class="text-success small fw-bold mb-1"><i class="fas fa-check-circle mr-1"></i> Alta Psiquiátrica</p>
+							
+							<p v-if="!historia.initial_psychological_history && dataUser.profession === 'Psicólogo'" class="text-danger small mb-1"><i class="fas fa-exclamation-triangle mr-1"></i> Sin historia inicial de psicología</p>
+							<p v-if="!historia.initial_psychiatric_history && dataUser.profession === 'Psiquiatra'" class="text-danger small mb-1"><i class="fas fa-exclamation-triangle mr-1"></i> Sin historia inicial de psiquiatra</p>
+						</div>
+
+						<div class="w-100 d-flex align-items-center flex-wrap gap-2 mt-auto pt-3 border-top">
+							<a class="btn btn-light btn-sm text-muted cursor-disabled rounded-circle shadow-sm" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"
+								title="Sin historia inicial de psicologia" v-if="!historia.initial_psychological_history
+									&& dataUser.profession === 'Psicólogo'">
+								<i class="fa-solid fa-user-slash"></i>
+							</a>
+							<a class="btn btn-light btn-sm text-muted cursor-disabled rounded-circle shadow-sm" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"
+								title="Sin historia inicial de psiquiatra" v-else-if="!historia.initial_psychiatric_history
+									&& dataUser.profession === 'Psiquiatra'">
+								<i class="fa-solid fa-user-slash"></i>
+							</a>
+							<router-link class="btn btn-primary btn-sm rounded-circle shadow-sm" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;" :to="`evoluciones/${historia.id}`" title="Ver evoluciones"
+								v-else>
+								<i class="fa-solid fa-user-doctor"></i>
+							</router-link>
+							
+							<router-link class="btn btn-success btn-sm rounded-circle shadow-sm" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;" :to="`evoluciones/${historia.id}`" title="Ver evoluciones"
+								v-if="dataUser.id==5 || dataUser.id==18">
+								<i class="fa-solid fa-user-doctor"></i>
+							</router-link>
+
+							<a v-if="dataUser.id==5 || dataUser.id==18" :href="`/api/pdfEvolution/thorough/${historia.id}?token=${$token}`" class="btn btn-danger btn-sm rounded-circle shadow-sm" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;" title="Generar PDF para evoluciones" target="_blank"> <i class="fas fa-file-pdf"></i> </a>
+							<a v-else :href="`/api/pdfEvolution/restricted/${historia.id}?token=${$token}`" class="btn btn-danger btn-sm rounded-circle shadow-sm" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;" title="Generar PDF para evoluciones" target="_blank"> <i class="fas fa-file-pdf"></i> </a>
+							
+							<a v-if="dataUser.profession!='Psicólogo'" :href="`/profesional/recetas/${historia.id}`" class="btn btn-info btn-sm text-white rounded-circle shadow-sm" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;" title="Generar receta"><i class="fa-solid fa-vial"></i></a>
+							
+							<button 
+								@click="prepararPaciente(historia)" class="btn btn-warning btn-sm text-dark rounded-circle shadow-sm" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;" title="Agregar triaje" >
+								<i class="fa-solid fa-shield-heart"></i>
+							</button>
+							<button 
+								@click="datosPaciente = historia" class="btn btn-secondary btn-sm rounded-circle shadow-sm" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;" title="Ver autotriaje" data-bs-toggle="modal" data-bs-target="#modalVerAutoTriaje">
+								<i class="fa-solid fa-clipboard-list"></i>
+							</button>
+							<!--Cargar mensajes del chat de recepcionista a profesional.-->
+							<a 
+								class="btn btn-success btn-sm rounded-circle shadow-sm" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"
+								title="Ver chat"
+								@click="abrirChat(historia)"
+								>
+								<i class="fa-solid fa-comment-dots"></i>
+							</a>
 						</div>
 					</div>
 				</div>
+			</div>
+		</div>
+		
 			</div>
 		</div>
 
@@ -274,7 +261,7 @@ export default {
 }
 
 .historia-info {
-	height: 100%;
+	flex-grow: 1;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -300,5 +287,12 @@ export default {
 
 .cursor-disabled {
 	cursor: not-allowed !important;
+}
+
+.bg-warning-light {
+	background-color: #fdf3d8;
+}
+.bg-success-light {
+	background-color: #e3fbed;
 }
 </style>

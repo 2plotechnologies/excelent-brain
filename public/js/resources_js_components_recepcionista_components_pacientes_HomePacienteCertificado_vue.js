@@ -45,6 +45,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       },
       servicios: [],
       monedas: [],
+      professionals: [],
       modalPayment: null,
       savingPago: false,
       pagoForm: {
@@ -54,6 +55,14 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         tipo_comprobante: '1',
         voucher: '',
         motivo: ''
+      },
+      modalHistory: null,
+      savingHistory: false,
+      formHistoria: {
+        id: null,
+        paciente_nombre: '',
+        historia: '',
+        professional_id: ''
       },
       pagination: {
         current_page: 1,
@@ -78,40 +87,47 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         pagesArray.push(page);
       }
       return pagesArray;
+    },
+    activeProfessionals: function activeProfessionals() {
+      return this.professionals.filter(function (p) {
+        return p.activo == 1 || p.activo == '1';
+      });
     }
   },
   methods: {
     cargarListas: function cargarListas() {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var _yield$Promise$all, _yield$Promise$all2, monedasRes, preciosRes, permitidos;
+        var _yield$Promise$all, _yield$Promise$all2, monedasRes, preciosRes, professionalsRes, permitidos;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
               _context.prev = 0;
               _context.next = 3;
-              return Promise.all([_this.axios.get('/api/listarMonedas'), _this.axios.get('/api/listarPreciosTodos')]);
+              return Promise.all([_this.axios.get('/api/listarMonedas'), _this.axios.get('/api/listarPreciosTodos'), _this.axios.get('/api/professional')]);
             case 3:
               _yield$Promise$all = _context.sent;
-              _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 2);
+              _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 3);
               monedasRes = _yield$Promise$all2[0];
               preciosRes = _yield$Promise$all2[1];
+              professionalsRes = _yield$Promise$all2[2];
               _this.monedas = monedasRes.data;
-              permitidos = ['Rotación de servicio', 'Prácticas pre profesionales', 'Serum', 'Nombramiento', 'Certificado de trabajo simple'];
+              _this.professionals = professionalsRes.data;
+              permitidos = ['Rotación de servicio', 'Prácticas pre profesionales', 'Serum', 'Nombramiento', 'Certificado de trabajo simple', 'Informe Psicológico', 'Informe Psiquiátrico', 'Hoja membretada'];
               _this.servicios = preciosRes.data.filter(function (p) {
                 return p.idClasificacion === 3 && permitidos.includes(p.descripcion.trim());
               });
-              _context.next = 15;
+              _context.next = 17;
               break;
-            case 12:
-              _context.prev = 12;
+            case 14:
+              _context.prev = 14;
               _context.t0 = _context["catch"](0);
               console.error('Error cargando listas:', _context.t0);
-            case 15:
+            case 17:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[0, 12]]);
+        }, _callee, null, [[0, 14]]);
       }))();
     },
     buscarDatosDNI: function buscarDatosDNI() {
@@ -546,6 +562,67 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         };
       }());
     },
+    openHistoryModal: function openHistoryModal(paciente) {
+      this.formHistoria = {
+        id: paciente.id,
+        paciente_nombre: "".concat(paciente.nombres, " ").concat(paciente.apellidos),
+        historia: paciente.historia || '',
+        professional_id: paciente.professional_id || ''
+      };
+      if (!this.modalHistory) {
+        this.modalHistory = new window.bootstrap.Modal(this.$refs.modalHistoryForm);
+      }
+      this.modalHistory.show();
+    },
+    closeHistoryModal: function closeHistoryModal() {
+      if (this.modalHistory) this.modalHistory.hide();
+    },
+    submitHistoria: function submitHistoria() {
+      var _this10 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
+        var _error$response2;
+        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+          while (1) switch (_context9.prev = _context9.next) {
+            case 0:
+              _this10.savingHistory = true;
+              _context9.prev = 1;
+              _context9.next = 4;
+              return _this10.axios.put("/api/paciente-certificado/".concat(_this10.formHistoria.id, "/historia"), {
+                historia: _this10.formHistoria.historia,
+                professional_id: _this10.formHistoria.professional_id
+              });
+            case 4:
+              _this10.$swal({
+                icon: 'success',
+                title: 'Historia Guardada',
+                text: 'Se registraron los datos de la historia y firma.',
+                showConfirmButton: false,
+                timer: 1500
+              });
+              _this10.closeHistoryModal();
+              _this10.cargarPacientes(_this10.pagination.current_page);
+              _context9.next = 13;
+              break;
+            case 9:
+              _context9.prev = 9;
+              _context9.t0 = _context9["catch"](1);
+              console.error('Error guardando historia:', _context9.t0);
+              _this10.$swal({
+                icon: 'error',
+                title: 'Error',
+                text: ((_error$response2 = _context9.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || 'No se pudo guardar la historia clínica.'
+              });
+            case 13:
+              _context9.prev = 13;
+              _this10.savingHistory = false;
+              return _context9.finish(13);
+            case 16:
+            case "end":
+              return _context9.stop();
+          }
+        }, _callee9, null, [[1, 9, 13, 16]]);
+      }))();
+    },
     getNombreServicio: function getNombreServicio(id) {
       var s = this.servicios.find(function (x) {
         return x.id.toString() === (id === null || id === void 0 ? void 0 : id.toString());
@@ -578,25 +655,26 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     }
   },
   mounted: function mounted() {
-    var _this10 = this;
-    return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
-      return _regeneratorRuntime().wrap(function _callee9$(_context9) {
-        while (1) switch (_context9.prev = _context9.next) {
+    var _this11 = this;
+    return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
+      return _regeneratorRuntime().wrap(function _callee10$(_context10) {
+        while (1) switch (_context10.prev = _context10.next) {
           case 0:
-            _context9.next = 2;
-            return _this10.cargarListas();
+            _context10.next = 2;
+            return _this11.cargarListas();
           case 2:
-            _this10.cargarPacientes();
+            _this11.cargarPacientes();
           case 3:
           case "end":
-            return _context9.stop();
+            return _context10.stop();
         }
-      }, _callee9);
+      }, _callee10);
     }))();
   },
   beforeDestroy: function beforeDestroy() {
     if (this.modal) this.modal.dispose();
     if (this.modalPayment) this.modalPayment.dispose();
+    if (this.modalHistory) this.modalHistory.dispose();
   }
 });
 
@@ -740,8 +818,17 @@ var render = function render() {
     }, [_vm._v("-")])]), _vm._v(" "), _c("td", {
       staticClass: "text-center"
     }, [_c("span", {
-      staticClass: "badge bg-light text-dark px-3 py-2 rounded-pill font-weight-bold border"
-    }, [_vm._v("\n                " + _vm._s(_vm.getNombreServicio(paciente.tipo_certificado)) + "\n              ")])]), _vm._v(" "), _c("td", {
+      staticClass: "badge bg-light text-dark px-3 py-2 rounded-pill font-weight-bold border mb-1 d-inline-block"
+    }, [_vm._v("\n                " + _vm._s(_vm.getNombreServicio(paciente.tipo_certificado)) + "\n              ")]), _vm._v(" "), paciente.professional ? _c("div", {
+      staticClass: "text-xs text-muted mt-1",
+      staticStyle: {
+        "font-size": "0.75rem"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-signature text-primary mr-1"
+    }), _vm._v(" Firma: "), _c("span", {
+      staticClass: "font-weight-bold"
+    }, [_vm._v(_vm._s(paciente.professional.name))])]) : _vm._e()]), _vm._v(" "), _c("td", {
       staticClass: "text-center"
     }, [_c("select", {
       directives: [{
@@ -810,6 +897,18 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fas fa-check-circle"
+    })]), _vm._v(" "), _c("button", {
+      staticClass: "btn btn-icon-history",
+      attrs: {
+        title: "Historia"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.openHistoryModal(paciente);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-file-medical"
     })]), _vm._v(" "), _c("button", {
       staticClass: "btn btn-icon-edit",
       attrs: {
@@ -1348,7 +1447,140 @@ var render = function render() {
     }
   }) : _c("i", {
     staticClass: "fas fa-check mr-1"
-  }), _vm._v(" Confirmar Pago\n            ")])])])])])])]);
+  }), _vm._v(" Confirmar Pago\n            ")])])])])])]), _vm._v(" "), _c("div", {
+    ref: "modalHistoryForm",
+    staticClass: "modal fade",
+    attrs: {
+      id: "modalHistoriaCertificado",
+      tabindex: "-1",
+      "aria-labelledby": "modalHistoriaCertificadoLabel",
+      "aria-hidden": "true"
+    }
+  }, [_c("div", {
+    staticClass: "modal-dialog modal-dialog-centered"
+  }, [_c("div", {
+    staticClass: "modal-content border-0 shadow-lg rounded-4"
+  }, [_c("div", {
+    staticClass: "modal-header border-0 pb-0 px-4 pt-4"
+  }, [_vm._m(16), _vm._v(" "), _c("button", {
+    staticClass: "btn-close",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal",
+      "aria-label": "Close"
+    },
+    on: {
+      click: _vm.closeHistoryModal
+    }
+  })]), _vm._v(" "), _c("form", {
+    on: {
+      submit: function submit($event) {
+        $event.preventDefault();
+        return _vm.submitHistoria.apply(null, arguments);
+      }
+    }
+  }, [_c("div", {
+    staticClass: "modal-body p-4"
+  }, [_c("div", {
+    staticClass: "row g-3"
+  }, [_c("div", {
+    staticClass: "col-12"
+  }, [_c("label", {
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Paciente")]), _vm._v(" "), _c("input", {
+    staticClass: "form-control bg-light",
+    attrs: {
+      type: "text",
+      readonly: ""
+    },
+    domProps: {
+      value: _vm.formHistoria.paciente_nombre
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-12"
+  }, [_vm._m(17), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.formHistoria.professional_id,
+      expression: "formHistoria.professional_id"
+    }],
+    staticClass: "form-select",
+    attrs: {
+      required: ""
+    },
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.formHistoria, "professional_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "",
+      disabled: ""
+    }
+  }, [_vm._v("Seleccione el profesional")]), _vm._v(" "), _vm._l(_vm.activeProfessionals, function (prof) {
+    return _c("option", {
+      key: prof.id,
+      domProps: {
+        value: prof.id
+      }
+    }, [_vm._v("\n                    " + _vm._s(prof.name) + " (" + _vm._s(prof.profession) + ")\n                  ")]);
+  })], 2)]), _vm._v(" "), _c("div", {
+    staticClass: "col-12"
+  }, [_vm._m(18), _vm._v(" "), _c("textarea", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.formHistoria.historia,
+      expression: "formHistoria.historia"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      rows: "6",
+      required: "",
+      placeholder: "Escriba el detalle de la historia o informe aquí..."
+    },
+    domProps: {
+      value: _vm.formHistoria.historia
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.formHistoria, "historia", $event.target.value);
+      }
+    }
+  })])])]), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer border-0 p-4 pt-0"
+  }, [_c("button", {
+    staticClass: "btn btn-light rounded-pill px-4 text-muted font-weight-bold",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    },
+    on: {
+      click: _vm.closeHistoryModal
+    }
+  }, [_vm._v("Cancelar")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-indigo text-white rounded-pill px-4 shadow font-weight-bold",
+    attrs: {
+      type: "submit",
+      disabled: _vm.savingHistory
+    }
+  }, [_vm.savingHistory ? _c("span", {
+    staticClass: "spinner-border spinner-border-sm mr-2",
+    attrs: {
+      role: "status"
+    }
+  }) : _c("i", {
+    staticClass: "fas fa-save mr-1"
+  }), _vm._v(" Guardar Historia\n            ")])])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -1507,6 +1739,33 @@ var staticRenderFns = [function () {
   }, [_vm._v("Motivo / Observación "), _c("span", {
     staticClass: "text-danger"
   }, [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h5", {
+    staticClass: "modal-title font-weight-bold text-dark",
+    attrs: {
+      id: "modalHistoriaCertificadoLabel"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-file-medical text-indigo mr-2"
+  }), _vm._v(" Historia Clínica & Firma\n          ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Profesional que Firma "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("label", {
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Historia / Observaciones "), _c("span", {
+    staticClass: "text-danger"
+  }, [_vm._v("*")])]);
 }];
 render._withStripped = true;
 
@@ -1529,7 +1788,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.paciente-certificado-container[data-v-76e7cc44] {\n  max-width: 1200px;\n  margin: 0 auto;\n}\n\n/* Color definitions */\n.text-indigo[data-v-76e7cc44] {\n  color: #6366f1 !important;\n}\n.bg-indigo[data-v-76e7cc44] {\n  background-color: #6366f1 !important;\n}\n.bg-indigo-soft[data-v-76e7cc44] {\n  background-color: #e0e7ff !important;\n}\n.text-emerald[data-v-76e7cc44] {\n  color: #10b981 !important;\n}\n.bg-emerald[data-v-76e7cc44] {\n  background-color: #10b981 !important;\n}\n.bg-emerald-soft[data-v-76e7cc44] {\n  background-color: #d1fae5 !important;\n}\n.bg-primary-soft[data-v-76e7cc44] {\n  background-color: #e0f2fe !important;\n}\n\n/* Metric Cards styling */\n.metric-card[data-v-76e7cc44] {\n  transition: transform 0.2s ease, box-shadow 0.2s ease;\n}\n.metric-card[data-v-76e7cc44]:hover {\n  transform: translateY(-3px);\n  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;\n}\n.metric-progress[data-v-76e7cc44] {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  height: 4px;\n  opacity: 0.8;\n}\n\n/* Table styling */\n.patient-row[data-v-76e7cc44] {\n  transition: background-color 0.15s ease;\n}\n.patient-row[data-v-76e7cc44]:hover {\n  background-color: #f8fafc;\n}\n\n/* Avatar circle */\n.avatar-circle[data-v-76e7cc44] {\n  width: 38px;\n  height: 38px;\n  border-radius: 50%;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-weight: bold;\n  font-size: 0.85rem;\n}\n.avatar-circle.bg-primary-soft[data-v-76e7cc44] { color: #0284c7;\n}\n.avatar-circle.bg-success-soft[data-v-76e7cc44] { color: #15803d; color: #10b981; background-color: #d1fae5;\n}\n.avatar-circle.bg-info-soft[data-v-76e7cc44] { color: #0891b2; background-color: #ecfeff;\n}\n.avatar-circle.bg-warning-soft[data-v-76e7cc44] { color: #b45309; background-color: #fef3c7;\n}\n.avatar-circle.bg-danger-soft[data-v-76e7cc44] { color: #b91c1c; background-color: #fee2e2;\n}\n\n/* Badges */\n.badge-trabajo[data-v-76e7cc44] {\n  background-color: #e0e7ff;\n  color: #4f46e5;\n  border: 1px solid #c7d2fe;\n}\n.badge-estudios[data-v-76e7cc44] {\n  background-color: #d1fae5;\n  color: #065f46;\n  border: 1px solid #a7f3d0;\n}\n\n/* Action Buttons */\n.btn-icon-edit[data-v-76e7cc44], .btn-icon-delete[data-v-76e7cc44] {\n  background: transparent;\n  border: none;\n  border-radius: 50%;\n  width: 32px;\n  height: 32px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  transition: all 0.2s ease;\n}\n.btn-icon-edit[data-v-76e7cc44] {\n  color: #3b82f6;\n}\n.btn-icon-edit[data-v-76e7cc44]:hover {\n  background-color: #dbeafe;\n  color: #1d4ed8;\n}\n.btn-icon-delete[data-v-76e7cc44] {\n  color: #ef4444;\n}\n.btn-icon-delete[data-v-76e7cc44]:hover {\n  background-color: #fee2e2;\n  color: #b91c1c;\n}\n\n/* Custom styles for modern input fields */\n.form-control[data-v-76e7cc44], .form-select[data-v-76e7cc44] {\n  border-radius: 10px;\n  padding: 0.6rem 0.9rem;\n  border-color: #e2e8f0;\n  box-shadow: none !important;\n  transition: border-color 0.2s ease;\n}\n.form-control[data-v-76e7cc44]:focus, .form-select[data-v-76e7cc44]:focus {\n  border-color: #3b82f6;\n}\n.input-group-text[data-v-76e7cc44] {\n  border-radius: 10px;\n  border-color: #e2e8f0;\n}\n\n/* Transitions */\n.hover-lift[data-v-76e7cc44] {\n  transition: transform 0.2s ease, box-shadow 0.2s ease;\n}\n.hover-lift[data-v-76e7cc44]:hover {\n  transform: translateY(-1px);\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.paciente-certificado-container[data-v-76e7cc44] {\n  max-width: 1200px;\n  margin: 0 auto;\n}\n\n/* Color definitions */\n.text-indigo[data-v-76e7cc44] {\n  color: #6366f1 !important;\n}\n.bg-indigo[data-v-76e7cc44] {\n  background-color: #6366f1 !important;\n}\n.bg-indigo-soft[data-v-76e7cc44] {\n  background-color: #e0e7ff !important;\n}\n.text-emerald[data-v-76e7cc44] {\n  color: #10b981 !important;\n}\n.bg-emerald[data-v-76e7cc44] {\n  background-color: #10b981 !important;\n}\n.bg-emerald-soft[data-v-76e7cc44] {\n  background-color: #d1fae5 !important;\n}\n.bg-primary-soft[data-v-76e7cc44] {\n  background-color: #e0f2fe !important;\n}\n\n/* Metric Cards styling */\n.metric-card[data-v-76e7cc44] {\n  transition: transform 0.2s ease, box-shadow 0.2s ease;\n}\n.metric-card[data-v-76e7cc44]:hover {\n  transform: translateY(-3px);\n  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;\n}\n.metric-progress[data-v-76e7cc44] {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  height: 4px;\n  opacity: 0.8;\n}\n\n/* Table styling */\n.patient-row[data-v-76e7cc44] {\n  transition: background-color 0.15s ease;\n}\n.patient-row[data-v-76e7cc44]:hover {\n  background-color: #f8fafc;\n}\n\n/* Avatar circle */\n.avatar-circle[data-v-76e7cc44] {\n  width: 38px;\n  height: 38px;\n  border-radius: 50%;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-weight: bold;\n  font-size: 0.85rem;\n}\n.avatar-circle.bg-primary-soft[data-v-76e7cc44] { color: #0284c7;\n}\n.avatar-circle.bg-success-soft[data-v-76e7cc44] { color: #15803d; color: #10b981; background-color: #d1fae5;\n}\n.avatar-circle.bg-info-soft[data-v-76e7cc44] { color: #0891b2; background-color: #ecfeff;\n}\n.avatar-circle.bg-warning-soft[data-v-76e7cc44] { color: #b45309; background-color: #fef3c7;\n}\n.avatar-circle.bg-danger-soft[data-v-76e7cc44] { color: #b91c1c; background-color: #fee2e2;\n}\n\n/* Badges */\n.badge-trabajo[data-v-76e7cc44] {\n  background-color: #e0e7ff;\n  color: #4f46e5;\n  border: 1px solid #c7d2fe;\n}\n.badge-estudios[data-v-76e7cc44] {\n  background-color: #d1fae5;\n  color: #065f46;\n  border: 1px solid #a7f3d0;\n}\n\n/* Action Buttons */\n.btn-icon-edit[data-v-76e7cc44], .btn-icon-delete[data-v-76e7cc44], .btn-icon-history[data-v-76e7cc44] {\n  background: transparent;\n  border: none;\n  border-radius: 50%;\n  width: 32px;\n  height: 32px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  transition: all 0.2s ease;\n}\n.btn-icon-edit[data-v-76e7cc44] {\n  color: #3b82f6;\n}\n.btn-icon-edit[data-v-76e7cc44]:hover {\n  background-color: #dbeafe;\n  color: #1d4ed8;\n}\n.btn-icon-delete[data-v-76e7cc44] {\n  color: #ef4444;\n}\n.btn-icon-delete[data-v-76e7cc44]:hover {\n  background-color: #fee2e2;\n  color: #b91c1c;\n}\n.btn-icon-history[data-v-76e7cc44] {\n  color: #6366f1;\n}\n.btn-icon-history[data-v-76e7cc44]:hover {\n  background-color: #e0e7ff;\n  color: #4f46e5;\n}\n.btn-indigo[data-v-76e7cc44] {\n  background-color: #6366f1;\n  border-color: #6366f1;\n}\n.btn-indigo[data-v-76e7cc44]:hover {\n  background-color: #4f46e5;\n  border-color: #4f46e5;\n}\n\n/* Custom styles for modern input fields */\n.form-control[data-v-76e7cc44], .form-select[data-v-76e7cc44] {\n  border-radius: 10px;\n  padding: 0.6rem 0.9rem;\n  border-color: #e2e8f0;\n  box-shadow: none !important;\n  transition: border-color 0.2s ease;\n}\n.form-control[data-v-76e7cc44]:focus, .form-select[data-v-76e7cc44]:focus {\n  border-color: #3b82f6;\n}\n.input-group-text[data-v-76e7cc44] {\n  border-radius: 10px;\n  border-color: #e2e8f0;\n}\n\n/* Transitions */\n.hover-lift[data-v-76e7cc44] {\n  transition: transform 0.2s ease, box-shadow 0.2s ease;\n}\n.hover-lift[data-v-76e7cc44]:hover {\n  transform: translateY(-1px);\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

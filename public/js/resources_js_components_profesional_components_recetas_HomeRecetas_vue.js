@@ -293,66 +293,74 @@ var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
+    staticClass: "p-4",
+    staticStyle: {
+      "background-color": "#f8f9fc",
+      "min-height": "100vh"
+    }
+  }, [_vm._m(0), _vm._v(" "), _c("kairos-modal"), _vm._v(" "), _c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-xl-12 col-lg-12"
-  }, [_c("a", {
-    staticClass: "btn btn-warning mb-2",
-    attrs: {
-      href: "#",
-      "data-bs-toggle": "modal",
-      "data-bs-target": "#kairosModal"
-    }
-  }, [_vm._v("Agregar Kairos")]), _vm._v(" "), _c("kairos-modal"), _vm._v(" "), _c("a", {
-    staticClass: "btn btn-warning mb-2",
-    attrs: {
-      href: "../kairostable"
-    }
-  }, [_vm._v("Tabla Kairos")]), _vm._v(" "), _c("div", {
-    staticClass: "card shadow mb-4"
   }, [_c("div", {
-    staticClass: "card-header bg-warning py-3 d-flex flex-row align-items-center justify-content-between"
-  }, [_c("h6", {
-    staticClass: "m-0 font-weight-bold text-white"
-  }, [_vm._v("Receta")]), _vm._v(" "), _vm.last_recipes.length != 0 ? _c("li", {
+    staticClass: "card border-0 shadow-sm mb-4",
+    staticStyle: {
+      "border-radius": "10px"
+    }
+  }, [_c("div", {
+    staticClass: "card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between",
+    staticStyle: {
+      "border-bottom": "1px solid #e3e6f0",
+      "border-top": "4px solid #f6c23e !important",
+      "border-radius": "10px 10px 0 0"
+    }
+  }, [_vm._m(1), _vm._v(" "), _vm.last_recipes.length != 0 ? _c("li", {
     staticClass: "nav-item dropdown no-arrow mx-1 list-unstyled"
-  }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in",
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
+    staticClass: "dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in border-0",
+    staticStyle: {
+      "border-radius": "10px",
+      overflow: "hidden"
+    },
     attrs: {
       "aria-labelledby": "alertsDropdown"
     }
   }, [_c("h6", {
-    staticClass: "dropdown-header"
-  }, [_vm._v("\r\n                            Ultima Receta\r\n                        ")]), _vm._v(" "), _vm._l(_vm.last_recipes, function (recipe) {
+    staticClass: "dropdown-header bg-warning text-dark border-0"
+  }, [_vm._v("\r\n                                Historial de Recetas\r\n                            ")]), _vm._v(" "), _vm._l(_vm.last_recipes, function (recipe) {
     return _c("a", {
       key: recipe.id,
-      staticClass: "dropdown-item d-flex align-items-center",
+      staticClass: "dropdown-item d-flex align-items-center py-3 border-bottom",
       attrs: {
         href: "#"
       }
-    }, [_vm._m(1, true), _vm._v(" "), _c("div", [_c("div", {
+    }, [_vm._m(3, true), _vm._v(" "), _c("div", [_c("div", {
       staticClass: "small text-gray-500"
     }, [_vm._v(_vm._s(recipe.pivot.indications) + " - " + _vm._s(recipe.pivot.way) + " - " + _vm._s(recipe.pivot.amount) + " - " + _vm._s(recipe.presentation))]), _vm._v(" "), _c("span", {
-      staticClass: "font-weight-bold"
+      staticClass: "font-weight-bold text-dark"
     }, [_vm._v(_vm._s(recipe.name) + " - " + _vm._s(recipe.tradename) + " - " + _vm._s(recipe.concentration))])])]);
   })], 2)]) : _vm._e()]), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
+    staticClass: "card-body p-4"
   }, [_c("div", {
     staticClass: "form-row"
   }, [_c("div", {
-    staticClass: "col-md-12"
+    staticClass: "col-md-12 mb-3"
   }, [_c("label", {
-    attrs: {
-      "for": ""
+    staticClass: "small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Paciente")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group shadow-sm",
+    staticStyle: {
+      "border-radius": "8px",
+      overflow: "hidden"
     }
-  }, [_vm._v("Paciente")]), _vm._v(" "), _c("input", {
+  }, [_vm._m(4), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.full_patient_name,
       expression: "full_patient_name"
     }],
-    staticClass: "form-control text-capitalize",
+    staticClass: "form-control border-0 text-capitalize bg-light",
     attrs: {
       type: "text",
       placeholder: "Apellidos y Nombres",
@@ -367,22 +375,26 @@ var render = function render() {
         _vm.full_patient_name = $event.target.value;
       }
     }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-row"
+  })])])]), _vm._v(" "), _c("div", {
+    staticClass: "form-row mb-4"
   }, [_c("div", {
-    staticClass: "col-md-4"
+    staticClass: "col-md-4 mb-3"
   }, [_c("label", {
-    attrs: {
-      "for": ""
+    staticClass: "small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Fecha Actual")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group shadow-sm",
+    staticStyle: {
+      "border-radius": "8px",
+      overflow: "hidden"
     }
-  }, [_vm._v("Fecha Actual")]), _vm._v(" "), _c("input", {
+  }, [_vm._m(5), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.prescription.attention_date,
       expression: "prescription.attention_date"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control border-0 bg-light",
     attrs: {
       type: "date"
     },
@@ -395,20 +407,24 @@ var render = function render() {
         _vm.$set(_vm.prescription, "attention_date", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-4"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4 mb-3"
   }, [_c("label", {
-    attrs: {
-      "for": ""
+    staticClass: "small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Fecha de Vencimiento")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group shadow-sm",
+    staticStyle: {
+      "border-radius": "8px",
+      overflow: "hidden"
     }
-  }, [_vm._v("Fecha de Vencimiento")]), _vm._v(" "), _c("input", {
+  }, [_vm._m(6), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.prescription.effective_date,
       expression: "prescription.effective_date"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control border-0 bg-light",
     attrs: {
       type: "date"
     },
@@ -421,14 +437,10 @@ var render = function render() {
         _vm.$set(_vm.prescription, "effective_date", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-4"
-  }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Firma")]), _vm._v(" "), _c("div", {
-    staticClass: "form-check"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4 mb-3 d-flex align-items-end pb-2"
+  }, [_c("div", {
+    staticClass: "form-check custom-checkbox"
   }, [_c("input", {
     directives: [{
       name: "model",
@@ -436,9 +448,15 @@ var render = function render() {
       value: _vm.prescription.signature,
       expression: "prescription.signature"
     }],
-    staticClass: "form-check-input",
+    staticClass: "form-check-input shadow-sm",
+    staticStyle: {
+      width: "20px",
+      height: "20px",
+      "margin-top": "2px"
+    },
     attrs: {
-      type: "checkbox"
+      type: "checkbox",
+      id: "signatureCheck"
     },
     domProps: {
       checked: Array.isArray(_vm.prescription.signature) ? _vm._i(_vm.prescription.signature, null) > -1 : _vm.prescription.signature
@@ -462,28 +480,32 @@ var render = function render() {
       }
     }
   }), _vm._v(" "), _c("label", {
-    staticClass: "form-check-label",
+    staticClass: "form-check-label ml-2 font-weight-bold text-dark",
     attrs: {
-      "for": "defaultCheck1"
+      "for": "signatureCheck"
     }
-  }, [_vm._v("\r\n                    Firma\r\n                ")])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-12"
+  }, [_vm._v("\r\n                                    Incluir Firma\r\n                                ")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-12 mt-2"
   }, [_c("label", {
-    attrs: {
-      "for": ""
+    staticClass: "small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Buscar Medicamento")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group shadow-sm position-relative",
+    staticStyle: {
+      "border-radius": "8px",
+      overflow: "visible"
     }
-  }, [_vm._v("Medicamento")]), _vm._v(" "), _c("input", {
+  }, [_vm._m(7), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.buscar,
       expression: "buscar"
     }],
-    staticClass: "form-control w-100",
+    staticClass: "form-control border-0 py-2",
     attrs: {
       autocomplete: "off",
       type: "text",
-      placeholder: "Ingrese el nombre del medicamento",
+      placeholder: "Escribe el nombre del medicamento para buscar en Kairos...",
       name: "",
       id: "via"
     },
@@ -503,48 +525,80 @@ var render = function render() {
       value: _vm.showResults,
       expression: "showResults"
     }],
-    staticClass: "border border-secondary shadow w-100"
+    staticClass: "position-absolute w-100 bg-white shadow-lg rounded",
+    staticStyle: {
+      top: "100%",
+      left: "0",
+      "z-index": "1000",
+      "max-height": "300px",
+      "overflow-y": "auto"
+    }
   }, _vm._l(_vm.filtro, function (medicamento) {
     return _c("div", {
       key: medicamento.id,
-      staticClass: "border border-secondary",
+      staticClass: "p-3 border-bottom text-dark",
+      staticStyle: {
+        cursor: "pointer"
+      },
       attrs: {
         "data-bs-toggle": "modal",
-        "data-bs-target": "#recetaModal"
+        "data-bs-target": "#recetaModal",
+        onmouseover: "this.style.backgroundColor='#f8f9fc';",
+        onmouseout: "this.style.backgroundColor='white';"
       },
       on: {
         click: function click($event) {
           return _vm.callModal(medicamento, "Agregar");
         }
       }
-    }, [_vm._v(_vm._s(medicamento.name) + " - " + _vm._s(medicamento.tradename) + " - " + _vm._s(medicamento.concentration) + " - " + _vm._s(medicamento.presentation))]);
-  }), 0)])]), _vm._v(" "), _c("div", {
-    staticClass: "form-row mt-2"
+    }, [_c("div", {
+      staticClass: "font-weight-bold"
+    }, [_c("i", {
+      staticClass: "fas fa-pills text-warning mr-2"
+    }), _vm._v(_vm._s(medicamento.name) + " "), _c("span", {
+      staticClass: "text-muted font-weight-normal ml-1"
+    }, [_vm._v(_vm._s(medicamento.tradename))])]), _vm._v(" "), _c("div", {
+      staticClass: "small text-muted ml-4"
+    }, [_vm._v(_vm._s(medicamento.concentration) + " - " + _vm._s(medicamento.presentation))])]);
+  }), 0)])])]), _vm._v(" "), _c("div", {
+    staticClass: "form-row mt-4"
   }, [_c("div", {
     staticClass: "col-md-12"
+  }, [_c("div", {
+    staticClass: "table-responsive border rounded-4 shadow-sm mb-4"
   }, [_c("table", {
-    staticClass: "table"
-  }, [_vm._m(2), _vm._v(" "), _c("tbody", _vm._l(_vm.selected, function (select, key) {
+    staticClass: "table table-hover align-middle mb-0"
+  }, [_vm._m(8), _vm._v(" "), _c("tbody", [_vm.selected.length === 0 ? _c("tr", [_c("td", {
+    staticClass: "text-center py-4 text-muted",
+    attrs: {
+      colspan: "6"
+    }
+  }, [_vm._v("No se han añadido medicamentos a la receta")])]) : _vm._e(), _vm._v(" "), _vm._l(_vm.selected, function (select, key) {
     return _c("tr", {
       key: select.id
     }, [_c("th", {
+      staticClass: "ps-4",
       attrs: {
         scope: "row"
       }
-    }, [_vm._v(_vm._s(key + 1))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(select.name))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(select.way))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(select.indications))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(select.amount))]), _vm._v(" "), _c("td", [_c("button", {
-      staticClass: "btn btn-danger",
-      on: {
-        click: function click($event) {
-          return _vm.deleteSelected(key);
-        }
-      }
-    }, [_c("i", {
-      staticClass: "fas fa-trash"
-    })]), _vm._v(" "), _c("button", {
-      staticClass: "btn btn-primary",
+    }, [_vm._v(_vm._s(key + 1))]), _vm._v(" "), _c("td", {
+      staticClass: "font-weight-bold text-dark"
+    }, [_vm._v(_vm._s(select.name))]), _vm._v(" "), _c("td", [_c("span", {
+      staticClass: "badge bg-light text-dark border px-2 py-1"
+    }, [_vm._v(_vm._s(select.way))])]), _vm._v(" "), _c("td", {
+      staticClass: "text-muted"
+    }, [_vm._v(_vm._s(select.indications))]), _vm._v(" "), _c("td", [_c("span", {
+      staticClass: "badge bg-primary text-white rounded-pill"
+    }, [_vm._v(_vm._s(select.amount))])]), _vm._v(" "), _c("td", {
+      staticClass: "text-end pe-4"
+    }, [_c("div", {
+      staticClass: "btn-group shadow-sm rounded-pill"
+    }, [_c("button", {
+      staticClass: "btn btn-sm btn-light text-primary",
       attrs: {
         "data-bs-toggle": "modal",
-        "data-bs-target": "#recetaModal"
+        "data-bs-target": "#recetaModal",
+        title: "Editar"
       },
       on: {
         click: function click($event) {
@@ -553,16 +607,30 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fas fa-pencil-alt"
-    })])])]);
-  }), 0)])]), _vm._v(" "), _vm.usuario.professional.profession != "Psicólogo" ? _c("div", [_c("button", {
-    staticClass: "btn btn-outline-success",
+    })]), _vm._v(" "), _c("button", {
+      staticClass: "btn btn-sm btn-light text-danger",
+      attrs: {
+        title: "Eliminar"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.deleteSelected(key);
+        }
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-trash-alt"
+    })])])])]);
+  })], 2)])])]), _vm._v(" "), _vm.usuario && _vm.usuario.professional.profession != "Psicólogo" ? _c("div", {
+    staticClass: "col-12 text-right border-top pt-4"
+  }, [_c("button", {
+    staticClass: "btn btn-success rounded-pill px-4 shadow-sm font-weight-bold mr-2",
     on: {
       click: _vm.insertPrescription
     }
   }, [_c("i", {
-    staticClass: "far fa-save"
+    staticClass: "far fa-save mr-2"
   }), _vm._v(" Registrar receta")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-outline-success ml-1",
+    staticClass: "btn btn-danger rounded-pill px-4 shadow-sm font-weight-bold",
     attrs: {
       id: "printBtn",
       disabled: ""
@@ -571,9 +639,9 @@ var render = function render() {
       click: _vm.print
     }
   }, [_c("i", {
-    staticClass: "fas fa-print"
-  }), _vm._v(" Imprimir receta en PDF")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-outline-warning ml-1 d-none",
+    staticClass: "fas fa-file-pdf mr-2"
+  }), _vm._v(" Imprimir PDF")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-warning rounded-pill px-4 shadow-sm font-weight-bold d-none ml-2",
     attrs: {
       id: "btnPrueba"
     },
@@ -581,19 +649,57 @@ var render = function render() {
       click: _vm.prueba
     }
   }, [_c("i", {
-    staticClass: "fas fa-print"
-  }), _vm._v(" Prueba demo")])]) : _vm._e()])])])], 1), _vm._v(" "), _vm.medicamento ? _c("recetas-modal", {
+    staticClass: "fas fa-print mr-2"
+  }), _vm._v(" Prueba demo")])]) : _vm._e()])])])]), _vm._v(" "), _vm.medicamento ? _c("recetas-modal", {
     attrs: {
       med: _vm.medicamento,
       type: this.tipo
     }
-  }) : _vm._e()], 1);
+  }) : _vm._e()], 1)], 1);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "d-sm-flex align-items-center justify-content-between mb-4"
+  }, [_c("div", [_c("h4", {
+    staticClass: "m-0 font-weight-bold text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-file-prescription text-primary mr-2"
+  }), _vm._v(" Recetas Médicas")]), _vm._v(" "), _c("small", {
+    staticClass: "text-muted"
+  }, [_vm._v("Gestión de recetas y medicamentos (Kairos)")])]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex gap-2"
+  }, [_c("a", {
+    staticClass: "btn btn-light border-0 shadow-sm rounded-pill font-weight-bold text-primary px-3",
+    attrs: {
+      href: "#",
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#kairosModal"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-plus-circle mr-1"
+  }), _vm._v(" Agregar Kairos\r\n            ")]), _vm._v(" "), _c("a", {
+    staticClass: "btn btn-primary border-0 shadow-sm rounded-pill font-weight-bold px-3 ml-2",
+    attrs: {
+      href: "../kairostable"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-table mr-1"
+  }), _vm._v(" Tabla Kairos\r\n            ")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "m-0 font-weight-bold text-dark text-uppercase small"
+  }, [_c("i", {
+    staticClass: "fas fa-prescription-bottle-alt text-warning mr-1"
+  }), _vm._v(" Nueva Receta")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
   return _c("a", {
-    staticClass: "nav-link dropdown-toggle",
+    staticClass: "nav-link dropdown-toggle p-0",
     attrs: {
       href: "#",
       id: "messagesDropdown",
@@ -602,25 +708,69 @@ var staticRenderFns = [function () {
       "aria-haspopup": "true",
       "aria-expanded": "false"
     }
+  }, [_c("span", {
+    staticClass: "badge bg-warning text-dark px-2 py-1 shadow-sm"
   }, [_c("i", {
-    staticClass: "fas fa-envelope text-white"
-  })]);
+    staticClass: "fas fa-history mr-1"
+  }), _vm._v(" Últimas Recetas")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
     staticClass: "mr-3"
   }, [_c("div", {
-    staticClass: "icon-circle bg-primary"
+    staticClass: "icon-circle bg-warning-light d-flex align-items-center justify-content-center",
+    staticStyle: {
+      width: "40px",
+      height: "40px",
+      "border-radius": "50%",
+      "background-color": "#fdf3d8"
+    }
   }, [_c("i", {
-    staticClass: "fas fa-file-alt text-white"
+    staticClass: "fas fa-pills text-warning"
   })])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-0 text-muted"
+  }, [_c("i", {
+    staticClass: "fas fa-user"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-0 text-muted"
+  }, [_c("i", {
+    staticClass: "far fa-calendar-alt"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-0 text-muted"
+  }, [_c("i", {
+    staticClass: "far fa-calendar-times"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-0 text-primary"
+  }, [_c("i", {
+    staticClass: "fas fa-search"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
   return _c("thead", {
-    staticClass: "bg-warning text-white"
+    staticClass: "table-light text-muted text-uppercase small",
+    staticStyle: {
+      "font-size": "0.75rem"
+    }
   }, [_c("tr", [_c("th", {
+    staticClass: "ps-4 py-3",
     attrs: {
       scope: "col"
     }
@@ -641,6 +791,7 @@ var staticRenderFns = [function () {
       scope: "col"
     }
   }, [_vm._v("Cantidad")]), _vm._v(" "), _c("th", {
+    staticClass: "text-end pe-4",
     attrs: {
       scope: "col"
     }

@@ -225,29 +225,38 @@ var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
+    staticClass: "p-4",
+    staticStyle: {
+      "background-color": "#f8f9fc",
+      "min-height": "100vh"
+    }
+  }, [_vm._m(0), _vm._v(" "), _c("div", {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-xl-12 col-lg-12"
   }, [_c("div", {
-    staticClass: "card shadow mb-4"
-  }, [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "card-body"
+    staticClass: "card border-0 shadow-sm mb-4",
+    staticStyle: {
+      "border-radius": "10px"
+    }
+  }, [_c("div", {
+    staticClass: "card-body p-4"
   }, [_c("div", [_c("div", {
     staticClass: "form-row"
   }, [_c("div", {
-    staticClass: "form-group col"
+    staticClass: "form-group col-md-6"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Paciente")]), _vm._v(" "), _c("input", {
+    staticClass: "small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Paciente")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group"
+  }, [_vm._m(1), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.exam.name_patient,
       expression: "exam.name_patient"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control bg-light border-0",
     attrs: {
       type: "text",
       placeholder: "Nombre del Paciente"
@@ -261,20 +270,20 @@ var render = function render() {
         _vm.$set(_vm.exam, "name_patient", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "form-group col"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "form-group col-md-6"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Fecha Actual")]), _vm._v(" "), _c("input", {
+    staticClass: "small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Fecha Actual")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group"
+  }, [_vm._m(2), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.exam.attention_date,
       expression: "exam.attention_date"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control bg-light border-0",
     attrs: {
       type: "date"
     },
@@ -287,12 +296,15 @@ var render = function render() {
         _vm.$set(_vm.exam, "attention_date", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _c("div", {
-    staticClass: "form-row"
+  })])])]), _vm._v(" "), _c("div", {
+    staticClass: "form-row mt-3"
   }, [_c("div", {
-    staticClass: "form-group col"
-  }, [_vm._m(1), _vm._v(" "), _c("select", {
-    staticClass: "form-select",
+    staticClass: "form-group col-12"
+  }, [_vm._m(3), _vm._v(" "), _c("select", {
+    staticClass: "form-select bg-light border-0",
+    staticStyle: {
+      height: "45px"
+    },
     attrs: {
       name: "",
       id: "typeExam"
@@ -313,19 +325,23 @@ var render = function render() {
       value: "3"
     }
   }, [_vm._v("Otros")])])])]), _vm._v(" "), _c("div", {
-    staticClass: "form-row"
+    staticClass: "form-row mt-3"
   }, [_c("div", {
-    staticClass: "form-group w-100 position-relative"
+    staticClass: "form-group col-12 position-relative"
   }, [_c("label", {
-    attrs: {
-      "for": ""
+    staticClass: "small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Buscar Examen")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group shadow-sm",
+    staticStyle: {
+      "border-radius": "8px",
+      overflow: "hidden"
     }
-  }, [_vm._v("Examen")]), _vm._v(" "), _c("input", {
-    staticClass: "form-control w-100",
+  }, [_vm._m(4), _vm._v(" "), _c("input", {
+    staticClass: "form-control border-0 py-2",
     attrs: {
       autocomplete: "off",
       type: "text",
-      placeholder: "Nombre del estudio",
+      placeholder: "Escribe el nombre del estudio...",
       name: "",
       id: "diagnostico"
     },
@@ -349,15 +365,23 @@ var render = function render() {
       }
     }, [_vm._v("\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + _vm._s(exam.name) + "\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t")])]);
   }), 0)])])]), _vm._v(" "), _c("div", {
-    staticClass: "form-row mt-2"
+    staticClass: "form-row mt-4"
   }, [_c("div", {
     staticClass: "col-md-12"
+  }, [_c("div", {
+    staticClass: "table-responsive border rounded-4 shadow-sm"
   }, [_c("table", {
-    staticClass: "table"
-  }, [_vm._m(2), _vm._v(" "), _c("tbody", _vm._l(_vm.selected, function (select, key) {
+    staticClass: "table table-hover align-middle mb-0"
+  }, [_vm._m(5), _vm._v(" "), _c("tbody", [_vm.selected.length === 0 ? _c("tr", [_c("td", {
+    staticClass: "text-center py-4 text-muted",
+    attrs: {
+      colspan: "4"
+    }
+  }, [_vm._v("No hay exámenes seleccionados")])]) : _vm._e(), _vm._v(" "), _vm._l(_vm.selected, function (select, key) {
     return _c("tr", {
       key: select.id
     }, [_c("th", {
+      staticClass: "ps-4",
       attrs: {
         scope: "row"
       }
@@ -365,25 +389,38 @@ var render = function render() {
       attrs: {
         scope: "row"
       }
-    }, [_vm._v(_vm._s(select.type === 1 ? "Laboratorio" : select.type === 2 ? "Imagenología" : select.type === 3 ? "Otro" : "Sin tipo de examen"))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(select.name))]), _vm._v(" "), _c("td", [_c("button", {
-      staticClass: "btn btn-danger",
+    }, [_c("span", {
+      staticClass: "badge bg-light text-dark border px-2 py-1"
+    }, [_vm._v("\r\n                                                " + _vm._s(select.type === 1 ? "Laboratorio" : select.type === 2 ? "Imagenología" : select.type === 3 ? "Otro" : "Sin tipo de examen") + "\r\n                                            ")])]), _vm._v(" "), _c("td", {
+      staticClass: "font-weight-bold text-dark"
+    }, [_vm._v(_vm._s(select.name))]), _vm._v(" "), _c("td", {
+      staticClass: "text-end pe-4"
+    }, [_c("button", {
+      staticClass: "btn btn-sm text-danger btn-light rounded-circle shadow-sm",
+      attrs: {
+        title: "Eliminar"
+      },
       on: {
         click: function click($event) {
           return _vm.deleteSelected(key);
         }
       }
     }, [_c("i", {
-      staticClass: "fas fa-trash"
+      staticClass: "fas fa-trash-alt"
     })])])]);
-  }), 0)])]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-success ml-1",
+  })], 2)])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-12 mt-4 text-right"
+  }, [_c("button", {
+    staticClass: "btn btn-primary rounded-pill px-4 shadow-sm font-weight-bold",
     attrs: {
       id: "printBtn"
     },
     on: {
       click: _vm.print
     }
-  }, [_vm._v("Imprimir PDF")])])])])]), _vm._v(" "), _c("div", {
+  }, [_c("i", {
+    staticClass: "fas fa-print mr-2"
+  }), _vm._v("Imprimir PDF\r\n                        ")])])])])])])]), _vm._v(" "), _c("div", {
     staticClass: "modal fade",
     attrs: {
       id: "modalAddExamen",
@@ -395,7 +432,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-sm modal-dialog-centered"
   }, [_c("div", {
     staticClass: "modal-content"
-  }, [_vm._m(3), _vm._v(" "), _c("div", {
+  }, [_vm._m(6), _vm._v(" "), _c("div", {
     staticClass: "modal-body border-0"
   }, [_c("label", {
     attrs: {
@@ -474,41 +511,69 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fa-regular fa-floppy-disk"
-  }), _vm._v(" Ingresar nuevo tipo")])])])])])]);
+  }), _vm._v(" Ingresar nuevo tipo")])])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "card-header bg-warning py-3 d-flex flex-row align-items-center justify-content-between"
-  }, [_c("h6", {
-    staticClass: "m-0 font-weight-bold text-white"
-  }, [_vm._v("Examen")])]);
+    staticClass: "d-sm-flex align-items-center justify-content-between mb-4"
+  }, [_c("div", [_c("h4", {
+    staticClass: "m-0 font-weight-bold text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-microscope text-primary mr-2"
+  }), _vm._v(" Exámenes Médicos")]), _vm._v(" "), _c("small", {
+    staticClass: "text-muted"
+  }, [_vm._v("Registro y órdenes de exámenes")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-light border-0 text-muted"
+  }, [_c("i", {
+    staticClass: "fas fa-user"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-light border-0 text-muted"
+  }, [_c("i", {
+    staticClass: "far fa-calendar-alt"
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Tipo de examen\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"), _c("button", {
-    staticClass: "btn btn-outline-primary btn-sm position-relative",
+    staticClass: "small fw-bold text-muted text-uppercase d-flex justify-content-between align-items-center"
+  }, [_c("span", [_vm._v("Tipo de examen")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-light btn-sm shadow-sm rounded-pill text-primary fw-bold px-3",
     attrs: {
       type: "button",
       "data-bs-target": "#modalAddExamen",
       "data-bs-toggle": "modal"
     }
   }, [_c("i", {
-    staticClass: "fa-solid fa-plus"
-  }), _vm._v(" Agregar nuevo elemento\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"), _c("span", {
-    staticClass: "position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle"
-  })])]);
+    staticClass: "fa-solid fa-plus mr-1"
+  }), _vm._v(" Nuevo Elemento\r\n                                ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-0 text-primary"
+  }, [_c("i", {
+    staticClass: "fas fa-search"
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("thead", {
-    staticClass: "bg-warning text-white"
+    staticClass: "table-light text-muted text-uppercase small",
+    staticStyle: {
+      "font-size": "0.75rem"
+    }
   }, [_c("tr", [_c("th", {
+    staticClass: "ps-4 py-3",
     attrs: {
       scope: "col"
     }
@@ -521,6 +586,7 @@ var staticRenderFns = [function () {
       scope: "col"
     }
   }, [_vm._v("Examen")]), _vm._v(" "), _c("th", {
+    staticClass: "text-end pe-4",
     attrs: {
       scope: "col"
     }

@@ -1,7 +1,7 @@
 <template>
   <div class="consulta d-flex align-items-center w-100 justify-content-around mb-2" > <!-- v-if="dataConsult.status!=3" -->
       <div class="h5 mb-0 mx-1">{{ dataConsult.schedule ? horaHumana(dataConsult.schedule.check_time) : '00-00'}}</div>
-      <div class="consulta-card card h-100 w-75 py-2 border-0" 
+      <div class="consulta-card card h-100 w-75 py-2 border-0 shadow-sm" style="border-radius: 10px;"
       :class='{
         "border-left-warning": dataConsult.status === 1 || dataConsult.status==4,
         "border-left-danger": dataConsult.status === 3,

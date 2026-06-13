@@ -7683,24 +7683,47 @@ __webpack_require__.r(__webpack_exports__);
 var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("div", [_c("h3", [_vm._v("Nutrición")]), _vm._v(" "), _vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "row row-cols-4 my-2"
-  }, _vm._l(_vm.nutriciones, function (nutrition, index) {
+  return _c("div", {
+    staticClass: "p-4",
+    staticStyle: {
+      "background-color": "#f8f9fc",
+      "min-height": "100vh"
+    }
+  }, [_vm._m(0), _vm._v(" "), _c("div", {
+    staticClass: "row row-cols-1 row-cols-md-2 row-cols-lg-4 my-4 g-4"
+  }, [_vm._l(_vm.nutriciones, function (nutrition, index) {
     return _c("div", {
+      key: index,
       staticClass: "col"
     }, [_c("div", {
-      staticClass: "card"
+      staticClass: "card border-0 shadow-sm h-100",
+      staticStyle: {
+        "border-radius": "10px",
+        "border-top": "4px solid #1cc88a !important"
+      }
     }, [_c("div", {
-      staticClass: "card-body"
-    }, [_vm._v("\n\t\t\t\t\tSesión tomada el " + _vm._s(_vm.fechaLatam(nutrition.creado)) + "\n\t\t\t\t\t"), _c("button", {
-      staticClass: "btn btn-sm btn-outline-secondary",
+      staticClass: "card-body p-4 d-flex flex-column"
+    }, [_c("div", {
+      staticClass: "d-flex align-items-center mb-3"
+    }, [_vm._m(1, true), _vm._v(" "), _c("div", [_c("h6", {
+      staticClass: "m-0 font-weight-bold text-dark"
+    }, [_vm._v("Sesión Nutricional")]), _vm._v(" "), _c("small", {
+      staticClass: "text-muted"
+    }, [_vm._v(_vm._s(_vm.fechaLatam(nutrition.creado)))])])]), _vm._v(" "), _c("button", {
+      staticClass: "btn btn-sm btn-light border mt-auto text-primary font-weight-bold rounded-pill shadow-sm",
       on: {
         click: function click($event) {
           return _vm.verDetalleNutricion(index);
         }
       }
-    }, [_vm._v("Ver detalles")])])])]);
-  }), 0), _vm._v(" "), _c("div", {
+    }, [_c("i", {
+      staticClass: "fas fa-eye mr-1"
+    }), _vm._v(" Ver detalles\n\t\t\t\t\t")])])])]);
+  }), _vm._v(" "), _vm.nutriciones.length === 0 ? _c("div", {
+    staticClass: "col-12 text-center py-5"
+  }, [_c("p", {
+    staticClass: "text-muted"
+  }, [_vm._v("No hay historias nutricionales registradas.")])]) : _vm._e()], 2), _vm._v(" "), _c("div", {
     staticClass: "modal fade",
     attrs: {
       id: "nuevoHistorialNutricion",
@@ -7712,24 +7735,28 @@ var render = function render() {
     staticClass: "modal-dialog modal-lg"
   }, [_c("div", {
     staticClass: "modal-content"
-  }, [_vm._m(1), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
   }, [_vm._m(2), _vm._v(" "), _c("div", {
-    staticClass: "row"
+    staticClass: "modal-body p-4"
+  }, [_vm._m(3), _vm._v(" "), _c("div", {
+    staticClass: "row g-3 mb-4"
   }, [_c("div", {
-    staticClass: "col"
+    staticClass: "col-md-6"
   }, [_c("label", {
-    attrs: {
-      "for": ""
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Peso (kg)")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group shadow-sm",
+    staticStyle: {
+      "border-radius": "8px",
+      overflow: "hidden"
     }
-  }, [_vm._v("Peso")]), _vm._v(" "), _c("input", {
+  }, [_vm._m(4), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.nutricion.peso,
       expression: "nutricion.peso"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control border-0",
     attrs: {
       type: "number"
     },
@@ -7742,20 +7769,24 @@ var render = function render() {
         _vm.$set(_vm.nutricion, "peso", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
   }, [_c("label", {
-    attrs: {
-      "for": ""
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Talla (cm)")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group shadow-sm",
+    staticStyle: {
+      "border-radius": "8px",
+      overflow: "hidden"
     }
-  }, [_vm._v("Talla")]), _vm._v(" "), _c("input", {
+  }, [_vm._m(5), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.nutricion.talla,
       expression: "nutricion.talla"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control border-0",
     attrs: {
       type: "number"
     },
@@ -7769,21 +7800,23 @@ var render = function render() {
       }
     }
   })])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col"
+    staticClass: "col-md-6"
   }, [_c("label", {
-    attrs: {
-      "for": ""
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
+  }, [_vm._v("IMC")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group shadow-sm",
+    staticStyle: {
+      "border-radius": "8px",
+      overflow: "hidden"
     }
-  }, [_vm._v("IMC")]), _vm._v(" "), _c("input", {
+  }, [_vm._m(6), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.nutricion.imc,
       expression: "nutricion.imc"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control border-0",
     attrs: {
       type: "number"
     },
@@ -7796,20 +7829,24 @@ var render = function render() {
         _vm.$set(_vm.nutricion, "imc", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6"
   }, [_c("label", {
-    attrs: {
-      "for": ""
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Perímetro")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group shadow-sm",
+    staticStyle: {
+      "border-radius": "8px",
+      overflow: "hidden"
     }
-  }, [_vm._v("Perímetro ")]), _vm._v(" "), _c("input", {
+  }, [_vm._m(7), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.nutricion.perimetro,
       expression: "nutricion.perimetro"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control border-0",
     attrs: {
       type: "number"
     },
@@ -7823,21 +7860,23 @@ var render = function render() {
       }
     }
   })])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col"
+    staticClass: "col-md-6"
   }, [_c("label", {
-    attrs: {
-      "for": ""
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
+  }, [_vm._v("% de Grasa Corporal")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group shadow-sm",
+    staticStyle: {
+      "border-radius": "8px",
+      overflow: "hidden"
     }
-  }, [_vm._v("% de grasa corporal")]), _vm._v(" "), _c("input", {
+  }, [_vm._m(8), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.nutricion.grasa,
       expression: "nutricion.grasa"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control border-0",
     attrs: {
       type: "number"
     },
@@ -7850,22 +7889,23 @@ var render = function render() {
         _vm.$set(_vm.nutricion, "grasa", $event.target.value);
       }
     }
-  })])]), _vm._v(" "), _vm._m(3), _vm._v(" "), _c("div", {
-    staticClass: "row"
+  })])])]), _vm._v(" "), _vm._m(9), _vm._v(" "), _c("div", {
+    staticClass: "row g-3 mb-4"
   }, [_c("div", {
-    staticClass: "col"
+    staticClass: "col-md-6"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("N° de comidas")]), _vm._v(" "), _c("input", {
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
+  }, [_vm._v("N° de comidas al día")]), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.nutricion.comidas,
       expression: "nutricion.comidas"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control shadow-sm border-0",
+    staticStyle: {
+      "border-radius": "8px"
+    },
     attrs: {
       type: "number"
     },
@@ -7879,21 +7919,19 @@ var render = function render() {
       }
     }
   })]), _vm._v(" "), _c("div", {
-    staticClass: "col"
+    staticClass: "col-md-6"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
-  }, [_vm._v("Intolerancia")]), _vm._v(" "), _c("select", {
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Intolerancia alimentaria")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.nutricion.intolerancia,
       expression: "nutricion.intolerancia"
     }],
-    staticClass: "form-select",
-    attrs: {
-      id: ""
+    staticClass: "form-select shadow-sm border-0",
+    staticStyle: {
+      "border-radius": "8px"
     },
     on: {
       change: function change($event) {
@@ -7914,14 +7952,10 @@ var render = function render() {
     attrs: {
       value: "1"
     }
-  }, [_vm._v("Si")])])])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col"
+  }, [_vm._v("Si")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
   }, [_vm._v("Alergias")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
@@ -7929,9 +7963,9 @@ var render = function render() {
       value: _vm.nutricion.alergias,
       expression: "nutricion.alergias"
     }],
-    staticClass: "form-select",
-    attrs: {
-      id: ""
+    staticClass: "form-select shadow-sm border-0",
+    staticStyle: {
+      "border-radius": "8px"
     },
     on: {
       change: function change($event) {
@@ -7953,11 +7987,9 @@ var render = function render() {
       value: "1"
     }
   }, [_vm._v("Si")])])]), _vm._v(" "), _c("div", {
-    staticClass: "col"
+    staticClass: "col-md-4"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
   }, [_vm._v("Fuma")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
@@ -7965,9 +7997,9 @@ var render = function render() {
       value: _vm.nutricion.fuma,
       expression: "nutricion.fuma"
     }],
-    staticClass: "form-select",
-    attrs: {
-      id: ""
+    staticClass: "form-select shadow-sm border-0",
+    staticStyle: {
+      "border-radius": "8px"
     },
     on: {
       change: function change($event) {
@@ -7988,14 +8020,10 @@ var render = function render() {
     attrs: {
       value: "1"
     }
-  }, [_vm._v("Si")])])])]), _vm._v(" "), _c("div", {
-    staticClass: "row"
-  }, [_c("div", {
-    staticClass: "col"
+  }, [_vm._v("Si")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
   }, [_vm._v("Bebe")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
@@ -8003,9 +8031,9 @@ var render = function render() {
       value: _vm.nutricion.bebe,
       expression: "nutricion.bebe"
     }],
-    staticClass: "form-select",
-    attrs: {
-      id: ""
+    staticClass: "form-select shadow-sm border-0",
+    staticStyle: {
+      "border-radius": "8px"
     },
     on: {
       change: function change($event) {
@@ -8026,16 +8054,20 @@ var render = function render() {
     attrs: {
       value: "1"
     }
-  }, [_vm._v("Si")])])])]), _vm._v(" "), _vm._m(4), _vm._v(" "), _c("textarea", {
+  }, [_vm._v("Si")])])])]), _vm._v(" "), _vm._m(10), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.nutricion.signos,
       expression: "nutricion.signos"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control shadow-sm border-0 mb-4",
+    staticStyle: {
+      "border-radius": "8px"
+    },
     attrs: {
-      rows: "3"
+      rows: "3",
+      placeholder: "Describa los signos y síntomas..."
     },
     domProps: {
       value: _vm.nutricion.signos
@@ -8046,16 +8078,20 @@ var render = function render() {
         _vm.$set(_vm.nutricion, "signos", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(5), _vm._v(" "), _c("textarea", {
+  }), _vm._v(" "), _vm._m(11), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.nutricion.diagnostico,
       expression: "nutricion.diagnostico"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control shadow-sm border-0 mb-4",
+    staticStyle: {
+      "border-radius": "8px"
+    },
     attrs: {
-      rows: "3"
+      rows: "3",
+      placeholder: "Diagnóstico..."
     },
     domProps: {
       value: _vm.nutricion.diagnostico
@@ -8066,10 +8102,10 @@ var render = function render() {
         _vm.$set(_vm.nutricion, "diagnostico", $event.target.value);
       }
     }
-  }), _vm._v(" "), _vm._m(6), _vm._v(" "), _c("label", {
-    attrs: {
-      "for": ""
-    }
+  }), _vm._v(" "), _vm._m(12), _vm._v(" "), _c("div", {
+    staticClass: "mb-3"
+  }, [_c("label", {
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
   }, [_vm._v("Dieta")]), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
@@ -8077,9 +8113,13 @@ var render = function render() {
       value: _vm.nutricion.dieta,
       expression: "nutricion.dieta"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control shadow-sm border-0",
+    staticStyle: {
+      "border-radius": "8px"
+    },
     attrs: {
-      rows: "3"
+      rows: "3",
+      placeholder: "Descripción de la dieta..."
     },
     domProps: {
       value: _vm.nutricion.dieta
@@ -8090,10 +8130,10 @@ var render = function render() {
         _vm.$set(_vm.nutricion, "dieta", $event.target.value);
       }
     }
-  }), _vm._v(" "), _c("label", {
-    attrs: {
-      "for": ""
-    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "mb-4"
+  }, [_c("label", {
+    staticClass: "form-label small fw-bold text-muted text-uppercase"
   }, [_vm._v("Suplemento o complemento nutricional")]), _vm._v(" "), _c("textarea", {
     directives: [{
       name: "model",
@@ -8101,9 +8141,13 @@ var render = function render() {
       value: _vm.nutricion.suplemento,
       expression: "nutricion.suplemento"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control shadow-sm border-0",
+    staticStyle: {
+      "border-radius": "8px"
+    },
     attrs: {
-      rows: "3"
+      rows: "3",
+      placeholder: "Suplementos requeridos..."
     },
     domProps: {
       value: _vm.nutricion.suplemento
@@ -8114,8 +8158,10 @@ var render = function render() {
         _vm.$set(_vm.nutricion, "suplemento", $event.target.value);
       }
     }
-  }), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-outline-primary mt-2",
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "text-end"
+  }, [_c("button", {
+    staticClass: "btn btn-primary rounded-pill px-4 shadow font-weight-bold",
     attrs: {
       "data-bs-dismiss": "modal"
     },
@@ -8125,71 +8171,143 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "far fa-save"
-  }), _vm._v(" Crear plan inicial")])])])])])]);
+    staticClass: "far fa-save mr-1"
+  }), _vm._v(" Crear plan inicial")])])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("button", {
-    staticClass: "btn btn-outline-primary",
+  return _c("div", {
+    staticClass: "d-sm-flex align-items-center justify-content-between mb-4"
+  }, [_c("div", [_c("h4", {
+    staticClass: "m-0 font-weight-bold text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-apple-alt text-primary mr-2"
+  }), _vm._v(" Nutrición")]), _vm._v(" "), _c("small", {
+    staticClass: "text-muted"
+  }, [_vm._v("Gestión de planes nutricionales e historial")])]), _vm._v(" "), _c("div", [_c("button", {
+    staticClass: "btn btn-primary shadow-sm rounded-pill font-weight-bold px-4",
     attrs: {
       "data-bs-target": "#nuevoHistorialNutricion",
       "data-bs-toggle": "modal"
     }
   }, [_c("i", {
-    staticClass: "far fa-comment-alt"
-  }), _vm._v(" Agregar historia nutricional")]);
+    staticClass: "fas fa-plus-circle mr-1"
+  }), _vm._v(" Agregar historia nutricional\n\t\t\t")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "modal-header"
+    staticClass: "icon-circle bg-success-light mr-3 d-flex align-items-center justify-content-center",
+    staticStyle: {
+      width: "40px",
+      height: "40px",
+      "border-radius": "50%",
+      "background-color": "#e3fbed"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-leaf text-success"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modal-header border-0 pb-0 px-4 pt-4"
   }, [_c("h5", {
-    staticClass: "modal-title",
+    staticClass: "modal-title font-weight-bold text-dark",
     attrs: {
       id: "infoModalLabel"
     }
-  }, [_vm._v("Exámenes")]), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-danger",
+  }, [_c("i", {
+    staticClass: "fas fa-apple-alt text-primary mr-2"
+  }), _vm._v(" Historia Nutricional\n\t\t\t\t\t")]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close",
     attrs: {
       type: "button",
       "data-bs-dismiss": "modal",
       "aria-label": "Close"
     }
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "font-weight-bold text-primary mb-3"
   }, [_c("i", {
-    staticClass: "fas fa-times"
-  })])]);
+    staticClass: "fas fa-ruler-vertical mr-1"
+  }), _vm._v(" 1. Antecedentes")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("p", {
-    staticClass: "mt-2"
-  }, [_c("strong", [_vm._v("1. Antecedentes:")])]);
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-0 text-muted"
+  }, [_c("i", {
+    staticClass: "fas fa-weight"
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("p", {
-    staticClass: "mt-2"
-  }, [_c("strong", [_vm._v("2. Hábitos almimenticios:")])]);
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-0 text-muted"
+  }, [_c("i", {
+    staticClass: "fas fa-ruler"
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("p", {
-    staticClass: "mt-2"
-  }, [_c("strong", [_vm._v("3. Signos y síntomas:")])]);
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-0 text-muted"
+  }, [_c("i", {
+    staticClass: "fas fa-calculator"
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("p", {
-    staticClass: "mt-2"
-  }, [_c("strong", [_vm._v("4. Diagnóstico nutricional:")])]);
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-0 text-muted"
+  }, [_c("i", {
+    staticClass: "fas fa-tape"
+  })]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("p", {
-    staticClass: "mt-2"
-  }, [_c("strong", [_vm._v("5. Plan nutricional:")])]);
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-0 text-muted"
+  }, [_c("i", {
+    staticClass: "fas fa-percentage"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "font-weight-bold text-primary mb-3 mt-2"
+  }, [_c("i", {
+    staticClass: "fas fa-utensils mr-1"
+  }), _vm._v(" 2. Hábitos Alimenticios")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "font-weight-bold text-primary mb-3 mt-2"
+  }, [_c("i", {
+    staticClass: "fas fa-stethoscope mr-1"
+  }), _vm._v(" 3. Signos y síntomas")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "font-weight-bold text-primary mb-3"
+  }, [_c("i", {
+    staticClass: "fas fa-notes-medical mr-1"
+  }), _vm._v(" 4. Diagnóstico Nutricional")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "font-weight-bold text-primary mb-3"
+  }, [_c("i", {
+    staticClass: "fas fa-clipboard-list mr-1"
+  }), _vm._v(" 5. Plan Nutricional")]);
 }];
 render._withStripped = true;
 

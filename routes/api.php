@@ -474,5 +474,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/paciente-certificado/dni/{dni}', [PacienteCertificadoController::class, 'buscarPorDni']);
     Route::put('/paciente-certificado/{id}/estado', [PacienteCertificadoController::class, 'cambiarEstado']);
     Route::post('/paciente-certificado/{id}/pagar', [PacienteCertificadoController::class, 'pagar']);
+    Route::put('/paciente-certificado/{id}/historia', [PacienteCertificadoController::class, 'guardarHistoria']);
 
 });

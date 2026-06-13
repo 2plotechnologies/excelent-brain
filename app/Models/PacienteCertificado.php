@@ -18,8 +18,15 @@ class PacienteCertificado extends Model
         'telefono',
         'correo',
         'tipo_certificado',
-        'estado'
+        'estado',
+        'historia',
+        'professional_id'
     ];
+
+    public function professional()
+    {
+        return $this->belongsTo(Professional::class, 'professional_id', 'id');
+    }
 
     public function pagos()
     {

@@ -552,10 +552,12 @@ var render = function render() {
   }, [_vm._m(0), _vm._v(" "), _c("div", {
     staticClass: "modal-body bg-light p-4"
   }, [_vm.loading ? _c("div", {
+    key: "loading",
     staticClass: "text-center py-5"
   }, [_vm._m(1), _vm._v(" "), _c("p", {
     staticClass: "mt-2 text-muted"
   }, [_vm._v("Obteniendo respuestas...")])]) : _vm.error ? _c("div", {
+    key: "error",
     staticClass: "alert alert-warning shadow-sm border-0 d-flex align-items-center p-4 rounded-lg"
   }, [_c("i", {
     staticClass: "fas fa-exclamation-triangle fa-2x me-3 text-warning"
@@ -563,7 +565,9 @@ var render = function render() {
     staticClass: "mb-1 text-warning font-weight-bold"
   }, [_vm._v("Aviso")]), _vm._v(" "), _c("p", {
     staticClass: "mb-0"
-  }, [_vm._v(_vm._s(_vm.error))])])]) : _vm.respuestas ? _c("div", [_c("div", {
+  }, [_vm._v(_vm._s(_vm.error))])])]) : _vm.respuestas ? _c("div", {
+    key: "respuestas"
+  }, [_c("div", {
     staticClass: "card border-0 shadow-sm mb-3 rounded-lg"
   }, [_c("div", {
     staticClass: "card-body"
@@ -920,23 +924,43 @@ __webpack_require__.r(__webpack_exports__);
 var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("main", [_vm._m(0), _vm._v(" "), _c("div", {
-    staticClass: "d-sm-flex align-items-center justify-content-between flex-wrap mt-2 gap-10"
+  return _c("main", {
+    staticClass: "p-4",
+    staticStyle: {
+      "background-color": "#f8f9fc",
+      "min-height": "100vh"
+    }
+  }, [_vm._m(0), _vm._v(" "), _c("div", {
+    staticClass: "card border-0 shadow-sm mb-4",
+    staticStyle: {
+      "border-radius": "10px"
+    }
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_c("div", {
+    staticClass: "d-sm-flex align-items-center justify-content-between flex-wrap mb-4 gap-10"
   }, [_c("form", {
-    staticClass: "d-sm-inline-block form-inline form-search-historia",
+    staticClass: "d-sm-inline-block form-inline form-search-historia w-100",
+    staticStyle: {
+      "max-width": "400px"
+    },
     on: {
       submit: function submit($event) {
         $event.preventDefault();
       }
     }
   }, [_c("div", {
-    staticClass: "input-group"
-  }, [_c("input", {
-    staticClass: "form-control bg-white shadow-sm border-0 small",
+    staticClass: "input-group shadow-sm",
+    staticStyle: {
+      "border-radius": "8px",
+      overflow: "hidden"
+    }
+  }, [_vm._m(1), _vm._v(" "), _c("input", {
+    staticClass: "form-control border-0 py-2",
     attrs: {
       type: "text",
       id: "searchHistoriaProfesional",
-      placeholder: "Buscar...",
+      placeholder: "Buscar paciente por nombre...",
       "aria-label": "Search",
       "aria-describedby": "basic-addon2"
     },
@@ -946,10 +970,8 @@ var render = function render() {
         return _vm.searchHistoria();
       }
     }
-  }), _vm._v(" "), _c("div", {
-    staticClass: "input-group-append"
-  }, [_c("button", {
-    staticClass: "btn btn-primary",
+  }), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary px-3 font-weight-bold",
     attrs: {
       type: "button"
     },
@@ -958,10 +980,8 @@ var render = function render() {
         return _vm.searchHistoria();
       }
     }
-  }, [_c("i", {
-    staticClass: "fas fa-search fa-sm"
-  })])])])]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex align-items-center ms-5"
+  }, [_vm._v("\n\t\t\t\t\t\t\t\tBuscar\n\t\t\t\t\t\t\t")])])]), _vm._v(" "), _c("div", {
+    staticClass: "d-flex align-items-center mt-3 mt-sm-0"
   }, [_c("ul", {
     staticClass: "nav nav-pills",
     attrs: {
@@ -974,7 +994,7 @@ var render = function render() {
       role: "presentation"
     }
   }, [_c("button", {
-    staticClass: "btn btn-sm btn-outline-secondary order-active",
+    staticClass: "btn btn-sm btn-light shadow-sm text-muted font-weight-bold rounded-pill px-3 order-active",
     attrs: {
       id: "pills-home-tab",
       "data-bs-toggle": "pill"
@@ -985,60 +1005,95 @@ var render = function render() {
       }
     }
   }, [_c("i", {
-    staticClass: "fa-solid fa-eraser"
-  }), _vm._v(" Limpiar búsqueda\n\t\t\t\t\t\t")])])])])]), _vm._v(" "), _c("h4", {
-    staticClass: "mt-3"
+    staticClass: "fa-solid fa-eraser mr-1"
+  }), _vm._v(" Limpiar búsqueda\n\t\t\t\t\t\t\t\t")])])])])]), _vm._v(" "), _c("h6", {
+    staticClass: "font-weight-bold text-dark mb-3 text-uppercase small"
   }, [_vm._v("Mis pacientes asignados")]), _vm._v(" "), _c("div", {
-    staticClass: "row historia-card"
+    staticClass: "historia-card mt-2"
   }, _vm._l(_vm.busqueda, function (historia, index) {
     return _c("div", {
-      key: index
+      key: index,
+      staticClass: "card h-100 border-0 shadow-sm",
+      staticStyle: {
+        "border-radius": "10px",
+        overflow: "hidden"
+      },
+      style: historia.discharge != 1 ? "border-top: 4px solid #f6c23e !important;" : "border-top: 4px solid #1cc88a !important;"
     }, [_c("div", {
-      staticClass: "card h-100 shadow"
-    }, [historia.discharge != 1 ? _c("div", {
-      staticClass: "card-header bg-warning py-3 d-flex flex-row align-items-center justify-content-between"
-    }, [_c("h6", {
-      staticClass: "m-0 font-weight-bold text-white"
-    }, [_vm._v("Código de Paciente: " + _vm._s(historia.id))])]) : _c("div", {
-      staticClass: "card-header bg-success py-3 d-flex flex-row align-items-center justify-content-between"
-    }, [_c("h6", {
-      staticClass: "m-0 font-weight-bold text-white"
-    }, [_vm._v("Código de Paciente: " + _vm._s(historia.id))])]), _vm._v(" "), _c("div", {
-      staticClass: "card-body"
+      staticClass: "card-body p-4 d-flex flex-column"
     }, [_c("div", {
+      staticClass: "d-flex justify-content-between align-items-start mb-3"
+    }, [_c("h6", {
+      staticClass: "m-0 font-weight-bold text-dark text-capitalize",
+      staticStyle: {
+        "line-height": "1.4"
+      }
+    }, [_vm._v(_vm._s(historia.name ? _vm.lowerCase(historia.name) + ", " + _vm.lowerCase(historia.nombres) : "..."))]), _vm._v(" "), _c("span", {
+      staticClass: "badge",
+      "class": historia.discharge != 1 ? "bg-warning-light text-dark" : "bg-success-light text-success"
+    }, [_vm._v("ID: " + _vm._s(historia.id))])]), _vm._v(" "), _c("div", {
       staticClass: "historia-info"
-    }, [_c("p", {
-      staticClass: "text-capitalize"
-    }, [_vm._v("Paciente: "), _c("span", {
-      staticClass: "fst-italic"
-    }, [_vm._v(_vm._s(historia.name ? _vm.lowerCase(historia.name) + ", " + _vm.lowerCase(historia.nombres) : "..."))])]), _vm._v(" "), historia.alta_psicologica == 1 && historia.alta_psiquiatrica == 1 ? _c("p", {
-      staticClass: "text-success fw-bold"
-    }, [_vm._v("Paciente con Alta Psicológica y Psiquiátrica")]) : historia.alta_psicologica == 1 ? _c("p", {
-      staticClass: "text-info fw-bold"
-    }, [_vm._v("Paciente con Alta Psicológica")]) : historia.alta_psiquiatrica == 1 ? _c("p", {
-      staticClass: "text-success fw-bold"
-    }, [_vm._v("Paciente con Alta Psiquiátrica")]) : _vm._e(), _vm._v(" "), !historia.initial_psychological_history && _vm.dataUser.profession === "Psicólogo" ? _c("p", {
-      staticClass: "text-danger"
-    }, [_vm._v("\n\t\t\t\t\t\t\t\tSin historia inicial de psicología\n\t\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), !historia.initial_psychiatric_history && _vm.dataUser.profession === "Psiquiatra" ? _c("p", {
-      staticClass: "text-danger"
-    }, [_vm._v("Sin historia inicial de\n\t\t\t\t\t\t\t\tpsiquiatra")]) : _vm._e(), _vm._v(" "), _c("div", {
-      staticClass: "w-100 d-flex align-items-center gap-10"
+    }, [_c("div", {
+      staticClass: "mb-3"
+    }, [historia.alta_psicologica == 1 && historia.alta_psiquiatrica == 1 ? _c("p", {
+      staticClass: "text-success small fw-bold mb-1"
+    }, [_c("i", {
+      staticClass: "fas fa-check-circle mr-1"
+    }), _vm._v(" Alta Psicológica y Psiquiátrica")]) : historia.alta_psicologica == 1 ? _c("p", {
+      staticClass: "text-info small fw-bold mb-1"
+    }, [_c("i", {
+      staticClass: "fas fa-check-circle mr-1"
+    }), _vm._v(" Alta Psicológica")]) : historia.alta_psiquiatrica == 1 ? _c("p", {
+      staticClass: "text-success small fw-bold mb-1"
+    }, [_c("i", {
+      staticClass: "fas fa-check-circle mr-1"
+    }), _vm._v(" Alta Psiquiátrica")]) : _vm._e(), _vm._v(" "), !historia.initial_psychological_history && _vm.dataUser.profession === "Psicólogo" ? _c("p", {
+      staticClass: "text-danger small mb-1"
+    }, [_c("i", {
+      staticClass: "fas fa-exclamation-triangle mr-1"
+    }), _vm._v(" Sin historia inicial de psicología")]) : _vm._e(), _vm._v(" "), !historia.initial_psychiatric_history && _vm.dataUser.profession === "Psiquiatra" ? _c("p", {
+      staticClass: "text-danger small mb-1"
+    }, [_c("i", {
+      staticClass: "fas fa-exclamation-triangle mr-1"
+    }), _vm._v(" Sin historia inicial de psiquiatra")]) : _vm._e()]), _vm._v(" "), _c("div", {
+      staticClass: "w-100 d-flex align-items-center flex-wrap gap-2 mt-auto pt-3 border-top"
     }, [!historia.initial_psychological_history && _vm.dataUser.profession === "Psicólogo" ? _c("a", {
-      staticClass: "btn btn-secondary btn-circle opacity-50 cursor-disabled",
+      staticClass: "btn btn-light btn-sm text-muted cursor-disabled rounded-circle shadow-sm",
+      staticStyle: {
+        width: "35px",
+        height: "35px",
+        display: "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      },
       attrs: {
         title: "Sin historia inicial de psicologia"
       }
     }, [_c("i", {
       staticClass: "fa-solid fa-user-slash"
     })]) : !historia.initial_psychiatric_history && _vm.dataUser.profession === "Psiquiatra" ? _c("a", {
-      staticClass: "btn btn-secondary btn-circle opacity-50 cursor-disabled",
+      staticClass: "btn btn-light btn-sm text-muted cursor-disabled rounded-circle shadow-sm",
+      staticStyle: {
+        width: "35px",
+        height: "35px",
+        display: "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      },
       attrs: {
         title: "Sin historia inicial de psiquiatra"
       }
     }, [_c("i", {
       staticClass: "fa-solid fa-user-slash"
     })]) : _c("router-link", {
-      staticClass: "btn btn-primary btn-circle",
+      staticClass: "btn btn-primary btn-sm rounded-circle shadow-sm",
+      staticStyle: {
+        width: "35px",
+        height: "35px",
+        display: "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      },
       attrs: {
         to: "evoluciones/".concat(historia.id),
         title: "Ver evoluciones"
@@ -1046,7 +1101,14 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fa-solid fa-user-doctor"
     })]), _vm._v(" "), _vm.dataUser.id == 5 || _vm.dataUser.id == 18 ? _c("router-link", {
-      staticClass: "btn btn-success btn-circle",
+      staticClass: "btn btn-success btn-sm rounded-circle shadow-sm",
+      staticStyle: {
+        width: "35px",
+        height: "35px",
+        display: "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      },
       attrs: {
         to: "evoluciones/".concat(historia.id),
         title: "Ver evoluciones"
@@ -1054,7 +1116,14 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fa-solid fa-user-doctor"
     })]) : _vm._e(), _vm._v(" "), _vm.dataUser.id == 5 || _vm.dataUser.id == 18 ? _c("a", {
-      staticClass: "btn btn-primary btn-circle",
+      staticClass: "btn btn-danger btn-sm rounded-circle shadow-sm",
+      staticStyle: {
+        width: "35px",
+        height: "35px",
+        display: "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      },
       attrs: {
         href: "/api/pdfEvolution/thorough/".concat(historia.id, "?token=").concat(_vm.$token),
         title: "Generar PDF para evoluciones",
@@ -1063,7 +1132,14 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fas fa-file-pdf"
     })]) : _c("a", {
-      staticClass: "btn btn-primary btn-circle",
+      staticClass: "btn btn-danger btn-sm rounded-circle shadow-sm",
+      staticStyle: {
+        width: "35px",
+        height: "35px",
+        display: "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      },
       attrs: {
         href: "/api/pdfEvolution/restricted/".concat(historia.id, "?token=").concat(_vm.$token),
         title: "Generar PDF para evoluciones",
@@ -1072,7 +1148,14 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fas fa-file-pdf"
     })]), _vm._v(" "), _vm.dataUser.profession != "Psicólogo" ? _c("a", {
-      staticClass: "btn btn-primary btn-circle",
+      staticClass: "btn btn-info btn-sm text-white rounded-circle shadow-sm",
+      staticStyle: {
+        width: "35px",
+        height: "35px",
+        display: "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      },
       attrs: {
         href: "/profesional/recetas/".concat(historia.id),
         title: "Generar receta"
@@ -1080,7 +1163,14 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fa-solid fa-vial"
     })]) : _vm._e(), _vm._v(" "), _c("button", {
-      staticClass: "btn btn-info btn-circle text-white",
+      staticClass: "btn btn-warning btn-sm text-dark rounded-circle shadow-sm",
+      staticStyle: {
+        width: "35px",
+        height: "35px",
+        display: "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      },
       attrs: {
         title: "Agregar triaje"
       },
@@ -1092,7 +1182,14 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fa-solid fa-shield-heart"
     })]), _vm._v(" "), _c("button", {
-      staticClass: "btn btn-secondary btn-circle",
+      staticClass: "btn btn-secondary btn-sm rounded-circle shadow-sm",
+      staticStyle: {
+        width: "35px",
+        height: "35px",
+        display: "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      },
       attrs: {
         title: "Ver autotriaje",
         "data-bs-toggle": "modal",
@@ -1106,7 +1203,14 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fa-solid fa-clipboard-list"
     })]), _vm._v(" "), _c("a", {
-      staticClass: "btn btn-success btn-circle",
+      staticClass: "btn btn-success btn-sm rounded-circle shadow-sm",
+      staticStyle: {
+        width: "35px",
+        height: "35px",
+        display: "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      },
       attrs: {
         title: "Ver chat"
       },
@@ -1117,8 +1221,8 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fa-solid fa-comment-dots"
-    })])], 1)])])])]);
-  }), 0), _vm._v(" "), _vm.datosPaciente ? _c("modal-triaje", {
+    })])], 1)])])]);
+  }), 0)])]), _vm._v(" "), _vm.datosPaciente ? _c("modal-triaje", {
     attrs: {
       dataPatient: _vm.datosPaciente,
       profesionales: _vm.profesionales
@@ -1137,10 +1241,22 @@ var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
-    staticClass: "d-sm-flex align-items-center justify-content-between mb-1"
-  }, [_c("h1", {
-    staticClass: "h3 mb-0 text-gray-800"
-  }, [_vm._v("Historias Clínicas")])]);
+    staticClass: "d-sm-flex align-items-center justify-content-between mb-4"
+  }, [_c("div", [_c("h4", {
+    staticClass: "m-0 font-weight-bold text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-file-medical text-primary mr-2"
+  }), _vm._v(" Historias Clínicas")]), _vm._v(" "), _c("small", {
+    staticClass: "text-muted"
+  }, [_vm._v("Gestión de pacientes e historiales")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-0 text-primary"
+  }, [_c("i", {
+    staticClass: "fas fa-search"
+  })]);
 }];
 render._withStripped = true;
 
@@ -1262,6 +1378,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
 /* harmony export */ });
 var render = function render() {
+  var _vm$patient;
   var _vm = this,
     _c = _vm._self._c;
   return _c("div", {
@@ -1282,7 +1399,7 @@ var render = function render() {
     staticClass: "modal-header border-0"
   }, [_c("h5", {
     staticClass: "modal-title"
-  }, [_vm._v("\n          💬 Recomendaciones - " + _vm._s(_vm.patient.nombres) + "\n        ")]), _vm._v(" "), _c("button", {
+  }, [_vm._v("\n          💬 Recomendaciones - " + _vm._s((_vm$patient = _vm.patient) === null || _vm$patient === void 0 ? void 0 : _vm$patient.nombres) + "\n        ")]), _vm._v(" "), _c("button", {
     staticClass: "btn-close",
     attrs: {
       "data-bs-dismiss": "modal",
@@ -2229,7 +2346,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.historia-card {\r\n\tdisplay: grid;\r\n\tgrid-template-columns: repeat(auto-fit, minmax(300px, 1fr));\r\n\tgrid-gap: 25px;\r\n\tpadding: 15px;\n}\n.historia-info {\r\n\theight: 100%;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n\tjustify-content: space-between;\n}\n.text-capitalize {\r\n\ttext-transform: lowercase !important;\r\n\ttext-transform: capitalize !important;\n}\n.gap-10 {\r\n\tgap: 10px;\n}\n.form-search-historia {\r\n\tflex: 1 0 auto;\n}\n.opacity-50 {\r\n\topacity: .5;\n}\n.cursor-disabled {\r\n\tcursor: not-allowed !important;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.historia-card {\r\n\tdisplay: grid;\r\n\tgrid-template-columns: repeat(auto-fit, minmax(300px, 1fr));\r\n\tgrid-gap: 25px;\r\n\tpadding: 15px;\n}\n.historia-info {\r\n\tflex-grow: 1;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n\tjustify-content: space-between;\n}\n.text-capitalize {\r\n\ttext-transform: lowercase !important;\r\n\ttext-transform: capitalize !important;\n}\n.gap-10 {\r\n\tgap: 10px;\n}\n.form-search-historia {\r\n\tflex: 1 0 auto;\n}\n.opacity-50 {\r\n\topacity: .5;\n}\n.cursor-disabled {\r\n\tcursor: not-allowed !important;\n}\n.bg-warning-light {\r\n\tbackground-color: #fdf3d8;\n}\n.bg-success-light {\r\n\tbackground-color: #e3fbed;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

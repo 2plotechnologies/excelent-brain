@@ -9,20 +9,20 @@
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body bg-light p-4">
-          <div v-if="loading" class="text-center py-5">
+          <div v-if="loading" key="loading" class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
               <span class="visually-hidden">Cargando...</span>
             </div>
             <p class="mt-2 text-muted">Obteniendo respuestas...</p>
           </div>
-          <div v-else-if="error" class="alert alert-warning shadow-sm border-0 d-flex align-items-center p-4 rounded-lg">
+          <div v-else-if="error" key="error" class="alert alert-warning shadow-sm border-0 d-flex align-items-center p-4 rounded-lg">
             <i class="fas fa-exclamation-triangle fa-2x me-3 text-warning"></i>
             <div>
               <h5 class="mb-1 text-warning font-weight-bold">Aviso</h5>
               <p class="mb-0">{{ error }}</p>
             </div>
           </div>
-          <div v-else-if="respuestas">
+          <div v-else-if="respuestas" key="respuestas">
             
             <div class="card border-0 shadow-sm mb-3 rounded-lg">
               <div class="card-body">

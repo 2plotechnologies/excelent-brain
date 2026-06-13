@@ -218,22 +218,44 @@ __webpack_require__.r(__webpack_exports__);
 var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("div", [_c("h1", [_vm._v("Resumen de visita por pacientes")]), _vm._v(" "), _c("h3", [_c("small", [_vm._v("Del Profesional: Dr. " + _vm._s(_vm.dataUser.nombre))])]), _vm._v(" "), _c("div", {
-    staticClass: "card"
+  return _c("div", {
+    staticClass: "p-4",
+    staticStyle: {
+      "background-color": "#f8f9fc",
+      "min-height": "100vh"
+    }
   }, [_c("div", {
-    staticClass: "card-body"
+    staticClass: "d-sm-flex align-items-center justify-content-between mb-4"
+  }, [_c("div", [_vm._m(0), _vm._v(" "), _c("small", {
+    staticClass: "text-muted"
+  }, [_vm._v("Gestión de cartera de pacientes del Dr. " + _vm._s(_vm.dataUser.nombre))])])]), _vm._v(" "), _c("div", {
+    staticClass: "card border-0 shadow-sm mb-4",
+    staticStyle: {
+      "border-radius": "10px",
+      "border-top": "4px solid #4e73df !important"
+    }
   }, [_c("div", {
-    staticClass: "row row-cols-auto g-3 align-items-center"
+    staticClass: "card-body p-4"
+  }, [_vm._m(1), _vm._v(" "), _c("div", {
+    staticClass: "row g-3 align-items-end"
   }, [_c("div", {
-    staticClass: "col-3"
-  }, [_vm._m(0), _vm._v(" "), _c("input", {
+    staticClass: "col-md-4"
+  }, [_c("label", {
+    staticClass: "small fw-bold text-muted text-uppercase"
+  }, [_vm._v("Buscar paciente")]), _vm._v(" "), _c("div", {
+    staticClass: "input-group shadow-sm",
+    staticStyle: {
+      "border-radius": "8px",
+      overflow: "hidden"
+    }
+  }, [_vm._m(2), _vm._v(" "), _c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
       value: _vm.filtro.texto,
       expression: "filtro.texto"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control bg-light border-0",
     attrs: {
       type: "text",
       placeholder: "DNI o Nombres"
@@ -247,12 +269,10 @@ var render = function render() {
         _vm.$set(_vm.filtro, "texto", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    staticClass: "col-3"
+  })])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-3"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
+    staticClass: "small fw-bold text-muted text-uppercase"
   }, [_vm._v("Año")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
@@ -260,7 +280,10 @@ var render = function render() {
       value: _vm.filtro.año,
       expression: "filtro.año"
     }],
-    staticClass: "form-select",
+    staticClass: "form-select bg-light border-0 shadow-sm",
+    staticStyle: {
+      "border-radius": "8px"
+    },
     on: {
       change: function change($event) {
         var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
@@ -279,11 +302,9 @@ var render = function render() {
       }
     }, [_vm._v(_vm._s(año))]);
   }), 0)]), _vm._v(" "), _c("div", {
-    staticClass: "col-3"
+    staticClass: "col-md-3"
   }, [_c("label", {
-    attrs: {
-      "for": ""
-    }
+    staticClass: "small fw-bold text-muted text-uppercase"
   }, [_vm._v("Mes")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
@@ -291,7 +312,10 @@ var render = function render() {
       value: _vm.filtro.mes,
       expression: "filtro.mes"
     }],
-    staticClass: "form-select text-capitalize",
+    staticClass: "form-select bg-light border-0 shadow-sm text-capitalize",
+    staticStyle: {
+      "border-radius": "8px"
+    },
     on: {
       change: function change($event) {
         var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
@@ -315,23 +339,33 @@ var render = function render() {
       }
     }, [_vm._v(_vm._s(_vm.capitalizar(mes)))]);
   })], 2)]), _vm._v(" "), _c("div", {
-    staticClass: "col-3 d-flex align-items-end"
+    staticClass: "col-md-2"
   }, [_c("button", {
-    staticClass: "btn btn-outline-primary",
+    staticClass: "btn btn-primary w-100 shadow-sm font-weight-bold",
+    staticStyle: {
+      "border-radius": "8px",
+      "padding-top": "10px",
+      "padding-bottom": "10px"
+    },
     on: {
       click: function click($event) {
         return _vm.buscarCartera();
       }
     }
   }, [_c("i", {
-    staticClass: "fa-solid fa-magnifying-glass"
-  }), _vm._v(" Filtrar cartera")])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "card mt-3"
+    staticClass: "fa-solid fa-magnifying-glass mr-1"
+  }), _vm._v(" Filtrar\n\t\t\t\t\t")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card border-0 shadow-sm",
+    staticStyle: {
+      "border-radius": "10px"
+    }
   }, [_c("div", {
-    staticClass: "card-body"
+    staticClass: "card-body p-0"
+  }, [_c("div", {
+    staticClass: "table-responsive"
   }, [_c("table", {
-    staticClass: "table table-sm table-hover"
-  }, [_vm._m(1), _vm._v(" "), _c("tbody", _vm._l(_vm.citasResumidas, function (cita, index) {
+    staticClass: "table table-hover align-middle mb-0"
+  }, [_vm._m(3), _vm._v(" "), _c("tbody", _vm._l(_vm.citasResumidas, function (cita, index) {
     return _c("tr", [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", {
       staticClass: "text-capitalize"
     }, [_vm._v(_vm._s(cita.patient.name.toLowerCase()))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(cita.patient.phone))]), _vm._v(" "), _c("td", {
@@ -418,22 +452,8 @@ var render = function render() {
       }
     }, [_c("i", {
       staticClass: "fas fa-circle"
-    })]), _vm._v(" "), _c("button", {
-      staticClass: "btn btn-sm btn-circle btn-outline-primary",
-      attrs: {
-        title: "Enviar a seguimiento",
-        "data-bs-target": "#modalSeguimiento",
-        "data-bs-toggle": "modal"
-      },
-      on: {
-        click: function click($event) {
-          _vm.elegido = cita.patient;
-        }
-      }
-    }, [_c("i", {
-      staticClass: "far fa-paper-plane"
     })])])]);
-  }), 0)])])]), _vm._v(" "), _c("div", {
+  }), 0)])])])]), _vm._v(" "), _c("div", {
     staticClass: "modal fade",
     attrs: {
       id: "modalCitasPreview",
@@ -442,17 +462,22 @@ var render = function render() {
       "aria-hidden": "true"
     }
   }, [_c("div", {
-    staticClass: "modal-dialog"
+    staticClass: "modal-dialog modal-dialog-centered"
   }, [_c("div", {
-    staticClass: "modal-content"
+    staticClass: "modal-content border-0 shadow-lg",
+    staticStyle: {
+      "border-radius": "15px"
+    }
   }, [_c("div", {
-    staticClass: "modal-header"
-  }, [_c("h1", {
-    staticClass: "modal-title fs-5",
+    staticClass: "modal-header border-0 pb-0 px-4 pt-4"
+  }, [_c("h5", {
+    staticClass: "modal-title font-weight-bold text-primary",
     attrs: {
       id: "exampleModalLabel"
     }
-  }, [_vm._v(_vm._s(_vm.titulo))]), _vm._v(" "), _c("button", {
+  }, [_c("i", {
+    staticClass: "fas fa-calendar-check mr-2"
+  }), _vm._v(_vm._s(_vm.titulo) + "\n\t\t\t\t")]), _vm._v(" "), _c("button", {
     staticClass: "btn-close",
     attrs: {
       type: "button",
@@ -460,31 +485,52 @@ var render = function render() {
       "aria-label": "Close"
     }
   })]), _vm._v(" "), _c("div", {
-    staticClass: "modal-body"
+    staticClass: "modal-body p-4"
+  }, [_c("div", {
+    staticClass: "table-responsive border rounded-4 shadow-sm"
   }, [_c("table", {
-    staticClass: "table table-hover table-sm"
-  }, [_vm._m(2), _vm._v(" "), _c("tbody", [_vm._l(_vm.previewCitas, function (preview, index) {
+    staticClass: "table table-hover align-middle mb-0"
+  }, [_vm._m(4), _vm._v(" "), _c("tbody", [_vm._l(_vm.previewCitas, function (preview, index) {
     return _c("tr", [_c("td", [_vm._v(_vm._s(index + 1))]), _vm._v(" "), _c("td", [_vm._v(_vm._s(_vm.fechaLatam(preview.date)))])]);
   }), _vm._v(" "), _vm.previewCitas.length == 0 ? _c("tr", [_c("td", {
     attrs: {
       colspan: "2"
     }
-  }, [_vm._v("No se encontraron datos")])]) : _vm._e()], 2)])])])])])]);
+  }, [_vm._v("No se encontraron datos")])]) : _vm._e()], 2)])])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("label", {
-    attrs: {
-      "for": ""
-    }
+  return _c("h4", {
+    staticClass: "m-0 font-weight-bold text-dark"
   }, [_c("i", {
-    staticClass: "fas fa-filter"
-  }), _vm._v(" Filtro")]);
+    staticClass: "fas fa-users text-primary mr-2"
+  }), _vm._v(" Resumen de Visitas por Paciente")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("thead", [_c("tr", [_c("th", [_vm._v("N°")]), _vm._v(" "), _c("th", [_vm._v("Nombre y Apellidos")]), _vm._v(" "), _c("th", [_vm._v("Celular")]), _vm._v(" "), _c("th", {
+  return _c("h6", {
+    staticClass: "font-weight-bold text-primary mb-3 text-uppercase small"
+  }, [_c("i", {
+    staticClass: "fas fa-filter mr-1"
+  }), _vm._v(" Filtros de Búsqueda")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-light border-0 text-muted"
+  }, [_c("i", {
+    staticClass: "fas fa-search"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", {
+    staticClass: "table-light text-muted text-uppercase small",
+    staticStyle: {
+      "font-size": "0.75rem"
+    }
+  }, [_c("tr", [_c("th", [_vm._v("N°")]), _vm._v(" "), _c("th", [_vm._v("Nombre y Apellidos")]), _vm._v(" "), _c("th", [_vm._v("Celular")]), _vm._v(" "), _c("th", {
     staticClass: "d-none"
   }, [_vm._v("Antigüedad")]), _vm._v(" "), _c("th", [_vm._v("N° Citas")]), _vm._v(" "), _c("th", [_vm._v("N° Conf.")]), _vm._v(" "), _c("th", [_vm._v("No asistieron")]), _vm._v(" "), _c("th", [_vm._v("N° Anulados")]), _vm._v(" "), _c("th", [_vm._v("N° Reprogramados")]), _vm._v(" "), _c("th", {
     staticClass: "d-none"

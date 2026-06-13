@@ -622,12 +622,15 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "h5 mb-0 mx-1"
   }, [_vm._v(_vm._s(_vm.dataConsult.schedule ? _vm.horaHumana(_vm.dataConsult.schedule.check_time) : "00-00"))]), _vm._v(" "), _c("div", {
-    staticClass: "consulta-card card h-100 w-75 py-2 border-0",
+    staticClass: "consulta-card card h-100 w-75 py-2 border-0 shadow-sm",
     "class": {
       "border-left-warning": _vm.dataConsult.status === 1 || _vm.dataConsult.status == 4,
       "border-left-danger": _vm.dataConsult.status === 3,
       consultAnulada: _vm.dataConsult.status === 3,
       "border-left-success": _vm.dataConsult.status === 2
+    },
+    staticStyle: {
+      "border-radius": "10px"
     }
   }, [_c("div", {
     staticClass: "card-body"
@@ -1551,19 +1554,30 @@ __webpack_require__.r(__webpack_exports__);
 var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("main", [_c("div", {
+  return _c("main", {
+    staticClass: "p-4",
+    staticStyle: {
+      "background-color": "#f8f9fc",
+      "min-height": "100vh"
+    }
+  }, [_c("div", {
     staticClass: "d-sm-flex main-header align-items-center justify-content-between mb-4"
-  }, [_c("h1", {
-    staticClass: "h3 mb-0 text-gray-800"
-  }, [_vm._v("Consultas Kurame")]), _vm._v(" "), _c("div", {
+  }, [_vm._m(0), _vm._v(" "), _c("div", {
     staticClass: "d-flex consultas-btn-top align-content-stretch my-3",
     staticStyle: {
-      gap: "5px"
+      gap: "10px"
     }
   }, [_c("div", {
     staticClass: "d-flex gap fecha-restablecer"
-  }, [_c("input", {
-    staticClass: "form-control",
+  }, [_c("div", {
+    staticClass: "input-group input-group-sm shadow-sm",
+    staticStyle: {
+      "border-radius": "8px",
+      overflow: "hidden",
+      "max-width": "150px"
+    }
+  }, [_vm._m(1), _vm._v(" "), _c("input", {
+    staticClass: "form-control border-0 bg-white",
     attrs: {
       type: "date",
       name: "",
@@ -1572,13 +1586,21 @@ var render = function render() {
     on: {
       change: _vm.calendarActive
     }
-  }), _vm._v(" "), _c("a", {
-    staticClass: "btn btn-sm btn-primary d-flex align-items-center",
+  })]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm btn-light border-0 shadow-sm px-3 d-flex align-items-center font-weight-bold text-primary",
+    staticStyle: {
+      "border-radius": "8px"
+    },
     on: {
       click: _vm.now
     }
-  }, [_vm._v("\n                Restablecer\n                ")])]), _vm._v(" "), _vm.dayActive ? _c("ul", {
-    staticClass: "d-flex justify-content-start align-content-stretch nav nav-pills",
+  }, [_c("i", {
+    staticClass: "fas fa-undo-alt mr-1"
+  }), _vm._v(" Restablecer\n                ")])]), _vm._v(" "), _vm.dayActive ? _c("ul", {
+    staticClass: "d-flex justify-content-start align-content-stretch nav nav-pills bg-white shadow-sm p-1",
+    staticStyle: {
+      "border-radius": "8px"
+    },
     attrs: {
       id: "pills-tab",
       role: "tablist"
@@ -1589,7 +1611,10 @@ var render = function render() {
       role: "presentation"
     }
   }, [_c("button", {
-    staticClass: "btnConsultas h-100 btn btn-sm btn-primary btnConsultasActive active btn-hover",
+    staticClass: "btnConsultas h-100 btn btn-sm btn-primary btnConsultasActive active btn-hover px-3 font-weight-bold",
+    staticStyle: {
+      "border-radius": "6px"
+    },
     attrs: {
       id: "pills-home-tab",
       "data-bs-toggle": "pill",
@@ -1604,13 +1629,17 @@ var render = function render() {
         return _vm.consultaActiva(false, true);
       }
     }
-  }, [_vm._v("\n                    Todas las consultas\n                    ")])]), _vm._v(" "), _c("li", {
+  }, [_vm._v("\n                    Todas\n                    ")])]), _vm._v(" "), _c("li", {
     staticClass: "nav-item",
     attrs: {
       role: "presentation"
     }
   }, [_c("button", {
-    staticClass: "btnConsultas h-100 btn btn-sm btn-hover",
+    staticClass: "btnConsultas h-100 btn btn-sm btn-hover px-3 text-muted font-weight-bold",
+    staticStyle: {
+      "border-radius": "6px",
+      "background-color": "transparent"
+    },
     attrs: {
       id: "pills-profile-tab",
       "data-bs-toggle": "pill",
@@ -1625,10 +1654,16 @@ var render = function render() {
         return _vm.consultaActiva(true, true);
       }
     }
-  }, [_vm._v("\n                    Consultas pendientes\n                    ")])])]) : _vm._e()])]), _vm._v(" "), _c("div", {
-    staticClass: "card pb-4"
+  }, [_vm._v("\n                    Pendientes\n                    ")])])]) : _vm._e()])]), _vm._v(" "), _c("div", {
+    staticClass: "card border-0 shadow-sm mb-4",
+    staticStyle: {
+      "border-radius": "10px",
+      "background-color": "#fff"
+    }
   }, [_c("div", {
-    staticClass: "row px-1 shadow consult-content pb-3"
+    staticClass: "card-body p-4"
+  }, [_c("div", {
+    staticClass: "row"
   }, [_c("div", {
     staticClass: "col-md-4 dayCalendar before"
   }, [_vm.dayActive ? _c("div", {
@@ -1679,8 +1714,8 @@ var render = function render() {
       }
     });
   }), 1) : _c("div", {
-    staticClass: "text-center"
-  }, [_vm.dayActive ? _c("span", [_vm._v("No hay Citas")]) : _vm._e()])])])]), _vm._v(" "), _c("info-modal", {
+    staticClass: "text-center text-muted small py-3"
+  }, [_vm.dayActive ? _c("span", [_vm._v("No hay Citas")]) : _vm._e()])])])])]), _vm._v(" "), _c("info-modal", {
     attrs: {
       dataModal: _vm.infoModal
     }
@@ -1694,7 +1729,25 @@ var render = function render() {
     }
   })], 1);
 };
-var staticRenderFns = [];
+var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", [_c("h4", {
+    staticClass: "m-0 font-weight-bold text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-hand-holding-medical text-primary mr-2"
+  }), _vm._v(" Consultas Kurame")]), _vm._v(" "), _c("small", {
+    staticClass: "text-muted"
+  }, [_vm._v("Gestión de consultas para el programa Kurame")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("span", {
+    staticClass: "input-group-text bg-white border-0 text-primary"
+  }, [_c("i", {
+    staticClass: "far fa-calendar-alt"
+  })]);
+}];
 render._withStripped = true;
 
 
