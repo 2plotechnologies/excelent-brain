@@ -398,6 +398,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       fichaView: 'botones',
       savingFicha: false,
       professionalsList: [],
+      paymentMethodsList: [],
       fichaSeleccionada: null,
       linkGenerado: '',
       nuevaFicha: {
@@ -1303,8 +1304,12 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       return 'Evolución';
     },
     getPaymentMethodName: function getPaymentMethodName(id) {
-      var methods = ['Efectivo', 'Depósito bancario', 'POS', 'Aplicativo Yape', 'Banco: BCP', 'Banco: BBVA', 'Banco: Interbank', 'Banco: Nación', 'Banco: Scotiabank', 'Aplicativo Plin', 'Open pay'];
       if (!id) return '—';
+      var found = this.paymentMethodsList.find(function (m) {
+        return m.id == id;
+      });
+      if (found) return found.tipo;
+      var methods = ['Efectivo', 'Depósito bancario', 'POS', 'Aplicativo Yape', 'Banco: BCP', 'Banco: BBVA', 'Banco: Interbank', 'Banco: Nación', 'Banco: Scotiabank', 'Aplicativo Plin', 'Open pay', 'Izipay'];
       return methods[id - 1] || "M\xE9todo ".concat(id);
     },
     formatLongDate: function formatLongDate(date) {
@@ -1512,6 +1517,11 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     });
     this.axios.get('/api/professional').then(function (res) {
       _this12.professionalsList = res.data;
+    })["catch"](function (err) {
+      return console.error(err);
+    });
+    this.axios.get('/api/listarMonedas').then(function (res) {
+      _this12.paymentMethodsList = res.data;
     })["catch"](function (err) {
       return console.error(err);
     });

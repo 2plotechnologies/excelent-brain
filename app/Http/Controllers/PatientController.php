@@ -1169,25 +1169,83 @@ class PatientController extends Controller
 			$patient->deudas_financieras = DB::table('deudas')->where('patient_id', $id)->orderBy('fecha', 'desc')->get();
 
 			// Financial summary for Finanzas tab
-			$pagosHistorial = DB::table('payments as p')
+			$pagosAppointments = DB::table('payments as p')
 				->join('appointments as a', 'a.id', '=', 'p.appointment_id')
 				->leftJoin('precios as pr', 'pr.id', '=', 'a.type')
 				->where('a.patient_id', $id)
-				->orderBy('a.date', 'desc')
-				->select('a.date', 'pr.descripcion as concepto', 'p.payment_method as metodo_id', 'p.price as monto', 'p.pay_status as estado', 'p.id as payment_id')
+				->select('a.date', 'pr.descripcion as concepto', 'p.payment_method as metodo_id', 'p.price as monto', 'p.pay_status as estado', 'p.id as payment_id', 'p.observation')
 				->get();
-			$patient->pagos_historial = $pagosHistorial;
+
+			$extraPayments = DB::table('extra_payments as ep')
+				->leftJoin('tipo_pagos as tp', 'tp.id', '=', 'ep.type')
+				->where('ep.patient_id', $id)
+				->where('ep.activo', 1)
+				->select('ep.date', 'tp.descripcion as concepto', 'ep.moneda as metodo_id', 'ep.price as monto', DB::raw('2 as estado'), 'ep.id as payment_id', 'ep.observation')
+				->get();
+
+			$allPayments = [];
+
+			foreach ($pagosAppointments as $pago) {
+				$concepto = $pago->concepto ?: 'Consulta';
+				if (!empty($pago->observation)) {
+					$concepto .= ' - ' . $pago->observation;
+				}
+				$allPayments[] = [
+					'date' => $pago->date,
+					'concepto' => $concepto,
+					'metodo_id' => $pago->metodo_id,
+					'monto' => $pago->monto,
+					'estado' => $pago->estado,
+					'payment_id' => 'appointment_' . $pago->payment_id,
+					'source' => 'appointment'
+				];
+			}
+
+			foreach ($extraPayments as $pago) {
+				$concepto = $pago->concepto ?: 'Pago Extra';
+				if (!empty($pago->observation)) {
+					$concepto .= ' - ' . $pago->observation;
+				}
+				$allPayments[] = [
+					'date' => $pago->date,
+					'concepto' => $concepto,
+					'metodo_id' => $pago->metodo_id,
+					'monto' => $pago->monto,
+					'estado' => $pago->estado,
+					'payment_id' => 'extra_' . $pago->payment_id,
+					'source' => 'extra'
+				];
+			}
+
+			// Sort by date desc
+			usort($allPayments, function ($a, $b) {
+				$dateA = strtotime($a['date']);
+				$dateB = strtotime($b['date']);
+				if ($dateA == $dateB) {
+					return strcmp($b['payment_id'], $a['payment_id']);
+				}
+				return $dateB - $dateA;
+			});
+
+			$patient->pagos_historial = $allPayments;
 
 			$deudaTotal = $patient->deudas_financieras->where('estado', 1)->sum('monto');
 			$pagosPendientes = $patient->deudas_financieras->where('estado', 1)->count();
-			$totalPagado = DB::table('payments as p')
+			
+			$totalPagadoAppointments = DB::table('payments as p')
 				->join('appointments as a', 'a.id', '=', 'p.appointment_id')
 				->where('a.patient_id', $id)
 				->where('p.pay_status', 2)
 				->sum('p.price');
+
+			$totalPagadoExtra = DB::table('extra_payments')
+				->where('patient_id', $id)
+				->where('activo', 1)
+				->sum('price');
+
 			$patient->deuda_total = $deudaTotal;
 			$patient->pagos_pendientes = $pagosPendientes;
-			$patient->total_pagado = $totalPagado;
+			$patient->total_pagado = $totalPagadoAppointments + $totalPagadoExtra;
 			$patient->archivos_list = DB::table('archivos')->where('patient_id', $id)->get();
 			$patient->archivos_triaje = DB::table('triaje_archivo')->where('patient_id', $id)->get();
 			$patient->faltas_historial = DB::table('faltas as f')

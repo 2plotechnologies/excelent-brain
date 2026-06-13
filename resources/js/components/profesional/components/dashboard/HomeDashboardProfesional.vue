@@ -126,8 +126,8 @@
                                             <small class="text-muted">{{ cita.motivo || 'Cita Programada' }}</small>
                                         </div>
                                         <div class="text-right">
-                                            <span class="badge" :class="statusBadge(cita.status).class" >
-                                                {{ statusBadge(cita.status).text }}
+                                            <span class="badge" :class="statusBadge(cita).class" >
+                                                {{ statusBadge(cita).text }}
                                             </span><br>
                                             <small class="text-muted"><i class="far fa-clock mr-1"></i>{{ cita.time || cita.hora_inicio || cita.date }}</small>
                                         </div>
@@ -197,11 +197,12 @@ export default {
             axios.get('/api/dashboardProfesional')
                 .then(res => {
                     let data = res.data;
+                    let citasHoy = data.citasHoy || [];
                     this.dashboardData = {
-                        citasHoy: data.citasHoy || [],
+                        citasHoy: citasHoy,
                         totalCitas: data.totalCitas || 0,
                         totalCitasPendientes: data.totalCitasPendientes || 0,
-                        totalCitasCompletadas: data.totalCitasCompletadas || 0,
+                        totalCitasCompletadas: citasHoy.filter(c => c.attention_status === 'atendido').length,
                         totalCitasCanceladas: data.totalCitasCanceladas || 0,
                     };
                 })
@@ -212,15 +213,23 @@ export default {
                     this.loading = false;
                 });
         },
-        statusBadge(status) {
-            // 1: Pendiente, 2: Completado (Atendida), 3: Cancelada
+        statusBadge(cita) {
+            if (cita.attention_status === 'atendido') {
+                return { text: 'Atendida', class: 'badge-success' };
+            } else if (cita.attention_status === 'atencion') {
+                return { text: 'En Atención', class: 'badge-info text-white' };
+            } else if (cita.attention_status === 'espera') {
+                return { text: 'En Espera', class: 'badge-secondary' };
+            }
+
+            let status = cita.status;
             switch(status) {
                 case '1':
                 case 1:
                     return { text: 'Pendiente', class: 'badge-warning text-dark' };
                 case '2':
                 case 2:
-                    return { text: 'Atendida', class: 'badge-success' };
+                    return { text: 'Confirmada', class: 'badge-primary' };
                 case '3':
                 case 3:
                     return { text: 'Cancelada', class: 'badge-danger' };

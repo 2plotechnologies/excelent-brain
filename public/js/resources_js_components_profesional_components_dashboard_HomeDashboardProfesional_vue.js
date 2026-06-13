@@ -63,11 +63,14 @@ moment__WEBPACK_IMPORTED_MODULE_0___default().locale('es');
       this.loading = true;
       axios.get('/api/dashboardProfesional').then(function (res) {
         var data = res.data;
+        var citasHoy = data.citasHoy || [];
         _this.dashboardData = {
-          citasHoy: data.citasHoy || [],
+          citasHoy: citasHoy,
           totalCitas: data.totalCitas || 0,
           totalCitasPendientes: data.totalCitasPendientes || 0,
-          totalCitasCompletadas: data.totalCitasCompletadas || 0,
+          totalCitasCompletadas: citasHoy.filter(function (c) {
+            return c.attention_status === 'atendido';
+          }).length,
           totalCitasCanceladas: data.totalCitasCanceladas || 0
         };
       })["catch"](function (err) {
@@ -76,8 +79,24 @@ moment__WEBPACK_IMPORTED_MODULE_0___default().locale('es');
         _this.loading = false;
       });
     },
-    statusBadge: function statusBadge(status) {
-      // 1: Pendiente, 2: Completado (Atendida), 3: Cancelada
+    statusBadge: function statusBadge(cita) {
+      if (cita.attention_status === 'atendido') {
+        return {
+          text: 'Atendida',
+          "class": 'badge-success'
+        };
+      } else if (cita.attention_status === 'atencion') {
+        return {
+          text: 'En Atención',
+          "class": 'badge-info text-white'
+        };
+      } else if (cita.attention_status === 'espera') {
+        return {
+          text: 'En Espera',
+          "class": 'badge-secondary'
+        };
+      }
+      var status = cita.status;
       switch (status) {
         case '1':
         case 1:
@@ -88,8 +107,8 @@ moment__WEBPACK_IMPORTED_MODULE_0___default().locale('es');
         case '2':
         case 2:
           return {
-            text: 'Atendida',
-            "class": 'badge-success'
+            text: 'Confirmada',
+            "class": 'badge-primary'
           };
         case '3':
         case 3:
@@ -279,8 +298,8 @@ var render = function render() {
       staticClass: "text-right"
     }, [_c("span", {
       staticClass: "badge",
-      "class": _vm.statusBadge(cita.status)["class"]
-    }, [_vm._v("\n                                            " + _vm._s(_vm.statusBadge(cita.status).text) + "\n                                        ")]), _c("br"), _vm._v(" "), _c("small", {
+      "class": _vm.statusBadge(cita)["class"]
+    }, [_vm._v("\n                                            " + _vm._s(_vm.statusBadge(cita).text) + "\n                                        ")]), _c("br"), _vm._v(" "), _c("small", {
       staticClass: "text-muted"
     }, [_c("i", {
       staticClass: "far fa-clock mr-1"

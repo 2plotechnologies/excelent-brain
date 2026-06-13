@@ -2279,6 +2279,7 @@ export default {
       fichaView: 'botones',
       savingFicha: false,
       professionalsList: [],
+      paymentMethodsList: [],
       fichaSeleccionada: null,
       linkGenerado: '',
       nuevaFicha: {
@@ -3046,8 +3047,11 @@ export default {
       return 'Evolución';
     },
     getPaymentMethodName(id) {
-      const methods = ['Efectivo', 'Depósito bancario', 'POS', 'Aplicativo Yape', 'Banco: BCP', 'Banco: BBVA', 'Banco: Interbank', 'Banco: Nación', 'Banco: Scotiabank', 'Aplicativo Plin', 'Open pay'];
       if (!id) return '—';
+      const found = this.paymentMethodsList.find(m => m.id == id);
+      if (found) return found.tipo;
+
+      const methods = ['Efectivo', 'Depósito bancario', 'POS', 'Aplicativo Yape', 'Banco: BCP', 'Banco: BBVA', 'Banco: Interbank', 'Banco: Nación', 'Banco: Scotiabank', 'Aplicativo Plin', 'Open pay', 'Izipay'];
       return methods[id - 1] || `Método ${id}`;
     },
     formatLongDate(date) {
@@ -3212,6 +3216,9 @@ export default {
     });
     this.axios.get('/api/professional').then(res => {
       this.professionalsList = res.data;
+    }).catch(err => console.error(err));
+    this.axios.get('/api/listarMonedas').then(res => {
+      this.paymentMethodsList = res.data;
     }).catch(err => console.error(err));
   },
   watch: {
