@@ -6300,12 +6300,30 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   watch: {
     cita: {
       handler: function handler(newCita) {
+        var _this = this;
         if (newCita && newCita.attention && !newCita.hora_fin && newCita.precio && newCita.precio.duracion) {
           this.departureTimeLocal = moment__WEBPACK_IMPORTED_MODULE_0___default()(newCita.attention, 'HH:mm:ss').add(newCita.precio.duracion, 'minutes').format('HH:mm');
         } else if (newCita && newCita.hora_fin) {
           this.departureTimeLocal = moment__WEBPACK_IMPORTED_MODULE_0___default()(newCita.hora_fin, 'HH:mm:ss').format('HH:mm');
         } else {
           this.departureTimeLocal = null;
+        }
+
+        // Autoponer Atendido cuando llega la hora de fin.
+        if (newCita && newCita.attention_status === 'atencion' && newCita.hora_fin && newCita.date) {
+          var endDateTime = moment__WEBPACK_IMPORTED_MODULE_0___default()("".concat(newCita.date, " ").concat(newCita.hora_fin), 'YYYY-MM-DD HH:mm:ss');
+          var now = moment__WEBPACK_IMPORTED_MODULE_0___default()();
+          if (now.isSameOrAfter(endDateTime)) {
+            this.cambiarEstadoAtencion('atendido');
+          } else {
+            var diff = endDateTime.diff(now);
+            if (this._timeoutAtendido) clearTimeout(this._timeoutAtendido);
+            this._timeoutAtendido = setTimeout(function () {
+              if (_this.cita && _this.cita.id === newCita.id && _this.cita.attention_status === 'atencion') {
+                _this.cambiarEstadoAtencion('atendido');
+              }
+            }, diff);
+          }
         }
       },
       immediate: true,
@@ -6320,110 +6338,137 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   },
   methods: {
     registrarTiempo: function registrarTiempo(tipo) {
-      var _this = this;
+      var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var payload, duracion, endTime, _response$data, response;
+        var defaultTime, title, _yield$_this2$$swal, timeVal, selectedTimeStr, payload, duracion, endTime, _response$data, response;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              if (_this.cita) {
+              if (_this2.cita) {
                 _context.next = 2;
                 break;
               }
               return _context.abrupt("return");
             case 2:
+              defaultTime = moment__WEBPACK_IMPORTED_MODULE_0___default()().format('HH:mm');
+              title = tipo === 'llegada' ? 'Hora de Llegada' : 'Hora de Atención';
+              _context.next = 6;
+              return _this2.$swal({
+                title: title,
+                html: "\n          <div style=\"margin-bottom: 15px; color: #6c757d; font-size: 0.9rem;\">Verifique o modifique la hora a registrar:</div>\n          <input type=\"time\" id=\"swal-time-input\" class=\"swal2-input\" value=\"".concat(defaultTime, "\" style=\"max-width: 200px; margin: 0 auto; display: block; text-align: center;\">\n        "),
+                showCancelButton: true,
+                confirmButtonText: 'Registrar',
+                cancelButtonText: 'Cancelar',
+                preConfirm: function preConfirm() {
+                  var val = document.getElementById('swal-time-input').value;
+                  if (!val) {
+                    return false;
+                  }
+                  return val;
+                }
+              });
+            case 6:
+              _yield$_this2$$swal = _context.sent;
+              timeVal = _yield$_this2$$swal.value;
+              if (timeVal) {
+                _context.next = 10;
+                break;
+              }
+              return _context.abrupt("return");
+            case 10:
+              selectedTimeStr = timeVal.length === 5 ? timeVal + ':00' : timeVal;
               payload = {
-                idCita: _this.cita.id,
-                entrance: _this.cita.entrance,
-                attention: _this.cita.attention
+                idCita: _this2.cita.id,
+                entrance: _this2.cita.entrance,
+                attention: _this2.cita.attention
               };
               _context.t0 = tipo;
-              _context.next = _context.t0 === 'llegada' ? 6 : _context.t0 === 'atención' ? 11 : 22;
+              _context.next = _context.t0 === 'llegada' ? 15 : _context.t0 === 'atención' ? 20 : 31;
               break;
-            case 6:
-              if (!_this.cita.entrance) {
-                _context.next = 8;
+            case 15:
+              if (!_this2.cita.entrance) {
+                _context.next = 17;
                 break;
               }
               return _context.abrupt("return");
-            case 8:
-              _this.cita.entrance = moment__WEBPACK_IMPORTED_MODULE_0___default()().format('HH:mm:ss');
-              payload.entrance = _this.cita.entrance;
-              return _context.abrupt("break", 23);
-            case 11:
-              if (!_this.cita.attention) {
-                _context.next = 13;
+            case 17:
+              _this2.cita.entrance = selectedTimeStr;
+              payload.entrance = _this2.cita.entrance;
+              return _context.abrupt("break", 32);
+            case 20:
+              if (!_this2.cita.attention) {
+                _context.next = 22;
                 break;
               }
               return _context.abrupt("return");
-            case 13:
-              _this.cita.attention = moment__WEBPACK_IMPORTED_MODULE_0___default()().format('HH:mm:ss');
-              payload.attention = _this.cita.attention;
-              duracion = 60; // Fallback
-              if (_this.cita.precio && _this.cita.precio.duracion) {
-                duracion = parseInt(_this.cita.precio.duracion);
-              } else if (_this.cita.membresia && _this.cita.membresia.precio && _this.cita.membresia.precio.duracion) {
-                duracion = parseInt(_this.cita.membresia.precio.duracion);
-              }
-              endTime = moment__WEBPACK_IMPORTED_MODULE_0___default()(_this.cita.attention, 'HH:mm:ss').add(duracion, 'minutes').format('HH:mm:ss');
-              _this.$set(_this.cita, 'hora_fin', endTime);
-              payload.departure = endTime;
-              _this.departureTimeLocal = moment__WEBPACK_IMPORTED_MODULE_0___default()(endTime, 'HH:mm:ss').format('HH:mm');
-              return _context.abrupt("break", 23);
             case 22:
-              return _context.abrupt("break", 23);
-            case 23:
-              _context.prev = 23;
-              _context.next = 26;
-              return _this.axios.post('/api/registrarHora', payload);
-            case 26:
+              _this2.cita.attention = selectedTimeStr;
+              payload.attention = _this2.cita.attention;
+              duracion = 60; // Fallback
+              if (_this2.cita.precio && _this2.cita.precio.duracion) {
+                duracion = parseInt(_this2.cita.precio.duracion);
+              } else if (_this2.cita.membresia && _this2.cita.membresia.precio && _this2.cita.membresia.precio.duracion) {
+                duracion = parseInt(_this2.cita.membresia.precio.duracion);
+              }
+              endTime = moment__WEBPACK_IMPORTED_MODULE_0___default()(_this2.cita.attention, 'HH:mm:ss').add(duracion, 'minutes').format('HH:mm:ss');
+              _this2.$set(_this2.cita, 'hora_fin', endTime);
+              payload.departure = endTime;
+              _this2.departureTimeLocal = moment__WEBPACK_IMPORTED_MODULE_0___default()(endTime, 'HH:mm:ss').format('HH:mm');
+              return _context.abrupt("break", 32);
+            case 31:
+              return _context.abrupt("break", 32);
+            case 32:
+              _context.prev = 32;
+              _context.next = 35;
+              return _this2.axios.post('/api/registrarHora', payload);
+            case 35:
               response = _context.sent;
               if (((_response$data = response.data) === null || _response$data === void 0 ? void 0 : _response$data.mensaje) == 'Ok') {
-                _this.$emit('actualizar', 'sksks');
+                _this2.$emit('actualizar', 'sksks');
                 if (window.alertify) {
                   window.alertify.notify('<i class="fa-regular fa-calendar-check"></i> Datos actualizados', 'success', 5);
                 }
+                if (tipo === 'atención') {
+                  _this2.cambiarEstadoAtencion('atencion');
+                }
               }
-              _context.next = 33;
+              _context.next = 42;
               break;
-            case 30:
-              _context.prev = 30;
-              _context.t1 = _context["catch"](23);
+            case 39:
+              _context.prev = 39;
+              _context.t1 = _context["catch"](32);
               console.error(_context.t1);
-            case 33:
+            case 42:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[23, 30]]);
+        }, _callee, null, [[32, 39]]);
       }))();
     },
     cambiarEstadoAtencion: function cambiarEstadoAtencion(estado) {
-      var _this2 = this;
+      var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var _response$data2, response;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              if (!(!_this2.cita || _this2.cargandoEstado)) {
+              if (!(!_this3.cita || _this3.cargandoEstado)) {
                 _context2.next = 2;
                 break;
               }
               return _context2.abrupt("return");
             case 2:
-              _this2.cargandoEstado = true;
+              _this3.cargandoEstado = true;
               _context2.prev = 3;
               _context2.next = 6;
-              return _this2.axios.post("/api/updateAttentionStatus/".concat(_this2.cita.id), {
+              return _this3.axios.post("/api/updateAttentionStatus/".concat(_this3.cita.id), {
                 attention_status: estado
               });
             case 6:
               response = _context2.sent;
               if (((_response$data2 = response.data) === null || _response$data2 === void 0 ? void 0 : _response$data2.mensaje) == 'Ok') {
-                _this2.$set(_this2.cita, 'attention_status', estado);
-                if (_this2.cita.status == 1) {
-                  _this2.$set(_this2.cita, 'status', 2); // Confirmado
-                }
-                _this2.$emit('actualizar');
+                _this3.$set(_this3.cita, 'attention_status', estado);
+                _this3.$emit('actualizar');
                 if (window.alertify) {
                   window.alertify.notify('<i class="fa-regular fa-calendar-check"></i> Estado de atención actualizado', 'success', 5);
                 }
@@ -6436,7 +6481,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               console.error(_context2.t0);
             case 13:
               _context2.prev = 13;
-              _this2.cargandoEstado = false;
+              _this3.cargandoEstado = false;
               return _context2.finish(13);
             case 16:
             case "end":
@@ -6521,7 +6566,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       return !!(c && c.patient);
     },
     sendSatisfaction: function sendSatisfaction(c) {
-      var _this3 = this;
+      var _this4 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var res, phone, text;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
@@ -6533,8 +6578,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               }
               if (window.alertify) {
                 window.alertify.error('El paciente no tiene un número de teléfono registrado.');
-              } else if (_this3.$swal) {
-                _this3.$swal('El paciente no tiene un número de teléfono registrado.');
+              } else if (_this4.$swal) {
+                _this4.$swal('El paciente no tiene un número de teléfono registrado.');
               } else {
                 alert('El paciente no tiene un número de teléfono registrado.');
               }
@@ -6542,7 +6587,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             case 3:
               _context3.prev = 3;
               _context3.next = 6;
-              return _this3.axios.post("/api/appointment/".concat(c.id, "/satisfaction-link"));
+              return _this4.axios.post("/api/appointment/".concat(c.id, "/satisfaction-link"));
             case 6:
               res = _context3.sent;
               phone = (c.patient.phone || '').toString().replaceAll(' ', '');
@@ -6554,8 +6599,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               _context3.prev = 12;
               _context3.t0 = _context3["catch"](3);
               console.error(_context3.t0);
-              if (_this3.$swal) {
-                _this3.$swal('No se pudo generar el enlace de satisfaccion');
+              if (_this4.$swal) {
+                _this4.$swal('No se pudo generar el enlace de satisfaccion');
               }
             case 16:
             case "end":
@@ -6565,9 +6610,9 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       }))();
     },
     enviarAlLimbo: function enviarAlLimbo(cita) {
-      var _this4 = this;
+      var _this5 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var _yield$_this4$$swal, motivo, userRes, userId;
+        var _yield$_this5$$swal, motivo, userRes, userId;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
@@ -6578,7 +6623,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               return _context4.abrupt("return");
             case 2:
               _context4.next = 4;
-              return _this4.$swal({
+              return _this5.$swal({
                 title: 'Enviar al Limbo',
                 input: 'text',
                 inputLabel: 'Motivo para enviar al limbo',
@@ -6593,20 +6638,20 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 }
               });
             case 4:
-              _yield$_this4$$swal = _context4.sent;
-              motivo = _yield$_this4$$swal.value;
+              _yield$_this5$$swal = _context4.sent;
+              motivo = _yield$_this5$$swal.value;
               if (!motivo) {
                 _context4.next = 22;
                 break;
               }
               _context4.prev = 7;
               _context4.next = 10;
-              return _this4.axios.get('/api/user');
+              return _this5.axios.get('/api/user');
             case 10:
               userRes = _context4.sent;
               userId = userRes.data && userRes.data.user ? userRes.data.user.id : null;
               _context4.next = 14;
-              return _this4.axios.post('/api/limbos', {
+              return _this5.axios.post('/api/limbos', {
                 appointment_id: cita.id,
                 user_id: userId,
                 motivo: motivo
@@ -6615,19 +6660,19 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
               if (window.alertify) {
                 window.alertify.notify('<i class="fa-regular fa-check-circle"></i> Cita enviada al limbo', 'success', 5);
               } else {
-                _this4.$swal({
+                _this5.$swal({
                   icon: 'success',
                   title: 'Cita enviada al limbo'
                 });
               }
-              _this4.$emit('actualizar');
+              _this5.$emit('actualizar');
               _context4.next = 22;
               break;
             case 18:
               _context4.prev = 18;
               _context4.t0 = _context4["catch"](7);
               console.error(_context4.t0);
-              _this4.$swal({
+              _this5.$swal({
                 icon: 'error',
                 title: 'Ocurrió un error al enviar al limbo'
               });

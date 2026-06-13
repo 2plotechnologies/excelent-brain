@@ -249,6 +249,23 @@ export default {
         } else {
           this.departureTimeLocal = null;
         }
+
+        // Autoponer Atendido cuando llega la hora de fin.
+        if (newCita && newCita.attention_status === 'atencion' && newCita.hora_fin && newCita.date) {
+          const endDateTime = moment(`${newCita.date} ${newCita.hora_fin}`, 'YYYY-MM-DD HH:mm:ss');
+          const now = moment();
+          if (now.isSameOrAfter(endDateTime)) {
+            this.cambiarEstadoAtencion('atendido');
+          } else {
+            const diff = endDateTime.diff(now);
+            if (this._timeoutAtendido) clearTimeout(this._timeoutAtendido);
+            this._timeoutAtendido = setTimeout(() => {
+               if (this.cita && this.cita.id === newCita.id && this.cita.attention_status === 'atencion') {
+                 this.cambiarEstadoAtencion('atendido');
+               }
+            }, diff);
+          }
+        }
       },
       immediate: true,
       deep: true
@@ -263,6 +280,31 @@ export default {
   methods: {
     async registrarTiempo(tipo) {
       if (!this.cita) return;
+
+      const defaultTime = moment().format('HH:mm');
+      const title = tipo === 'llegada' ? 'Hora de Llegada' : 'Hora de Atención';
+      
+      const { value: timeVal } = await this.$swal({
+        title: title,
+        html: `
+          <div style="margin-bottom: 15px; color: #6c757d; font-size: 0.9rem;">Verifique o modifique la hora a registrar:</div>
+          <input type="time" id="swal-time-input" class="swal2-input" value="${defaultTime}" style="max-width: 200px; margin: 0 auto; display: block; text-align: center;">
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Registrar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+          const val = document.getElementById('swal-time-input').value;
+          if (!val) {
+            return false;
+          }
+          return val;
+        }
+      });
+
+      if (!timeVal) return;
+      const selectedTimeStr = timeVal.length === 5 ? timeVal + ':00' : timeVal;
+
       let payload = {
         idCita: this.cita.id,
         entrance: this.cita.entrance,
@@ -272,12 +314,12 @@ export default {
       switch (tipo) {
         case 'llegada':
           if(this.cita.entrance) return;
-          this.cita.entrance = moment().format('HH:mm:ss');
+          this.cita.entrance = selectedTimeStr;
           payload.entrance = this.cita.entrance;
           break;
         case 'atención':
           if(this.cita.attention) return;
-          this.cita.attention = moment().format('HH:mm:ss');
+          this.cita.attention = selectedTimeStr;
           payload.attention = this.cita.attention;
           
           let duracion = 60; // Fallback
@@ -301,6 +343,10 @@ export default {
             if (window.alertify) {
               window.alertify.notify('<i class="fa-regular fa-calendar-check"></i> Datos actualizados', 'success', 5);
             }
+            
+            if (tipo === 'atención') {
+              this.cambiarEstadoAtencion('atencion');
+            }
         }
       } catch (error) {
         console.error(error);
@@ -313,9 +359,6 @@ export default {
         let response = await this.axios.post(`/api/updateAttentionStatus/${this.cita.id}`, { attention_status: estado });
         if (response.data?.mensaje == 'Ok') {
           this.$set(this.cita, 'attention_status', estado);
-          if (this.cita.status == 1) {
-            this.$set(this.cita, 'status', 2); // Confirmado
-          }
           this.$emit('actualizar');
           if (window.alertify) {
             window.alertify.notify('<i class="fa-regular fa-calendar-check"></i> Estado de atención actualizado', 'success', 5);
