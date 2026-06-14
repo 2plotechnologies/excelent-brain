@@ -155,8 +155,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         return 1;
       } else if (esp === 'psicologica' || esp === 'psicológica' || nombre.includes('psicolog')) {
         return 2;
-      } else if (esp === 'nutricional' || nombre.includes('nutricion') || nombre.includes('nutricion')) {
+      } else if (esp === 'nutricional' || nombre.includes('nutricion') || nombre.includes('nutricional')) {
         return 6;
+      } else if (nombre.includes('masaje') || nombre.includes('reflexologia') || nombre.includes('terapia') || nombre.includes('cervicalia') || nombre.includes('dorsalgia') || nombre.includes('lumbalgia') || nombre.includes('esguince')) {
+        return this.paqueteSeleccionado.idClasificacion == 8 ? 8 : 7;
       }
       return this.paqueteSeleccionado.idClasificacion == 5 ? 2 : this.paqueteSeleccionado.idClasificacion;
     },
@@ -2247,6 +2249,8 @@ var render = function render() {
       }, [_c("div", {
         staticClass: "d-flex align-items-center flex-wrap gap-2"
       }, [_c("span", {
+        staticClass: "badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill"
+      }, [_vm._v("Cita #" + _vm._s(cita.num_sesion && cita.num_sesion > 0 ? cita.num_sesion : paquete.historial_citas.length - index))]), _vm._v(" "), _c("span", {
         staticClass: "fw-bold"
       }, [_vm._v(_vm._s(cita.professional ? cita.professional.name : "Sin asignación"))]), _vm._v(" "), _c("span", {
         staticClass: "badge",
@@ -3674,7 +3678,7 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "fw-medium",
     "class": _vm.selectedEspecialidadPaquete === "hibrida" ? "text-primary" : "text-dark"
-  }, [_vm._v("Híbrida")])])])]) : _vm._e(), _vm._v(" "), _vm.selectedTipoPaquete === "otros" ? _c("div", {
+  }, [_vm._v("Híbrida")])])])]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "col-md-3"
   }, [_c("div", {
     staticClass: "card h-100 cursor-pointer transition-all",
@@ -3689,7 +3693,7 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "fw-medium",
     "class": _vm.selectedEspecialidadPaquete === "otros" ? "text-primary" : "text-dark"
-  }, [_vm._v("Otros")])])])]) : _vm._e()])]) : _vm._e(), _vm._v(" "), (_vm.selectedTipoPaquete === "sesiones" || _vm.selectedTipoPaquete === "tiempo") && _vm.selectedEspecialidadPaquete ? _c("div", {
+  }, [_vm._v("Otros")])])])])])]) : _vm._e(), _vm._v(" "), (_vm.selectedTipoPaquete === "sesiones" || _vm.selectedTipoPaquete === "tiempo") && _vm.selectedEspecialidadPaquete ? _c("div", {
     staticClass: "mb-4"
   }, [_vm._m(5), _vm._v(" "), _c("div", {
     staticClass: "row g-3"

@@ -270,6 +270,7 @@
                 </div>
                 <div class="small w-100 ps-2 border-start ms-2">
                   <div class="d-flex align-items-center flex-wrap gap-2">
+                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">Cita #{{ cita.num_sesion && cita.num_sesion > 0 ? cita.num_sesion : (paquete.historial_citas.length - index) }}</span>
                     <span class="fw-bold">{{ cita.professional ? cita.professional.name : 'Sin asignación' }}</span>
                     <span class="badge" :class="getCitaStatusBadgeMap(cita.status).class">{{ getCitaStatusBadgeMap(cita.status).text }}</span>
                   </div>
@@ -867,8 +868,10 @@ export default {
         return 1;
       } else if (esp === 'psicologica' || esp === 'psicológica' || nombre.includes('psicolog')) {
         return 2;
-      } else if (esp === 'nutricional' || nombre.includes('nutricion') || nombre.includes('nutricion')) {
+      } else if (esp === 'nutricional' || nombre.includes('nutricion') || nombre.includes('nutricional')) {
         return 6;
+      } else if (nombre.includes('masaje') || nombre.includes('reflexologia') || nombre.includes('terapia') || nombre.includes('cervicalia') || nombre.includes('dorsalgia') || nombre.includes('lumbalgia') || nombre.includes('esguince')) {
+        return this.paqueteSeleccionado.idClasificacion == 8 ? 8 : 7;
       }
       return this.paqueteSeleccionado.idClasificacion == 5 ? 2 : this.paqueteSeleccionado.idClasificacion;
     },

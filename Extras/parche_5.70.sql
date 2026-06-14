@@ -10,6 +10,7 @@ WHERE NOT EXISTS (
     SELECT 1 FROM precios WHERE descripcion = 'Informe Psicológico' AND idClasificacion = 3
 );
 
+-- Precio Informe Psiquiátrico.
 INSERT INTO precios (descripcion, nuevos, continuos, idClasificacion, servicio, activo, sesiones)
 SELECT 'Informe Psiquiátrico', 50, 50, 3, '1', '1', 1
 FROM dual

@@ -4586,7 +4586,7 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "fw-medium",
     "class": _vm.selectedEspecialidadPaquete === "hibrida" ? "text-primary" : "text-dark"
-  }, [_vm._v("Híbrida")])])])]) : _vm._e(), _vm._v(" "), _vm.selectedTipoPaquete === "otros" ? _c("div", {
+  }, [_vm._v("Híbrida")])])])]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "col-md-3"
   }, [_c("div", {
     staticClass: "card h-100 cursor-pointer transition-all",
@@ -4601,7 +4601,7 @@ var render = function render() {
   }, [_c("div", {
     staticClass: "fw-medium",
     "class": _vm.selectedEspecialidadPaquete === "otros" ? "text-primary" : "text-dark"
-  }, [_vm._v("Otros")])])])]) : _vm._e()])]) : _vm._e(), _vm._v(" "), (_vm.selectedTipoPaquete === "sesiones" || _vm.selectedTipoPaquete === "tiempo") && _vm.selectedEspecialidadPaquete ? _c("div", {
+  }, [_vm._v("Otros")])])])])])]) : _vm._e(), _vm._v(" "), (_vm.selectedTipoPaquete === "sesiones" || _vm.selectedTipoPaquete === "tiempo") && _vm.selectedEspecialidadPaquete ? _c("div", {
     staticClass: "mb-4"
   }, [_vm._m(5), _vm._v(" "), _c("div", {
     staticClass: "row g-3"

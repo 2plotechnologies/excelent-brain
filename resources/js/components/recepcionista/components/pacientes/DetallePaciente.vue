@@ -488,7 +488,7 @@
                       <a href="#" class="text-primary text-decoration-none">{{ cita.professional ? cita.professional.name : 'N/A' }}</a>
                     </td>
                     <td class="align-middle py-3 border-bottom-0" style="border-bottom: 1px solid #f1f3f5 !important;">
-                      <span class="badge rounded-pill fw-normal px-3 py-2" :class="getStatusBadge(cita) + ' bg-opacity-10'" style="font-size: 0.8rem;">
+                      <span class="badge rounded-pill fw-normal px-3 py-2" :style="getStatusStyle(cita)" style="font-size: 0.8rem;">
                         {{ getStatusName(cita) }}
                       </span>
                     </td>
@@ -1531,8 +1531,8 @@
               </button>
             </div>
 
-            <div v-if="paciente.prescriptions && paciente.prescriptions.length > 0">
-              <div v-for="receta in paciente.prescriptions" :key="receta.id" class="card border border-light shadow-sm mb-4" style="border-radius: 12px; overflow: hidden;">
+            <div v-if="recetasOrdenadas && recetasOrdenadas.length > 0">
+              <div v-for="receta in recetasOrdenadas" :key="receta.id" class="card border border-light shadow-sm mb-4" style="border-radius: 12px; overflow: hidden;">
                 <div class="card-body p-4 bg-white">
                   <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
                     <div class="d-flex align-items-center">
@@ -2338,6 +2338,14 @@ export default {
     }
   },
   computed: {
+    recetasOrdenadas() {
+      if (!this.paciente || !this.paciente.prescriptions) return [];
+      return this.paciente.prescriptions.slice().sort((a, b) => {
+        const dateA = a.created_at ? new Date(a.created_at.replace(' ', 'T')).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at.replace(' ', 'T')).getTime() : 0;
+        return dateB - dateA;
+      });
+    },
     faltasCitas() {
       if (!this.paciente.appointments) return [];
       return this.paciente.appointments.filter(cita => cita.status == 3 || cita.status == 6);
@@ -2886,6 +2894,22 @@ export default {
       if(status==5) return 'bg-danger text-danger';
       if(status==6) return 'bg-secondary text-secondary';
       return 'bg-secondary text-secondary';
+    },
+    getStatusStyle(s) {
+      let status = s;
+      let isAtendido = false;
+      if (s && typeof s === 'object') {
+        status = s.status;
+        isAtendido = s.attention_status === 'atendido';
+      }
+      if (isAtendido) return 'background-color: #d1fae5; color: #065f46; font-weight: 500;';
+      if (status == 1) return 'background-color: #fef3c7; color: #92400e; font-weight: 500;';
+      if (status == 2) return 'background-color: #dbeafe; color: #1e40af; font-weight: 500;';
+      if (status == 3) return 'background-color: #fee2e2; color: #991b1b; font-weight: 500;';
+      if (status == 4) return 'background-color: #e0f2fe; color: #0369a1; font-weight: 500;';
+      if (status == 5) return 'background-color: #fee2e2; color: #991b1b; font-weight: 500;';
+      if (status == 6) return 'background-color: #f3f4f6; color: #374151; font-weight: 500;';
+      return 'background-color: #f3f4f6; color: #374151; font-weight: 500;';
     },
     getHobbies(hobbiesStr) {
       if (!hobbiesStr) return [];

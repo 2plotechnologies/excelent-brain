@@ -109,7 +109,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="col-md-3" v-if="selectedTipoPaquete === 'otros'">
+							<div class="col-md-3">
 								<div class="card h-100 cursor-pointer transition-all" 
 									 :class="selectedEspecialidadPaquete === 'otros' ? 'border-primary card-paquete-selected' : 'border-secondary border-opacity-25'"
 									 @click="seleccionarEspecialidad('otros')">

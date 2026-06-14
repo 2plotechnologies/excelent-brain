@@ -843,12 +843,35 @@ class ExtrasController extends Controller
 		->get();
 	}
 	public function preciosMembresias(){
-		return DB::table('precios')->where('activo', 1)
-		//->whereIn('id', [15, 28] )
-		->whereIn('idClasificacion', [5, 9])
-		->whereNotIn('id', [19, 20, 21, 23, 24, 25, 26] )
-		->orderBy('descripcion', 'asc')
-		->get();
+		$precios = DB::table('precios')->where('activo', 1)
+			->whereIn('idClasificacion', [5, 6, 7, 8, 9])
+			->whereNotIn('id', [19, 20, 21, 23, 24, 25, 26])
+			->orderBy('descripcion', 'asc')
+			->get();
+
+		foreach ($precios as $precio) {
+			if (empty($precio->paquete_tipo) || empty($precio->paquete_especialidad)) {
+				$descLower = strtolower($precio->descripcion);
+				if (
+					in_array($precio->idClasificacion, [6, 7, 8]) ||
+					strpos($descLower, 'nutricion') !== false ||
+					strpos($descLower, 'terapia') !== false ||
+					strpos($descLower, 'masaje') !== false
+				) {
+					if ($precio->sesiones > 0) {
+						$precio->paquete_tipo = 'sesiones';
+					} elseif ($precio->meses > 0) {
+						$precio->paquete_tipo = 'tiempo';
+					} else {
+						$precio->paquete_tipo = 'otros';
+					}
+					$precio->paquete_especialidad = 'otros';
+					$precio->paquete_subtipo = $precio->descripcion;
+				}
+			}
+		}
+
+		return response()->json($precios);
 	}
 	public function insertarSeguimiento(Request $request){
 		//var_dump($request->all()); die();
