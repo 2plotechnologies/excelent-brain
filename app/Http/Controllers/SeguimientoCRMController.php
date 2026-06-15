@@ -42,10 +42,10 @@ class SeguimientoCRMController extends Controller
 
                 if ($precio) {
                     $precio_clasificacion = DB::table("precios_clasificacion")
-                        ->where("id", $precio->IdClasificacion)
+                        ->where("id", $precio->idClasificacion)
                         ->first();
 
-                    $patient->servicio = $precio_clasificacion->descripcion ?? "Sin servicio.";
+                    $patient->servicio = $precio_clasificacion->clasificacion ?? "Sin servicio.";
                 } else {
                     $patient->servicio = "Sin servicio.";
                 }

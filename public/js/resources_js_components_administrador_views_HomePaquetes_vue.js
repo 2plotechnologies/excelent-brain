@@ -3748,7 +3748,7 @@ var render = function render() {
     }, [_c("div", {
       staticClass: "fw-bold mb-1",
       "class": _vm.selectedSubtipoPaquete === opcion ? "text-primary" : "text-dark"
-    }, [_vm._v("\n\t\t\t\t\t\t\t\t\t\t" + _vm._s(opcion) + " "), _vm.selectedTipoPaquete === "sesiones" ? _c("span", [_vm._v("sesiones")]) : _vm._e()]), _vm._v(" "), _vm.obtenerPrecioSubtipo(opcion) ? _c("div", {
+    }, [_vm._v("\n\t\t\t\t\t\t\t\t\t\t" + _vm._s(opcion)), _vm.selectedTipoPaquete === "sesiones" && !isNaN(Number(opcion)) ? _c("span", [_vm._v(" sesiones")]) : _vm._e()]), _vm._v(" "), _vm.obtenerPrecioSubtipo(opcion) ? _c("div", {
       staticClass: "small text-muted fw-medium"
     }, [_vm._v("S/ " + _vm._s(_vm.obtenerPrecioSubtipo(opcion)))]) : _vm._e()])])]);
   }), 0) : _c("div", {

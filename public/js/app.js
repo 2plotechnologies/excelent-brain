@@ -6515,9 +6515,6 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       if (attention_status) {
         return attention_status === tipo;
       }
-      // Fallback a lógica basada en status para datos antiguos (sin depender de tiempos)
-      if (tipo === 'espera') return status == 1;
-      if (tipo === 'atencion') return status == 2;
       return false;
     },
     calcularEspera: function calcularEspera() {
@@ -20298,7 +20295,7 @@ var render = function render() {
         attrs: {
           points: "22 4 12 14.01 9 11.01"
         }
-      })]) : horaOcup.attention_status === "atencion" || !horaOcup.attention_status && horaOcup.status == 2 ? _c("svg", {
+      })]) : horaOcup.attention_status === "atencion" ? _c("svg", {
         staticClass: "text-info me-1",
         attrs: {
           xmlns: "http://www.w3.org/2000/svg",
@@ -20315,7 +20312,7 @@ var render = function render() {
         attrs: {
           d: "M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"
         }
-      })]) : horaOcup.attention_status === "espera" || !horaOcup.attention_status && horaOcup.status == 1 ? _c("svg", {
+      })]) : horaOcup.attention_status === "espera" ? _c("svg", {
         staticClass: "text-warning me-1",
         attrs: {
           xmlns: "http://www.w3.org/2000/svg",
@@ -21194,10 +21191,6 @@ var routes = [{
     name: 'kurame',
     component: HomeKurame
   }, {
-    path: 'altas',
-    name: 'altasProfesional',
-    component: HomeAltas
-  }, {
     path: 'pacientes-sos',
     name: 'pacientesSosInterno',
     component: PacientesSos
@@ -21326,6 +21319,10 @@ var routes = [{
     path: 'kurame',
     name: 'kurame',
     component: HomeKurame
+  }, {
+    path: 'altas',
+    name: 'altasProfesional',
+    component: HomeAltas
   }]
 }, {
   path: '/administrador',

@@ -253,11 +253,6 @@ export const routes = [
         component: HomeKurame
       },
       {
-        path: 'altas',
-        name: 'altasProfesional',
-        component: HomeAltas
-      },
-      {
         path: 'pacientes-sos',
         name: 'pacientesSosInterno',
         component: PacientesSos
@@ -407,6 +402,11 @@ export const routes = [
         path: 'kurame',
         name: 'kurame',
         component: HomeKurame
+      },
+      {
+        path: 'altas',
+        name: 'altasProfesional',
+        component: HomeAltas
       }
     ]
   },

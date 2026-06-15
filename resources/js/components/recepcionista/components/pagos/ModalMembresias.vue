@@ -159,7 +159,7 @@
 									 @click="seleccionarSubtipo(opcion)">
 									<div class="card-body text-center py-3">
 										<div class="fw-bold mb-1" :class="selectedSubtipoPaquete === opcion ? 'text-primary' : 'text-dark'">
-											{{ opcion }} <span v-if="selectedTipoPaquete === 'sesiones'">sesiones</span>
+											{{ opcion }}<span v-if="selectedTipoPaquete === 'sesiones' && !isNaN(Number(opcion))"> sesiones</span>
 										</div>
 										<div class="small text-muted fw-medium" v-if="obtenerPrecioSubtipo(opcion)">S/ {{ obtenerPrecioSubtipo(opcion) }}</div>
 									</div>

@@ -390,9 +390,6 @@ export default {
       if (attention_status) {
         return attention_status === tipo;
       }
-      // Fallback a lógica basada en status para datos antiguos (sin depender de tiempos)
-      if (tipo === 'espera') return status == 1;
-      if (tipo === 'atencion') return status == 2;
       return false;
     },
     calcularEspera() {

@@ -850,23 +850,92 @@ class ExtrasController extends Controller
 			->get();
 
 		foreach ($precios as $precio) {
-			if (empty($precio->paquete_tipo) || empty($precio->paquete_especialidad)) {
-				$descLower = strtolower($precio->descripcion);
-				if (
-					in_array($precio->idClasificacion, [6, 7, 8]) ||
-					strpos($descLower, 'nutricion') !== false ||
-					strpos($descLower, 'terapia') !== false ||
-					strpos($descLower, 'masaje') !== false
+			// Clean accents and lowercase including ñ/Ñ.
+			$descClean = str_replace(
+				['á', 'é', 'í', 'ó', 'ú', 'Á', 'É', 'Í', 'Ó', 'Ú', 'ñ', 'Ñ'],
+				['a', 'e', 'i', 'o', 'u', 'a', 'e', 'i', 'o', 'u', 'n', 'n'],
+				$precio->descripcion
+			);
+			$descLower = strtolower($descClean);
+
+			// 1. Determine Specialty.
+			if (empty($precio->paquete_especialidad)) {
+				if (strpos($descLower, 'psicolog') !== false) {
+					$precio->paquete_especialidad = 'psicologica';
+				} elseif (strpos($descLower, 'psiquiatr') !== false) {
+					$precio->paquete_especialidad = 'psiquiatrica';
+				} elseif (strpos($descLower, 'sucamec') !== false) {
+					$precio->paquete_especialidad = 'hibrida';
+				} elseif (
+					(strpos($descLower, 'ninos') !== false || strpos($descLower, 'adultos') !== false) &&
+					strpos($descLower, 'sesiones') !== false &&
+					strpos($descLower, 'nutricion') === false &&
+					strpos($descLower, 'terapia') === false &&
+					strpos($descLower, 'psiquiatr') === false
 				) {
-					if ($precio->sesiones > 0) {
-						$precio->paquete_tipo = 'sesiones';
-					} elseif ($precio->meses > 0) {
-						$precio->paquete_tipo = 'tiempo';
-					} else {
-						$precio->paquete_tipo = 'otros';
-					}
+					// Fallback for "Niños - 14 sesiones" etc.
+					$precio->paquete_especialidad = 'psicologica';
+				} else {
 					$precio->paquete_especialidad = 'otros';
-					$precio->paquete_subtipo = $precio->descripcion;
+				}
+			}
+
+			// 2. Determine Type
+			if (empty($precio->paquete_tipo)) {
+				if (
+					strpos($descLower, 'dias') !== false ||
+					strpos($descLower, 'tiempo') !== false ||
+					strpos($descLower, 'mes') !== false ||
+					$precio->meses > 0
+				) {
+					$precio->paquete_tipo = 'tiempo';
+				} elseif (
+					strpos($descLower, 'sesion') !== false ||
+					strpos($descLower, 'sesiones') !== false ||
+					$precio->sesiones > 0
+				) {
+					$precio->paquete_tipo = 'sesiones';
+				} else {
+					$precio->paquete_tipo = 'otros';
+				}
+			}
+
+			// 3. Determine Public (Adultos / Niños)
+			if (empty($precio->paquete_publico)) {
+				if (
+					strpos($descLower, 'nino') !== false ||
+					strpos($descLower, 'nina') !== false ||
+					strpos($descLower, 'infantil') !== false
+				) {
+					$precio->paquete_publico = 'ninos';
+				} elseif (strpos($descLower, 'adulto') !== false) {
+					$precio->paquete_publico = 'adultos';
+				} else {
+					$precio->paquete_publico = 'ambos';
+				}
+			}
+
+			// 4. Determine Subtype
+			if (empty($precio->paquete_subtipo)) {
+				if (in_array($precio->paquete_especialidad, ['psicologica', 'psiquiatrica', 'hibrida'])) {
+					if (preg_match('/(\d+)\s*sesiones/', $descLower, $matches)) {
+						$precio->paquete_subtipo = $matches[1];
+					} elseif ($precio->sesiones > 0) {
+						$precio->paquete_subtipo = (string)$precio->sesiones;
+					} elseif (preg_match('/(\d+)\s*dias/', $descLower, $matches)) {
+						$precio->paquete_subtipo = $matches[1] . ' días';
+					} else {
+						$precio->paquete_subtipo = $precio->descripcion;
+					}
+				} else {
+					// For other services (Nutricion, Terapia, etc.)
+					if (preg_match('/paquete\s+nutricional\s*-\s*(\d+)\s*sesiones/i', $descClean, $matches)) {
+						$precio->paquete_subtipo = "Nutricional - " . $matches[1] . " sesiones";
+					} elseif (preg_match('/paquete\s*(\d+)\s*dias\s*-\s*nutricional/i', $descClean, $matches)) {
+						$precio->paquete_subtipo = "Nutricional - " . $matches[1] . " días";
+					} else {
+						$precio->paquete_subtipo = $precio->descripcion;
+					}
 				}
 			}
 		}
