@@ -63,6 +63,13 @@ export default {
       this.axios.get('/api/getNames')
         .then((result) => {
           this.patients = result.data;
+          const routePatientId = this.$route.params.patientId;
+          if (routePatientId && this.patients) {
+            const patient = this.patients.find(p => p.id == routePatientId);
+            if (patient) {
+              this.autoSelectPatient(patient);
+            }
+          }
         })
         .catch((err) => {
           console.error(err);
@@ -75,6 +82,11 @@ export default {
         .finally(() => {
           this.isLoading = false;
         });
+    },
+    
+    autoSelectPatient(patient) {
+      this.buscar = `${patient.name} ${patient.nombres}`;
+      this.$emit('selectPatient', patient.id);
     },
     
     handlePatientClick(patient) {

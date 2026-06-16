@@ -531,7 +531,13 @@
                 this.axios.get('/api/getNames')
                 .then((result) => {
                     this.patients = result.data
-                    //console.log(this.patients)
+                    const routePatientId = this.$route.params.patientId;
+                    if (routePatientId && this.patients) {
+                        const patient = this.patients.find(p => p.id == routePatientId);
+                        if (patient) {
+                            this.selectPatient(patient);
+                        }
+                    }
                 }).catch((err) => {
 
                 });

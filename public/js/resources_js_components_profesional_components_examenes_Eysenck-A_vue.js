@@ -937,6 +937,15 @@ __webpack_require__.r(__webpack_exports__);
       this.isLoading = true;
       this.axios.get('/api/getNames').then(function (result) {
         _this.patients = result.data;
+        var routePatientId = _this.$route.params.patientId;
+        if (routePatientId && _this.patients) {
+          var patient = _this.patients.find(function (p) {
+            return p.id == routePatientId;
+          });
+          if (patient) {
+            _this.autoSelectPatient(patient);
+          }
+        }
       })["catch"](function (err) {
         console.error(err);
         _this.$swal({
@@ -947,6 +956,10 @@ __webpack_require__.r(__webpack_exports__);
       })["finally"](function () {
         _this.isLoading = false;
       });
+    },
+    autoSelectPatient: function autoSelectPatient(patient) {
+      this.buscar = "".concat(patient.name, " ").concat(patient.nombres);
+      this.$emit('selectPatient', patient.id);
     },
     handlePatientClick: function handlePatientClick(patient) {
       var _this2 = this;

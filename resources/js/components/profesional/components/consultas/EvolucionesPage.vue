@@ -470,7 +470,7 @@
                         <div class="cie-content rounded overflow-auto mt-2 bg-white shadow-sm border" v-if="searchCie.length>0" style="max-height: 200px; position: absolute; z-index: 100; width: 100%;">
                           <div v-for="(cie, index) in dataCies" :key="index">
                             <span class="w-100 px-3 py-2 cie--hover d-block border-bottom pointer cie-item"
-                              :class="{ 'bg-primary text-white': inicialPsiquiatria.diagnostic.find(el => el == cie.id) }"
+                              :class="{ 'bg-primary text-white': Array.isArray(inicialPsiquiatria.diagnostic) && inicialPsiquiatria.diagnostic.find(el => el == cie.id) }"
                               :data-id="cie.id" @click="addCie">
                               {{ cie.id }} - {{ cie.code }} - {{ cie.description }}
                             </span>
@@ -1395,7 +1395,7 @@ components: { updatedModal, ExamResult, ExamTable, editModal, modalVerDetalle, M
 				insight: '...',
 
 				diagnostic_problems: '...',
-				diagnostic: '...',
+				diagnostic: [],
 				plan: '...',
 
 				professional_id: '',
@@ -1930,24 +1930,51 @@ components: { updatedModal, ExamResult, ExamTable, editModal, modalVerDetalle, M
 			.then(res=> this.comentarios= res.data)
 			
 		},
-		async updatedConsult() {
-			let data = Object;
-			if (this.dataUser.profession === 'Psiquiatra') {
-				data = this.inicialPsiquiatria
+		async updatedConsult(forceType = null) {
+			let isPsychiatric = false;
+			if (forceType === 'psychiatric') {
+				isPsychiatric = true;
+			} else if (forceType === 'psychological') {
+				isPsychiatric = false;
 			} else {
-				data = this.initialPsychological
+				const psychiatricFields = [
+					'general_antecedent', 'main_signs_symptoms', 'psiquiatria_illness',
+					'apc', 'languaje', 'thought', 'affect', 'percetion',
+					'superior_function', 'abstraction', 'conscience', 'insight',
+					'diagnostic_problems', 'diagnostic', 'psiquiatria_plan'
+				];
+				const psychologicalFields = [
+					'Psicologia_illness', 'antecedent', 'dynamic', 'attitude', 'dx', 'Psicologia_plan'
+				];
+
+				if (psychiatricFields.includes(this.inputActive)) {
+					isPsychiatric = true;
+				} else if (psychologicalFields.includes(this.inputActive)) {
+					isPsychiatric = false;
+				} else {
+					isPsychiatric = this.dataUser.profession === 'Psiquiatra';
+				}
 			}
 
-			let url = this.dataUser.profession === 'Psiquiatra' ? 'initialPsychiatric' : 'initialPsychological'
-			let idHistoria = this.dataUser.profession === 'Psiquiatra' ? this.datosConsulta.initial_psychiatric_history.id : this.datosConsulta.initial_psychological_history.id
+			let data = isPsychiatric ? this.inicialPsiquiatria : this.initialPsychological;
+			let url = isPsychiatric ? 'initialPsychiatric' : 'initialPsychological';
+			let idHistoria = null;
 
-			await axios.put(`/api/${url}/${idHistoria}`, data)
-				.then(res => {
-					// console.log(res.data)
-				})
-				.catch(err => {
-					console.error(err)
-				})
+			if (isPsychiatric && this.datosConsulta.initial_psychiatric_history) {
+				idHistoria = this.datosConsulta.initial_psychiatric_history.id;
+			} else if (!isPsychiatric && this.datosConsulta.initial_psychological_history) {
+				idHistoria = this.datosConsulta.initial_psychological_history.id;
+			}
+
+			if (idHistoria) {
+				await axios.put(`/api/${url}/${idHistoria}`, data)
+					.then(res => {
+						// console.log(res.data)
+					})
+					.catch(err => {
+						console.error(err)
+					})
+			}
 
 			this.switch = 0
 			this.inputSwitchActive(this.inputActive, false)
@@ -1986,7 +2013,7 @@ components: { updatedModal, ExamResult, ExamTable, editModal, modalVerDetalle, M
 		},
 
 		updateDiag() {
-			this.updatedConsult()
+			this.updatedConsult('psychiatric')
 		},
 
 		updateModal(data) {
@@ -2530,15 +2557,8 @@ h4 {
 	width: 100%;
 	background-color: #fff;
 	border: .3px solid #22222260;
-	visibility: hidden;
 	position: absolute;
 	z-index: 10000;
-	transition: visibility 1s normal 3s;
-}
-
-#diagnostico:focus~.cie-content {
-	visibility: visible;
-	/* display: block !important; */
 }
 
 .cie-item:active {

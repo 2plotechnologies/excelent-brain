@@ -21123,63 +21123,63 @@ var routes = [{
     name: 'recursosProfesional',
     component: HomeProfesionalRecursos
   }, {
-    path: 'scr',
+    path: 'scr/:patientId?',
     name: 'scr',
     component: Scr90
   }, {
-    path: 'burns',
+    path: 'burns/:patientId?',
     name: 'burns',
     component: Burns
   }, {
-    path: 'depzung',
+    path: 'depzung/:patientId?',
     name: 'depzung',
     component: DepZung
   }, {
-    path: 'anszung',
+    path: 'anszung/:patientId?',
     name: 'anszung',
     component: AnsZung
   }, {
-    path: 'millon',
+    path: 'millon/:patientId?',
     name: 'millon',
     component: Millon
   }, {
-    path: 'phq-9',
+    path: 'phq-9/:patientId?',
     name: 'phq-9',
     component: phq
   }, {
-    path: 'gad-7',
+    path: 'gad-7/:patientId?',
     name: 'GAD-7',
     component: gad
   }, {
-    path: 'bdi-2',
+    path: 'bdi-2/:patientId?',
     name: 'BDI-2',
     component: bdi
   }, {
-    path: 'mcmi',
+    path: 'mcmi/:patientId?',
     name: 'MCMI-II',
     component: mcmi
   }, {
-    path: 'baron',
+    path: 'baron/:patientId?',
     name: 'BARON',
     component: baron
   }, {
-    path: 'eysenck-a',
+    path: 'eysenck-a/:patientId?',
     name: 'Eysenck-A',
     component: eysenck_a
   }, {
-    path: 'eysenck-b',
+    path: 'eysenck-b/:patientId?',
     name: 'Eysenck-B',
     component: eysenck_b
   }, {
-    path: 'srq',
+    path: 'srq/:patientId?',
     name: 'SRQ',
     component: srq
   }, {
-    path: 'phq-15',
+    path: 'phq-15/:patientId?',
     name: 'phq-15',
     component: phq15
   }, {
-    path: 'mdq',
+    path: 'mdq/:patientId?',
     name: 'mdq',
     component: mdq
   }, {
@@ -21244,7 +21244,7 @@ var routes = [{
     name: 'recursosProfesional',
     component: HomeProfesionalRecursos
   }, {
-    path: 'scr',
+    path: 'scr/:patientId?',
     name: 'scr',
     component: Scr90
   }, {
@@ -21252,7 +21252,7 @@ var routes = [{
     name: 'ver_scr',
     component: Scr90
   }, {
-    path: 'burns',
+    path: 'burns/:patientId?',
     name: 'burns',
     component: Burns
   }, {
@@ -21260,55 +21260,55 @@ var routes = [{
     name: 'ver_burns',
     component: Burns
   }, {
-    path: 'depzung',
+    path: 'depzung/:patientId?',
     name: 'depzung',
     component: DepZung
   }, {
-    path: 'anszung',
+    path: 'anszung/:patientId?',
     name: 'anszung',
     component: AnsZung
   }, {
-    path: 'millon',
+    path: 'millon/:patientId?',
     name: 'millon',
     component: Millon
   }, {
-    path: 'phq-9',
+    path: 'phq-9/:patientId?',
     name: 'phq-9',
     component: phq
   }, {
-    path: 'gad-7',
+    path: 'gad-7/:patientId?',
     name: 'GAD-7',
     component: gad
   }, {
-    path: 'bdi-2',
+    path: 'bdi-2/:patientId?',
     name: 'BDI-2',
     component: bdi
   }, {
-    path: 'mcmi',
+    path: 'mcmi/:patientId?',
     name: 'MCMI-II',
     component: mcmi
   }, {
-    path: 'baron',
+    path: 'baron/:patientId?',
     name: 'BARON',
     component: baron
   }, {
-    path: 'eysenck-a',
+    path: 'eysenck-a/:patientId?',
     name: 'Eysenck-A',
     component: eysenck_a
   }, {
-    path: 'eysenck-b',
+    path: 'eysenck-b/:patientId?',
     name: 'Eysenck-B',
     component: eysenck_b
   }, {
-    path: 'srq',
+    path: 'srq/:patientId?',
     name: 'SRQ',
     component: srq
   }, {
-    path: 'phq-15',
+    path: 'phq-15/:patientId?',
     name: 'phq-15',
     component: phq15
   }, {
-    path: 'mdq',
+    path: 'mdq/:patientId?',
     name: 'mdq',
     component: mdq
   }, {

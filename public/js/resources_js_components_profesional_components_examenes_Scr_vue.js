@@ -671,7 +671,15 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
       var _this2 = this;
       this.axios.get('/api/getNames').then(function (result) {
         _this2.patients = result.data;
-        //console.log(this.patients)
+        var routePatientId = _this2.$route.params.patientId;
+        if (routePatientId && _this2.patients) {
+          var patient = _this2.patients.find(function (p) {
+            return p.id == routePatientId;
+          });
+          if (patient) {
+            _this2.selectPatient(patient);
+          }
+        }
       })["catch"](function (err) {});
     },
     selectPatient: function selectPatient(patient) {
