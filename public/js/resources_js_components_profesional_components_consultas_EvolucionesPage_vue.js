@@ -180,7 +180,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _EvolucionModal_vue__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./EvolucionModal.vue */ "./resources/js/components/profesional/components/consultas/EvolucionModal.vue");
 /* harmony import */ var _ModalNuevoSeguimiento_vue__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./ModalNuevoSeguimiento.vue */ "./resources/js/components/profesional/components/consultas/ModalNuevoSeguimiento.vue");
 /* harmony import */ var _nutricion_HomeNutricion_vue__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ../nutricion/HomeNutricion.vue */ "./resources/js/components/profesional/components/nutricion/HomeNutricion.vue");
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+var _methods;
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
 function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
 function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
@@ -199,6 +199,7 @@ function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t =
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 
 
 
@@ -223,6 +224,14 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'evolucionPaciente',
+  watch: {
+    datosPaciente: {
+      handler: function handler() {
+        this.buildTimeline();
+      },
+      deep: true
+    }
+  },
   components: {
     updatedModal: _updatedEvolutionModal_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
     ExamResult: _ExamResult_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
@@ -247,6 +256,33 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
   },
   data: function data() {
     return {
+      rolUser: 'profesional',
+      filtroDocumento: 'Todos',
+      documentoModal: {
+        type: 'DNI',
+        file: null,
+        name: ''
+      },
+      documentFile: null,
+      triajeSeleccionado: null,
+      timelineActivity: [],
+      nuevaFicha: {
+        tipo: 'Consulta',
+        frecuencia: 'Quincenal',
+        motivo: '',
+        recomendaciones: [],
+        professional_id: '',
+        interconsultas: []
+      },
+      fichaView: 'lista',
+      fichaSeleccionada: null,
+      tempInterconsulta: {
+        specialty: '',
+        professional: '',
+        reason: ''
+      },
+      profesionales: [],
+      pacienteId: this.$route.params.idPaciente,
       ordenesMedicas: [],
       pruebaSeleccionada: null,
       allExams: {
@@ -312,6 +348,7 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         }
       },
       activeTab: 'historial',
+      activePill: 'recetas',
       autoSaveInfo: '',
       profesionalesTodos: [],
       datosConsulta: {
@@ -488,7 +525,275 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
     dataPatient: {},
     dataExam: Array
   },
-  methods: {
+  methods: (_methods = {
+    rolUserDefault: function rolUserDefault() {
+      return 'profesional';
+    },
+    getStatusName: function getStatusName(s) {
+      var status = s;
+      var isAtendido = false;
+      if (s && _typeof(s) === 'object') {
+        status = s.status;
+        isAtendido = s.attention_status === 'atendido';
+      }
+      if (isAtendido) return 'Atendido';
+      if (status == 1) return 'Sin confirmar';
+      if (status == 2) return 'Confirmado';
+      if (status == 3) return 'Anulado';
+      if (status == 4) return 'Reprogramado';
+      if (status == 5) return 'Eliminado';
+      if (status == 6) return 'Limbo';
+      return 'Otro';
+    },
+    getStatusBadge: function getStatusBadge(s) {
+      var status = s;
+      var isAtendido = false;
+      if (s && _typeof(s) === 'object') {
+        status = s.status;
+        isAtendido = s.attention_status === 'atendido';
+      }
+      if (isAtendido) return 'bg-success text-success';
+      if (status == 1) return 'bg-warning text-warning';
+      if (status == 2) return 'bg-primary text-primary';
+      if (status == 3) return 'bg-danger text-danger';
+      if (status == 4) return 'bg-info text-info';
+      if (status == 5) return 'bg-danger text-danger';
+      if (status == 6) return 'bg-secondary text-secondary';
+      return 'bg-secondary text-secondary';
+    },
+    getStatusStyle: function getStatusStyle(s) {
+      var status = s;
+      if (s && _typeof(s) === 'object') {
+        status = s.status;
+      }
+      if (status == 1) return 'background-color: #fef3c7; color: #92400e; font-weight: 500;';
+      if (status == 2) return 'background-color: #dbeafe; color: #1e40af; font-weight: 500;';
+      if (status == 3) return 'background-color: #fee2e2; color: #991b1b; font-weight: 500;';
+      if (status == 4) return 'background-color: #e0f2fe; color: #0369a1; font-weight: 500;';
+      if (status == 5) return 'background-color: #fee2e2; color: #991b1b; font-weight: 500;';
+      return 'background-color: #f3f4f6; color: #374151; font-weight: 500;';
+    },
+    formatOnlyDate: function formatOnlyDate(date) {
+      if (!date) return '';
+      if (typeof date === 'string') {
+        var parts = date.split(' ')[0].split('T')[0].split('-');
+        if (parts.length === 3) {
+          var monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+          return "".concat(parts[2], " ").concat(monthNames[parseInt(parts[1]) - 1], " ").concat(parts[0]);
+        }
+      }
+      return date;
+    },
+    formatOnlyTime: function formatOnlyTime(timeStr) {
+      if (!timeStr) return '';
+      if (typeof timeStr === 'string' && timeStr.includes(':')) {
+        var parts = timeStr.split(' ');
+        var timePart = parts[0];
+        if (timeStr.includes('T')) {
+          timePart = timeStr.split('T')[1].split('.')[0];
+        }
+        var tParts = timePart.split(':');
+        var hours = parseInt(tParts[0]);
+        var minutes = tParts[1];
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        return "".concat(hours.toString().padStart(2, '0'), ":").concat(minutes, " ").concat(ampm);
+      }
+      return '';
+    },
+    getProfessionalName: function getProfessionalName(id) {
+      var p = this.professionalsList ? this.professionalsList.find(function (x) {
+        return x.id == id;
+      }) : null;
+      return p ? p.name : '--';
+    },
+    isSelectedRecomendacion: function isSelectedRecomendacion(val) {
+      if (!this.nuevaFicha || !this.nuevaFicha.recomendaciones) return false;
+      return this.nuevaFicha.recomendaciones.includes(val);
+    },
+    verPlanSeguridad: function verPlanSeguridad(plan) {
+      this.planSeguridadSeleccionado = plan;
+    },
+    abrirNuevoPlan: function abrirNuevoPlan() {
+      this.nuevoPlanSeguridad = {
+        senales_advertencia: '',
+        estrategias: '',
+        personas_dis: '',
+        personas_ayuda: '',
+        razones_vivir: '',
+        medidas: '',
+        contactos_emergencia: ''
+      };
+    },
+    sumarArray: function sumarArray(arr) {
+      if (!arr) return 0;
+      var values = Object.values(arr);
+      return values.reduce(function (sum, val) {
+        return sum + parseInt(val || 0, 10);
+      }, 0);
+    },
+    buildTimeline: function buildTimeline() {
+      var _this = this;
+      var activities = [];
+      if (this.paciente.appointments) {
+        this.paciente.appointments.forEach(function (appt) {
+          activities.push({
+            date: appt.created_at,
+            type: 'Cita Agendada',
+            desc: "Cita agendada para el ".concat(_this.formatDate(appt.date), " a las ").concat(appt.start_time),
+            icon: 'fa-calendar-plus',
+            color: 'primary'
+          });
+        });
+      }
+      if (this.paciente.medical_evolutions) {
+        this.paciente.medical_evolutions.forEach(function (evo) {
+          activities.push({
+            date: evo.created_at,
+            type: 'Evolución Médica',
+            desc: evo.descripcion ? evo.descripcion.substring(0, 50) + '...' : 'Evolución registrada',
+            profesional: evo.professional ? evo.professional.name : '',
+            icon: 'fa-stethoscope',
+            color: 'success'
+          });
+        });
+      }
+      if (this.paciente.prescriptions) {
+        this.paciente.prescriptions.forEach(function (pres) {
+          activities.push({
+            date: pres.created_at,
+            type: 'Receta Emitida',
+            desc: "Receta emitida por ".concat(pres.professional ? pres.professional.name : ''),
+            icon: 'fa-prescription',
+            color: 'info'
+          });
+        });
+      }
+      activities.sort(function (a, b) {
+        return new Date(b.date) - new Date(a.date);
+      });
+      this.timelineActivity = activities;
+    },
+    formatDateTime: function formatDateTime(date, time) {
+      if (!date || !time) return '';
+      return "".concat(date, " ").concat(time);
+    },
+    subirNuevoDocumento: function subirNuevoDocumento() {
+      var _this2 = this;
+      if (!this.documentFile) return;
+      var formData = new FormData();
+      formData.append('document', this.documentFile);
+      formData.append('type', this.documentoModal.type);
+      formData.append('name', this.documentoModal.name || this.documentoModal.type);
+      formData.append('patient_id', this.pacienteId);
+      this.axios.post('/api/patient-documents', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(function (response) {
+        _this2.$swal.fire('Éxito', 'Documento subido correctamente', 'success');
+        _this2.documentFile = null;
+        _this2.documentoModal.name = '';
+        $('#modalUploadDocument').modal('hide');
+        _this2.axios.get('/api/patientById/' + _this2.$route.params.idPaciente).then(function (res) {
+          _this2.datosPaciente = res.data;
+        });
+      })["catch"](function (error) {
+        _this2.$swal.fire('Error', 'Hubo un problema al subir el documento', 'error');
+      });
+    },
+    handleFileUpload: function handleFileUpload(event) {
+      this.documentFile = event.target.files[0];
+    },
+    descargarDocumento: function descargarDocumento(doc) {
+      window.open("/api/patient-documents/".concat(doc.id, "/download?token=").concat(this.$token), '_blank');
+    },
+    eliminarDocumento: function eliminarDocumento(id) {
+      var _this3 = this;
+      this.$swal.fire({
+        title: '¿Eliminar documento?',
+        text: "Esta acción no se puede deshacer",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar'
+      }).then(function (result) {
+        if (result.isConfirmed) {
+          _this3.axios["delete"]("/api/patient-documents/".concat(id)).then(function () {
+            _this3.$swal.fire('Eliminado', 'El documento ha sido eliminado.', 'success');
+            _this3.axios.get('/api/patientById/' + _this3.$route.params.idPaciente).then(function (res) {
+              _this3.datosPaciente = res.data;
+            });
+          });
+        }
+      });
+    },
+    verAutoTriaje: function verAutoTriaje(triaje) {
+      this.triajeSeleccionado = triaje;
+      $('#modalVerAutoTriaje').modal('show');
+    },
+    verFicha: function verFicha(ficha) {
+      this.fichaSeleccionada = ficha;
+      $('#modalFichaSeguimiento').modal('show');
+    },
+    crearNuevaFicha: function crearNuevaFicha() {
+      var _this4 = this;
+      // Basic post for creating ficha
+      var data = {
+        patient_id: this.pacienteId,
+        professional_id: this.nuevaFicha.professional_id,
+        tipo: this.nuevaFicha.tipo,
+        frecuencia: this.nuevaFicha.frecuencia,
+        motivo: this.nuevaFicha.motivo,
+        recomendaciones: JSON.stringify(this.nuevaFicha.recomendaciones),
+        interconsultas: this.nuevaFicha.interconsultas
+      };
+      this.axios.post('/api/fichas-seguimiento', data).then(function () {
+        _this4.$swal.fire('Éxito', 'Ficha creada correctamente', 'success');
+        _this4.fichaView = 'lista';
+        _this4.axios.get('/api/patientById/' + _this4.$route.params.idPaciente).then(function (res) {
+          _this4.datosPaciente = res.data;
+        });
+      })["catch"](function (err) {
+        _this4.$swal.fire('Error', 'No se pudo crear la ficha', 'error');
+      });
+    },
+    toggleRecomendacion: function toggleRecomendacion(val) {
+      var idx = this.nuevaFicha.recomendaciones.indexOf(val);
+      if (idx > -1) {
+        this.nuevaFicha.recomendaciones.splice(idx, 1);
+      } else {
+        this.nuevaFicha.recomendaciones.push(val);
+      }
+    },
+    hasRecomendacion: function hasRecomendacion(val) {
+      return this.nuevaFicha.recomendaciones.includes(val);
+    },
+    addInterconsulta: function addInterconsulta() {
+      this.nuevaFicha.interconsultas.push(_objectSpread({}, this.tempInterconsulta));
+      this.tempInterconsulta = {
+        specialty: '',
+        professional: '',
+        reason: ''
+      };
+    },
+    removeInterconsulta: function removeInterconsulta(idx) {
+      this.nuevaFicha.interconsultas.splice(idx, 1);
+    },
+    getPaymentMethodName: function getPaymentMethodName(id) {
+      var methods = {
+        1: 'Efectivo',
+        2: 'Tarjeta de Crédito',
+        3: 'Tarjeta de Débito',
+        4: 'Transferencia',
+        5: 'Yape',
+        6: 'Plin',
+        7: 'Otro'
+      };
+      return methods[id] || 'Desconocido';
+    },
     // Add these methods inside methods: block
     formatDate: function formatDate(dateStr) {
       if (!dateStr) return '';
@@ -498,651 +803,767 @@ function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e 
         month: '2-digit',
         year: 'numeric'
       });
-    },
-    formatOnlyDate: function formatOnlyDate(dateStr) {
-      return this.formatDate(dateStr);
-    },
-    irAPrueba: function irAPrueba(ruta) {
-      // Abre en nueva pestana o usa router
-      window.open("/profesional/".concat(ruta, "/").concat(this.datosConsulta.id), '_blank');
-    },
-    verDetallePrueba: function verDetallePrueba(resultado, nombreExamen) {
-      this.pruebaSeleccionada = _objectSpread(_objectSpread({}, resultado), {}, {
-        nombreExamen: nombreExamen
-      });
-      var myModal = new bootstrap.Modal(document.getElementById('modalDetallePrueba'));
-      myModal.show();
-    },
-    crearNuevaOrden: function crearNuevaOrden() {
-      if (this.datosConsulta && this.datosConsulta.appointments && this.datosConsulta.appointments.length > 0) {
-        var sortedAppointments = _toConsumableArray(this.datosConsulta.appointments).sort(function (a, b) {
-          return new Date(b.date) - new Date(a.date);
-        });
-        var latestApp = sortedAppointments[0];
-        window.open("/profesional/examenes/".concat(latestApp.id), '_blank');
-      } else {
-        this.$swal({
-          icon: 'error',
-          title: 'Sin Citas',
-          text: 'El paciente no tiene citas registradas para asignar una orden médica.'
-        });
-      }
-    },
-    getExamPromise: function getExamPromise() {
-      var _this = this;
-      Promise.all([this.axios("/api/zungDep/".concat(this.$route.params.idPaciente)), this.axios("/api/zungAns/".concat(this.$route.params.idPaciente)), this.axios("/api/millon/".concat(this.$route.params.idPaciente)), this.axios("/api/burns/".concat(this.$route.params.idPaciente)), this.axios("/api/src/".concat(this.$route.params.idPaciente)), this.axios("/api/exam/".concat(this.$route.params.idPaciente))]).then(function (res) {
-        var _res = _slicedToArray(res, 6),
-          zungDep = _res[0],
-          zungAns = _res[1],
-          millon = _res[2],
-          burn = _res[3],
-          src = _res[4],
-          exam = _res[5];
-        _this.allExams.scr.value = src.data;
-        _this.allExams.burns.value = burn.data;
-        _this.allExams.millon.value = millon.data;
-        _this.allExams.zunganxie.value = zungAns.data;
-        _this.allExams.zungdep.value = zungDep.data;
-
-        // Filter exams correctly based on exam.data if needed
-      })["catch"](function (err) {
-        return console.error(err);
-      });
-    },
-    evolucionModal: function evolucionModal() {
-      console.log('que');
-      this.datosIdEvolucion.professional.id = this.dataUser.id;
-      this.datosIdEvolucion.patient.id = this.datosConsulta.id;
-      this.$emit('datosEmitModal', this.dataConsulta);
-    },
-    refreshInfo: function refreshInfo(id) {
-      this.autoSaveInfo = localStorage.getItem(id);
-    },
-    toDischarge: function toDischarge() {
-      var _this2 = this;
-      this.$swal({
-        title: 'Dar de alta al paciente',
-        text: 'Ingrese un comentario sobre el alta:',
-        input: 'textarea',
-        inputPlaceholder: 'Comentarios...',
-        showDenyButton: true,
-        confirmButtonText: 'Dar de Alta',
-        denyButtonText: 'Cancelar',
-        preConfirm: function preConfirm(comentario) {
-          if (!comentario) {
-            _this2.$swal.showValidationMessage('El comentario es obligatorio para dar de alta');
-          }
-          return comentario;
-        }
-      }).then(function (result) {
-        if (result.isConfirmed) {
-          var typeDischarge = _this2.dataUser.profession === 'Psiquiatra' ? 2 : 1;
-          _this2.axios.post('/api/discharge', {
-            id: _this2.$route.params.idPaciente,
-            idProfesional: _this2.dataUser.id,
-            type: typeDischarge,
-            comments: result.value
-          }).then(function (res) {
-            _this2.$swal(res.data.msg);
-            _this2.getHistories();
-          });
-        }
-      });
-    },
-    editEvolution: function editEvolution(evolution) {
-      this.dataModal = evolution;
-    },
-    updatePariente: function updatePariente(pariente) {
-      /* if(pariente?.nombre){
-      	this.datosConsulta.relative[0].name = pariente.nombre
-      	this.datosConsulta.relative[0].phone = pariente.celular
-      	this.datosConsulta.relative[0].kinship = pariente.parentesco
-      }
-      if(pariente?.nombre2){
-      	this.datosConsulta.relative[1].name = pariente.nombre2
-      	this.datosConsulta.relative[1].phone = pariente.celular2
-      	this.datosConsulta.relative[1].kinship = pariente.parentesco2
-      } */
-      this.datosConsulta.relative = pariente;
-    },
-    getHistories: function getHistories() {
-      var _this3 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
-            case 0:
-              _context.next = 2;
-              return _this3.axios.get("/api/patientEvolution/".concat(_this3.$route.params.idPaciente, "/").concat(_this3.$attrs.idUser)).then(function (res) {
-                _this3.datosConsulta = res.data;
-                _this3.misHobbies = JSON.parse(_this3.datosConsulta.hobbies);
-                console.log(_this3.datosConsulta);
-                _this3.datosConsulta.medical_evolutions = _this3.datosConsulta.medical_evolutions.sort(function (a, b) {
-                  if (a.date < b.date) {
-                    return -1;
-                  }
-                  if (a.date > b.date) {
-                    return 1;
-                  }
-                  return 0;
-                });
-                _this3.datosExamPaciente.name = _this3.datosConsulta.name;
-                _this3.datosExamPaciente.id = _this3.datosConsulta.id;
-                if (res.data.initial_psychiatric_history) {
-                  _this3.inicialPsiquiatria = res.data.initial_psychiatric_history;
-                  _this3.inicialPsiquiatria.diagnostic = [];
-                  res.data.cies.forEach(function (el) {
-                    _this3.inicialPsiquiatria.diagnostic.push(el.id.toString());
-                  });
-                } else {
-                  _this3.inicialPsiquiatria;
-                }
-                res.data.initial_psychological_history ? _this3.initialPsychological = res.data.initial_psychological_history : _this3.initialPsychological;
-                _this3.datosConsulta.medical_evolutions = _this3.datosConsulta.medical_evolutions.reverse();
-                _this3.evolution.patient_id = _this3.datosConsulta.id;
-                _this3.tienePsiquiatria = res.data.initial_psychiatric_history != null;
-                _this3.tienePsicologia = res.data.initial_psychological_history != null;
-
-                // Extract ordenesMedicas
-                var ordenes = [];
-                if (res.data.appointments) {
-                  res.data.appointments.forEach(function (app) {
-                    if (app.medical_exams && app.medical_exams.length > 0) {
-                      app.medical_exams.forEach(function (exam) {
-                        ordenes.push(_objectSpread(_objectSpread({}, exam), {}, {
-                          created_at: app.date || exam.pivot.attention_date || exam.created_at,
-                          descripcion: exam.name
-                        }));
-                      });
-                    }
-                  });
-                }
-                // Sort descending by date
-                _this3.ordenesMedicas = ordenes.sort(function (a, b) {
-                  return new Date(b.created_at) - new Date(a.created_at);
-                });
-              })["catch"](function (err) {
-                console.error(err);
-              });
-            case 2:
-              _context.next = 4;
-              return _this3.axios.get("/api/datosPacienteSemaforo/".concat(_this3.$route.params.idPaciente)).then(function (res) {
-                _this3.datosPaciente = {
-                  id: _this3.datosConsulta.id,
-                  name: _this3.datosConsulta.name,
-                  semaforo: res.data
-                };
-              });
-            case 4:
-              _this3.axios.get('/api/profesional').then(function (res) {
-                return _this3.profesionalesTodos = res.data;
-              });
-              _this3.axios.get('/api/listRecomendation/' + _this3.$route.params.idPaciente).then(function (res) {
-                return _this3.comentarios = res.data;
-              });
-            case 6:
-            case "end":
-              return _context.stop();
-          }
-        }, _callee);
-      }))();
-    },
-    updatedConsult: function updatedConsult() {
-      var _this4 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var data, url, idHistoria;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
-            case 0:
-              data = Object;
-              if (_this4.dataUser.profession === 'Psiquiatra') {
-                data = _this4.inicialPsiquiatria;
-              } else {
-                data = _this4.initialPsychological;
-              }
-              url = _this4.dataUser.profession === 'Psiquiatra' ? 'initialPsychiatric' : 'initialPsychological';
-              idHistoria = _this4.dataUser.profession === 'Psiquiatra' ? _this4.datosConsulta.initial_psychiatric_history.id : _this4.datosConsulta.initial_psychological_history.id;
-              _context2.next = 6;
-              return axios.put("/api/".concat(url, "/").concat(idHistoria), data).then(function (res) {
-                // console.log(res.data)
-              })["catch"](function (err) {
-                console.error(err);
-              });
-            case 6:
-              _this4["switch"] = 0;
-              _this4.inputSwitchActive(_this4.inputActive, false);
-              _this4.inputActive = "";
-            case 9:
-            case "end":
-              return _context2.stop();
-          }
-        }, _callee2);
-      }))();
-    },
-    updateComentarios: function updateComentarios() {
-      var _this5 = this;
-      this.axios.get('/api/listRecomendation/' + this.$route.params.idPaciente).then(function (res) {
-        return _this5.comentarios = res.data;
-      });
-    },
-    // async addEvolution () {
-    //   await this.axios.post('/api/evolution', this.evolution)
-    //   .then(res => {
-    //     this.getHistories()
-    //   })
-    //   .catch(err => {
-    //     console.error(err)
-    //   })
-    // },
-    getDiagnostico: function getDiagnostico() {
-      var _this6 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) switch (_context3.prev = _context3.next) {
-            case 0:
-              _context3.next = 2;
-              return _this6.axios.get("/api/cies/".concat(_this6.searchCie === '' ? 'a' : _this6.searchCie)).then(function (res) {
-                _this6.dataCies = res.data;
-              })["catch"](function (err) {
-                console.error(err);
-              });
-            case 2:
-            case "end":
-              return _context3.stop();
-          }
-        }, _callee3);
-      }))();
-    },
-    keepExamFunction: function keepExamFunction(info) {
-      console.log(info);
-      this.component = info.component || info, this.datosExamenes = info.data;
-    },
-    updateDiag: function updateDiag() {
-      this.updatedConsult();
-    },
-    updateModal: function updateModal(data) {
-      this.dataModal = data;
-    },
-    collapse: function collapse() {
-      if (event.target.closest('.ques').matches(".active")) {
-        event.target.closest('.ques').classList.remove("active");
-        event.target.closest('.ques').removeAttribute("style");
-        event.target.closest('.ques').querySelector(".collapse").removeAttribute("style");
-      } else {
-        var heightQues = event.target.closest('.ques').scrollHeight;
-        document.querySelectorAll(".ques.active").forEach(function (el) {
-          el.classList.remove("active");
-          el.removeAttribute("style");
-          el.querySelector(".collapse").removeAttribute("style");
-        });
-        event.target.closest('.ques').classList.toggle("active");
-        event.target.closest('.ques').style.height = "".concat(heightQues, "px");
-        event.target.closest('.ques').querySelector(".collapse").style.background = "rgba(231, 231, 231, 0.788)";
-      }
-    },
-    collapseActive: function collapseActive(event) {
-      var heightQues = event.target.closest('.ques').scrollHeight;
-      event.target.closest('.ques').style.height = "".concat(heightQues + 80, "px");
-    },
-    clickOutside: function clickOutside() {
-      if (this.inputActive) {
-        if (!event.target.matches(".collpase__textarea, .collpase__textarea *") && document.querySelector(".collpase__textarea")) {
-          if (this["switch"] !== 0) {
-            this.updatedConsult();
-          } else {
-            this["switch"] += 1;
-          }
-        }
-      }
-      if (this.dobleClick !== event.target.id) {
-        this.dobleClick = event.target.id;
-        return;
-      }
-    },
-    inputSwitchActive: function inputSwitchActive(prop, value) {
-      // Psicplogia
-      switch (prop) {
-        case 'Psicologia_illness':
-          this.inicialInputPsychological.illness = value;
-          break;
-        case 'antecedent':
-          this.inicialInputPsychological.antecedent = value;
-          break;
-        case 'dynamic':
-          this.inicialInputPsychological.dynamic = value;
-          break;
-        case 'attitude':
-          this.inicialInputPsychological.attitude = value;
-          break;
-        case 'dx':
-          this.inicialInputPsychological.dx = value;
-          break;
-        case 'Psicologia_plan':
-          this.inicialInputPsychological.plan = value;
-          break;
-      }
-
-      // Psiquiatria
-      switch (prop) {
-        case 'main_signs_symptoms':
-          this.inicialInputPsiquiatria.main_signs_symptoms = value;
-          break;
-        case 'general_antecedent':
-          this.inicialInputPsiquiatria.general_antecedent = value;
-          break;
-        case 'psiquiatria_illness':
-          this.inicialInputPsiquiatria.illness = value;
-          break;
-        case 'apc':
-          this.inicialInputPsiquiatria.apc = value;
-          break;
-        case 'languaje':
-          this.inicialInputPsiquiatria.languaje = value;
-          break;
-        case 'thought':
-          this.inicialInputPsiquiatria.thought = value;
-          break;
-        case 'affect':
-          this.inicialInputPsiquiatria.affect = value;
-          break;
-        case 'percetion':
-          this.inicialInputPsiquiatria.percetion = value;
-          break;
-        case 'superior_function':
-          this.inicialInputPsiquiatria.superior_function = value;
-          break;
-        case 'abstraction':
-          this.inicialInputPsiquiatria.abstraction = value;
-          break;
-        case 'conscience':
-          this.inicialInputPsiquiatria.conscience = value;
-          break;
-        case 'insight':
-          this.inicialInputPsiquiatria.insight = value;
-          break;
-        case 'diagnostic_problems':
-          this.inicialInputPsiquiatria.diagnostic_problems = value;
-          break;
-        case 'diagnostic':
-          this.inicialInputPsiquiatria.diagnostic = value;
-          break;
-        case 'psiquiatria_plan':
-          this.inicialInputPsiquiatria.plan = value;
-          break;
-      }
-    },
-    convertir: function convertir(prop) {
-      var _this7 = this;
-      if (event.target.dataset.rol == "true") {
-        if (this.dobleClick == false) {
-          this.dobleClick = event.target.id;
-          setTimeout(function () {
-            _this7.dobleClick = false;
-          }, 600); // 600ms double click window
-          return;
-        }
-        if (this.dobleClick === event.target.id) {
-          this.inputActive = prop;
-          this.inputSwitchActive(prop, true);
-          this.dobleClick = false;
-        } else {
-          this.dobleClick = false;
-        }
-      } else {
-        //Solo para el profesional que pertenezca al bloque
-        this.$swal.fire({
-          title: 'No tiene acceso para editar este bloque',
-          icon: 'error'
-        });
-      }
-    },
-    lowerCase: function lowerCase() {
-      var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-      return text.toLowerCase();
-    },
-    evoluciones: function evoluciones() {
-      this.evolution.type = this.dataUser.profession === 'Psiquiatra' ? 1 : 2, this.evolution.date = (0,_helpers_Time_js__WEBPACK_IMPORTED_MODULE_4__.dateNow)(), this.evolution.schedule = this.getTiempo(), this.evolution.professional_id = this.dataUser.id;
-    },
-    refreshEvoluciones: function refreshEvoluciones() {
-      this.getHistories();
-      this.getExamPromise();
-    },
-    addCie: function addCie() {
-      var verify = true;
-      if (this.datosConsulta.cies.length === 0) {
-        this.inicialPsiquiatria.diagnostic.push(event.target.dataset.id);
-        this.datosConsulta.cies.push(event.target.textContent.trim());
-        return;
-      }
-      this.datosConsulta.cies.find(function (el) {
-        if (_typeof(el) == 'object') {
-          if ("".concat(el.id, " - ").concat(el.code, " - ").concat(el.description) === event.target.textContent.trim()) {
-            return verify = false;
-          }
-        } else {
-          if (el === event.target.textContent.trim()) {
-            return verify = false;
-          }
-        }
-      });
-      if (verify === true) {
-        this.inicialPsiquiatria.diagnostic.push(event.target.dataset.id);
-        this.datosConsulta.cies.push(event.target.textContent.trim());
-      }
-      this.searchCie = '';
-    },
-    deleteCie: function deleteCie() {
-      this.datosConsulta.cies.splice(parseInt(event.target.closest('.cie-item').dataset.cie), 1);
-      this.inicialPsiquiatria.diagnostic.splice(parseInt(event.target.closest('.cie-item').dataset.cie), 1);
-    },
-    crearSOS: function crearSOS() {
-      var _this8 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var textoIngresado;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
-            case 0:
-              if (!confirm("\xBFDesea activar el modo S.O.S en el paciente?")) {
-                _context4.next = 5;
-                break;
-              }
-              textoIngresado = prompt("Por favor, ingresa el motivo:");
-              if (!(textoIngresado !== null)) {
-                _context4.next = 5;
-                break;
-              }
-              _context4.next = 5;
-              return _this8.axios.post("/api/crearSOS", {
-                id: _this8.datosPaciente.id,
-                idProfesional: _this8.dataUser.id,
-                comentarios: textoIngresado
-              }).then(function (res) {
-                if (res.data.mensaje) {
-                  _this8.datosConsulta.sos = 1;
-                }
-              })["catch"](function (err) {
-                console.error(err);
-              });
-            case 5:
-            case "end":
-              return _context4.stop();
-          }
-        }, _callee4);
-      }))();
-    },
-    quitarSOS: function quitarSOS() {
-      var _this9 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
-            case 0:
-              if (!confirm("\xBFDesea desactivar el modo S.O.S en el paciente?")) {
-                _context5.next = 3;
-                break;
-              }
-              _context5.next = 3;
-              return _this9.axios.post("/api/quitarSOS", {
-                id: _this9.datosPaciente.id
-              }).then(function (res) {
-                if (res.data.mensaje) {
-                  _this9.datosConsulta.sos = 0;
-                }
-              })["catch"](function (err) {
-                console.error(err);
-              });
-            case 3:
-            case "end":
-              return _context5.stop();
-          }
-        }, _callee5);
-      }))();
-    },
-    getTiempo: function getTiempo() {
-      return "".concat(new Date().getHours().toString().length == 1 ? '0' + new Date().getHours() : new Date().getHours(), ":").concat(new Date().getMinutes().toString().length == 1 ? '0' + new Date().getMinutes() : new Date().getMinutes(), ":").concat(new Date().getSeconds().toString().length == 1 ? '0' + new Date().getSeconds() : new Date().getSeconds());
-    },
-    calculateAge: function calculateAge(age) {
-      return age ? moment__WEBPACK_IMPORTED_MODULE_5___default()().diff(age, 'years') : '0';
-      //return age ? new Date().getFullYear() - parseInt(age.substring(0,4)) : '...';
-    },
-    getDateNow: function getDateNow() {
-      return (0,_helpers_Time_js__WEBPACK_IMPORTED_MODULE_4__.dateNow)();
-    },
-    calcularDias: function calcularDias(fecha) {
-      var hoy = moment__WEBPACK_IMPORTED_MODULE_5___default()();
-      return hoy.diff(fecha, 'days');
-    },
-    maxStringCharacter: function maxStringCharacter(character, num) {
-      character === null ? character = '...' : character;
-      if (character.length > num) {
-        return character.substring(0, num) + '...';
-      } else {
-        return character;
-      }
-    },
-    fechaLatam: function fechaLatam(fecha) {
-      return fecha ? moment__WEBPACK_IMPORTED_MODULE_5___default()(fecha).format('DD/MM/YYYY') : 'Sin registro';
-    },
-    fechaLectura: function fechaLectura(fecha) {
-      moment__WEBPACK_IMPORTED_MODULE_5___default().locale('es');
-      return moment__WEBPACK_IMPORTED_MODULE_5___default()(fecha).format('dddd, DD [de] MMMM YYYY');
-    },
-    colorear: function colorear(index) {
-      var cabecera = document.querySelectorAll('.tarjeta .card-header')[index];
-      cabecera.closest('.card').classList.add('shadow');
-      //cabecera.classList.remove('bg-secondary');
-      //cabecera.classList.add('bg-success');
-    },
-    descolorear: function descolorear(index) {
-      var cabecera = document.querySelectorAll('.tarjeta .card-header')[index];
-      cabecera.closest('.card').classList.remove('shadow');
-      //cabecera.classList.remove('bg-success');
-      //cabecera.classList.add('bg-secondary');
-    },
-    mostrarCard: function mostrarCard(index) {
-      this.indexGlobal = index;
-      this.miniRespuesta.comentarios = [];
-      if (this.datosConsulta.medical_evolutions[index].professional) {
-        this.miniRespuesta.nombre = this.datosConsulta.medical_evolutions[index].professional.name;
-        this.miniRespuesta.firma = this.datosConsulta.medical_evolutions[index].professional.signing;
-        this.miniRespuesta.foto = this.datosConsulta.medical_evolutions[index].professional.photo;
-        this.miniRespuesta.fecha = this.datosConsulta.medical_evolutions[index].date;
-        this.miniRespuesta.comentarios = this.datosConsulta.medical_evolutions[index].comentarios;
-        this.miniRespuesta.treatment = this.datosConsulta.medical_evolutions[index].treatment;
-        this.miniRespuesta.diagnostic = this.datosConsulta.medical_evolutions[index].diagnostic;
-        if (this.miniRespuesta.firma == '-') {
-          this.miniRespuesta.firma = '';
-        }
-      } else {
-        this.miniRespuesta.nombre = 'Sin asignar';
-        this.miniRespuesta.firma = '';
-        this.miniRespuesta.foto = '';
-      }
-      this.miniRespuesta.contenido = this.datosConsulta.medical_evolutions[index].content;
-    },
-    contarExamenes: function contarExamenes() {
-      if (this.datosConsulta !== undefined) {
-        return this.datosConsulta.examenes_basicos.length + this.datosConsulta.examenes_personalizados.burns.length + this.datosConsulta.examenes_personalizados.gads.length + this.datosConsulta.examenes_personalizados.scrs.length + this.datosConsulta.examenes_personalizados.zung_anxieties.length + this.datosConsulta.examenes_personalizados.zung_depressions.length;
-      }
-      //datosConsulta.examenes[0].length + datosConsulta.examenes[1]['burns'].length + datosConsulta.examenes[1]['gads'].length + datosConsulta.examenes[1]['scrs'].length + datosConsulta.examenes[1]['zung_anxieties'].length + datosConsulta.examenes[1]['zung_depressions'].length
-    },
-    queEstado: function queEstado(dato) {
-      if (dato !== undefined) return this.estados.find(function (x) {
-        return x.id == dato;
-      }).valor;else return '';
-    },
-    datos1Paciente: function datos1Paciente() {
-      var _this10 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-          while (1) switch (_context6.prev = _context6.next) {
-            case 0:
-              _this10.axios.get('/api/patientById/' + _this10.$route.params.idPaciente).then(function (res) {
-                _this10.dato1 = res.data[0];
-                //$("#patientModal" ).modal('show')
-              });
-            case 1:
-            case "end":
-              return _context6.stop();
-          }
-        }, _callee6);
-      }))();
-    },
-    dondeEsta: function dondeEsta(tips) {
-      var tipoColores = {
-        1: 'evolucionPsiquiatria',
-        2: 'evolucionPsicologia',
-        3: 'evolucionTipo3',
-        4: 'evolucionTipo4',
-        5: 'evolucionTipo5',
-        6: 'evolucionTipo6',
-        7: 'evolucionTerapista',
-        8: 'evolucionTipo8'
-      };
-      if (tipoColores[tips]) return tipoColores[tips];
-      var valor = null;
-      if (valor = this.evolucionPsiquiatria.indexOf(tips) > -1) return 'evolucionPsiquiatria';else if (valor = this.evolucionPsicologia.indexOf(tips) > -1) return 'evolucionPsicologia';else if (valor = this.evolucionTerapista.indexOf(tips) > -1) return 'evolucionTerapista';else if (valor = this.evolucionTecnologo.indexOf(tips) > -1) return 'evolucionTecnologo';else if (valor = this.evolucionNutricion.indexOf(tips) > -1) return 'evolucionNutricion';else return 'evoOtro';
-    },
-    dondeEsta2: function dondeEsta2(tips) {
-      var tipoNombres = {
-        1: 'Psiquiatría',
-        2: 'Psicología',
-        3: 'Certificado',
-        4: 'Kurame',
-        5: 'Paquete',
-        6: 'Nutrición',
-        7: 'Terapista',
-        8: 'Otro'
-      };
-      if (tipoNombres[tips]) return tipoNombres[tips];
-      var valor = null;
-      if (valor = this.evolucionPsiquiatria.indexOf(tips) > -1) return 'Psiquiatría';else if (valor = this.evolucionPsicologia.indexOf(tips) > -1) return 'Psicología';else if (valor = this.evolucionTerapista.indexOf(tips) > -1) return 'Terapista';else if (valor = this.evolucionTecnologo.indexOf(tips) > -1) return 'Tec. Médico';else if (valor = this.evolucionNutricion.indexOf(tips) > -1) return 'Nutrición';else return 'Otro sin especificar';
-    },
-    cargarLineas: function cargarLineas() {
-      var _this11 = this;
-      this.$emit('ordenarLineas');
-      this.axios('/api/cargarLineas/' + this.datosPaciente.id).then(function (res) {
-        _this11.lineas = res.data;
-      });
-    },
-    agregarComentario: function agregarComentario(datos) {
-      //this.miniRespuesta.comentarios.push(datos)
-      this.datosConsulta.medical_evolutions[this.indexGlobal].comentarios.push(datos);
     }
-  },
+  }, _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_methods, "formatOnlyDate", function formatOnlyDate(dateStr) {
+    return this.formatDate(dateStr);
+  }), "formatDateWithTime", function formatDateWithTime(dateStr) {
+    if (!dateStr) return '';
+    var d;
+    if (typeof dateStr === 'string' && !dateStr.includes('T') && dateStr.includes(' ')) {
+      d = new Date(dateStr.replace(' ', 'T'));
+    } else {
+      d = new Date(dateStr);
+    }
+    if (isNaN(d.getTime())) return dateStr;
+    var day = d.getDate().toString().padStart(2, '0');
+    var monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+    var month = monthNames[d.getMonth()];
+    var year = d.getFullYear();
+    var hours = d.getHours();
+    var minutes = d.getMinutes().toString().padStart(2, '0');
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    return "".concat(day, " ").concat(month, " ").concat(year, " - ").concat(hours.toString().padStart(2, '0'), ":").concat(minutes, " ").concat(ampm);
+  }), "irAPrueba", function irAPrueba(ruta) {
+    // Abre en nueva pestana o usa router
+    window.open("/profesional/".concat(ruta, "/").concat(this.datosConsulta.id), '_blank');
+  }), "verDetallePrueba", function verDetallePrueba(resultado, nombreExamen) {
+    this.pruebaSeleccionada = _objectSpread(_objectSpread({}, resultado), {}, {
+      nombreExamen: nombreExamen
+    });
+    var myModal = new bootstrap.Modal(document.getElementById('modalDetallePrueba'));
+    myModal.show();
+  }), "crearNuevaOrden", function crearNuevaOrden() {
+    if (this.datosConsulta && this.datosConsulta.appointments && this.datosConsulta.appointments.length > 0) {
+      var sortedAppointments = _toConsumableArray(this.datosConsulta.appointments).sort(function (a, b) {
+        return new Date(b.date) - new Date(a.date);
+      });
+      var latestApp = sortedAppointments[0];
+      window.open("/profesional/examenes/".concat(latestApp.id), '_blank');
+    } else {
+      this.$swal({
+        icon: 'error',
+        title: 'Sin Citas',
+        text: 'El paciente no tiene citas registradas para asignar una orden médica.'
+      });
+    }
+  }), "getExamPromise", function getExamPromise() {
+    var _this5 = this;
+    Promise.all([this.axios("/api/zungDep/".concat(this.$route.params.idPaciente)), this.axios("/api/zungAns/".concat(this.$route.params.idPaciente)), this.axios("/api/millon/".concat(this.$route.params.idPaciente)), this.axios("/api/burns/".concat(this.$route.params.idPaciente)), this.axios("/api/src/".concat(this.$route.params.idPaciente)), this.axios("/api/exam/".concat(this.$route.params.idPaciente))]).then(function (res) {
+      var _res = _slicedToArray(res, 6),
+        zungDep = _res[0],
+        zungAns = _res[1],
+        millon = _res[2],
+        burn = _res[3],
+        src = _res[4],
+        exam = _res[5];
+      _this5.allExams.scr.value = src.data;
+      _this5.allExams.burns.value = burn.data;
+      _this5.allExams.millon.value = millon.data;
+      _this5.allExams.zunganxie.value = zungAns.data;
+      _this5.allExams.zungdep.value = zungDep.data;
+
+      // Filter exams correctly based on exam.data if needed
+    })["catch"](function (err) {
+      return console.error(err);
+    });
+  }), "evolucionModal", function evolucionModal() {
+    console.log('que');
+    this.datosIdEvolucion.professional.id = this.dataUser.id;
+    this.datosIdEvolucion.patient.id = this.datosConsulta.id;
+    this.$emit('datosEmitModal', this.dataConsulta);
+  }), "refreshInfo", function refreshInfo(id) {
+    this.autoSaveInfo = localStorage.getItem(id);
+  }), "toDischarge", function toDischarge() {
+    var _this6 = this;
+    this.$swal({
+      title: 'Dar de alta al paciente',
+      text: 'Ingrese un comentario sobre el alta:',
+      input: 'textarea',
+      inputPlaceholder: 'Comentarios...',
+      showDenyButton: true,
+      confirmButtonText: 'Dar de Alta',
+      denyButtonText: 'Cancelar',
+      preConfirm: function preConfirm(comentario) {
+        if (!comentario) {
+          _this6.$swal.showValidationMessage('El comentario es obligatorio para dar de alta');
+        }
+        return comentario;
+      }
+    }).then(function (result) {
+      if (result.isConfirmed) {
+        var typeDischarge = _this6.dataUser.profession === 'Psiquiatra' ? 2 : 1;
+        _this6.axios.post('/api/discharge', {
+          id: _this6.$route.params.idPaciente,
+          idProfesional: _this6.dataUser.id,
+          type: typeDischarge,
+          comments: result.value
+        }).then(function (res) {
+          _this6.$swal(res.data.msg);
+          _this6.getHistories();
+        });
+      }
+    });
+  }), "editEvolution", function editEvolution(evolution) {
+    this.dataModal = evolution;
+  }), _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_methods, "updatePariente", function updatePariente(pariente) {
+    /* if(pariente?.nombre){
+    	this.datosConsulta.relative[0].name = pariente.nombre
+    	this.datosConsulta.relative[0].phone = pariente.celular
+    	this.datosConsulta.relative[0].kinship = pariente.parentesco
+    }
+    if(pariente?.nombre2){
+    	this.datosConsulta.relative[1].name = pariente.nombre2
+    	this.datosConsulta.relative[1].phone = pariente.celular2
+    	this.datosConsulta.relative[1].kinship = pariente.parentesco2
+    } */
+    this.datosConsulta.relative = pariente;
+  }), "getHistories", function getHistories() {
+    var _this7 = this;
+    return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+      return _regeneratorRuntime().wrap(function _callee$(_context) {
+        while (1) switch (_context.prev = _context.next) {
+          case 0:
+            _context.next = 2;
+            return _this7.axios.get("/api/patientEvolution/".concat(_this7.$route.params.idPaciente, "/").concat(_this7.$attrs.idUser)).then(function (res) {
+              _this7.datosConsulta = res.data;
+              _this7.misHobbies = JSON.parse(_this7.datosConsulta.hobbies);
+              console.log(_this7.datosConsulta);
+              _this7.datosConsulta.medical_evolutions = _this7.datosConsulta.medical_evolutions.sort(function (a, b) {
+                if (a.date < b.date) {
+                  return -1;
+                }
+                if (a.date > b.date) {
+                  return 1;
+                }
+                return 0;
+              });
+              _this7.datosExamPaciente.name = _this7.datosConsulta.name;
+              _this7.datosExamPaciente.id = _this7.datosConsulta.id;
+              if (res.data.initial_psychiatric_history) {
+                _this7.inicialPsiquiatria = res.data.initial_psychiatric_history;
+                _this7.inicialPsiquiatria.diagnostic = [];
+                res.data.cies.forEach(function (el) {
+                  _this7.inicialPsiquiatria.diagnostic.push(el.id.toString());
+                });
+              } else {
+                _this7.inicialPsiquiatria;
+              }
+              res.data.initial_psychological_history ? _this7.initialPsychological = res.data.initial_psychological_history : _this7.initialPsychological;
+              _this7.datosConsulta.medical_evolutions = _this7.datosConsulta.medical_evolutions.reverse();
+              _this7.evolution.patient_id = _this7.datosConsulta.id;
+              _this7.tienePsiquiatria = res.data.initial_psychiatric_history != null;
+              _this7.tienePsicologia = res.data.initial_psychological_history != null;
+
+              // Extract ordenesMedicas
+              var ordenes = [];
+              if (res.data.appointments) {
+                res.data.appointments.forEach(function (app) {
+                  if (app.medical_exams && app.medical_exams.length > 0) {
+                    app.medical_exams.forEach(function (exam) {
+                      ordenes.push(_objectSpread(_objectSpread({}, exam), {}, {
+                        created_at: app.date || exam.pivot.attention_date || exam.created_at,
+                        descripcion: exam.name
+                      }));
+                    });
+                  }
+                });
+              }
+              // Sort descending by date
+              _this7.ordenesMedicas = ordenes.sort(function (a, b) {
+                return new Date(b.created_at) - new Date(a.created_at);
+              });
+            })["catch"](function (err) {
+              console.error(err);
+            });
+          case 2:
+            _context.next = 4;
+            return _this7.axios.get("/api/datosPacienteSemaforo/".concat(_this7.$route.params.idPaciente)).then(function (res) {
+              _this7.datosPaciente = {
+                id: _this7.datosConsulta.id,
+                name: _this7.datosConsulta.name,
+                semaforo: res.data
+              };
+            });
+          case 4:
+            // Cargar datos completos del paciente para los nuevos tabs (Citas, Triaje, Finanzas, etc.)
+            _this7.axios.get("/api/patient/".concat(_this7.$route.params.idPaciente, "/full-details")).then(function (res) {
+              _this7.datosPaciente = Object.assign({}, _this7.datosPaciente, res.data);
+            })["catch"](function (err) {
+              console.error('Error al cargar detalles del paciente:', err);
+            });
+            _this7.axios.get('/api/profesional').then(function (res) {
+              return _this7.profesionalesTodos = res.data;
+            });
+            _this7.axios.get('/api/listRecomendation/' + _this7.$route.params.idPaciente).then(function (res) {
+              return _this7.comentarios = res.data;
+            });
+          case 7:
+          case "end":
+            return _context.stop();
+        }
+      }, _callee);
+    }))();
+  }), "updatedConsult", function updatedConsult() {
+    var _this8 = this;
+    return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+      var data, url, idHistoria;
+      return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+        while (1) switch (_context2.prev = _context2.next) {
+          case 0:
+            data = Object;
+            if (_this8.dataUser.profession === 'Psiquiatra') {
+              data = _this8.inicialPsiquiatria;
+            } else {
+              data = _this8.initialPsychological;
+            }
+            url = _this8.dataUser.profession === 'Psiquiatra' ? 'initialPsychiatric' : 'initialPsychological';
+            idHistoria = _this8.dataUser.profession === 'Psiquiatra' ? _this8.datosConsulta.initial_psychiatric_history.id : _this8.datosConsulta.initial_psychological_history.id;
+            _context2.next = 6;
+            return axios.put("/api/".concat(url, "/").concat(idHistoria), data).then(function (res) {
+              // console.log(res.data)
+            })["catch"](function (err) {
+              console.error(err);
+            });
+          case 6:
+            _this8["switch"] = 0;
+            _this8.inputSwitchActive(_this8.inputActive, false);
+            _this8.inputActive = "";
+          case 9:
+          case "end":
+            return _context2.stop();
+        }
+      }, _callee2);
+    }))();
+  }), "updateComentarios", function updateComentarios() {
+    var _this9 = this;
+    this.axios.get('/api/listRecomendation/' + this.$route.params.idPaciente).then(function (res) {
+      return _this9.comentarios = res.data;
+    });
+  }), "getDiagnostico", function getDiagnostico() {
+    var _this10 = this;
+    return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        while (1) switch (_context3.prev = _context3.next) {
+          case 0:
+            _context3.next = 2;
+            return _this10.axios.get("/api/cies/".concat(_this10.searchCie === '' ? 'a' : _this10.searchCie)).then(function (res) {
+              _this10.dataCies = res.data;
+            })["catch"](function (err) {
+              console.error(err);
+            });
+          case 2:
+          case "end":
+            return _context3.stop();
+        }
+      }, _callee3);
+    }))();
+  }), "keepExamFunction", function keepExamFunction(info) {
+    console.log(info);
+    this.component = info.component || info, this.datosExamenes = info.data;
+  }), "updateDiag", function updateDiag() {
+    this.updatedConsult();
+  }), "updateModal", function updateModal(data) {
+    this.dataModal = data;
+  }), "collapse", function collapse() {
+    if (event.target.closest('.ques').matches(".active")) {
+      event.target.closest('.ques').classList.remove("active");
+      event.target.closest('.ques').removeAttribute("style");
+      event.target.closest('.ques').querySelector(".collapse").removeAttribute("style");
+    } else {
+      var heightQues = event.target.closest('.ques').scrollHeight;
+      document.querySelectorAll(".ques.active").forEach(function (el) {
+        el.classList.remove("active");
+        el.removeAttribute("style");
+        el.querySelector(".collapse").removeAttribute("style");
+      });
+      event.target.closest('.ques').classList.toggle("active");
+      event.target.closest('.ques').style.height = "".concat(heightQues, "px");
+      event.target.closest('.ques').querySelector(".collapse").style.background = "rgba(231, 231, 231, 0.788)";
+    }
+  }), "collapseActive", function collapseActive(event) {
+    var heightQues = event.target.closest('.ques').scrollHeight;
+    event.target.closest('.ques').style.height = "".concat(heightQues + 80, "px");
+  }), _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_methods, "clickOutside", function clickOutside() {
+    if (this.inputActive) {
+      if (!event.target.matches(".collpase__textarea, .collpase__textarea *") && document.querySelector(".collpase__textarea")) {
+        if (this["switch"] !== 0) {
+          this.updatedConsult();
+        } else {
+          this["switch"] += 1;
+        }
+      }
+    }
+    if (this.dobleClick !== event.target.id) {
+      this.dobleClick = event.target.id;
+      return;
+    }
+  }), "inputSwitchActive", function inputSwitchActive(prop, value) {
+    // Psicplogia
+    switch (prop) {
+      case 'Psicologia_illness':
+        this.inicialInputPsychological.illness = value;
+        break;
+      case 'antecedent':
+        this.inicialInputPsychological.antecedent = value;
+        break;
+      case 'dynamic':
+        this.inicialInputPsychological.dynamic = value;
+        break;
+      case 'attitude':
+        this.inicialInputPsychological.attitude = value;
+        break;
+      case 'dx':
+        this.inicialInputPsychological.dx = value;
+        break;
+      case 'Psicologia_plan':
+        this.inicialInputPsychological.plan = value;
+        break;
+    }
+
+    // Psiquiatria
+    switch (prop) {
+      case 'main_signs_symptoms':
+        this.inicialInputPsiquiatria.main_signs_symptoms = value;
+        break;
+      case 'general_antecedent':
+        this.inicialInputPsiquiatria.general_antecedent = value;
+        break;
+      case 'psiquiatria_illness':
+        this.inicialInputPsiquiatria.illness = value;
+        break;
+      case 'apc':
+        this.inicialInputPsiquiatria.apc = value;
+        break;
+      case 'languaje':
+        this.inicialInputPsiquiatria.languaje = value;
+        break;
+      case 'thought':
+        this.inicialInputPsiquiatria.thought = value;
+        break;
+      case 'affect':
+        this.inicialInputPsiquiatria.affect = value;
+        break;
+      case 'percetion':
+        this.inicialInputPsiquiatria.percetion = value;
+        break;
+      case 'superior_function':
+        this.inicialInputPsiquiatria.superior_function = value;
+        break;
+      case 'abstraction':
+        this.inicialInputPsiquiatria.abstraction = value;
+        break;
+      case 'conscience':
+        this.inicialInputPsiquiatria.conscience = value;
+        break;
+      case 'insight':
+        this.inicialInputPsiquiatria.insight = value;
+        break;
+      case 'diagnostic_problems':
+        this.inicialInputPsiquiatria.diagnostic_problems = value;
+        break;
+      case 'diagnostic':
+        this.inicialInputPsiquiatria.diagnostic = value;
+        break;
+      case 'psiquiatria_plan':
+        this.inicialInputPsiquiatria.plan = value;
+        break;
+    }
+  }), "convertir", function convertir(prop) {
+    var _this11 = this;
+    if (event.target.dataset.rol == "true") {
+      if (this.dobleClick == false) {
+        this.dobleClick = event.target.id;
+        setTimeout(function () {
+          _this11.dobleClick = false;
+        }, 600); // 600ms double click window
+        return;
+      }
+      if (this.dobleClick === event.target.id) {
+        this.inputActive = prop;
+        this.inputSwitchActive(prop, true);
+        this.dobleClick = false;
+      } else {
+        this.dobleClick = false;
+      }
+    } else {
+      //Solo para el profesional que pertenezca al bloque
+      this.$swal.fire({
+        title: 'No tiene acceso para editar este bloque',
+        icon: 'error'
+      });
+    }
+  }), "lowerCase", function lowerCase() {
+    var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    return text.toLowerCase();
+  }), "evoluciones", function evoluciones() {
+    this.evolution.type = this.dataUser.profession === 'Psiquiatra' ? 1 : 2, this.evolution.date = (0,_helpers_Time_js__WEBPACK_IMPORTED_MODULE_4__.dateNow)(), this.evolution.schedule = this.getTiempo(), this.evolution.professional_id = this.dataUser.id;
+  }), "refreshEvoluciones", function refreshEvoluciones() {
+    this.getHistories();
+    this.getExamPromise();
+  }), "addCie", function addCie() {
+    var verify = true;
+    if (this.datosConsulta.cies.length === 0) {
+      this.inicialPsiquiatria.diagnostic.push(event.target.dataset.id);
+      this.datosConsulta.cies.push(event.target.textContent.trim());
+      return;
+    }
+    this.datosConsulta.cies.find(function (el) {
+      if (_typeof(el) == 'object') {
+        if ("".concat(el.id, " - ").concat(el.code, " - ").concat(el.description) === event.target.textContent.trim()) {
+          return verify = false;
+        }
+      } else {
+        if (el === event.target.textContent.trim()) {
+          return verify = false;
+        }
+      }
+    });
+    if (verify === true) {
+      this.inicialPsiquiatria.diagnostic.push(event.target.dataset.id);
+      this.datosConsulta.cies.push(event.target.textContent.trim());
+    }
+    this.searchCie = '';
+  }), "deleteCie", function deleteCie() {
+    this.datosConsulta.cies.splice(parseInt(event.target.closest('.cie-item').dataset.cie), 1);
+    this.inicialPsiquiatria.diagnostic.splice(parseInt(event.target.closest('.cie-item').dataset.cie), 1);
+  }), "crearSOS", function crearSOS() {
+    var _this12 = this;
+    return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+      var textoIngresado;
+      return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+        while (1) switch (_context4.prev = _context4.next) {
+          case 0:
+            if (!confirm("\xBFDesea activar el modo S.O.S en el paciente?")) {
+              _context4.next = 5;
+              break;
+            }
+            textoIngresado = prompt("Por favor, ingresa el motivo:");
+            if (!(textoIngresado !== null)) {
+              _context4.next = 5;
+              break;
+            }
+            _context4.next = 5;
+            return _this12.axios.post("/api/crearSOS", {
+              id: _this12.datosPaciente.id,
+              idProfesional: _this12.dataUser.id,
+              comentarios: textoIngresado
+            }).then(function (res) {
+              if (res.data.mensaje) {
+                _this12.datosConsulta.sos = 1;
+              }
+            })["catch"](function (err) {
+              console.error(err);
+            });
+          case 5:
+          case "end":
+            return _context4.stop();
+        }
+      }, _callee4);
+    }))();
+  }), "quitarSOS", function quitarSOS() {
+    var _this13 = this;
+    return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+      return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+        while (1) switch (_context5.prev = _context5.next) {
+          case 0:
+            if (!confirm("\xBFDesea desactivar el modo S.O.S en el paciente?")) {
+              _context5.next = 3;
+              break;
+            }
+            _context5.next = 3;
+            return _this13.axios.post("/api/quitarSOS", {
+              id: _this13.datosPaciente.id
+            }).then(function (res) {
+              if (res.data.mensaje) {
+                _this13.datosConsulta.sos = 0;
+              }
+            })["catch"](function (err) {
+              console.error(err);
+            });
+          case 3:
+          case "end":
+            return _context5.stop();
+        }
+      }, _callee5);
+    }))();
+  }), _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_methods, "getTiempo", function getTiempo() {
+    return "".concat(new Date().getHours().toString().length == 1 ? '0' + new Date().getHours() : new Date().getHours(), ":").concat(new Date().getMinutes().toString().length == 1 ? '0' + new Date().getMinutes() : new Date().getMinutes(), ":").concat(new Date().getSeconds().toString().length == 1 ? '0' + new Date().getSeconds() : new Date().getSeconds());
+  }), "calculateAge", function calculateAge(age) {
+    return age ? moment__WEBPACK_IMPORTED_MODULE_5___default()().diff(age, 'years') : '0';
+    //return age ? new Date().getFullYear() - parseInt(age.substring(0,4)) : '...';
+  }), "getDateNow", function getDateNow() {
+    return (0,_helpers_Time_js__WEBPACK_IMPORTED_MODULE_4__.dateNow)();
+  }), "calcularDias", function calcularDias(fecha) {
+    var hoy = moment__WEBPACK_IMPORTED_MODULE_5___default()();
+    return hoy.diff(fecha, 'days');
+  }), "maxStringCharacter", function maxStringCharacter(character, num) {
+    character === null ? character = '...' : character;
+    if (character.length > num) {
+      return character.substring(0, num) + '...';
+    } else {
+      return character;
+    }
+  }), "fechaLatam", function fechaLatam(fecha) {
+    return fecha ? moment__WEBPACK_IMPORTED_MODULE_5___default()(fecha).format('DD/MM/YYYY') : 'Sin registro';
+  }), "fechaLectura", function fechaLectura(fecha) {
+    moment__WEBPACK_IMPORTED_MODULE_5___default().locale('es');
+    return moment__WEBPACK_IMPORTED_MODULE_5___default()(fecha).format('dddd, DD [de] MMMM YYYY');
+  }), "colorear", function colorear(index) {
+    var cabecera = document.querySelectorAll('.tarjeta .card-header')[index];
+    cabecera.closest('.card').classList.add('shadow');
+    //cabecera.classList.remove('bg-secondary');
+    //cabecera.classList.add('bg-success');
+  }), "descolorear", function descolorear(index) {
+    var cabecera = document.querySelectorAll('.tarjeta .card-header')[index];
+    cabecera.closest('.card').classList.remove('shadow');
+    //cabecera.classList.remove('bg-success');
+    //cabecera.classList.add('bg-secondary');
+  }), "mostrarCard", function mostrarCard(index) {
+    this.indexGlobal = index;
+    this.miniRespuesta.comentarios = [];
+    if (this.datosConsulta.medical_evolutions[index].professional) {
+      this.miniRespuesta.nombre = this.datosConsulta.medical_evolutions[index].professional.name;
+      this.miniRespuesta.firma = this.datosConsulta.medical_evolutions[index].professional.signing;
+      this.miniRespuesta.foto = this.datosConsulta.medical_evolutions[index].professional.photo;
+      this.miniRespuesta.fecha = this.datosConsulta.medical_evolutions[index].date;
+      this.miniRespuesta.comentarios = this.datosConsulta.medical_evolutions[index].comentarios;
+      this.miniRespuesta.treatment = this.datosConsulta.medical_evolutions[index].treatment;
+      this.miniRespuesta.diagnostic = this.datosConsulta.medical_evolutions[index].diagnostic;
+      if (this.miniRespuesta.firma == '-') {
+        this.miniRespuesta.firma = '';
+      }
+    } else {
+      this.miniRespuesta.nombre = 'Sin asignar';
+      this.miniRespuesta.firma = '';
+      this.miniRespuesta.foto = '';
+    }
+    this.miniRespuesta.contenido = this.datosConsulta.medical_evolutions[index].content;
+  }), _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_methods, "contarExamenes", function contarExamenes() {
+    if (this.datosConsulta !== undefined) {
+      return this.datosConsulta.examenes_basicos.length + this.datosConsulta.examenes_personalizados.burns.length + this.datosConsulta.examenes_personalizados.gads.length + this.datosConsulta.examenes_personalizados.scrs.length + this.datosConsulta.examenes_personalizados.zung_anxieties.length + this.datosConsulta.examenes_personalizados.zung_depressions.length;
+    }
+    //datosConsulta.examenes[0].length + datosConsulta.examenes[1]['burns'].length + datosConsulta.examenes[1]['gads'].length + datosConsulta.examenes[1]['scrs'].length + datosConsulta.examenes[1]['zung_anxieties'].length + datosConsulta.examenes[1]['zung_depressions'].length
+  }), "queEstado", function queEstado(dato) {
+    if (dato !== undefined) return this.estados.find(function (x) {
+      return x.id == dato;
+    }).valor;else return '';
+  }), "datos1Paciente", function datos1Paciente() {
+    var _this14 = this;
+    return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+      return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+        while (1) switch (_context6.prev = _context6.next) {
+          case 0:
+            _this14.axios.get('/api/patientById/' + _this14.$route.params.idPaciente).then(function (res) {
+              _this14.dato1 = res.data[0];
+              //$("#patientModal" ).modal('show')
+            });
+          case 1:
+          case "end":
+            return _context6.stop();
+        }
+      }, _callee6);
+    }))();
+  }), "dondeEsta", function dondeEsta(tips) {
+    var tipoColores = {
+      1: 'evolucionPsiquiatria',
+      2: 'evolucionPsicologia',
+      3: 'evolucionTipo3',
+      4: 'evolucionTipo4',
+      5: 'evolucionTipo5',
+      6: 'evolucionTipo6',
+      7: 'evolucionTerapista',
+      8: 'evolucionTipo8'
+    };
+    if (tipoColores[tips]) return tipoColores[tips];
+    var valor = null;
+    if (valor = this.evolucionPsiquiatria.indexOf(tips) > -1) return 'evolucionPsiquiatria';else if (valor = this.evolucionPsicologia.indexOf(tips) > -1) return 'evolucionPsicologia';else if (valor = this.evolucionTerapista.indexOf(tips) > -1) return 'evolucionTerapista';else if (valor = this.evolucionTecnologo.indexOf(tips) > -1) return 'evolucionTecnologo';else if (valor = this.evolucionNutricion.indexOf(tips) > -1) return 'evolucionNutricion';else return 'evoOtro';
+  }), "dondeEsta2", function dondeEsta2(tips) {
+    var tipoNombres = {
+      1: 'Psiquiatría',
+      2: 'Psicología',
+      3: 'Certificado',
+      4: 'Kurame',
+      5: 'Paquete',
+      6: 'Nutrición',
+      7: 'Terapista',
+      8: 'Otro'
+    };
+    if (tipoNombres[tips]) return tipoNombres[tips];
+    var valor = null;
+    if (valor = this.evolucionPsiquiatria.indexOf(tips) > -1) return 'Psiquiatría';else if (valor = this.evolucionPsicologia.indexOf(tips) > -1) return 'Psicología';else if (valor = this.evolucionTerapista.indexOf(tips) > -1) return 'Terapista';else if (valor = this.evolucionTecnologo.indexOf(tips) > -1) return 'Tec. Médico';else if (valor = this.evolucionNutricion.indexOf(tips) > -1) return 'Nutrición';else return 'Otro sin especificar';
+  }), "cargarLineas", function cargarLineas() {
+    var _this15 = this;
+    this.$emit('ordenarLineas');
+    this.axios('/api/cargarLineas/' + this.datosPaciente.id).then(function (res) {
+      _this15.lineas = res.data;
+    });
+  }), "agregarComentario", function agregarComentario(datos) {
+    //this.miniRespuesta.comentarios.push(datos)
+    this.datosConsulta.medical_evolutions[this.indexGlobal].comentarios.push(datos);
+  })),
   computed: {
+    documentosFiltrados: function documentosFiltrados() {
+      var _this16 = this;
+      if (!this.paciente.documents) return [];
+      var docs = this.paciente.documents;
+      if (this.filtroDocumento !== 'Todos') {
+        docs = docs.filter(function (d) {
+          return d.type === _this16.filtroDocumento;
+        });
+      }
+      return docs.sort(function (a, b) {
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+    },
+    faltasCitas: function faltasCitas() {
+      if (!this.paciente.appointments) return [];
+      return this.paciente.appointments.filter(function (cita) {
+        return cita.status == 3 || cita.status == 6;
+      });
+    },
+    reprogramacionesCitas: function reprogramacionesCitas() {
+      if (!this.paciente.appointments) return [];
+      return this.paciente.appointments.filter(function (cita) {
+        return cita.status == 4;
+      });
+    },
+    proximaCita: function proximaCita() {
+      if (!this.paciente.appointments) return null;
+      var futureAppointments = this.paciente.appointments.filter(function (appt) {
+        return new Date(appt.date) >= new Date();
+      });
+      if (futureAppointments.length === 0) return null;
+      return futureAppointments.sort(function (a, b) {
+        return new Date(a.date) - new Date(b.date);
+      })[0];
+    },
+    ultimaEvolucion: function ultimaEvolucion() {
+      if (!this.paciente.medical_evolutions || this.paciente.medical_evolutions.length === 0) return null;
+      return _toConsumableArray(this.paciente.medical_evolutions).sort(function (a, b) {
+        return new Date(b.created_at) - new Date(a.created_at);
+      })[0];
+    },
+    allTests: function allTests() {
+      var combined = [];
+      if (this.paciente.scrs) combined = combined.concat(this.paciente.scrs.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'SCL90R',
+          path: '/api/src/'
+        });
+      }));
+      if (this.paciente.burns) combined = combined.concat(this.paciente.burns.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'ANSIEDAD DE BURNS',
+          path: '/api/burns/'
+        });
+      }));
+      if (this.paciente.millons) combined = combined.concat(this.paciente.millons.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'MILLON',
+          path: '/api/millon/'
+        });
+      }));
+      if (this.paciente.zung_depressions) combined = combined.concat(this.paciente.zung_depressions.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'DEPRESIÓN DE ZUNG',
+          path: '/api/zungDep/'
+        });
+      }));
+      if (this.paciente.zung_anxieties) combined = combined.concat(this.paciente.zung_anxieties.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'ANSIEDAD DE ZUNG',
+          path: '/api/zungAns/'
+        });
+      }));
+      if (this.paciente.phqs) combined = combined.concat(this.paciente.phqs.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'PHQ-9',
+          path: '/api/phq/'
+        });
+      }));
+      if (this.paciente.gads) combined = combined.concat(this.paciente.gads.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'GAD-7',
+          path: '/api/gad/'
+        });
+      }));
+      if (this.paciente.bdis) combined = combined.concat(this.paciente.bdis.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'BDI-2',
+          path: '/api/bdi/'
+        });
+      }));
+      if (this.paciente.mcmis) combined = combined.concat(this.paciente.mcmis.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'MCMI-II',
+          path: '/api/mcmi/'
+        });
+      }));
+      if (this.paciente.barons) combined = combined.concat(this.paciente.barons.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'BARON',
+          path: '/api/baron/'
+        });
+      }));
+      if (this.paciente.eysenckas) combined = combined.concat(this.paciente.eysenckas.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'EYSENCK-A',
+          path: '/api/eysencka/'
+        });
+      }));
+      if (this.paciente.eysenckbs) combined = combined.concat(this.paciente.eysenckbs.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'EYSENCK-B',
+          path: '/api/eysenckb/'
+        });
+      }));
+      if (this.paciente.phq15s) combined = combined.concat(this.paciente.phq15s.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'PHQ-15',
+          path: '/api/phq15/'
+        });
+      }));
+      if (this.paciente.mdqs) combined = combined.concat(this.paciente.mdqs.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'MDQ',
+          path: '/api/mdq/'
+        });
+      }));
+      if (this.paciente.srqs) combined = combined.concat(this.paciente.srqs.map(function (t) {
+        return _objectSpread(_objectSpread({}, t), {}, {
+          typeName: 'SRQ-18',
+          path: '/api/srq/'
+        });
+      }));
+      return combined.sort(function (a, b) {
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+    },
+    recetasOrdenadas: function recetasOrdenadas() {
+      if (!this.paciente.prescriptions) return [];
+      return _toConsumableArray(this.paciente.prescriptions).sort(function (a, b) {
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+    },
+    paciente: function paciente() {
+      return this.datosPaciente;
+    },
     updatedValues: function updatedValues() {
       return this.dataUser.profession === 'Psiquiatra' ? this.rol = 'Psiquiatra' : this.rol = 'Psicólogo';
     },
     evolutionToday: function evolutionToday() {
-      var _this12 = this;
+      var _this17 = this;
       if (this.datosConsulta.medical_evolutions) {
         if (this.datosConsulta.medical_evolutions.length === 0) {
           return this.consultaHoy = true;
         }
         this.datosConsulta.medical_evolutions.forEach(function (el) {
           if (el.date === (0,_helpers_Time_js__WEBPACK_IMPORTED_MODULE_4__.dateNow)()) {
-            return _this12.consultaHoy = false;
+            return _this17.consultaHoy = false;
           } else {
-            _this12.consultaHoy = true;
+            _this17.consultaHoy = true;
           }
         });
       }
@@ -2010,6 +2431,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
     },
     tipoMembresia: function tipoMembresia() {
       var membresia = this.membresia;
+      if (!membresia) return null;
       if (membresia.meses > 0) return 'tiempo';
       if (membresia.sesiones > 0) return 'sesiones';
     },
@@ -3742,6 +4164,25 @@ var render = function render() {
       role: "presentation"
     }
   }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-dark",
+    "class": {
+      active: _vm.activeTab === "resumen"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "resumen";
+      }
+    }
+  }, [_vm._v("Resumen")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
     staticClass: "nav-link font-weight-bold small text-muted",
     "class": {
       active: _vm.activeTab === "datos"
@@ -3757,7 +4198,28 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-user me-1"
-  }), _vm._v(" Datos Personales\n        ")])]), _vm._v(" "), _c("li", {
+  }), _vm._v(" Datos Personales")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    "class": {
+      active: _vm.activeTab === "citas"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "citas";
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-calendar-alt me-1"
+  }), _vm._v(" Citas & Paquetes")])]), _vm._v(" "), _vm.rolUser === "profesional" || _vm.rolUser === "interno" ? _c("li", {
     staticClass: "nav-item",
     attrs: {
       role: "presentation"
@@ -3778,7 +4240,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-history me-1"
-  }), _vm._v(" Historial Clínico\n        ")])]), _vm._v(" "), _c("li", {
+  }), _vm._v(" Historial Clínico "), _vm.paciente.medical_evolutions ? _c("span", [_vm._v("(" + _vm._s(_vm.paciente.medical_evolutions.length) + ")")]) : _vm._e()])]) : _vm._e(), _vm._v(" "), _c("li", {
     staticClass: "nav-item",
     attrs: {
       role: "presentation"
@@ -3786,7 +4248,7 @@ var render = function render() {
   }, [_c("button", {
     staticClass: "nav-link font-weight-bold small text-muted",
     "class": {
-      active: _vm.activeTab === "linea"
+      active: _vm.activeTab === "triaje"
     },
     attrs: {
       type: "button",
@@ -3794,12 +4256,12 @@ var render = function render() {
     },
     on: {
       click: function click($event) {
-        _vm.activeTab = "linea";
+        _vm.activeTab = "triaje";
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-sort-amount-up-alt me-1"
-  }), _vm._v(" Línea de Vida\n        ")])]), _vm._v(" "), _c("li", {
+    staticClass: "fas fa-heartbeat me-1"
+  }), _vm._v(" Triaje & Seguridad")])]), _vm._v(" "), _c("li", {
     staticClass: "nav-item",
     attrs: {
       role: "presentation"
@@ -3807,7 +4269,7 @@ var render = function render() {
   }, [_c("button", {
     staticClass: "nav-link font-weight-bold small text-muted",
     "class": {
-      active: _vm.activeTab === "nutricion"
+      active: _vm.activeTab === "seguimiento"
     },
     attrs: {
       type: "button",
@@ -3815,12 +4277,12 @@ var render = function render() {
     },
     on: {
       click: function click($event) {
-        _vm.activeTab = "nutricion";
+        _vm.activeTab = "seguimiento";
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-apple-alt me-1"
-  }), _vm._v(" Nutrición\n        ")])]), _vm._v(" "), _c("li", {
+    staticClass: "fas fa-clipboard-list me-1"
+  }), _vm._v(" Plan de Intervención\n        ")])]), _vm._v(" "), _c("li", {
     staticClass: "nav-item",
     attrs: {
       role: "presentation"
@@ -3841,7 +4303,7 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-prescription me-1"
-  }), _vm._v(" Recetas & Órdenes\n        ")])]), _vm._v(" "), _c("li", {
+  }), _vm._v(" Recetas & Órdenes")])]), _vm._v(" "), _c("li", {
     staticClass: "nav-item",
     attrs: {
       role: "presentation"
@@ -3862,12 +4324,162 @@ var render = function render() {
     }
   }, [_c("i", {
     staticClass: "fas fa-flask me-1"
-  }), _vm._v(" Pruebas Psicológicas\n        ")])])]), _vm._v(" "), _c("div", {
+  }), _vm._v(" Pruebas Psicológicas")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    "class": {
+      active: _vm.activeTab === "documentos"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "documentos";
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-file-contract me-1"
+  }), _vm._v(" Documentos")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    "class": {
+      active: _vm.activeTab === "convenios"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "convenios";
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-handshake me-1"
+  }), _vm._v(" Convenios")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link font-weight-bold small text-muted",
+    "class": {
+      active: _vm.activeTab === "finanzas"
+    },
+    attrs: {
+      type: "button",
+      role: "tab"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activeTab = "finanzas";
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-wallet me-1"
+  }), _vm._v("Finanzas")])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-content px-2",
     attrs: {
       id: "patientTabsContent"
     }
   }, [_c("div", {
+    staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "resumen"
+    },
+    attrs: {
+      id: "resumen",
+      role: "tabpanel"
+    }
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-md-4"
+  }, [_vm.paciente.discharges && _vm.paciente.discharges.length > 0 ? _c("div", {
+    staticClass: "card shadow-sm border rounded-lg mb-3"
+  }, [_c("div", {
+    staticClass: "card-body"
+  }, [_vm._m(4), _vm._v(" "), _vm._l(_vm.paciente.discharges, function (alta) {
+    return _c("div", {
+      key: alta.id,
+      staticClass: "mb-3 border-bottom pb-2"
+    }, [_c("p", {
+      staticClass: "small mb-1 d-flex justify-content-between align-items-center"
+    }, [_c("span", {
+      staticClass: "badge bg-info bg-opacity-10 border border-info border-opacity-25"
+    }, [_vm._v(_vm._s(alta.type == 1 ? "Psicológica" : "Psiquiátrica"))]), _vm._v(" "), _c("span", {
+      staticClass: "text-muted",
+      staticStyle: {
+        "font-size": "0.75rem"
+      }
+    }, [_vm._v(_vm._s(_vm.formatDate(alta.created_at)))])]), _vm._v(" "), _c("p", {
+      staticClass: "small text-dark mb-1",
+      staticStyle: {
+        "font-style": "italic"
+      }
+    }, [_vm._v('"' + _vm._s(alta.comments) + '"')]), _vm._v(" "), alta.professional ? _c("p", {
+      staticClass: "small text-muted mb-0"
+    }, [_c("i", {
+      staticClass: "fas fa-user-md me-1"
+    }), _vm._v(_vm._s(alta.professional.name))]) : _vm._e()]);
+  })], 2)]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "card shadow-sm border rounded-lg mb-3"
+  }, [_c("div", {
+    staticClass: "card-body"
+  }, [_vm._m(5), _vm._v(" "), _vm.proximaCita ? _c("div", [_c("h5", {
+    staticClass: "mb-1 text-dark"
+  }, [_vm._v(_vm._s(_vm.formatDateTime(_vm.proximaCita.date, _vm.proximaCita.hora)))]), _vm._v(" "), _vm.proximaCita.professional ? _c("p", {
+    staticClass: "small text-muted mb-0"
+  }, [_vm._v(_vm._s(_vm.proximaCita.professional.name))]) : _vm._e()]) : _c("div", [_c("p", {
+    staticClass: "text-muted mb-0 small"
+  }, [_vm._v("No hay citas próximas programadas.")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "card shadow-sm border rounded-lg mb-3"
+  }, [_c("div", {
+    staticClass: "card-body"
+  }, [_vm._m(6), _vm._v(" "), _vm.ultimaEvolucion ? _c("div", [_c("p", {
+    staticClass: "small text-muted mb-1"
+  }, [_vm._v(_vm._s(_vm.formatDate(_vm.ultimaEvolucion.date)) + " - Dr. " + _vm._s(_vm.ultimaEvolucion.professional ? _vm.ultimaEvolucion.professional.name : ""))]), _vm._v(" "), _c("p", {
+    staticClass: "small mb-0"
+  }, [_vm._v(_vm._s(_vm.ultimaEvolucion.descripcion || "Sin descripción"))])]) : _c("div", [_c("p", {
+    staticClass: "text-muted mb-0 small"
+  }, [_vm._v("No hay evoluciones registradas.")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-8"
+  }, [_c("div", {
+    staticClass: "card shadow-sm border rounded-lg h-100"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_vm._m(7), _vm._v(" "), _c("div", {
+    staticClass: "timeline ms-3 mt-3 content-timeline"
+  }, [_vm._l(_vm.timelineActivity.slice(0, 5), function (item, index) {
+    return _c("div", {
+      key: index,
+      staticClass: "timeline-item pb-3 mb-3 border-bottom"
+    }, [_c("div", {
+      staticClass: "d-flex justify-content-between"
+    }, [_c("div", [_c("strong", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(item.type == "Cita" ? "Cita Programada" : "Evolución Clínica"))]), _vm._v(" "), _c("p", {
+      staticClass: "small text-muted mb-0 mt-1"
+    }, [_vm._v(_vm._s(item.desc))]), _vm._v(" "), _c("p", {
+      staticClass: "small text-primary mb-0 mt-1"
+    }, [_vm._v(_vm._s(item.profesional))])]), _vm._v(" "), _c("div", {
+      staticClass: "text-end"
+    }, [_c("span", {
+      staticClass: "small text-muted"
+    }, [_vm._v(_vm._s(_vm.formatDate(item.date)))])])])]);
+  }), _vm._v(" "), _vm.timelineActivity.length === 0 ? _c("div", {
+    staticClass: "text-muted small"
+  }, [_vm._v("\n                    No hay actividad reciente.\n                  ")]) : _vm._e()], 2)])])])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
     "class": {
       "show active": _vm.activeTab === "datos"
@@ -3884,7 +4496,7 @@ var render = function render() {
     staticClass: "card shadow-sm mb-4 h-100 border-0 rounded-lg"
   }, [_c("div", {
     staticClass: "card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between border-bottom-0"
-  }, [_vm._m(4), _vm._v(" "), _c("button", {
+  }, [_vm._m(8), _vm._v(" "), _c("button", {
     staticClass: "btn btn-sm btn-outline-primary",
     attrs: {
       "data-bs-toggle": "modal",
@@ -3915,7 +4527,7 @@ var render = function render() {
     staticClass: "col-md-6 mb-3"
   }, [_c("div", {
     staticClass: "card shadow-sm mb-4 border-0 rounded-lg"
-  }, [_vm._m(5), _vm._v(" "), _c("div", {
+  }, [_vm._m(9), _vm._v(" "), _c("div", {
     staticClass: "card-body bg-light rounded m-3 p-4 pt-3"
   }, [_vm.datosConsulta.relative && _vm.datosConsulta.relative[0] ? _c("div", [_c("p", {
     staticClass: "text-capitalize mb-1"
@@ -3935,7 +4547,7 @@ var render = function render() {
     staticClass: "col-md-6 mb-3"
   }, [_c("div", {
     staticClass: "card shadow-sm mb-4 border-0 rounded-lg"
-  }, [_vm._m(6), _vm._v(" "), _c("div", {
+  }, [_vm._m(10), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_c("ul", {
     staticClass: "list-group list-group-flush"
@@ -3947,11 +4559,11 @@ var render = function render() {
     }), _vm._v(" "), _c("strong", [_vm._v(_vm._s(comentario.nombre) + ":")]), _vm._v(" " + _vm._s(comentario.comment) + "\n                  ")]);
   }), _vm._v(" "), _vm.comentarios.length == 0 ? _c("li", {
     staticClass: "list-group-item border-0 px-0 py-2 text-muted small"
-  }, [_vm._v("No hay recomendaciones previas")]) : _vm._e()], 2)])])]), _vm._v(" "), _vm._m(7), _vm._v(" "), _c("div", {
+  }, [_vm._v("No hay recomendaciones previas")]) : _vm._e()], 2)])])]), _vm._v(" "), _vm._m(11), _vm._v(" "), _c("div", {
     staticClass: "col-md-12 mb-3"
   }, [_c("div", {
     staticClass: "card shadow-sm mb-4 border-0 rounded-lg"
-  }, [_vm._m(8), _vm._v(" "), _c("div", {
+  }, [_vm._m(12), _vm._v(" "), _c("div", {
     staticClass: "card-body"
   }, [_vm.datosPaciente.semaforo && _vm.datosPaciente.semaforo.length > 0 ? _c("p", {
     staticClass: "mb-2"
@@ -4071,7 +4683,7 @@ var render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(9), _vm._v(" "), !_vm.inicialInputPsiquiatria.general_antecedent ? _c("p", {
+  }, [_vm._m(13), _vm._v(" "), !_vm.inicialInputPsiquiatria.general_antecedent ? _c("p", {
     staticClass: "collapse__paragraph form-control bg-light",
     attrs: {
       id: "general_antecedent",
@@ -4106,7 +4718,7 @@ var render = function render() {
     }
   })])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(10), _vm._v(" "), !_vm.inicialInputPsiquiatria.main_signs_symptoms ? _c("p", {
+  }, [_vm._m(14), _vm._v(" "), !_vm.inicialInputPsiquiatria.main_signs_symptoms ? _c("p", {
     staticClass: "collapse__paragraph form-control bg-light",
     attrs: {
       id: "main_signs_symptoms",
@@ -4141,7 +4753,7 @@ var render = function render() {
     }
   })])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(11), _vm._v(" "), !_vm.inicialInputPsiquiatria.illness ? _c("p", {
+  }, [_vm._m(15), _vm._v(" "), !_vm.inicialInputPsiquiatria.illness ? _c("p", {
     staticClass: "collapse__paragraph form-control bg-light",
     attrs: {
       id: "psiquiatria_Illness",
@@ -4176,7 +4788,7 @@ var render = function render() {
     }
   })])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(12), _vm._v(" "), !_vm.inicialInputPsiquiatria.apc ? _c("p", {
+  }, [_vm._m(16), _vm._v(" "), !_vm.inicialInputPsiquiatria.apc ? _c("p", {
     staticClass: "collapse__paragraph form-control bg-light",
     attrs: {
       id: "apc",
@@ -4213,7 +4825,7 @@ var render = function render() {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-6 mb-3"
-  }, [_vm._m(13), _vm._v(" "), !_vm.inicialInputPsiquiatria.languaje ? _c("p", {
+  }, [_vm._m(17), _vm._v(" "), !_vm.inicialInputPsiquiatria.languaje ? _c("p", {
     staticClass: "collapse__paragraph form-control bg-light",
     attrs: {
       id: "languaje",
@@ -4248,7 +4860,7 @@ var render = function render() {
     }
   })])]), _vm._v(" "), _c("div", {
     staticClass: "col-6 mb-3"
-  }, [_vm._m(14), _vm._v(" "), !_vm.inicialInputPsiquiatria.thought ? _c("p", {
+  }, [_vm._m(18), _vm._v(" "), !_vm.inicialInputPsiquiatria.thought ? _c("p", {
     staticClass: "collapse__paragraph form-control bg-light",
     attrs: {
       id: "thought",
@@ -4283,7 +4895,7 @@ var render = function render() {
     }
   })])])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(15), _vm._v(" "), !_vm.inicialInputPsiquiatria.affect ? _c("p", {
+  }, [_vm._m(19), _vm._v(" "), !_vm.inicialInputPsiquiatria.affect ? _c("p", {
     staticClass: "collapse__paragraph form-control bg-light",
     attrs: {
       id: "affect",
@@ -4322,7 +4934,7 @@ var render = function render() {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-6 mb-3"
-  }, [_vm._m(16), _vm._v(" "), !_vm.inicialInputPsiquiatria.percetion ? _c("p", {
+  }, [_vm._m(20), _vm._v(" "), !_vm.inicialInputPsiquiatria.percetion ? _c("p", {
     staticClass: "collapse__paragraph form-control bg-light",
     attrs: {
       id: "percetion",
@@ -4357,7 +4969,7 @@ var render = function render() {
     }
   })])]), _vm._v(" "), _c("div", {
     staticClass: "col-6 mb-3"
-  }, [_vm._m(17), _vm._v(" "), !_vm.inicialInputPsiquiatria.superior_function ? _c("p", {
+  }, [_vm._m(21), _vm._v(" "), !_vm.inicialInputPsiquiatria.superior_function ? _c("p", {
     staticClass: "collapse__paragraph form-control bg-light",
     attrs: {
       id: "superior_function",
@@ -4394,7 +5006,7 @@ var render = function render() {
     staticClass: "row"
   }, [_c("div", {
     staticClass: "col-6 mb-3"
-  }, [_vm._m(18), _vm._v(" "), !_vm.inicialInputPsiquiatria.abstraction ? _c("p", {
+  }, [_vm._m(22), _vm._v(" "), !_vm.inicialInputPsiquiatria.abstraction ? _c("p", {
     staticClass: "collapse__paragraph form-control bg-light",
     attrs: {
       id: "abstraction",
@@ -4429,7 +5041,7 @@ var render = function render() {
     }
   })])]), _vm._v(" "), _c("div", {
     staticClass: "col-6 mb-3"
-  }, [_vm._m(19), _vm._v(" "), !_vm.inicialInputPsiquiatria.conscience ? _c("p", {
+  }, [_vm._m(23), _vm._v(" "), !_vm.inicialInputPsiquiatria.conscience ? _c("p", {
     staticClass: "collapse__paragraph form-control bg-light",
     attrs: {
       id: "conscience",
@@ -4464,7 +5076,7 @@ var render = function render() {
     }
   })])])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(20), _vm._v(" "), !_vm.inicialInputPsiquiatria.insight ? _c("p", {
+  }, [_vm._m(24), _vm._v(" "), !_vm.inicialInputPsiquiatria.insight ? _c("p", {
     staticClass: "collapse__paragraph form-control bg-light",
     attrs: {
       id: "insight",
@@ -4499,7 +5111,7 @@ var render = function render() {
     }
   })])]), _vm._v(" "), _c("div", {
     staticClass: "mb-3"
-  }, [_vm._m(21), _vm._v(" "), !_vm.inicialInputPsiquiatria.diagnostic_problems ? _c("p", {
+  }, [_vm._m(25), _vm._v(" "), !_vm.inicialInputPsiquiatria.diagnostic_problems ? _c("p", {
     staticClass: "collapse__paragraph form-control bg-light",
     attrs: {
       id: "diagnostic_problems",
@@ -4952,7 +5564,7 @@ var render = function render() {
     }
   })])])])])])])])]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "d-flex justify-content-between align-items-center mb-3 mt-4"
-  }, [_vm._m(22), _vm._v(" "), _c("p", {
+  }, [_vm._m(26), _vm._v(" "), _c("p", {
     staticClass: "small mb-0",
     "class": {
       "text-success": _vm.datosConsulta.maximo == 0,
@@ -5054,7 +5666,7 @@ var render = function render() {
     })]) : _vm._e()])])])]);
   }), _vm._v(" "), !_vm.datosConsulta.medical_evolutions || _vm.datosConsulta.medical_evolutions.length === 0 ? _c("div", {
     staticClass: "col-12"
-  }, [_vm._m(23)]) : _vm._e()], 2)]), _vm._v(" "), _c("div", {
+  }, [_vm._m(27)]) : _vm._e()], 2)]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
     "class": {
       "show active": _vm.activeTab === "linea"
@@ -5065,7 +5677,7 @@ var render = function render() {
     }
   }, [_c("div", {
     staticClass: "card shadow-sm border-0 rounded-lg"
-  }, [_vm._m(24), _vm._v(" "), _c("div", {
+  }, [_vm._m(28), _vm._v(" "), _c("div", {
     staticClass: "card-body p-0"
   }, [_c("lineaTiempo", {
     attrs: {
@@ -5094,80 +5706,146 @@ var render = function render() {
       id: "recetas",
       role: "tabpanel"
     }
+  }, [_c("ul", {
+    staticClass: "nav nav-pills mb-4",
+    attrs: {
+      id: "recetasOrdenesTabs",
+      role: "tablist"
+    }
+  }, [_c("li", {
+    staticClass: "nav-item me-2",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link rounded-pill px-4 small border shadow-sm",
+    "class": _vm.activePill === "recetas" ? "bg-primary text-white active" : "bg-white text-dark",
+    staticStyle: {
+      "font-weight": "500"
+    },
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activePill = "recetas";
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-link me-1"
+  }), _vm._v(" Recetas Médicas\n            ")])]), _vm._v(" "), _c("li", {
+    staticClass: "nav-item",
+    attrs: {
+      role: "presentation"
+    }
+  }, [_c("button", {
+    staticClass: "nav-link rounded-pill px-4 small border shadow-sm",
+    "class": _vm.activePill === "ordenes" ? "bg-primary text-white active" : "bg-white text-muted",
+    staticStyle: {
+      "font-weight": "500"
+    },
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        _vm.activePill = "ordenes";
+      }
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-file-invoice me-1"
+  }), _vm._v(" Órdenes Médicas\n            ")])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-content",
+    attrs: {
+      id: "pills-tabContent"
+    }
   }, [_c("div", {
-    staticClass: "row"
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.activePill === "recetas",
+      expression: "activePill === 'recetas'"
+    }]
   }, [_c("div", {
-    staticClass: "col-md-6 mb-4"
-  }, [_c("div", {
-    staticClass: "card shadow-sm border-0 rounded-lg h-100"
-  }, [_c("div", {
-    staticClass: "card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom"
-  }, [_vm._m(25), _vm._v(" "), _vm.dataUser.profession != "Psicólogo" ? _c("router-link", {
-    staticClass: "btn btn-outline-primary btn-sm",
+    staticClass: "d-flex justify-content-between align-items-center mb-4"
+  }, [_vm._m(29), _vm._v(" "), _vm.dataUser.profession != "Psicólogo" ? _c("router-link", {
+    staticClass: "btn btn-primary rounded-pill px-3 shadow-sm btn-sm",
     attrs: {
       to: {
         path: "/profesional/recetas/".concat(_vm.datosConsulta.id)
       }
     }
   }, [_c("i", {
-    staticClass: "fas fa-plus"
-  }), _vm._v(" Nueva Receta\n                ")]) : _vm._e()], 1), _vm._v(" "), _c("div", {
-    staticClass: "card-body p-0"
-  }, [_c("div", {
-    staticClass: "table-responsive"
-  }, [_c("table", {
-    staticClass: "table table-hover mb-0"
-  }, [_vm._m(26), _vm._v(" "), _c("tbody", [_vm._l(_vm.datosConsulta.prescriptions, function (prescription, index) {
-    return _c("tr", {
-      key: index
-    }, [_c("td", {
-      staticClass: "align-middle ps-4 py-3 fw-bold"
-    }, [_vm._v(_vm._s(prescription ? prescription.attention_date : "..."))]), _vm._v(" "), _c("td", {
-      staticClass: "align-middle text-end pe-4 py-3"
-    }, [prescription ? _c("a", {
-      staticClass: "btn btn-sm btn-outline-danger",
+    staticClass: "fas fa-plus me-1"
+  }), _vm._v(" Nueva Receta\n              ")]) : _vm._e()], 1), _vm._v(" "), _vm.datosConsulta.prescriptions && _vm.datosConsulta.prescriptions.length > 0 ? _c("div", _vm._l(_vm.datosConsulta.prescriptions, function (prescription, index) {
+    return _c("div", {
+      key: index,
+      staticClass: "card border border-light shadow-sm mb-4",
+      staticStyle: {
+        "border-radius": "12px",
+        overflow: "hidden"
+      }
+    }, [_c("div", {
+      staticClass: "card-body p-4 bg-white"
+    }, [_c("div", {
+      staticClass: "d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2"
+    }, [_c("div", {
+      staticClass: "d-flex align-items-center"
+    }, [_vm._m(30, true), _vm._v(" "), _c("div", [_c("h6", {
+      staticClass: "mb-0 font-weight-bold text-dark fs-5"
+    }, [_vm._v("Receta Médica")]), _vm._v(" "), _c("div", {
+      staticClass: "small text-muted mt-1"
+    }, [_vm._v("\n                          " + _vm._s(prescription ? prescription.attention_date : "...") + "\n                        ")])])]), _vm._v(" "), _c("div", {
+      staticClass: "d-flex align-items-center gap-2"
+    }, [_c("span", {
+      staticClass: "badge bg-success bg-opacity-10 rounded-pill px-3 py-1 border border-success border-opacity-25",
+      staticStyle: {
+        "font-weight": "500"
+      }
+    }, [_vm._v("Vigente")]), _vm._v(" "), prescription ? _c("a", {
+      staticClass: "btn btn-light btn-sm rounded text-muted shadow-sm border",
       attrs: {
         href: "/api/pdf/".concat(prescription.id, "?token=").concat(_vm.$token),
         target: "_blank"
       }
     }, [_c("i", {
-      staticClass: "fas fa-file-pdf"
-    }), _vm._v(" PDF\n                          ")]) : _vm._e()])]);
-  }), _vm._v(" "), !_vm.datosConsulta.prescriptions || _vm.datosConsulta.prescriptions.length === 0 ? _c("tr", [_c("td", {
-    staticClass: "text-center text-muted py-4",
-    attrs: {
-      colspan: "2"
-    }
-  }, [_vm._v("No hay recetas emitidas.")])]) : _vm._e()], 2)])])])])]), _vm._v(" "), _c("div", {
-    staticClass: "col-md-6 mb-4"
+      staticClass: "fas fa-print"
+    }), _vm._v(" PDF")]) : _vm._e()])])])]);
+  }), 0) : _c("div", {
+    staticClass: "alert alert-light border text-center p-5"
+  }, [_c("i", {
+    staticClass: "fas fa-capsules text-muted mb-3 fs-1"
+  }), _vm._v(" "), _c("h6", {
+    staticClass: "text-muted"
+  }, [_vm._v("No hay recetas emitidas")])])]), _vm._v(" "), _c("div", {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: _vm.activePill === "ordenes",
+      expression: "activePill === 'ordenes'"
+    }]
   }, [_c("div", {
-    staticClass: "card shadow-sm border-0 rounded-lg h-100"
-  }, [_c("div", {
-    staticClass: "card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom"
-  }, [_vm._m(27), _vm._v(" "), _c("button", {
-    staticClass: "btn btn-outline-success btn-sm",
+    staticClass: "d-flex justify-content-between align-items-center mb-4"
+  }, [_vm._m(31), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary rounded-pill px-3 shadow-sm btn-sm",
     on: {
       click: _vm.crearNuevaOrden
     }
   }, [_c("i", {
-    staticClass: "fas fa-plus"
-  }), _vm._v(" Nueva Orden\n                ")])]), _vm._v(" "), _c("div", {
-    staticClass: "card-body p-0"
-  }, [_c("div", {
+    staticClass: "fas fa-plus me-1"
+  }), _vm._v(" Nueva Orden\n              ")])]), _vm._v(" "), _vm.ordenesMedicas && _vm.ordenesMedicas.length > 0 ? _c("div", [_c("div", {
     staticClass: "table-responsive"
   }, [_c("table", {
-    staticClass: "table table-hover mb-0"
-  }, [_vm._m(28), _vm._v(" "), _c("tbody", [_vm._l(_vm.ordenesMedicas, function (orden, index) {
+    staticClass: "table table-hover align-middle"
+  }, [_vm._m(32), _vm._v(" "), _c("tbody", _vm._l(_vm.ordenesMedicas, function (orden, idx) {
     return _c("tr", {
-      key: index
-    }, [_c("td", {
-      staticClass: "align-middle ps-4 py-3 fw-bold"
-    }, [_vm._v(_vm._s(_vm.formatOnlyDate(orden.created_at)))]), _vm._v(" "), _c("td", {
-      staticClass: "align-middle py-3 text-muted"
+      key: idx
+    }, [_c("td", [_vm._v(_vm._s(_vm.formatOnlyDate(orden.created_at)))]), _vm._v(" "), _c("td", {
+      staticClass: "fw-bold"
     }, [_vm._v(_vm._s(orden.descripcion || "Orden Médica"))]), _vm._v(" "), _c("td", {
-      staticClass: "align-middle text-end pe-4 py-3"
+      staticClass: "text-end"
     }, [_c("button", {
-      staticClass: "btn btn-sm btn-outline-primary",
+      staticClass: "btn btn-sm btn-light border text-primary",
       on: {
         click: function click($event) {
           return _vm.verDetalleOrden(orden);
@@ -5176,12 +5854,13 @@ var render = function render() {
     }, [_c("i", {
       staticClass: "fas fa-eye"
     })])])]);
-  }), _vm._v(" "), !_vm.ordenesMedicas || _vm.ordenesMedicas.length === 0 ? _c("tr", [_c("td", {
-    staticClass: "text-center text-muted py-4",
-    attrs: {
-      colspan: "3"
-    }
-  }, [_vm._v("No hay órdenes médicas registradas.")])]) : _vm._e()], 2)])])])])])])]), _vm._v(" "), _c("div", {
+  }), 0)])])]) : _c("div", {
+    staticClass: "alert alert-light border text-center p-5"
+  }, [_c("i", {
+    staticClass: "fas fa-file-medical text-muted mb-3 fs-1"
+  }), _vm._v(" "), _c("h6", {
+    staticClass: "text-muted"
+  }, [_vm._v("No hay órdenes médicas registradas.")])])])])]), _vm._v(" "), _c("div", {
     staticClass: "tab-pane fade",
     "class": {
       "show active": _vm.activeTab === "pruebas"
@@ -5194,9 +5873,9 @@ var render = function render() {
     staticClass: "card shadow-sm border-0 rounded-lg"
   }, [_c("div", {
     staticClass: "card-header bg-white py-3 d-flex justify-content-between align-items-center"
-  }, [_vm._m(29), _vm._v(" "), _c("div", {
+  }, [_vm._m(33), _vm._v(" "), _c("div", {
     staticClass: "dropdown"
-  }, [_vm._m(30), _vm._v(" "), _c("ul", {
+  }, [_vm._m(34), _vm._v(" "), _c("ul", {
     staticClass: "dropdown-menu dropdown-menu-end shadow",
     attrs: {
       "aria-labelledby": "dropdownPruebas"
@@ -5345,7 +6024,639 @@ var render = function render() {
     staticClass: "text-muted"
   }, [_vm._v("No se han realizado pruebas psicológicas")]), _vm._v(" "), _c("p", {
     staticClass: "text-muted small mb-0"
-  }, [_vm._v('Seleccione "Aplicar Prueba" para comenzar una nueva evaluación.')])])])])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v('Seleccione "Aplicar Prueba" para comenzar una nueva evaluación.')])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "citas"
+    },
+    attrs: {
+      id: "citas",
+      role: "tabpanel"
+    }
+  }, [_vm._m(35), _vm._v(" "), _c("div", {
+    staticClass: "row mb-4"
+  }, [_vm._l(_vm.paciente.membresias || [], function (mem) {
+    return _c("div", {
+      key: mem.id,
+      staticClass: "col-md-6"
+    }, [_c("div", {
+      staticClass: "card border rounded-3 mb-3 shadow-sm",
+      staticStyle: {
+        "border-color": "#eef2f5 !important"
+      }
+    }, [_c("div", {
+      staticClass: "card-body p-4"
+    }, [_c("div", {
+      staticClass: "d-flex justify-content-between align-items-start mb-1"
+    }, [_c("h6", {
+      staticClass: "font-weight-bold text-dark mb-0",
+      staticStyle: {
+        "font-size": "1.05rem"
+      }
+    }, [_vm._v(_vm._s(mem.precio ? mem.precio.descripcion : "Paquete"))]), _vm._v(" "), _c("span", {
+      staticClass: "badge rounded-pill px-3 py-1",
+      "class": mem.activo ? "bg-success bg-opacity-10" : "bg-secondary bg-opacity-10 text-secondary",
+      staticStyle: {
+        "font-weight": "500"
+      }
+    }, [_vm._v(_vm._s(mem.activo ? "Activo" : "Inactivo"))])]), _vm._v(" "), _c("p", {
+      staticClass: "text-muted small mb-4"
+    }, [_vm._v("Vence: " + _vm._s(_vm.formatOnlyDate(mem.fin)))]), _vm._v(" "), _c("div", {
+      staticClass: "d-flex justify-content-between align-items-end mb-2"
+    }, [_c("span", {
+      staticClass: "text-dark small",
+      staticStyle: {
+        "font-weight": "500"
+      }
+    }, [_vm._v("Sesiones usadas")]), _vm._v(" "), mem.sesiones_totales === 0 ? _c("span", {
+      staticClass: "text-dark small font-weight-bold"
+    }, [_vm._v(_vm._s(mem.sesiones_usadas || 0) + " / ∞")]) : _c("span", {
+      staticClass: "text-dark small font-weight-bold"
+    }, [_vm._v(_vm._s(mem.sesiones_usadas || 0) + " / " + _vm._s(mem.sesiones_totales))])]), _vm._v(" "), mem.sesiones_totales !== 0 ? _c("div", {
+      staticClass: "progress mb-2 rounded-pill",
+      staticStyle: {
+        height: "6px"
+      }
+    }, [_c("div", {
+      staticClass: "progress-bar bg-primary",
+      style: {
+        width: (mem.sesiones_usadas || 0) / (mem.sesiones_totales || 6) * 100 + "%"
+      },
+      attrs: {
+        role: "progressbar"
+      }
+    }), _vm._v(" "), _c("div", {
+      staticClass: "progress-bar",
+      staticStyle: {
+        "background-color": "#fd7e14"
+      },
+      style: {
+        width: 100 - (mem.sesiones_usadas || 0) / (mem.sesiones_totales || 6) * 100 + "%"
+      },
+      attrs: {
+        role: "progressbar"
+      }
+    })]) : _vm._e(), _vm._v(" "), mem.sesiones_totales !== 0 ? _c("small", {
+      staticClass: "text-muted",
+      staticStyle: {
+        "font-size": "0.75rem"
+      }
+    }, [_vm._v(_vm._s((mem.sesiones_totales || 6) - (mem.sesiones_usadas || 0)) + " sesiones restantes")]) : _c("small", {
+      staticClass: "text-muted",
+      staticStyle: {
+        "font-size": "0.75rem"
+      }
+    }, [_vm._v("Sesiones infinitas")])])])]);
+  }), _vm._v(" "), !_vm.paciente.membresias || _vm.paciente.membresias.length == 0 ? _c("div", {
+    staticClass: "col-12"
+  }, [_c("div", {
+    staticClass: "alert alert-light border text-center text-muted"
+  }, [_vm._v("No tiene paquetes.")])]) : _vm._e()], 2), _vm._v(" "), _vm._m(36), _vm._v(" "), _c("div", {
+    staticClass: "card border rounded-3 shadow-sm mb-4"
+  }, [_c("div", {
+    staticClass: "card-body p-0"
+  }, [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-hover mb-0",
+    staticStyle: {
+      "font-size": "0.9rem"
+    }
+  }, [_vm._m(37), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.appointments || [], function (cita) {
+    return _c("tr", {
+      key: cita.id
+    }, [_c("td", {
+      staticClass: "align-middle py-3 ps-4 border-bottom-0"
+    }, [_c("div", {
+      staticClass: "text-dark fw-bold",
+      staticStyle: {
+        "font-size": "0.9rem"
+      }
+    }, [_vm._v(_vm._s(_vm.formatOnlyDate(cita.date)))]), _vm._v(" "), _c("div", {
+      staticClass: "text-muted small"
+    }, [_vm._v(_vm._s(_vm.formatOnlyTime(cita.hora) || _vm.formatOnlyTime(cita.date)))])]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle py-3 text-dark border-bottom-0"
+    }, [_vm._v(_vm._s(cita.service ? cita.service.name : cita.tipo_cita || "Psicológica"))]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle py-3 border-bottom-0"
+    }, [_c("a", {
+      staticClass: "text-primary text-decoration-none",
+      attrs: {
+        href: "#"
+      }
+    }, [_vm._v(_vm._s(cita.professional ? cita.professional.name : "N/A"))])]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle py-3 border-bottom-0"
+    }, [_c("span", {
+      staticClass: "badge rounded-pill fw-normal px-3 py-2",
+      staticStyle: {
+        "font-size": "0.8rem"
+      },
+      style: _vm.getStatusStyle(cita)
+    }, [_vm._v(_vm._s(_vm.getStatusName(cita)))])]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle py-3 pe-4 text-muted border-bottom-0"
+    }, [_vm._v(_vm._s(cita.notas || cita.descripcion || cita.motivo || "—"))])]);
+  }), _vm._v(" "), !_vm.paciente.appointments || _vm.paciente.appointments.length == 0 ? _c("tr", [_c("td", {
+    staticClass: "text-center text-muted py-4",
+    attrs: {
+      colspan: "5"
+    }
+  }, [_vm._v("No tiene citas en el historial")])]) : _vm._e()], 2)])])])]), _vm._v(" "), _vm._m(38), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-md-6 mb-4"
+  }, [_c("div", {
+    staticClass: "card border rounded-3 shadow-sm h-100"
+  }, [_vm._m(39), _vm._v(" "), _c("div", {
+    staticClass: "card-body p-0"
+  }, [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-hover mb-0",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_c("tbody", [_vm._l(_vm.faltasCitas, function (cita) {
+    return _c("tr", {
+      key: "f-" + cita.id
+    }, [_c("td", {
+      staticClass: "align-middle py-3 ps-4"
+    }, [_c("div", {
+      staticClass: "text-dark fw-bold"
+    }, [_vm._v(_vm._s(_vm.formatOnlyDate(cita.date)))]), _vm._v(" "), _c("div", {
+      staticClass: "text-muted small"
+    }, [_vm._v(_vm._s(_vm.formatOnlyTime(cita.hora) || _vm.formatOnlyTime(cita.date)))])]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle py-3 text-dark"
+    }, [_vm._v(_vm._s(cita.service ? cita.service.name : cita.tipo_cita || "Psicológica"))]), _vm._v(" "), _vm._m(40, true)]);
+  }), _vm._v(" "), _vm.faltasCitas.length === 0 ? _c("tr", [_c("td", {
+    staticClass: "text-center text-muted py-4",
+    attrs: {
+      colspan: "3"
+    }
+  }, [_vm._v("No registra inasistencias")])]) : _vm._e()], 2)])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-6 mb-4"
+  }, [_c("div", {
+    staticClass: "card border rounded-3 shadow-sm h-100"
+  }, [_vm._m(41), _vm._v(" "), _c("div", {
+    staticClass: "card-body p-0"
+  }, [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-hover mb-0",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_c("tbody", [_vm._l(_vm.reprogramacionesCitas, function (cita) {
+    return _c("tr", {
+      key: "r-" + cita.id
+    }, [_c("td", {
+      staticClass: "align-middle py-3 ps-4"
+    }, [_c("div", {
+      staticClass: "text-dark fw-bold"
+    }, [_vm._v(_vm._s(_vm.formatOnlyDate(cita.date)))]), _vm._v(" "), _c("div", {
+      staticClass: "text-muted small"
+    }, [_vm._v(_vm._s(_vm.formatOnlyTime(cita.hora) || _vm.formatOnlyTime(cita.date)))])]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle py-3 text-dark"
+    }, [_vm._v(_vm._s(cita.service ? cita.service.name : cita.tipo_cita || "Psicológica"))]), _vm._v(" "), _vm._m(42, true)]);
+  }), _vm._v(" "), _vm.reprogramacionesCitas.length === 0 ? _c("tr", [_c("td", {
+    staticClass: "text-center text-muted py-4",
+    attrs: {
+      colspan: "3"
+    }
+  }, [_vm._v("No registra reprogramaciones")])]) : _vm._e()], 2)])])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "triaje"
+    },
+    attrs: {
+      id: "triaje",
+      role: "tabpanel"
+    }
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-12 mb-4"
+  }, [_vm._m(43), _vm._v(" "), _vm.paciente.triajes && _vm.paciente.triajes.length > 0 ? _c("div", _vm._l(_vm.paciente.triajes, function (tr) {
+    return _c("div", {
+      key: tr.id,
+      staticClass: "card border-0 shadow-sm mb-3 rounded-lg",
+      staticStyle: {
+        "background-color": "#fcfcfc"
+      }
+    }, [_c("div", {
+      staticClass: "card-body p-4"
+    }, [_c("div", {
+      staticClass: "d-flex mb-4"
+    }, [_vm._m(44, true), _vm._v(" "), _c("div", [_c("h6", {
+      staticClass: "font-weight-bold mb-1 text-dark"
+    }, [_vm._v("Triaje")]), _vm._v(" "), _c("div", {
+      staticClass: "small text-muted"
+    }, [_c("span", [_vm._v(_vm._s(_vm.formatDateWithTime(tr.fecha || tr.created_at)))]), tr.responsable ? _c("span", {
+      staticClass: "mx-1"
+    }, [_vm._v("·")]) : _vm._e(), tr.responsable ? _c("span", [_vm._v("Int. " + _vm._s(tr.responsable))]) : _vm._e()])])]), _vm._v(" "), _c("div", {
+      staticClass: "row mb-3"
+    }, [_c("div", {
+      staticClass: "col-md-4 mb-3 mb-md-0"
+    }, [_c("h6", {
+      staticClass: "small text-muted font-weight-bold text-uppercase mb-3",
+      staticStyle: {
+        "letter-spacing": "0.5px"
+      }
+    }, [_vm._v("Signos Vitales")]), _vm._v(" "), _c("div", {
+      staticClass: "d-flex flex-column gap-2 small"
+    }, [tr.pa ? _c("div", {
+      staticClass: "d-flex align-items-center"
+    }, [_c("i", {
+      staticClass: "far fa-heart text-danger me-2",
+      staticStyle: {
+        width: "16px"
+      }
+    }), _c("span", {
+      staticClass: "text-muted me-1"
+    }, [_vm._v("PA:")]), _c("strong", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(tr.pa))])]) : _vm._e(), _vm._v(" "), tr.fc ? _c("div", {
+      staticClass: "d-flex align-items-center"
+    }, [_c("span", {
+      staticClass: "text-muted me-1"
+    }, [_vm._v("FC:")]), _c("strong", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(tr.fc) + " "), _c("span", {
+      staticClass: "fw-normal text-muted"
+    }, [_vm._v("bpm")])])]) : _vm._e(), _vm._v(" "), tr.t ? _c("div", {
+      staticClass: "d-flex align-items-center"
+    }, [_c("i", {
+      staticClass: "fas fa-temperature-low text-info me-2",
+      staticStyle: {
+        width: "16px"
+      }
+    }), _c("span", {
+      staticClass: "text-muted me-1"
+    }, [_vm._v("Temp:")]), _c("strong", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(tr.t) + " "), _c("span", {
+      staticClass: "fw-normal text-muted"
+    }, [_vm._v("°C")])])]) : _vm._e(), _vm._v(" "), tr.saturacion ? _c("div", {
+      staticClass: "d-flex align-items-center"
+    }, [_c("i", {
+      staticClass: "fas fa-wind text-primary me-2",
+      staticStyle: {
+        width: "16px"
+      }
+    }), _c("span", {
+      staticClass: "text-muted me-1"
+    }, [_vm._v("SpO2:")]), _c("strong", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(tr.saturacion) + " "), _c("span", {
+      staticClass: "fw-normal text-muted"
+    }, [_vm._v("%")])])]) : _vm._e(), _vm._v(" "), tr.peso ? _c("div", {
+      staticClass: "d-flex align-items-center"
+    }, [_c("span", {
+      staticClass: "text-muted me-1"
+    }, [_vm._v("Peso:")]), _c("strong", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(tr.peso))])]) : _vm._e(), _vm._v(" "), tr.talla ? _c("div", {
+      staticClass: "d-flex align-items-center"
+    }, [_c("span", {
+      staticClass: "text-muted me-1"
+    }, [_vm._v("Talla:")]), _c("strong", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(tr.talla))])]) : _vm._e()])]), _vm._v(" "), _c("div", {
+      staticClass: "col-md-4 mb-3 mb-md-0"
+    }, [_c("h6", {
+      staticClass: "small text-muted font-weight-bold text-uppercase mb-3",
+      staticStyle: {
+        "letter-spacing": "0.5px"
+      }
+    }, [_vm._v("Evaluación y Pruebas")]), _vm._v(" "), _c("div", {
+      staticClass: "d-flex flex-column gap-2 small"
+    }, [tr.pruebas ? _c("div", [_c("span", {
+      staticClass: "text-muted d-block mb-1"
+    }, [_vm._v("Pruebas Aplicadas:")]), _c("strong", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(tr.pruebas))])]) : _vm._e()])]), _vm._v(" "), _c("div", {
+      staticClass: "col-md-4"
+    }, [_c("h6", {
+      staticClass: "small text-muted font-weight-bold text-uppercase mb-3",
+      staticStyle: {
+        "letter-spacing": "0.5px"
+      }
+    }, [_vm._v("Clínica")]), _vm._v(" "), _c("div", {
+      staticClass: "d-flex flex-column gap-2 small"
+    }, [tr.sintomatologia ? _c("div", [_c("span", {
+      staticClass: "text-muted me-1"
+    }, [_vm._v("Sintomatología:")]), _c("span", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(tr.sintomatologia))])]) : _vm._e(), _vm._v(" "), tr.antecedentes ? _c("div", [_c("span", {
+      staticClass: "text-muted me-1"
+    }, [_vm._v("Antecedentes:")]), _c("span", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(tr.antecedentes))])]) : _vm._e()])])]), _vm._v(" "), _c("div", {
+      staticClass: "mt-4"
+    }, [tr.motivo ? _c("p", {
+      staticClass: "small text-dark mb-3"
+    }, [_c("span", {
+      staticClass: "text-muted me-1"
+    }, [_vm._v("Motivo:")]), _vm._v(" " + _vm._s(tr.motivo))]) : _vm._e()])])]);
+  }), 0) : _c("div", {
+    staticClass: "alert alert-light text-center border py-5 mb-4"
+  }, [_c("i", {
+    staticClass: "fas fa-clipboard text-muted mb-3 fs-1 d-block"
+  }), _vm._v(" "), _c("h6", {
+    staticClass: "text-muted"
+  }, [_vm._v("No existen registros de triaje para este paciente.")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-12"
+  }, [_vm._m(45), _vm._v(" "), _c("div", {
+    staticClass: "card border"
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_vm.paciente.semaforo_estados && _vm.paciente.semaforo_estados.length > 0 ? _c("ul", {
+    staticClass: "list-group list-group-flush"
+  }, _vm._l(_vm.paciente.semaforo_estados.slice(0, 5), function (sem) {
+    return _c("li", {
+      key: sem.id,
+      staticClass: "list-group-item px-0"
+    }, [_c("strong", [_vm._v(_vm._s(_vm.formatDate(sem.registro)))]), _vm._v(" "), _c("p", {
+      staticClass: "mb-0 small mt-1"
+    }, [_vm._v("Código: " + _vm._s(sem.codigo) + " - "), _c("span", {
+      staticClass: "text-muted"
+    }, [_vm._v(_vm._s(sem.observaciones))])])]);
+  }), 0) : _c("p", {
+    staticClass: "text-muted small mb-0"
+  }, [_vm._v("Sin registros en el semáforo.")])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "seguimiento"
+    },
+    attrs: {
+      id: "seguimiento",
+      role: "tabpanel"
+    }
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-12 mb-4"
+  }, [_vm._m(46), _vm._v(" "), _c("p", {
+    staticClass: "text-muted small mb-4"
+  }, [_vm._v("Registro del plan de tratamiento del paciente.")]), _vm._v(" "), _vm.paciente.fichas_seguimiento && _vm.paciente.fichas_seguimiento.length > 0 ? _c("div", _vm._l(_vm.paciente.fichas_seguimiento, function (ficha, index) {
+    return _c("div", {
+      key: ficha.id,
+      staticClass: "card border mb-3 rounded-lg"
+    }, [_c("div", {
+      staticClass: "card-body p-4"
+    }, [_c("h6", {
+      staticClass: "font-weight-bold text-dark mb-1"
+    }, [_vm._v("Ficha " + _vm._s(_vm.paciente.fichas_seguimiento.length - index))]), _vm._v(" "), _c("div", {
+      staticClass: "small text-muted"
+    }, [_vm._v(_vm._s(_vm.formatDate(ficha.fecha)) + " - " + _vm._s(ficha.tipo) + " - " + _vm._s(ficha.frecuencia))])])]);
+  }), 0) : _c("div", {
+    staticClass: "alert alert-light border text-center p-5 rounded-lg"
+  }, [_c("i", {
+    staticClass: "fas fa-file-alt text-muted mb-3 fs-1"
+  }), _vm._v(" "), _c("h6", {
+    staticClass: "text-muted"
+  }, [_vm._v("No hay fichas de seguimiento registradas para este paciente.")])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "documentos"
+    },
+    attrs: {
+      id: "documentos",
+      role: "tabpanel"
+    }
+  }, [_vm._m(47), _vm._v(" "), _c("div", {
+    staticClass: "d-flex flex-wrap gap-2 mb-4"
+  }, [_c("button", {
+    staticClass: "btn btn-sm rounded-pill px-3",
+    "class": _vm.filtroDocumento === "Todos" ? "btn-primary" : "btn-light border text-muted",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        _vm.filtroDocumento = "Todos";
+      }
+    }
+  }, [_vm._v("Todos")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm rounded-pill px-3",
+    "class": _vm.filtroDocumento === "orden" ? "btn-light bg-white border text-dark" : "btn-light border text-muted",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        _vm.filtroDocumento = "orden";
+      }
+    }
+  }, [_vm._v("Órdenes")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm rounded-pill px-3",
+    "class": _vm.filtroDocumento === "resultado" ? "btn-light bg-white border text-dark" : "btn-light border text-muted",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        _vm.filtroDocumento = "resultado";
+      }
+    }
+  }, [_vm._v("Resultados")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm rounded-pill px-3",
+    "class": _vm.filtroDocumento === "consentimiento" ? "btn-light bg-white border text-dark" : "btn-light border text-muted",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        _vm.filtroDocumento = "consentimiento";
+      }
+    }
+  }, [_vm._v("Consentimientos")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-sm rounded-pill px-3",
+    "class": _vm.filtroDocumento === "otro" ? "btn-light bg-white border text-dark" : "btn-light border text-muted",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        _vm.filtroDocumento = "otro";
+      }
+    }
+  }, [_vm._v("Otros")])]), _vm._v(" "), _vm.documentosFiltrados.length > 0 ? _c("div", {
+    staticClass: "row g-3"
+  }, _vm._l(_vm.documentosFiltrados, function (doc) {
+    return _c("div", {
+      key: doc.id,
+      staticClass: "col-md-6 col-lg-4"
+    }, [_c("div", {
+      staticClass: "card h-100 border-light shadow-sm",
+      staticStyle: {
+        "border-radius": "12px",
+        "background-color": "#fcfcfc"
+      }
+    }, [_c("div", {
+      staticClass: "card-body p-4"
+    }, [_c("div", {
+      staticClass: "d-flex align-items-start mb-3"
+    }, [_vm._m(48, true), _vm._v(" "), _c("div", {
+      staticStyle: {
+        "min-width": "0"
+      }
+    }, [_c("h6", {
+      staticClass: "mb-1 text-dark text-truncate",
+      attrs: {
+        title: doc.nombre
+      }
+    }, [_vm._v(_vm._s(doc.nombre))])])]), _vm._v(" "), _c("div", {
+      staticClass: "d-flex justify-content-between align-items-center small text-muted mb-3"
+    }, [_c("span", [_c("i", {
+      staticClass: "far fa-calendar-alt me-1"
+    }), _vm._v(" " + _vm._s(_vm.formatDate(doc.created_at || doc.fecha)))])]), _vm._v(" "), _c("div", {
+      staticClass: "d-flex gap-2"
+    }, [_c("a", {
+      staticClass: "btn btn-light btn-sm flex-grow-1 border shadow-sm text-dark bg-white rounded-pill",
+      attrs: {
+        href: "/storage/archivos/" + doc.archivo,
+        target: "_blank"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-eye me-1"
+    }), _vm._v(" Ver")]), _vm._v(" "), _c("a", {
+      staticClass: "btn btn-light btn-sm flex-grow-1 border shadow-sm text-dark bg-white rounded-pill",
+      attrs: {
+        href: "/storage/archivos/" + doc.archivo,
+        download: "",
+        target: "_blank"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-download me-1"
+    }), _vm._v(" Descargar")])])])])]);
+  }), 0) : _c("div", {
+    staticClass: "alert alert-light text-center border p-5 mt-3 rounded-lg"
+  }, [_c("i", {
+    staticClass: "far fa-folder-open text-muted mb-3 fs-1"
+  }), _vm._v(" "), _c("h6", {
+    staticClass: "text-muted"
+  }, [_vm._v("No existen documentos adjuntos en esta categoría.")])])]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "convenios"
+    },
+    attrs: {
+      id: "convenios",
+      role: "tabpanel"
+    }
+  }, [_vm._m(49)]), _vm._v(" "), _c("div", {
+    staticClass: "tab-pane fade",
+    "class": {
+      "show active": _vm.activeTab === "finanzas"
+    },
+    attrs: {
+      id: "finanzas",
+      role: "tabpanel"
+    }
+  }, [_c("div", {
+    staticClass: "row g-3 mb-4"
+  }, [_c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "card border rounded-3 shadow-sm",
+    staticStyle: {
+      "border-color": "#eef2f5 !important"
+    }
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_vm._m(50), _vm._v(" "), _c("div", {
+    staticClass: "fw-bold",
+    staticStyle: {
+      "font-size": "1.5rem",
+      color: "#198754"
+    }
+  }, [_vm._v("S/ " + _vm._s(_vm.paciente.deuda_total ? parseFloat(_vm.paciente.deuda_total).toFixed(2) : "0.00"))])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "card border rounded-3 shadow-sm",
+    staticStyle: {
+      "border-color": "#eef2f5 !important"
+    }
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_vm._m(51), _vm._v(" "), _c("div", {
+    staticClass: "fw-bold",
+    staticStyle: {
+      "font-size": "1.5rem",
+      color: "#212529"
+    }
+  }, [_vm._v(_vm._s(_vm.paciente.pagos_pendientes || 0))])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-md-4"
+  }, [_c("div", {
+    staticClass: "card border rounded-3 shadow-sm",
+    staticStyle: {
+      "border-color": "#eef2f5 !important"
+    }
+  }, [_c("div", {
+    staticClass: "card-body p-4"
+  }, [_vm._m(52), _vm._v(" "), _c("div", {
+    staticClass: "fw-bold",
+    staticStyle: {
+      "font-size": "1.5rem",
+      color: "#198754"
+    }
+  }, [_vm._v("S/ " + _vm._s(_vm.paciente.total_pagado ? parseFloat(_vm.paciente.total_pagado).toFixed(2) : "0.00"))])])])])]), _vm._v(" "), _vm._m(53), _vm._v(" "), _c("div", {
+    staticClass: "card border-0 rounded-3 shadow-sm mb-4"
+  }, [_c("div", {
+    staticClass: "card-body p-0"
+  }, [_c("div", {
+    staticClass: "table-responsive"
+  }, [_c("table", {
+    staticClass: "table table-hover mb-0",
+    staticStyle: {
+      "font-size": "0.9rem"
+    }
+  }, [_vm._m(54), _vm._v(" "), _c("tbody", [_vm._l(_vm.paciente.pagos_historial || [], function (pago) {
+    return _c("tr", {
+      key: pago.payment_id,
+      staticStyle: {
+        "border-bottom": "1px solid #f8f9fa"
+      }
+    }, [_c("td", {
+      staticClass: "align-middle py-3 ps-4"
+    }, [_c("span", {
+      staticClass: "text-dark"
+    }, [_vm._v(_vm._s(_vm.formatOnlyDate(pago.date)))])]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle py-3 fw-bold text-dark"
+    }, [_vm._v(_vm._s(pago.concepto || "Consulta"))]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle py-3 text-end text-dark"
+    }, [_vm._v("S/ " + _vm._s(pago.monto ? parseFloat(pago.monto).toFixed(2) : "0.00"))]), _vm._v(" "), _c("td", {
+      staticClass: "align-middle py-3 pe-4"
+    }, [pago.estado == 2 || pago.estado == null ? _c("span", {
+      staticClass: "badge rounded-pill px-3 py-2",
+      staticStyle: {
+        "background-color": "#d1fae5",
+        color: "#065f46"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-check-circle me-1"
+    }), _vm._v(" Pagado")]) : pago.estado == 1 ? _c("span", {
+      staticClass: "badge rounded-pill px-3 py-2",
+      staticStyle: {
+        "background-color": "#fef3c7",
+        color: "#92400e"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-clock me-1"
+    }), _vm._v(" Sin pagar")]) : _c("span", {
+      staticClass: "badge rounded-pill px-3 py-2",
+      staticStyle: {
+        "background-color": "#fef3c7",
+        color: "#92400e"
+      }
+    }, [_c("i", {
+      staticClass: "fas fa-clock me-1"
+    }), _vm._v(" Pendiente")])])]);
+  }), _vm._v(" "), !_vm.paciente.pagos_historial || _vm.paciente.pagos_historial.length === 0 ? _c("tr", [_vm._m(55)]) : _vm._e()], 2)])])])])])]), _vm._v(" "), _c("div", {
     staticClass: "modal fade",
     attrs: {
       id: "examenModal",
@@ -5357,7 +6668,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-lg"
   }, [_c("div", {
     staticClass: "modal-content"
-  }, [_vm._m(31), _vm._v(" "), _c("keep-alive", [this.datosExamPaciente.id ? _c(_vm.component, {
+  }, [_vm._m(56), _vm._v(" "), _c("keep-alive", [this.datosExamPaciente.id ? _c(_vm.component, {
     tag: "component",
     attrs: {
       dataPatient: _vm.datosExamPaciente,
@@ -5381,11 +6692,11 @@ var render = function render() {
     staticClass: "modal-dialog modal-lg"
   }, [_c("div", {
     staticClass: "modal-content border-0 shadow-lg"
-  }, [_vm._m(32), _vm._v(" "), _c("div", {
+  }, [_vm._m(57), _vm._v(" "), _c("div", {
     staticClass: "modal-body p-0"
   }, [_c("table", {
     staticClass: "table table-hover mb-0"
-  }, [_vm._m(33), _vm._v(" "), _c("tbody", _vm._l(_vm.datosConsulta.prescriptions, function (prescription, index) {
+  }, [_vm._m(58), _vm._v(" "), _c("tbody", _vm._l(_vm.datosConsulta.prescriptions, function (prescription, index) {
     return _vm.datosConsulta ? _c("tr", {
       key: index
     }, [_c("td", {
@@ -5412,7 +6723,7 @@ var render = function render() {
     staticClass: "modal-dialog modal-dialog-centered"
   }, [_c("div", {
     staticClass: "modal-content border-0 shadow"
-  }, [_vm._m(34), _vm._v(" "), _vm.pruebaSeleccionada ? _c("div", {
+  }, [_vm._m(59), _vm._v(" "), _vm.pruebaSeleccionada ? _c("div", {
     staticClass: "modal-body"
   }, [_c("h6", {
     staticClass: "fw-bold mb-3"
@@ -5430,7 +6741,7 @@ var render = function render() {
     staticClass: "mb-1 small text-muted"
   }, [_vm._v("Diagnóstico:")]), _vm._v(" "), _c("p", {
     staticClass: "fw-bold mb-0 text-dark"
-  }, [_vm._v(_vm._s(_vm.pruebaSeleccionada.diagnostico || "N/A"))])])]) : _vm._e(), _vm._v(" "), _vm._m(35)])])]), _vm._v(" "), _c("updated-modal", {
+  }, [_vm._v(_vm._s(_vm.pruebaSeleccionada.diagnostico || "N/A"))])])]) : _vm._e(), _vm._v(" "), _vm._m(60)])])]), _vm._v(" "), _c("updated-modal", {
     attrs: {
       datosModal: _vm.dataModal
     },
@@ -5485,7 +6796,7 @@ var render = function render() {
     }
   }), _vm._v(" "), _c("ModalProximaCita", {
     attrs: {
-      profesional: _vm.dataUser,
+      profesional: [_vm.dataUser],
       paciente: _vm.datosPaciente
     }
   }), _vm._v(" "), _c("ModalArchivos", {
@@ -5566,6 +6877,40 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fa-solid fa-skull-crossbones me-2"
   }), _vm._v(" "), _c("strong", [_vm._v("Alerta!")]), _vm._v(" Paciente con riesgo de suicidio (S.O.S Activo)\n      ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "font-weight-bold mb-3 text-info"
+  }, [_c("i", {
+    staticClass: "fas fa-certificate me-2"
+  }), _vm._v(" Altas Médicas")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "font-weight-bold mb-3"
+  }, [_c("i", {
+    staticClass: "far fa-calendar text-primary"
+  }), _vm._v(" Próxima Cita")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h6", {
+    staticClass: "font-weight-bold mb-3"
+  }, [_c("i", {
+    staticClass: "fas fa-file-medical text-success"
+  }), _vm._v(" Última Evolución")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mb-4"
+  }, [_c("h6", {
+    staticClass: "font-weight-bold text-dark mb-0"
+  }, [_c("i", {
+    staticClass: "far fa-clock text-primary"
+  }), _vm._v(" Línea de Tiempo Clínica (Últimas Actividades)")])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -5797,41 +7142,48 @@ var staticRenderFns = [function () {
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("h6", {
-    staticClass: "m-0 font-weight-bold text-dark"
+  return _c("h5", {
+    staticClass: "mb-0 font-weight-bold d-flex align-items-center text-dark"
   }, [_c("i", {
-    staticClass: "fas fa-prescription text-primary me-2"
-  }), _vm._v(" Recetas Médicas")]);
+    staticClass: "fas fa-link text-warning me-2",
+    staticStyle: {
+      transform: "rotate(45deg)"
+    }
+  }), _vm._v(" Recetas Médicas\n              ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm",
+    staticStyle: {
+      width: "45px",
+      height: "45px",
+      "background-color": "#fff4e6",
+      color: "#ff8c00"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-capsules fs-5"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h5", {
+    staticClass: "mb-0 font-weight-bold d-flex align-items-center text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-file-invoice text-primary me-2"
+  }), _vm._v(" Órdenes Médicas\n              ")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("thead", {
-    staticClass: "bg-light text-muted small"
+    staticClass: "bg-light"
   }, [_c("tr", [_c("th", {
-    staticClass: "ps-4 py-3"
+    staticClass: "border-0 rounded-start"
   }, [_vm._v("Fecha")]), _vm._v(" "), _c("th", {
-    staticClass: "py-3 text-end pe-4"
-  }, [_vm._v("Acción")])])]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("h6", {
-    staticClass: "m-0 font-weight-bold text-dark"
-  }, [_c("i", {
-    staticClass: "fas fa-notes-medical text-success me-2"
-  }), _vm._v(" Órdenes Médicas")]);
-}, function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("thead", {
-    staticClass: "bg-light text-muted small"
-  }, [_c("tr", [_c("th", {
-    staticClass: "ps-4 py-3"
-  }, [_vm._v("Fecha")]), _vm._v(" "), _c("th", {
-    staticClass: "py-3"
-  }, [_vm._v("Tipo/Examen")]), _vm._v(" "), _c("th", {
-    staticClass: "py-3 text-end pe-4"
-  }, [_vm._v("Acción")])])]);
+    staticClass: "border-0"
+  }, [_vm._v("Examen")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 rounded-end text-end"
+  }, [_vm._v("Acciones")])])]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -5854,6 +7206,283 @@ var staticRenderFns = [function () {
   }, [_c("i", {
     staticClass: "fas fa-plus me-1"
   }), _vm._v(" Aplicar Prueba\n              ")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mb-3 mt-1"
+  }, [_c("h6", {
+    staticClass: "font-weight-bold mb-0 text-dark d-flex align-items-center"
+  }, [_c("i", {
+    staticClass: "fas fa-cube text-primary me-2"
+  }), _vm._v(" Paquetes Contratados\n          ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mb-3 mt-4"
+  }, [_c("h6", {
+    staticClass: "font-weight-bold mb-0 text-dark d-flex align-items-center"
+  }, [_c("i", {
+    staticClass: "far fa-calendar-alt text-primary me-2"
+  }), _vm._v(" Historial de Citas\n          ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", {
+    staticClass: "bg-light"
+  }, [_c("tr", [_c("th", {
+    staticClass: "border-0 text-muted fw-normal py-3 ps-4",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Fecha")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 text-muted fw-normal py-3",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Tipo")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 text-muted fw-normal py-3",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Profesional")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 text-muted fw-normal py-3",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Estado")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 text-muted fw-normal py-3 pe-4",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Notas")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mb-3 mt-4"
+  }, [_c("h6", {
+    staticClass: "font-weight-bold mb-0 text-dark d-flex align-items-center"
+  }, [_c("i", {
+    staticClass: "fas fa-exclamation-triangle text-warning me-2"
+  }), _vm._v(" Faltas y Reprogramaciones\n          ")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "card-header bg-light border-0 py-3"
+  }, [_c("h6", {
+    staticClass: "mb-0 text-dark font-weight-bold",
+    staticStyle: {
+      "font-size": "0.95rem"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-times-circle text-danger me-2"
+  }), _vm._v(" Inasistencias (Faltas)")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("td", {
+    staticClass: "align-middle py-3 pe-4 text-muted text-end"
+  }, [_c("span", {
+    staticClass: "badge bg-danger bg-opacity-10 rounded-pill fw-normal px-2 py-1"
+  }, [_vm._v("Falta")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "card-header bg-light border-0 py-3"
+  }, [_c("h6", {
+    staticClass: "mb-0 text-dark font-weight-bold",
+    staticStyle: {
+      "font-size": "0.95rem"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-sync-alt text-info me-2"
+  }), _vm._v(" Reprogramaciones")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("td", {
+    staticClass: "align-middle py-3 pe-4 text-muted text-end"
+  }, [_c("span", {
+    staticClass: "badge bg-info bg-opacity-10 rounded-pill fw-normal px-2 py-1"
+  }, [_vm._v("Reprogramada")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h5", {
+    staticClass: "card-title font-weight-bold mb-1"
+  }, [_c("i", {
+    staticClass: "fas fa-clipboard-check text-primary me-2"
+  }), _vm._v(" Registro de Triajes")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "rounded-circle bg-light text-info border d-flex justify-content-center align-items-center me-3",
+    staticStyle: {
+      width: "45px",
+      height: "45px",
+      "min-width": "45px"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-thermometer-half fs-5"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h5", {
+    staticClass: "card-title font-weight-bold mb-3 mt-2"
+  }, [_c("i", {
+    staticClass: "fas fa-traffic-light text-warning me-2"
+  }), _vm._v(" Seguridad / Semáforo")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("h5", {
+    staticClass: "card-title font-weight-bold mb-1"
+  }, [_c("i", {
+    staticClass: "fas fa-clipboard-list text-primary me-2"
+  }), _vm._v(" Ficha de Seguimiento")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "d-flex justify-content-between align-items-center mb-4 mt-2"
+  }, [_c("div", [_c("h5", {
+    staticClass: "mb-0 font-weight-bold d-flex align-items-center text-dark"
+  }, [_c("i", {
+    staticClass: "fas fa-paperclip text-primary me-2"
+  }), _vm._v(" Documentos Adjuntos")]), _vm._v(" "), _c("p", {
+    staticClass: "text-muted small mb-0 mt-1"
+  }, [_vm._v("Órdenes de examen, resultados y otros documentos")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "rounded bg-light text-secondary border d-flex justify-content-center align-items-center me-3 flex-shrink-0",
+    staticStyle: {
+      width: "45px",
+      height: "45px"
+    }
+  }, [_c("i", {
+    staticClass: "far fa-file-alt fs-5"
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "card border-0 shadow-sm",
+    staticStyle: {
+      "border-radius": "12px",
+      "background-color": "#fcfcfc"
+    }
+  }, [_c("div", {
+    staticClass: "card-body p-5 text-center"
+  }, [_c("div", {
+    staticClass: "mb-4"
+  }, [_c("i", {
+    staticClass: "fas fa-handshake text-primary opacity-50",
+    staticStyle: {
+      "font-size": "5rem"
+    }
+  })]), _vm._v(" "), _c("h4", {
+    staticClass: "font-weight-bold text-dark mb-3"
+  }, [_vm._v("Convenios, Alianzas y Club")]), _vm._v(" "), _c("p", {
+    staticClass: "text-muted mx-auto",
+    staticStyle: {
+      "max-width": "500px",
+      "font-size": "1.1rem"
+    }
+  }, [_vm._v("Esta sección está en desarrollo. Próximamente podrá gestionar aquí todos los acuerdos institucionales, beneficios de alianzas estratégicas y suscripciones de Club.")]), _vm._v(" "), _c("div", {
+    staticClass: "mt-4"
+  }, [_c("span", {
+    staticClass: "badge bg-warning text-dark px-4 py-2 rounded-pill shadow-sm",
+    staticStyle: {
+      "font-size": "1rem"
+    }
+  }, [_c("i", {
+    staticClass: "fas fa-tools me-2"
+  }), _vm._v(" Próximamente")])])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "text-muted small mb-2 d-flex align-items-center gap-2"
+  }, [_c("i", {
+    staticClass: "fas fa-dollar-sign text-muted"
+  }), _vm._v(" Deuda Total")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "text-muted small mb-2 d-flex align-items-center gap-2"
+  }, [_c("i", {
+    staticClass: "far fa-calendar-alt text-muted"
+  }), _vm._v(" Pagos Pendientes")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "text-muted small mb-2 d-flex align-items-center gap-2"
+  }, [_c("i", {
+    staticClass: "far fa-credit-card text-muted"
+  }), _vm._v(" Total Pagado")]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "d-flex align-items-center mb-3"
+  }, [_c("i", {
+    staticClass: "far fa-credit-card text-primary me-2"
+  }), _c("h6", {
+    staticClass: "font-weight-bold mb-0 text-dark"
+  }, [_vm._v("Historial de Pagos")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", {
+    staticStyle: {
+      "border-bottom": "1px solid #f1f3f5"
+    }
+  }, [_c("th", {
+    staticClass: "border-0 text-muted fw-normal py-3 ps-4",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Fecha")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 text-muted fw-normal py-3",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Concepto")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 text-muted fw-normal py-3 text-end",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Monto")]), _vm._v(" "), _c("th", {
+    staticClass: "border-0 text-muted fw-normal py-3 pe-4",
+    staticStyle: {
+      "font-size": "0.85rem"
+    }
+  }, [_vm._v("Estado")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("td", {
+    staticClass: "text-center text-muted py-5",
+    attrs: {
+      colspan: "4"
+    }
+  }, [_c("i", {
+    staticClass: "far fa-folder-open mb-2 d-block",
+    staticStyle: {
+      "font-size": "2rem",
+      opacity: "0.3"
+    }
+  }), _vm._v("No hay historial de pagos registrado.")]);
 }, function () {
   var _vm = this,
     _c = _vm._self._c;
@@ -6875,7 +8504,7 @@ var render = function render() {
     staticClass: "my-2"
   }, [_c("span", {
     staticClass: "text-capitalize"
-  }, [_vm._v(_vm._s(_vm.paciente.name.toLowerCase()))])]), _vm._v(" "), _c("label", {
+  }, [_vm._v(_vm._s(_vm.paciente && _vm.paciente.name ? _vm.paciente.name.toLowerCase() : ""))])]), _vm._v(" "), _c("label", {
     attrs: {
       "for": ""
     }

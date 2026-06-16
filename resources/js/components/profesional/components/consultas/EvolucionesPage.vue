@@ -66,39 +66,130 @@
     <!-- Nav tabs -->
     <ul class="nav nav-tabs mb-4 px-2" id="patientTabs" role="tablist" style="border-bottom: 0;">
       <li class="nav-item" role="presentation">
+        <button class="nav-link font-weight-bold small text-dark" :class="{ active: activeTab === 'resumen' }" @click="activeTab = 'resumen'" type="button" role="tab" >Resumen</button>
+      </li>
+      <li class="nav-item" role="presentation">
         <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'datos' }" @click="activeTab = 'datos'" type="button" role="tab" >
-          <i class="fas fa-user me-1"></i> Datos Personales
-        </button>
+          <i class="fas fa-user me-1"></i> Datos Personales</button>
       </li>
       <li class="nav-item" role="presentation">
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'citas' }" @click="activeTab = 'citas'" type="button" role="tab" >
+          <i class="fas fa-calendar-alt me-1"></i> Citas & Paquetes</button>
+      </li>
+      <li class="nav-item" role="presentation" v-if="rolUser === 'profesional' || rolUser === 'interno'">
         <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'historial' }" @click="activeTab = 'historial'" type="button" role="tab" >
-          <i class="fas fa-history me-1"></i> Historial Clínico
-        </button>
+          <i class="fas fa-history me-1"></i> Historial Clínico <span v-if="paciente.medical_evolutions">({{ paciente.medical_evolutions.length }})</span></button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'linea' }" @click="activeTab = 'linea'" type="button" role="tab" >
-          <i class="fas fa-sort-amount-up-alt me-1"></i> Línea de Vida
-        </button>
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'triaje' }" @click="activeTab = 'triaje'" type="button" role="tab" >
+          <i class="fas fa-heartbeat me-1"></i> Triaje & Seguridad</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'nutricion' }" @click="activeTab = 'nutricion'" type="button" role="tab" >
-          <i class="fas fa-apple-alt me-1"></i> Nutrición
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'seguimiento' }" @click="activeTab = 'seguimiento'" type="button" role="tab" >
+          <i class="fas fa-clipboard-list me-1"></i> Plan de Intervención
         </button>
       </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'recetas' }" @click="activeTab = 'recetas'" type="button" role="tab" >
-          <i class="fas fa-prescription me-1"></i> Recetas & Órdenes
-        </button>
+          <i class="fas fa-prescription me-1"></i> Recetas & Órdenes</button>
       </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'pruebas' }" @click="activeTab = 'pruebas'" type="button" role="tab" >
-          <i class="fas fa-flask me-1"></i> Pruebas Psicológicas
-        </button>
+          <i class="fas fa-flask me-1"></i> Pruebas Psicológicas</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'documentos' }" @click="activeTab = 'documentos'" type="button" role="tab">
+          <i class="fas fa-file-contract me-1"></i> Documentos</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'convenios' }" @click="activeTab = 'convenios'" type="button" role="tab" >
+          <i class="fas fa-handshake me-1"></i> Convenios</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link font-weight-bold small text-muted" :class="{ active: activeTab === 'finanzas' }" @click="activeTab = 'finanzas'" type="button" role="tab" >
+          <i class="fas fa-wallet me-1"></i>Finanzas</button>
       </li>
     </ul>
 
+    
     <!-- Tab panes -->
     <div class="tab-content px-2" id="patientTabsContent">
+      
+      <!-- RESUMEN -->
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'resumen' }" id="resumen" role="tabpanel">
+        <div class="row">
+          <div class="col-md-4">
+            <!-- Altas Médicas -->
+            <div class="card shadow-sm border rounded-lg mb-3" v-if="paciente.discharges && paciente.discharges.length > 0">
+              <div class="card-body">
+                <h6 class="font-weight-bold mb-3 text-info"><i class="fas fa-certificate me-2"></i> Altas Médicas</h6>
+                <div v-for="alta in paciente.discharges" :key="alta.id" class="mb-3 border-bottom pb-2">
+                  <p class="small mb-1 d-flex justify-content-between align-items-center">
+                    <span class="badge bg-info bg-opacity-10 border border-info border-opacity-25">{{ alta.type == 1 ? 'Psicológica' : 'Psiquiátrica' }}</span>
+                    <span class="text-muted" style="font-size: 0.75rem;">{{ formatDate(alta.created_at) }}</span>
+                  </p>
+                  <p class="small text-dark mb-1" style="font-style: italic;">"{{ alta.comments }}"</p>
+                  <p class="small text-muted mb-0" v-if="alta.professional"><i class="fas fa-user-md me-1"></i>{{ alta.professional.name }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card shadow-sm border rounded-lg mb-3">
+              <div class="card-body">
+                <h6 class="font-weight-bold mb-3"><i class="far fa-calendar text-primary"></i> Próxima Cita</h6>
+                <div v-if="proximaCita">
+                  <h5 class="mb-1 text-dark">{{ formatDateTime(proximaCita.date, proximaCita.hora) }}</h5>
+                  <p class="small text-muted mb-0" v-if="proximaCita.professional">{{ proximaCita.professional.name }}</p>
+                </div>
+                <div v-else>
+                  <p class="text-muted mb-0 small">No hay citas próximas programadas.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card shadow-sm border rounded-lg mb-3">
+              <div class="card-body">
+                <h6 class="font-weight-bold mb-3"><i class="fas fa-file-medical text-success"></i> Última Evolución</h6>
+                <div v-if="ultimaEvolucion">
+                  <p class="small text-muted mb-1">{{ formatDate(ultimaEvolucion.date) }} - Dr. {{ ultimaEvolucion.professional ? ultimaEvolucion.professional.name : '' }}</p>
+                  <p class="small mb-0">{{ ultimaEvolucion.descripcion || 'Sin descripción' }}</p>
+                </div>
+                <div v-else>
+                  <p class="text-muted mb-0 small">No hay evoluciones registradas.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="card shadow-sm border rounded-lg h-100">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <h6 class="font-weight-bold text-dark mb-0"><i class="far fa-clock text-primary"></i> Línea de Tiempo Clínica (Últimas Actividades)</h6>
+                </div>
+                <div class="timeline ms-3 mt-3 content-timeline">
+                  <!-- Show combined timeline of appointments and evolutions -->
+                  <div v-for="(item, index) in timelineActivity.slice(0, 5)" :key="index" class="timeline-item pb-3 mb-3 border-bottom">
+                    <div class="d-flex justify-content-between">
+                      <div>
+                        <strong class="text-dark">{{ item.type == 'Cita' ? 'Cita Programada' : 'Evolución Clínica' }}</strong>
+                        <p class="small text-muted mb-0 mt-1">{{ item.desc }}</p>
+                        <p class="small text-primary mb-0 mt-1">{{ item.profesional }}</p>
+                      </div>
+                      <div class="text-end">
+                        <span class="small text-muted">{{ formatDate(item.date) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-if="timelineActivity.length === 0" class="text-muted small">
+                    No hay actividad reciente.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       
       <!-- DATOS PERSONALES -->
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'datos' }" id="datos" role="tabpanel">
@@ -566,84 +657,106 @@
         <nutricionHome :dataCies="dataCies" :id="$route.params.idPaciente" ></nutricionHome>
       </div>
 
-      <!-- RECETAS Y ÓRDENES -->
+            <!-- RECETAS Y ÓRDENES -->
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'recetas' }" id="recetas" role="tabpanel">
-        <!-- Replicaremos el diseño para Recetas y construiremos la parte de Órdenes aquí -->
-        <div class="row">
-          <div class="col-md-6 mb-4">
-            <div class="card shadow-sm border-0 rounded-lg h-100">
-              <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
-                <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-prescription text-primary me-2"></i> Recetas Médicas</h6>
-                <router-link v-if="dataUser.profession!='Psicólogo'" :to="{ path: `/profesional/recetas/${datosConsulta.id}` }" class="btn btn-outline-primary btn-sm">
-                  <i class="fas fa-plus"></i> Nueva Receta
-                </router-link>
-              </div>
-              <div class="card-body p-0">
-                <div class="table-responsive">
-                  <table class="table table-hover mb-0">
-                    <thead class="bg-light text-muted small">
-                      <tr>
-                        <th class="ps-4 py-3">Fecha</th>
-                        <th class="py-3 text-end pe-4">Acción</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(prescription, index) in datosConsulta.prescriptions" :key="index">
-                        <td class="align-middle ps-4 py-3 fw-bold">{{ prescription ? prescription.attention_date : '...' }}</td>
-                        <td class="align-middle text-end pe-4 py-3">
-                          <a v-if="prescription" class="btn btn-sm btn-outline-danger" :href="`/api/pdf/${prescription.id}?token=${$token}`" target="_blank">
-                            <i class="fas fa-file-pdf"></i> PDF
-                          </a>
-                        </td>
-                      </tr>
-                      <tr v-if="!datosConsulta.prescriptions || datosConsulta.prescriptions.length === 0">
-                        <td colspan="2" class="text-center text-muted py-4">No hay recetas emitidas.</td>
-                      </tr>
-                    </tbody>
-                  </table>
+        
+        <!-- Tabs for Recetas and Ordenes -->
+        <ul class="nav nav-pills mb-4" id="recetasOrdenesTabs" role="tablist">
+          <li class="nav-item me-2" role="presentation">
+            <button class="nav-link rounded-pill px-4 small border shadow-sm" type="button" style="font-weight: 500;" @click="activePill = 'recetas'" :class="activePill === 'recetas' ? 'bg-primary text-white active' : 'bg-white text-dark'">
+              <i class="fas fa-link me-1"></i> Recetas Médicas
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4 small border shadow-sm" type="button" style="font-weight: 500;" @click="activePill = 'ordenes'" :class="activePill === 'ordenes' ? 'bg-primary text-white active' : 'bg-white text-muted'">
+              <i class="fas fa-file-invoice me-1"></i> Órdenes Médicas
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="pills-tabContent">
+          <!-- Recetas Médicas Tab -->
+          <div v-show="activePill === 'recetas'">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="mb-0 font-weight-bold d-flex align-items-center text-dark">
+                <i class="fas fa-link text-warning me-2" style="transform: rotate(45deg);"></i> Recetas Médicas
+              </h5>
+              <router-link v-if="dataUser.profession!='Psicólogo'" :to="{ path: `/profesional/recetas/${datosConsulta.id}` }" class="btn btn-primary rounded-pill px-3 shadow-sm btn-sm">
+                <i class="fas fa-plus me-1"></i> Nueva Receta
+              </router-link>
+            </div>
+
+            <div v-if="datosConsulta.prescriptions && datosConsulta.prescriptions.length > 0">
+              <div v-for="(prescription, index) in datosConsulta.prescriptions" :key="index" class="card border border-light shadow-sm mb-4" style="border-radius: 12px; overflow: hidden;">
+                <div class="card-body p-4 bg-white">
+                  <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+                    <div class="d-flex align-items-center">
+                      <div class="rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm" style="width: 45px; height: 45px; background-color: #fff4e6; color: #ff8c00;">
+                        <i class="fas fa-capsules fs-5"></i>
+                      </div>
+                      <div>
+                        <h6 class="mb-0 font-weight-bold text-dark fs-5">Receta Médica</h6>
+                        <div class="small text-muted mt-1">
+                          {{ prescription ? prescription.attention_date : '...' }}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="badge bg-success bg-opacity-10 rounded-pill px-3 py-1 border border-success border-opacity-25" style="font-weight: 500;">Vigente</span>
+                      <a v-if="prescription" :href="`/api/pdf/${prescription.id}?token=${$token}`" target="_blank" class="btn btn-light btn-sm rounded text-muted shadow-sm border"><i class="fas fa-print"></i> PDF</a>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+            <div v-else class="alert alert-light border text-center p-5">
+              <i class="fas fa-capsules text-muted mb-3 fs-1"></i>
+              <h6 class="text-muted">No hay recetas emitidas</h6>
+            </div>
           </div>
-          
-          <div class="col-md-6 mb-4">
-            <div class="card shadow-sm border-0 rounded-lg h-100">
-              <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
-                <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-notes-medical text-success me-2"></i> Órdenes Médicas</h6>
-                <button class="btn btn-outline-success btn-sm" @click="crearNuevaOrden">
-                  <i class="fas fa-plus"></i> Nueva Orden
-                </button>
+
+          <!-- Órdenes Médicas Tab -->
+          <div v-show="activePill === 'ordenes'">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="mb-0 font-weight-bold d-flex align-items-center text-dark">
+                <i class="fas fa-file-invoice text-primary me-2"></i> Órdenes Médicas
+              </h5>
+              <button class="btn btn-primary rounded-pill px-3 shadow-sm btn-sm" @click="crearNuevaOrden">
+                <i class="fas fa-plus me-1"></i> Nueva Orden
+              </button>
+            </div>
+
+            <div v-if="ordenesMedicas && ordenesMedicas.length > 0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead class="bg-light">
+                    <tr>
+                      <th class="border-0 rounded-start">Fecha</th>
+                      <th class="border-0">Examen</th>
+                      <th class="border-0 rounded-end text-end">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(orden, idx) in ordenesMedicas" :key="idx">
+                      <td>{{ formatOnlyDate(orden.created_at) }}</td>
+                      <td class="fw-bold">{{ orden.descripcion || 'Orden Médica' }}</td>
+                      <td class="text-end">
+                        <button class="btn btn-sm btn-light border text-primary" @click="verDetalleOrden(orden)">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <div class="card-body p-0">
-                <div class="table-responsive">
-                  <table class="table table-hover mb-0">
-                    <thead class="bg-light text-muted small">
-                      <tr>
-                        <th class="ps-4 py-3">Fecha</th>
-                        <th class="py-3">Tipo/Examen</th>
-                        <th class="py-3 text-end pe-4">Acción</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(orden, index) in ordenesMedicas" :key="index">
-                        <td class="align-middle ps-4 py-3 fw-bold">{{ formatOnlyDate(orden.created_at) }}</td>
-                        <td class="align-middle py-3 text-muted">{{ orden.descripcion || 'Orden Médica' }}</td>
-                        <td class="align-middle text-end pe-4 py-3">
-                          <button class="btn btn-sm btn-outline-primary" @click="verDetalleOrden(orden)">
-                            <i class="fas fa-eye"></i>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr v-if="!ordenesMedicas || ordenesMedicas.length === 0">
-                        <td colspan="3" class="text-center text-muted py-4">No hay órdenes médicas registradas.</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+            </div>
+            <div v-else class="alert alert-light border text-center p-5">
+              <i class="fas fa-file-medical text-muted mb-3 fs-1"></i>
+              <h6 class="text-muted">No hay órdenes médicas registradas.</h6>
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- PRUEBAS PSICOLÓGICAS -->
@@ -701,6 +814,356 @@
           </div>
         </div>
       </div>
+
+      <!-- CITAS Y PAQUETES -->
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'citas' }" id="citas" role="tabpanel">
+
+        <!-- Paquetes Contratados Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-1">
+          <h6 class="font-weight-bold mb-0 text-dark d-flex align-items-center">
+            <i class="fas fa-cube text-primary me-2"></i> Paquetes Contratados
+          </h6>
+        </div>
+
+        <!-- Paquetes List -->
+        <div class="row mb-4">
+          <div class="col-md-6" v-for="mem in (paciente.membresias || [])" :key="mem.id">
+            <div class="card border rounded-3 mb-3 shadow-sm" style="border-color: #eef2f5 !important;">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                  <h6 class="font-weight-bold text-dark mb-0" style="font-size: 1.05rem;">{{ mem.precio ? mem.precio.descripcion : 'Paquete' }}</h6>
+                  <span class="badge rounded-pill px-3 py-1" :class="mem.activo ? 'bg-success bg-opacity-10' : 'bg-secondary bg-opacity-10 text-secondary'" style="font-weight: 500;">{{ mem.activo ? 'Activo' : 'Inactivo' }}</span>
+                </div>
+                <p class="text-muted small mb-4">Vence: {{ formatOnlyDate(mem.fin) }}</p>
+                <div class="d-flex justify-content-between align-items-end mb-2">
+                  <span class="text-dark small" style="font-weight: 500;">Sesiones usadas</span>
+                  <span class="text-dark small font-weight-bold" v-if="mem.sesiones_totales === 0">{{ mem.sesiones_usadas || 0 }} / ∞</span>
+                  <span class="text-dark small font-weight-bold" v-else>{{ mem.sesiones_usadas || 0 }} / {{ mem.sesiones_totales }}</span>
+                </div>
+                <div v-if="mem.sesiones_totales !== 0" class="progress mb-2 rounded-pill" style="height: 6px;">
+                  <div class="progress-bar bg-primary" role="progressbar" :style="{ width: (((mem.sesiones_usadas || 0) / (mem.sesiones_totales || 6)) * 100) + '%' }"></div>
+                  <div class="progress-bar" role="progressbar" style="background-color: #fd7e14;" :style="{ width: (100 - (((mem.sesiones_usadas || 0) / (mem.sesiones_totales || 6)) * 100)) + '%' }"></div>
+                </div>
+                <small v-if="mem.sesiones_totales !== 0" class="text-muted" style="font-size: 0.75rem;">{{ (mem.sesiones_totales || 6) - (mem.sesiones_usadas || 0) }} sesiones restantes</small>
+                <small v-else class="text-muted" style="font-size: 0.75rem;">Sesiones infinitas</small>
+              </div>
+            </div>
+          </div>
+          <div v-if="!paciente.membresias || paciente.membresias.length == 0" class="col-12">
+            <div class="alert alert-light border text-center text-muted">No tiene paquetes.</div>
+          </div>
+        </div>
+
+        <!-- Historial de Citas Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-4">
+          <h6 class="font-weight-bold mb-0 text-dark d-flex align-items-center">
+            <i class="far fa-calendar-alt text-primary me-2"></i> Historial de Citas
+          </h6>
+        </div>
+
+        <!-- Historial de Citas Table -->
+        <div class="card border rounded-3 shadow-sm mb-4">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+                <thead class="bg-light">
+                  <tr>
+                    <th class="border-0 text-muted fw-normal py-3 ps-4" style="font-size: 0.85rem;">Fecha</th>
+                    <th class="border-0 text-muted fw-normal py-3" style="font-size: 0.85rem;">Tipo</th>
+                    <th class="border-0 text-muted fw-normal py-3" style="font-size: 0.85rem;">Profesional</th>
+                    <th class="border-0 text-muted fw-normal py-3" style="font-size: 0.85rem;">Estado</th>
+                    <th class="border-0 text-muted fw-normal py-3 pe-4" style="font-size: 0.85rem;">Notas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="cita in (paciente.appointments || [])" :key="cita.id">
+                    <td class="align-middle py-3 ps-4 border-bottom-0">
+                      <div class="text-dark fw-bold" style="font-size: 0.9rem;">{{ formatOnlyDate(cita.date) }}</div>
+                      <div class="text-muted small">{{ formatOnlyTime(cita.hora) || formatOnlyTime(cita.date) }}</div>
+                    </td>
+                    <td class="align-middle py-3 text-dark border-bottom-0">{{ cita.service ? cita.service.name : (cita.tipo_cita || 'Psicológica') }}</td>
+                    <td class="align-middle py-3 border-bottom-0"><a href="#" class="text-primary text-decoration-none">{{ cita.professional ? cita.professional.name : 'N/A' }}</a></td>
+                    <td class="align-middle py-3 border-bottom-0">
+                      <span class="badge rounded-pill fw-normal px-3 py-2" :style="getStatusStyle(cita)" style="font-size: 0.8rem;">{{ getStatusName(cita) }}</span>
+                    </td>
+                    <td class="align-middle py-3 pe-4 text-muted border-bottom-0">{{ cita.notas || cita.descripcion || cita.motivo || '—' }}</td>
+                  </tr>
+                  <tr v-if="!paciente.appointments || paciente.appointments.length == 0">
+                    <td colspan="5" class="text-center text-muted py-4">No tiene citas en el historial</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Faltas y Reprogramaciones -->
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-4">
+          <h6 class="font-weight-bold mb-0 text-dark d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle text-warning me-2"></i> Faltas y Reprogramaciones
+          </h6>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card border rounded-3 shadow-sm h-100">
+              <div class="card-header bg-light border-0 py-3">
+                <h6 class="mb-0 text-dark font-weight-bold" style="font-size: 0.95rem;"><i class="fas fa-times-circle text-danger me-2"></i> Inasistencias (Faltas)</h6>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0" style="font-size: 0.85rem;">
+                    <tbody>
+                      <tr v-for="cita in faltasCitas" :key="'f-'+cita.id">
+                        <td class="align-middle py-3 ps-4">
+                          <div class="text-dark fw-bold">{{ formatOnlyDate(cita.date) }}</div>
+                          <div class="text-muted small">{{ formatOnlyTime(cita.hora) || formatOnlyTime(cita.date) }}</div>
+                        </td>
+                        <td class="align-middle py-3 text-dark">{{ cita.service ? cita.service.name : (cita.tipo_cita || 'Psicológica') }}</td>
+                        <td class="align-middle py-3 pe-4 text-muted text-end"><span class="badge bg-danger bg-opacity-10 rounded-pill fw-normal px-2 py-1">Falta</span></td>
+                      </tr>
+                      <tr v-if="faltasCitas.length === 0">
+                        <td colspan="3" class="text-center text-muted py-4">No registra inasistencias</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="card border rounded-3 shadow-sm h-100">
+              <div class="card-header bg-light border-0 py-3">
+                <h6 class="mb-0 text-dark font-weight-bold" style="font-size: 0.95rem;"><i class="fas fa-sync-alt text-info me-2"></i> Reprogramaciones</h6>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0" style="font-size: 0.85rem;">
+                    <tbody>
+                      <tr v-for="cita in reprogramacionesCitas" :key="'r-'+cita.id">
+                        <td class="align-middle py-3 ps-4">
+                          <div class="text-dark fw-bold">{{ formatOnlyDate(cita.date) }}</div>
+                          <div class="text-muted small">{{ formatOnlyTime(cita.hora) || formatOnlyTime(cita.date) }}</div>
+                        </td>
+                        <td class="align-middle py-3 text-dark">{{ cita.service ? cita.service.name : (cita.tipo_cita || 'Psicológica') }}</td>
+                        <td class="align-middle py-3 pe-4 text-muted text-end"><span class="badge bg-info bg-opacity-10 rounded-pill fw-normal px-2 py-1">Reprogramada</span></td>
+                      </tr>
+                      <tr v-if="reprogramacionesCitas.length === 0">
+                        <td colspan="3" class="text-center text-muted py-4">No registra reprogramaciones</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRIAJE Y SEGURIDAD -->
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'triaje' }" id="triaje" role="tabpanel">
+        <div class="row">
+          <div class="col-12 mb-4">
+            <h5 class="card-title font-weight-bold mb-1"><i class="fas fa-clipboard-check text-primary me-2"></i> Registro de Triajes</h5>
+            <div v-if="paciente.triajes && paciente.triajes.length > 0">
+              <div class="card border-0 shadow-sm mb-3 rounded-lg" v-for="tr in paciente.triajes" :key="tr.id" style="background-color: #fcfcfc;">
+                <div class="card-body p-4">
+                  <div class="d-flex mb-4">
+                    <div class="rounded-circle bg-light text-info border d-flex justify-content-center align-items-center me-3" style="width: 45px; height: 45px; min-width: 45px;"><i class="fas fa-thermometer-half fs-5"></i></div>
+                    <div>
+                      <h6 class="font-weight-bold mb-1 text-dark">Triaje</h6>
+                      <div class="small text-muted"><span>{{ formatDateWithTime(tr.fecha || tr.created_at) }}</span><span v-if="tr.responsable" class="mx-1">&middot;</span><span v-if="tr.responsable">Int. {{ tr.responsable }}</span></div>
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                      <h6 class="small text-muted font-weight-bold text-uppercase mb-3" style="letter-spacing: 0.5px;">Signos Vitales</h6>
+                      <div class="d-flex flex-column gap-2 small">
+                        <div class="d-flex align-items-center" v-if="tr.pa"><i class="far fa-heart text-danger me-2" style="width: 16px;"></i><span class="text-muted me-1">PA:</span><strong class="text-dark">{{ tr.pa }}</strong></div>
+                        <div class="d-flex align-items-center" v-if="tr.fc"><span class="text-muted me-1">FC:</span><strong class="text-dark">{{ tr.fc }} <span class="fw-normal text-muted">bpm</span></strong></div>
+                        <div class="d-flex align-items-center" v-if="tr.t"><i class="fas fa-temperature-low text-info me-2" style="width: 16px;"></i><span class="text-muted me-1">Temp:</span><strong class="text-dark">{{ tr.t }} <span class="fw-normal text-muted">°C</span></strong></div>
+                        <div class="d-flex align-items-center" v-if="tr.saturacion"><i class="fas fa-wind text-primary me-2" style="width: 16px;"></i><span class="text-muted me-1">SpO2:</span><strong class="text-dark">{{ tr.saturacion }} <span class="fw-normal text-muted">%</span></strong></div>
+                        <div class="d-flex align-items-center" v-if="tr.peso"><span class="text-muted me-1">Peso:</span><strong class="text-dark">{{ tr.peso }}</strong></div>
+                        <div class="d-flex align-items-center" v-if="tr.talla"><span class="text-muted me-1">Talla:</span><strong class="text-dark">{{ tr.talla }}</strong></div>
+                      </div>
+                    </div>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                      <h6 class="small text-muted font-weight-bold text-uppercase mb-3" style="letter-spacing: 0.5px;">Evaluación y Pruebas</h6>
+                      <div class="d-flex flex-column gap-2 small">
+                        <div v-if="tr.pruebas"><span class="text-muted d-block mb-1">Pruebas Aplicadas:</span><strong class="text-dark">{{ tr.pruebas }}</strong></div>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <h6 class="small text-muted font-weight-bold text-uppercase mb-3" style="letter-spacing: 0.5px;">Clínica</h6>
+                      <div class="d-flex flex-column gap-2 small">
+                        <div v-if="tr.sintomatologia"><span class="text-muted me-1">Sintomatología:</span><span class="text-dark">{{ tr.sintomatologia }}</span></div>
+                        <div v-if="tr.antecedentes"><span class="text-muted me-1">Antecedentes:</span><span class="text-dark">{{ tr.antecedentes }}</span></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-4"><p class="small text-dark mb-3" v-if="tr.motivo"><span class="text-muted me-1">Motivo:</span> {{ tr.motivo }}</p></div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="alert alert-light text-center border py-5 mb-4">
+              <i class="fas fa-clipboard text-muted mb-3 fs-1 d-block"></i>
+              <h6 class="text-muted">No existen registros de triaje para este paciente.</h6>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <h5 class="card-title font-weight-bold mb-3 mt-2"><i class="fas fa-traffic-light text-warning me-2"></i> Seguridad / Semáforo</h5>
+            <div class="card border">
+              <div class="card-body p-4">
+                <ul class="list-group list-group-flush" v-if="paciente.semaforo_estados && paciente.semaforo_estados.length > 0">
+                  <li class="list-group-item px-0" v-for="sem in paciente.semaforo_estados.slice(0, 5)" :key="sem.id">
+                    <strong>{{ formatDate(sem.registro) }}</strong>
+                    <p class="mb-0 small mt-1">Código: {{ sem.codigo }} - <span class="text-muted">{{ sem.observaciones }}</span></p>
+                  </li>
+                </ul>
+                <p v-else class="text-muted small mb-0">Sin registros en el semáforo.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLAN DE INTERVENCIÓN -->
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'seguimiento' }" id="seguimiento" role="tabpanel">
+        <div class="row">
+          <div class="col-12 mb-4">
+            <h5 class="card-title font-weight-bold mb-1"><i class="fas fa-clipboard-list text-primary me-2"></i> Ficha de Seguimiento</h5>
+            <p class="text-muted small mb-4">Registro del plan de tratamiento del paciente.</p>
+            <div v-if="paciente.fichas_seguimiento && paciente.fichas_seguimiento.length > 0">
+              <div class="card border mb-3 rounded-lg" v-for="(ficha, index) in paciente.fichas_seguimiento" :key="ficha.id">
+                <div class="card-body p-4">
+                  <h6 class="font-weight-bold text-dark mb-1">Ficha {{ paciente.fichas_seguimiento.length - index }}</h6>
+                  <div class="small text-muted">{{ formatDate(ficha.fecha) }} - {{ ficha.tipo }} - {{ ficha.frecuencia }}</div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="alert alert-light border text-center p-5 rounded-lg">
+              <i class="fas fa-file-alt text-muted mb-3 fs-1"></i>
+              <h6 class="text-muted">No hay fichas de seguimiento registradas para este paciente.</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOCUMENTOS -->
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'documentos' }" id="documentos" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+          <div>
+            <h5 class="mb-0 font-weight-bold d-flex align-items-center text-dark"><i class="fas fa-paperclip text-primary me-2"></i> Documentos Adjuntos</h5>
+            <p class="text-muted small mb-0 mt-1">Órdenes de examen, resultados y otros documentos</p>
+          </div>
+        </div>
+        <!-- Filtros -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          <button type="button" class="btn btn-sm rounded-pill px-3" :class="filtroDocumento === 'Todos' ? 'btn-primary' : 'btn-light border text-muted'" @click.prevent="filtroDocumento = 'Todos'">Todos</button>
+          <button type="button" class="btn btn-sm rounded-pill px-3" :class="filtroDocumento === 'orden' ? 'btn-light bg-white border text-dark' : 'btn-light border text-muted'" @click.prevent="filtroDocumento = 'orden'">Órdenes</button>
+          <button type="button" class="btn btn-sm rounded-pill px-3" :class="filtroDocumento === 'resultado' ? 'btn-light bg-white border text-dark' : 'btn-light border text-muted'" @click.prevent="filtroDocumento = 'resultado'">Resultados</button>
+          <button type="button" class="btn btn-sm rounded-pill px-3" :class="filtroDocumento === 'consentimiento' ? 'btn-light bg-white border text-dark' : 'btn-light border text-muted'" @click.prevent="filtroDocumento = 'consentimiento'">Consentimientos</button>
+          <button type="button" class="btn btn-sm rounded-pill px-3" :class="filtroDocumento === 'otro' ? 'btn-light bg-white border text-dark' : 'btn-light border text-muted'" @click.prevent="filtroDocumento = 'otro'">Otros</button>
+        </div>
+        <div class="row g-3" v-if="documentosFiltrados.length > 0">
+          <div class="col-md-6 col-lg-4" v-for="doc in documentosFiltrados" :key="doc.id">
+            <div class="card h-100 border-light shadow-sm" style="border-radius: 12px; background-color: #fcfcfc;">
+              <div class="card-body p-4">
+                <div class="d-flex align-items-start mb-3">
+                  <div class="rounded bg-light text-secondary border d-flex justify-content-center align-items-center me-3 flex-shrink-0" style="width: 45px; height: 45px;"><i class="far fa-file-alt fs-5"></i></div>
+                  <div style="min-width: 0;"><h6 class="mb-1 text-dark text-truncate" :title="doc.nombre">{{ doc.nombre }}</h6></div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center small text-muted mb-3">
+                  <span><i class="far fa-calendar-alt me-1"></i> {{ formatDate(doc.created_at || doc.fecha) }}</span>
+                </div>
+                <div class="d-flex gap-2">
+                  <a :href="'/storage/archivos/' + doc.archivo" target="_blank" class="btn btn-light btn-sm flex-grow-1 border shadow-sm text-dark bg-white rounded-pill"><i class="fas fa-eye me-1"></i> Ver</a>
+                  <a :href="'/storage/archivos/' + doc.archivo" download target="_blank" class="btn btn-light btn-sm flex-grow-1 border shadow-sm text-dark bg-white rounded-pill"><i class="fas fa-download me-1"></i> Descargar</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else class="alert alert-light text-center border p-5 mt-3 rounded-lg">
+          <i class="far fa-folder-open text-muted mb-3 fs-1"></i>
+          <h6 class="text-muted">No existen documentos adjuntos en esta categoría.</h6>
+        </div>
+      </div>
+
+      <!-- CONVENIOS -->
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'convenios' }" id="convenios" role="tabpanel">
+        <div class="card border-0 shadow-sm" style="border-radius: 12px; background-color: #fcfcfc;">
+          <div class="card-body p-5 text-center">
+            <div class="mb-4"><i class="fas fa-handshake text-primary opacity-50" style="font-size: 5rem;"></i></div>
+            <h4 class="font-weight-bold text-dark mb-3">Convenios, Alianzas y Club</h4>
+            <p class="text-muted mx-auto" style="max-width: 500px; font-size: 1.1rem;">Esta sección está en desarrollo. Próximamente podrá gestionar aquí todos los acuerdos institucionales, beneficios de alianzas estratégicas y suscripciones de Club.</p>
+            <div class="mt-4"><span class="badge bg-warning text-dark px-4 py-2 rounded-pill shadow-sm" style="font-size: 1rem;"><i class="fas fa-tools me-2"></i> Próximamente</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINANZAS -->
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'finanzas' }" id="finanzas" role="tabpanel">
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">
+            <div class="card border rounded-3 shadow-sm" style="border-color: #eef2f5 !important;">
+              <div class="card-body p-4">
+                <div class="text-muted small mb-2 d-flex align-items-center gap-2"><i class="fas fa-dollar-sign text-muted"></i> Deuda Total</div>
+                <div class="fw-bold" style="font-size: 1.5rem; color: #198754;">S/ {{ paciente.deuda_total ? parseFloat(paciente.deuda_total).toFixed(2) : '0.00' }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card border rounded-3 shadow-sm" style="border-color: #eef2f5 !important;">
+              <div class="card-body p-4">
+                <div class="text-muted small mb-2 d-flex align-items-center gap-2"><i class="far fa-calendar-alt text-muted"></i> Pagos Pendientes</div>
+                <div class="fw-bold" style="font-size: 1.5rem; color: #212529;">{{ paciente.pagos_pendientes || 0 }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card border rounded-3 shadow-sm" style="border-color: #eef2f5 !important;">
+              <div class="card-body p-4">
+                <div class="text-muted small mb-2 d-flex align-items-center gap-2"><i class="far fa-credit-card text-muted"></i> Total Pagado</div>
+                <div class="fw-bold" style="font-size: 1.5rem; color: #198754;">S/ {{ paciente.total_pagado ? parseFloat(paciente.total_pagado).toFixed(2) : '0.00' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex align-items-center mb-3"><i class="far fa-credit-card text-primary me-2"></i><h6 class="font-weight-bold mb-0 text-dark">Historial de Pagos</h6></div>
+        <div class="card border-0 rounded-3 shadow-sm mb-4">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+                <thead>
+                  <tr style="border-bottom: 1px solid #f1f3f5;">
+                    <th class="border-0 text-muted fw-normal py-3 ps-4" style="font-size: 0.85rem;">Fecha</th>
+                    <th class="border-0 text-muted fw-normal py-3" style="font-size: 0.85rem;">Concepto</th>
+                    <th class="border-0 text-muted fw-normal py-3 text-end" style="font-size: 0.85rem;">Monto</th>
+                    <th class="border-0 text-muted fw-normal py-3 pe-4" style="font-size: 0.85rem;">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="pago in (paciente.pagos_historial || [])" :key="pago.payment_id" style="border-bottom: 1px solid #f8f9fa;">
+                    <td class="align-middle py-3 ps-4"><span class="text-dark">{{ formatOnlyDate(pago.date) }}</span></td>
+                    <td class="align-middle py-3 fw-bold text-dark">{{ pago.concepto || 'Consulta' }}</td>
+                    <td class="align-middle py-3 text-end text-dark">S/ {{ pago.monto ? parseFloat(pago.monto).toFixed(2) : '0.00' }}</td>
+                    <td class="align-middle py-3 pe-4">
+                      <span v-if="pago.estado == 2 || pago.estado == null" class="badge rounded-pill px-3 py-2" style="background-color: #d1fae5; color: #065f46;"><i class="fas fa-check-circle me-1"></i> Pagado</span>
+                      <span v-else-if="pago.estado == 1" class="badge rounded-pill px-3 py-2" style="background-color: #fef3c7; color: #92400e;"><i class="fas fa-clock me-1"></i> Sin pagar</span>
+                      <span v-else class="badge rounded-pill px-3 py-2" style="background-color: #fef3c7; color: #92400e;"><i class="fas fa-clock me-1"></i> Pendiente</span>
+                    </td>
+                  </tr>
+                  <tr v-if="!paciente.pagos_historial || paciente.pagos_historial.length === 0">
+                    <td colspan="4" class="text-center text-muted py-5"><i class="far fa-folder-open mb-2 d-block" style="font-size: 2rem; opacity: 0.3;"></i>No hay historial de pagos registrado.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div> <!-- End Tab Content -->
 
 		<!-- Modal de examenes -->
@@ -791,7 +1254,7 @@
 		<ModalVerEstados :dataPatient="datosPaciente" :estados="estados"></ModalVerEstados>
 		<ModalVerHobbies :hobbies="hobbies" :id="datosConsulta.id" :misHobbies="misHobbies" ></ModalVerHobbies>
 		<ModalComentarios :comentarios="comentarios" :idProfesional="dataUser.id" @refrescarComentarios="updateComentarios" ></ModalComentarios>
-		<ModalProximaCita :profesional="dataUser" :paciente="datosPaciente"></ModalProximaCita>
+		<ModalProximaCita :profesional="[dataUser]" :paciente="datosPaciente"></ModalProximaCita>
 		<ModalArchivos :idPaciente="datosConsulta.id" :idProfesional="dataUser.id" ></ModalArchivos>
 		<ModalNuevoAcontecimiento :idPaciente="datosConsulta.id" :idProfesional="dataUser.id"></ModalNuevoAcontecimiento>
 		<evolution-modal :dataUser="dataUser.profession" :datosIdEvolucion="datosIdEvolucion" ></evolution-modal>
@@ -799,6 +1262,9 @@
 		<ModalAgendarCita :profesional="dataUser" :paciente="datosPaciente"></ModalAgendarCita>
 		
 	</div>
+
+
+
 </template>
 
 <script>
@@ -829,10 +1295,33 @@ import nutricionHome from '../nutricion/HomeNutricion.vue'
 export default {
 	name: 'evolucionPaciente',
 
-	components: { updatedModal, ExamResult, ExamTable, editModal, modalVerDetalle, ModalVerTriajesViejos, ModalEditarPariente, ModalVerEstados, ModalEditarPaciente, ModalVerHobbies, BarChart, ModalComentarios, ModalProximaCita, ModalArchivos, ModalNuevoAcontecimiento, lineaTiempo, EvolutionModal, modalNuevoSeguimiento, nutricionHome, ModalAgendarCita },
+	
+  watch: {
+    datosPaciente: {
+      handler() {
+        this.buildTimeline();
+      },
+      deep: true
+    }
+  },
+components: { updatedModal, ExamResult, ExamTable, editModal, modalVerDetalle, ModalVerTriajesViejos, ModalEditarPariente, ModalVerEstados, ModalEditarPaciente, ModalVerHobbies, BarChart, ModalComentarios, ModalProximaCita, ModalArchivos, ModalNuevoAcontecimiento, lineaTiempo, EvolutionModal, modalNuevoSeguimiento, nutricionHome, ModalAgendarCita },
 
 	data() {
 		return {
+      rolUser: 'profesional',
+      
+      filtroDocumento: 'Todos',
+      documentoModal: { type: 'DNI', file: null, name: '' },
+      documentFile: null,
+      triajeSeleccionado: null,
+      timelineActivity: [],
+      nuevaFicha: { tipo: 'Consulta', frecuencia: 'Quincenal', motivo: '', recomendaciones: [], professional_id: '', interconsultas: [] },
+      fichaView: 'lista',
+      fichaSeleccionada: null,
+      tempInterconsulta: { specialty: '', professional: '', reason: '' },
+      profesionales: [],
+      pacienteId: this.$route.params.idPaciente,
+
             ordenesMedicas: [],
             pruebaSeleccionada: null,
             allExams: {
@@ -853,6 +1342,7 @@ export default {
                 srq: { name: 'SRQ-18', value: [] },
 			},
 			activeTab: 'historial',
+			activePill: 'recetas',
 			autoSaveInfo: '', profesionalesTodos:[],
 			datosConsulta: { triajes:[], examenes_basicos:[], examenes_personalizados:{burns:[], gads:[], scrs:[], zung_anxieties :[], zung_depressions :[]} },
 			evolucionPsiquiatria: [1,2,3,4,5,6,16,17], //Ver tabla de precios, son los IDs
@@ -975,6 +1465,252 @@ export default {
 
 	methods: {
 
+    rolUserDefault() { return 'profesional'; },
+    getStatusName(s) {
+      let status = s;
+      let isAtendido = false;
+      if (s && typeof s === 'object') {
+        status = s.status;
+        isAtendido = s.attention_status === 'atendido';
+      }
+      if (isAtendido) return 'Atendido';
+      if(status==1) return 'Sin confirmar';
+      if(status==2) return 'Confirmado';
+      if(status==3) return 'Anulado';
+      if(status==4) return 'Reprogramado';
+      if(status==5) return 'Eliminado';
+      if(status==6) return 'Limbo';
+      return 'Otro';
+    },
+    getStatusBadge(s) {
+      let status = s;
+      let isAtendido = false;
+      if (s && typeof s === 'object') {
+        status = s.status;
+        isAtendido = s.attention_status === 'atendido';
+      }
+      if (isAtendido) return 'bg-success text-success';
+      if(status==1) return 'bg-warning text-warning';
+      if(status==2) return 'bg-primary text-primary';
+      if(status==3) return 'bg-danger text-danger';
+      if(status==4) return 'bg-info text-info';
+      if(status==5) return 'bg-danger text-danger';
+      if(status==6) return 'bg-secondary text-secondary';
+      return 'bg-secondary text-secondary';
+    },
+    getStatusStyle(s) {
+      let status = s;
+      if (s && typeof s === 'object') {
+        status = s.status;
+      }
+      if (status == 1) return 'background-color: #fef3c7; color: #92400e; font-weight: 500;';
+      if (status == 2) return 'background-color: #dbeafe; color: #1e40af; font-weight: 500;';
+      if (status == 3) return 'background-color: #fee2e2; color: #991b1b; font-weight: 500;';
+      if (status == 4) return 'background-color: #e0f2fe; color: #0369a1; font-weight: 500;';
+      if (status == 5) return 'background-color: #fee2e2; color: #991b1b; font-weight: 500;';
+      return 'background-color: #f3f4f6; color: #374151; font-weight: 500;';
+    },
+    formatOnlyDate(date) {
+      if(!date) return '';
+      if (typeof date === 'string') {
+        const parts = date.split(' ')[0].split('T')[0].split('-');
+        if (parts.length === 3) {
+          const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+          return `${parts[2]} ${monthNames[parseInt(parts[1])-1]} ${parts[0]}`;
+        }
+      }
+      return date;
+    },
+    formatOnlyTime(timeStr) {
+      if(!timeStr) return '';
+      if (typeof timeStr === 'string' && timeStr.includes(':')) {
+        let parts = timeStr.split(' ');
+        let timePart = parts[0];
+        if (timeStr.includes('T')) {
+           timePart = timeStr.split('T')[1].split('.')[0];
+        }
+        let tParts = timePart.split(':');
+        let hours = parseInt(tParts[0]);
+        let minutes = tParts[1];
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        return `${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+      }
+      return '';
+    },
+    getProfessionalName(id) {
+      const p = this.professionalsList ? this.professionalsList.find(x => x.id == id) : null;
+      return p ? p.name : '--';
+    },
+    isSelectedRecomendacion(val) {
+      if (!this.nuevaFicha || !this.nuevaFicha.recomendaciones) return false;
+      return this.nuevaFicha.recomendaciones.includes(val);
+    },
+    verPlanSeguridad(plan) {
+      this.planSeguridadSeleccionado = plan;
+    },
+    abrirNuevoPlan() {
+      this.nuevoPlanSeguridad = {
+        senales_advertencia: '', estrategias: '', personas_dis: '',
+        personas_ayuda: '', razones_vivir: '', medidas: '', contactos_emergencia: ''
+      };
+    },
+    sumarArray(arr) {
+      if (!arr) return 0;
+      const values = Object.values(arr);
+      return values.reduce((sum, val) => sum + parseInt(val || 0, 10), 0);
+    },
+
+
+    buildTimeline() {
+      let activities = [];
+      if (this.paciente.appointments) {
+        this.paciente.appointments.forEach(appt => {
+          activities.push({
+            date: appt.created_at,
+            type: 'Cita Agendada',
+            desc: `Cita agendada para el ${this.formatDate(appt.date)} a las ${appt.start_time}`,
+            icon: 'fa-calendar-plus',
+            color: 'primary'
+          });
+        });
+      }
+      if (this.paciente.medical_evolutions) {
+        this.paciente.medical_evolutions.forEach(evo => {
+          activities.push({
+            date: evo.created_at,
+            type: 'Evolución Médica',
+            desc: evo.descripcion ? (evo.descripcion.substring(0,50) + '...') : 'Evolución registrada',
+            profesional: evo.professional ? evo.professional.name : '',
+            icon: 'fa-stethoscope',
+            color: 'success'
+          });
+        });
+      }
+      if (this.paciente.prescriptions) {
+        this.paciente.prescriptions.forEach(pres => {
+          activities.push({
+            date: pres.created_at,
+            type: 'Receta Emitida',
+            desc: `Receta emitida por ${pres.professional ? pres.professional.name : ''}`,
+            icon: 'fa-prescription',
+            color: 'info'
+          });
+        });
+      }
+      activities.sort((a, b) => new Date(b.date) - new Date(a.date));
+      this.timelineActivity = activities;
+    },
+    formatDateTime(date, time) {
+      if (!date || !time) return '';
+      return `${date} ${time}`;
+    },
+
+    subirNuevoDocumento() {
+      if (!this.documentFile) return;
+      const formData = new FormData();
+      formData.append('document', this.documentFile);
+      formData.append('type', this.documentoModal.type);
+      formData.append('name', this.documentoModal.name || this.documentoModal.type);
+      formData.append('patient_id', this.pacienteId);
+
+      this.axios.post('/api/patient-documents', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }).then(response => {
+        this.$swal.fire('Éxito', 'Documento subido correctamente', 'success');
+        this.documentFile = null;
+        this.documentoModal.name = '';
+        $('#modalUploadDocument').modal('hide');
+        this.axios.get('/api/patientById/'+this.$route.params.idPaciente).then(res => {
+          this.datosPaciente = res.data;
+        });
+      }).catch(error => {
+        this.$swal.fire('Error', 'Hubo un problema al subir el documento', 'error');
+      });
+    },
+    handleFileUpload(event) {
+      this.documentFile = event.target.files[0];
+    },
+    descargarDocumento(doc) {
+      window.open(`/api/patient-documents/${doc.id}/download?token=${this.$token}`, '_blank');
+    },
+    eliminarDocumento(id) {
+      this.$swal.fire({
+        title: '¿Eliminar documento?',
+        text: "Esta acción no se puede deshacer",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.axios.delete(`/api/patient-documents/${id}`).then(() => {
+            this.$swal.fire('Eliminado', 'El documento ha sido eliminado.', 'success');
+            this.axios.get('/api/patientById/'+this.$route.params.idPaciente).then(res => {
+              this.datosPaciente = res.data;
+            });
+          });
+        }
+      });
+    },
+    verAutoTriaje(triaje) {
+      this.triajeSeleccionado = triaje;
+      $('#modalVerAutoTriaje').modal('show');
+    },
+    verFicha(ficha) {
+      this.fichaSeleccionada = ficha;
+      $('#modalFichaSeguimiento').modal('show');
+    },
+    crearNuevaFicha() {
+      // Basic post for creating ficha
+      const data = {
+          patient_id: this.pacienteId,
+          professional_id: this.nuevaFicha.professional_id,
+          tipo: this.nuevaFicha.tipo,
+          frecuencia: this.nuevaFicha.frecuencia,
+          motivo: this.nuevaFicha.motivo,
+          recomendaciones: JSON.stringify(this.nuevaFicha.recomendaciones),
+          interconsultas: this.nuevaFicha.interconsultas
+      };
+      this.axios.post('/api/fichas-seguimiento', data).then(() => {
+        this.$swal.fire('Éxito', 'Ficha creada correctamente', 'success');
+        this.fichaView = 'lista';
+        this.axios.get('/api/patientById/'+this.$route.params.idPaciente).then(res => {
+            this.datosPaciente = res.data;
+        });
+      }).catch(err => {
+        this.$swal.fire('Error', 'No se pudo crear la ficha', 'error');
+      });
+    },
+    toggleRecomendacion(val) {
+      const idx = this.nuevaFicha.recomendaciones.indexOf(val);
+      if (idx > -1) {
+        this.nuevaFicha.recomendaciones.splice(idx, 1);
+      } else {
+        this.nuevaFicha.recomendaciones.push(val);
+      }
+    },
+    hasRecomendacion(val) {
+      return this.nuevaFicha.recomendaciones.includes(val);
+    },
+    addInterconsulta() {
+      this.nuevaFicha.interconsultas.push({ ...this.tempInterconsulta });
+      this.tempInterconsulta = { specialty: '', professional: '', reason: '' };
+    },
+    removeInterconsulta(idx) {
+      this.nuevaFicha.interconsultas.splice(idx, 1);
+    },
+    getPaymentMethodName(id) {
+        const methods = {
+            1: 'Efectivo', 2: 'Tarjeta de Crédito', 3: 'Tarjeta de Débito',
+            4: 'Transferencia', 5: 'Yape', 6: 'Plin', 7: 'Otro'
+        };
+        return methods[id] || 'Desconocido';
+    },
+
+
     // Add these methods inside methods: block
     formatDate(dateStr) {
       if (!dateStr) return '';
@@ -983,6 +1719,26 @@ export default {
     },
     formatOnlyDate(dateStr) {
       return this.formatDate(dateStr);
+    },
+    formatDateWithTime(dateStr) {
+      if(!dateStr) return '';
+      let d;
+      if (typeof dateStr === 'string' && !dateStr.includes('T') && dateStr.includes(' ')) {
+        d = new Date(dateStr.replace(' ', 'T'));
+      } else {
+        d = new Date(dateStr);
+      }
+      if (isNaN(d.getTime())) return dateStr;
+      const day = d.getDate().toString().padStart(2, '0');
+      const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+      const month = monthNames[d.getMonth()];
+      const year = d.getFullYear();
+      let hours = d.getHours();
+      const minutes = d.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; 
+      return `${day} ${month} ${year} - ${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
     },
     irAPrueba(ruta) {
       // Abre en nueva pestana o usa router
@@ -1157,6 +1913,15 @@ export default {
 					name: this.datosConsulta.name,
 					semaforo: res.data
 				}
+			})
+
+			// Cargar datos completos del paciente para los nuevos tabs (Citas, Triaje, Finanzas, etc.)
+			this.axios.get(`/api/patient/${this.$route.params.idPaciente}/full-details`)
+			.then(res => {
+				this.datosPaciente = Object.assign({}, this.datosPaciente, res.data);
+			})
+			.catch(err => {
+				console.error('Error al cargar detalles del paciente:', err);
 			})
 			this.axios.get('/api/profesional')
 			.then(res=> this.profesionalesTodos= res.data)
@@ -1568,6 +2333,66 @@ export default {
 	},
 
 	computed: {
+
+    documentosFiltrados() {
+      if (!this.paciente.documents) return [];
+      let docs = this.paciente.documents;
+      if (this.filtroDocumento !== 'Todos') {
+        docs = docs.filter(d => d.type === this.filtroDocumento);
+      }
+      return docs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    },
+
+    faltasCitas() {
+      if (!this.paciente.appointments) return [];
+      return this.paciente.appointments.filter(cita => cita.status == 3 || cita.status == 6);
+    },
+    reprogramacionesCitas() {
+      if (!this.paciente.appointments) return [];
+      return this.paciente.appointments.filter(cita => cita.status == 4);
+    },
+
+
+    proximaCita() {
+      if (!this.paciente.appointments) return null;
+      const futureAppointments = this.paciente.appointments.filter(
+        appt => new Date(appt.date) >= new Date()
+      );
+      if (futureAppointments.length === 0) return null;
+      return futureAppointments.sort((a, b) => new Date(a.date) - new Date(b.date))[0];
+    },
+    ultimaEvolucion() {
+      if (!this.paciente.medical_evolutions || this.paciente.medical_evolutions.length === 0) return null;
+      return [...this.paciente.medical_evolutions].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+    },
+    allTests() {
+      let combined = [];
+      if (this.paciente.scrs) combined = combined.concat(this.paciente.scrs.map(t => ({...t, typeName: 'SCL90R', path:'/api/src/'})));
+      if (this.paciente.burns) combined = combined.concat(this.paciente.burns.map(t => ({...t, typeName: 'ANSIEDAD DE BURNS', path:'/api/burns/'})));
+      if (this.paciente.millons) combined = combined.concat(this.paciente.millons.map(t => ({...t, typeName: 'MILLON', path:'/api/millon/'})));
+      if (this.paciente.zung_depressions) combined = combined.concat(this.paciente.zung_depressions.map(t => ({...t, typeName: 'DEPRESIÓN DE ZUNG', path:'/api/zungDep/'})));
+      if (this.paciente.zung_anxieties) combined = combined.concat(this.paciente.zung_anxieties.map(t => ({...t, typeName: 'ANSIEDAD DE ZUNG', path:'/api/zungAns/'})));
+      if (this.paciente.phqs) combined = combined.concat(this.paciente.phqs.map(t => ({...t, typeName: 'PHQ-9', path:'/api/phq/'})));
+      if (this.paciente.gads) combined = combined.concat(this.paciente.gads.map(t => ({...t, typeName: 'GAD-7', path:'/api/gad/'})));
+      if (this.paciente.bdis) combined = combined.concat(this.paciente.bdis.map(t => ({...t, typeName: 'BDI-2', path:'/api/bdi/'})));
+      if (this.paciente.mcmis) combined = combined.concat(this.paciente.mcmis.map(t => ({...t, typeName: 'MCMI-II', path:'/api/mcmi/'})));
+      if (this.paciente.barons) combined = combined.concat(this.paciente.barons.map(t => ({...t, typeName: 'BARON', path:'/api/baron/'})));
+      if (this.paciente.eysenckas) combined = combined.concat(this.paciente.eysenckas.map(t => ({...t, typeName: 'EYSENCK-A', path:'/api/eysencka/'})));
+      if (this.paciente.eysenckbs) combined = combined.concat(this.paciente.eysenckbs.map(t => ({...t, typeName: 'EYSENCK-B', path:'/api/eysenckb/'})));
+      if (this.paciente.phq15s) combined = combined.concat(this.paciente.phq15s.map(t => ({...t, typeName: 'PHQ-15', path:'/api/phq15/'})));
+      if (this.paciente.mdqs) combined = combined.concat(this.paciente.mdqs.map(t => ({...t, typeName: 'MDQ', path:'/api/mdq/'})));
+      if (this.paciente.srqs) combined = combined.concat(this.paciente.srqs.map(t => ({...t, typeName: 'SRQ-18', path:'/api/srq/'})));
+      return combined.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    },
+    recetasOrdenadas() {
+      if (!this.paciente.prescriptions) return [];
+      return [...this.paciente.prescriptions].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    },
+
+    paciente() {
+      return this.datosPaciente;
+    },
+
 		updatedValues() {
 			return this.dataUser.profession === 'Psiquiatra' ? this.rol = 'Psiquiatra' : this.rol = 'Psicólogo'
 		},
@@ -1763,3 +2588,8 @@ h4 {
 	}
 }
 </style>
+      
+      
+      
+      
+

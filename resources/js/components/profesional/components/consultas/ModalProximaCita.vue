@@ -14,7 +14,7 @@
 						<option v-for="prof in profesional" :value="prof.id">{{ prof.nombre }}</option>
 					</select>
 					<p class="my-2"><strong>Paciente:</strong> </p>
-					<p class="my-2"><span class="text-capitalize">{{paciente.name.toLowerCase()}}</span></p>
+					<p class="my-2"><span class="text-capitalize">{{paciente && paciente.name ? paciente.name.toLowerCase() : ''}}</span></p>
 					
 					<label for="">Tipo de servicio</label>
 					<select class="form-select" id="sltPreciosv2" v-model="cita.idServicio">
@@ -185,6 +185,7 @@ export default{
 		},
 		tipoMembresia(){
 			let membresia = this.membresia
+			if(!membresia) return null
 			if(membresia.meses > 0 ) return 'tiempo'
 			if(membresia.sesiones > 0) return 'sesiones'
 		},
